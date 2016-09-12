@@ -171,8 +171,9 @@ public abstract class DataManager {
 		else
 			cvManager = SpringHandler.getInstance().getCVManager();
 		this.dataManagers = dataManagers;
-		if (filters != null)
+		if (filters != null) {
 			setFilters(filters);
+		}
 		DataManager.minPeptideLength = minPeptideLength;
 		// this.sortingProteins = sortingProteins;
 		// this.sortingPeptides = sortingPeptides;
@@ -218,13 +219,15 @@ public abstract class DataManager {
 		}
 		boolean replicate = false;
 		for (DataManager dataManager : dmgs) {
-			if (dataManager instanceof ReplicateDataManager)
+			if (dataManager instanceof ReplicateDataManager) {
 				replicate = true;
-			else if (replicate)
+			} else if (replicate) {
 				throw new IllegalMiapeArgumentException(
 						"Datamanagers for " + idSet.getName() + " are from different sources");
-			if (dataManager instanceof ExperimentListDataManager)
+			}
+			if (dataManager instanceof ExperimentListDataManager) {
 				throw new IllegalMiapeArgumentException("ExperimentListDatamanagers cannot be collected!");
+			}
 		}
 		return replicate;
 	}
