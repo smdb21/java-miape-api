@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="SpectrumList">
+		<xs:annotation>
+			<xs:documentation>List of spectrum</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Spectrum" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="peptide_sequence" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Spectrum">
+		<xs:annotation>
+			<xs:documentation>Information about an spectrum</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="mzArray" type="peakListBinaryType" minOccurs="1" maxOccurs="1" />
+				<xs:element name="intensityArray" type="peakListBinaryType" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="precursor" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="spectrumFileURL" type="xs:string" use="required"/>
+			<xs:attribute name="spectrumRefInFile" type="xs:int" use="required"/>
+			<xs:attribute name="spectrumFileType" type="xs:string" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="peptideID" type="xs:long" use="required"/>
+			<xs:attribute name="miapeMS" type="xs:long" use="required"/>
+			<xs:attribute name="miapeMSI" type="xs:long" use="required"/>
+		</xs:complexType>
+		
+	</xs:element>
+	<xs:element name="precursor">
+		<xs:annotation>
+			<xs:documentation>Information about the precursor of a spectrum</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="mz" type="xs:double" use="required"/>
+			<xs:attribute name="intensity" type="xs:string" use="required"/>
+			<xs:attribute name="massType" type="xs:string"/>
+			<xs:attribute name="charge" type="xs:int"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="peakListBinaryType">
+		<xs:annotation>
+			<xs:documentation>Extension of binary data group for m/z and intensity values</xs:documentation>
+		</xs:annotation>
+		<xs:group ref="binaryDataGroup"/>
+	</xs:complexType>
+	<xs:group name="binaryDataGroup">
+		<xs:annotation>
+			<xs:documentation>The structure into which base64-encoded binary data go</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="data">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:base64Binary">
+							<xs:attribute name="precision" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="32"/>
+										<xs:enumeration value="64"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="endian" use="required">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="big"/>
+										<xs:enumeration value="little"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:attribute>
+							<xs:attribute name="length" type="xs:int" use="required"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+</xs:schema>

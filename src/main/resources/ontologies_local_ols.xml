@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="FILE">
+  <!--  PARA CARGAR EL OBO LOCAL, HAY QUE PONER classpath: y el nombre del fichero en el classpath -->
+   
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="http://ebi-pride.googlecode.com/svn/trunk/pride-core/schema/pride_cv.obo"
+              format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.0"/>
+  
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="http://psidev.cvs.sourceforge.net/psidev/psi/mod/data/PSI-MOD.obo"
+              format="OBO" name="PSI-MOD" identifier="MOD" version="1.260"/>
+  
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="http://obo.cvs.sourceforge.net/viewvc/obo/obo/ontology/genomic-proteomic/protein/psi-ms.obo"
+              format="OBO" name="PSI Mass Spectrometry Ontology" identifier="MS" version="1.42"/>
+  
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="http://gelml.googlecode.com/svn/trunk/CV/sep.obo"              
+              format="OBO" name="Separation methods" identifier="SEP" version="1.0"/>
+
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri="http://obo.cvs.sourceforge.net/obo/obo/ontology/chemical/chebi.obo"              
+              format="OBO" name="Chemical Entities of Biological Interest" identifier="CHEBI" version="80"/>    
+</cvSourceList>
+
+
+        

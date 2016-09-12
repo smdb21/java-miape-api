@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="FILE">
+  <!--  PARA CARGAR EL OBO LOCAL, HAY QUE PONER classpath: y el nombre del fichero en el classpath -->
+   
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri="classpath:psi-ms.obo"
+              format="OBO" name="PSI Mass Spectrometry Ontology" identifier="MS" version="1.42"/>
+  
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.ols.OlsOntology"
+              uri="classpath:pride_cv.obo"
+              format="OBO" name="PSI Mass Spectrometry Ontology" identifier="PRIDE" version="1.0"/>
+
+</cvSourceList>
+
+
+        

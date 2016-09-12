@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by Salva (Centro Nacional de Biotecnología, CSIC) -->
+<!--
+		edited with Eclipse 20090920-1017 by Salvador Martínez-Bartolomé
+		(ProteoRed - National Center for Biotechnology - CSIC - Spain)
+	-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:include schemaLocation="MIAPE_XML_v1.0.7.xsd"/>
+	<xs:include schemaLocation="MIAPE_PROJECT_XML_v1.0.xsd"/>
+	<xs:include schemaLocation="FuGElightv1.0.0.xsd"/>
+	<xs:element name="MS_ActivationDissociation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string"/>
+				<xs:element name="Gas" type="ParamType" minOccurs="0"/>
+				<xs:element name="Pressure" type="MIAPE_ParamUnit_Type" minOccurs="0"/>
+				<xs:element name="ActivationType" type="ParamType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_Acquisition">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="MIAPE_Software_Type">
+					<xs:sequence>
+						<xs:element name="Parameter_File" type="xs:anyURI" minOccurs="0"/>
+						<xs:element name="TransitionList_File" type="xs:anyURI" minOccurs="0"/>
+						<xs:element name="TargetList" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_Other_IonSource">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="ParamType"/>
+				<xs:element name="Parameters" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_ESI">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="ParamType"/>
+				<xs:element name="Supply_Type" type="ParamType" minOccurs="0"/>
+				<xs:element name="Oparameters" type="xs:string" minOccurs="0"/>
+				<xs:element name="MS_Interface" type="MIAPE_Equipment_Type" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="MS_Sprayer" type="MIAPE_Equipment_Type" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_Analyzer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="ParamType" />
+				<xs:element name="Description"  type="xs:string" minOccurs="0"/>
+				<xs:element name="Reflectron" type="ParamType" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_MALDI">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string"/>
+				<xs:element name="Plate_Type" type="xs:string" minOccurs="0"/>
+				<xs:element name="Matrix" type="xs:string" minOccurs="0"/>
+				<xs:element name="Dissociation" type="ParamType" minOccurs="0"/>
+				<xs:element name="Dissociation_Summary" type="xs:string" minOccurs="0"/>
+				<xs:element name="Extraction" type="xs:string" minOccurs="0"/>
+				<xs:element name="Laser" type="ParamType" minOccurs="0"/>
+				<xs:element name="WaveLength" type="xs:string" minOccurs="0"/>
+				<xs:element name="Oparameters" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_MIAPE_MS">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MIAPEProject" minOccurs="1" maxOccurs="1"/>
+				<xs:element name="Name" type="xs:string"/>
+				<xs:element name="Version" type="xs:string" minOccurs="0"/>
+				<xs:element name="Date" type="xs:string" minOccurs="0"/>
+				<xs:element name="Modification_Date" type="xs:dateTime" minOccurs="0"/>
+				<xs:element name="Resolution" type="xs:string" minOccurs="0"/>
+				<xs:element name="Accuracy" type="xs:string" minOccurs="0"/>
+				<xs:element name="AttachedFileLocation" type="xs:anyURI" minOccurs="0"/>
+				<xs:element name="Template" type="xs:boolean" minOccurs="0"/>
+				<xs:element name="MS_Contact" type="MIAPE_Contact_Type" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="MS_Spectrometer" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_Instrument_Configuration" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_Acquisition" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_DataAnalysis" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_Resulting_Data" minOccurs="0" maxOccurs="unbounded"/>
+				<!-- <xs:element ref="MS_Quantitation" minOccurs="0"
+					maxOccurs="unbounded" /> -->
+				<xs:element name="MS_Additional_Information" type="ParamType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:int" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_DataAnalysis">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="MIAPE_Software_Type">
+					<xs:sequence>
+						<xs:element name="Parameters_Location" type="xs:anyURI" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_Instrument_Configuration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string"/>
+				<xs:element ref="MS_ESI" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_MALDI" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_Other_IonSource" minOccurs="0" maxOccurs="unbounded"/>
+				<!-- 				<xs:element maxOccurs="unbounded" minOccurs="0" ref="MS_Ion_Optic"/> -->
+				<xs:element ref="MS_Analyzer" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="MS_ActivationDissociation" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- 	<xs:element name="MS_Quantitation"> -->
+	<!-- 		<xs:complexType> -->
+	<!-- 			<xs:sequence> -->
+	<!-- 				<xs:element name="Name" type="xs:string"/> -->
+	<!-- 				<xs:element minOccurs="0" name="Data_URL" type="xs:anyURI"/> -->
+	<!-- 				<xs:element minOccurs="0" name="Protocol" type="xs:string"/> -->
+	<!-- 				<xs:element minOccurs="0" name="Sample_Number" type="xs:string"/> -->
+	<!-- 				<xs:element minOccurs="0" name="Approach" type="xs:string"/> -->
+	<!-- 				<xs:element minOccurs="0" name="Normalization" type="xs:string"/> -->
+	<!-- 				<xs:element minOccurs="0" name="File_Type" type="xs:string"/> -->
+	<!-- 				<xs:element maxOccurs="unbounded" minOccurs="0" name="MS_Quantitation_Software" type="MIAPE_Software_Type"/> -->
+	<!-- 			</xs:sequence> -->
+	<!-- 		</xs:complexType> -->
+	<!-- 	</xs:element> -->
+	<xs:element name="MS_Resulting_Data">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string"/>
+				<xs:element name="DataFile_URL" type="xs:anyURI" minOccurs="0"/>
+				<xs:element name="DataFile_Type" type="ParamType" minOccurs="0"/>
+				<xs:element name="Additional_URL" type="xs:anyURI" minOccurs="0"/>
+				<xs:element name="SRM_URL" type="xs:anyURI" minOccurs="0"/>
+				<xs:element name="SRM_Type" type="ParamType" minOccurs="0"/>
+				<xs:element name="SRM_Descriptor" type="xs:string" minOccurs="0"/>
+				<!--  <xs:element ref="MS_Spectrum_Description" minOccurs="0"
+					maxOccurs="unbounded" />-->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="MS_Spectrometer">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="MIAPE_Equipment_Type">
+					<xs:sequence>
+						<xs:element name="Customizations" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!-- <xs:element name="MS_Spectrum_Description">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Name" type="xs:string" />
+				<xs:element name="Ion_Mode" type="ParamType" minOccurs="0" />
+				<xs:element name="MS_Level" type="xs:string" minOccurs="0"/>
+				<xs:element name="Precursor_charge" type="xs:string" minOccurs="0"/>
+				<xs:element name="Precursor_mz" type="xs:string" minOccurs="0"/>
+				<xs:element name="FullSpectrum_URL" type="xs:anyURI" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>-->
+	<!-- 	<xs:element name="MS_Ion_Optic"> -->
+	<!-- 		<xs:complexType> -->
+	<!-- 			<xs:all> -->
+	<!-- 				<xs:element name="Name" type="ParamType"/> -->
+	<!-- 			</xs:all> -->
+	<!-- 		</xs:complexType> -->
+	<!-- 	</xs:element> -->
+</xs:schema>

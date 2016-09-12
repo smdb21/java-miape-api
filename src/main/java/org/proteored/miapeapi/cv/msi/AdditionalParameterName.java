@@ -1,0 +1,170 @@
+package org.proteored.miapeapi.cv.msi;
+
+import org.proteored.miapeapi.cv.Accession;
+import org.proteored.miapeapi.cv.ControlVocabularyManager;
+import org.proteored.miapeapi.cv.ControlVocabularySet;
+
+public class AdditionalParameterName extends ControlVocabularySet {
+	/*
+	 * SEARCH_ENGINE_SPECIFIC_INPUT_PARAMETER("MS:1001302",
+	 * "search engine specific input parameter"),
+	 * SEQUEST_SORT_BY_RSP("MS:1001059", "sequest:sort_by_RSp"),
+	 * PROTEINEXTRACTOR_USEPHENYX("MS:1001443", "ProteinExtractor:UsePhenyx"),
+	 * PROTEINEXTRACTOR_PROTEINSOLVERWEIGHTING("MS:1001442",
+	 * "ProteinExtractor:ProteinSolverWeighting"),
+	 * PROTEINEXTRACTOR_PROTEINSOLVERUNIQUESCORE("MS:1001441",
+	 * "ProteinExtractor:ProteinSolverUniqueScore"),
+	 * PROTEINEXTRACTOR_PROTEINSOLVERPEPTIDESCORETHRESHOLD("MS:1001440",
+	 * "ProteinExtractor:ProteinSolverPeptideScoreThreshold"),
+	 * PROTEINEXTRACTOR_USESEQUEST("MS:1001435", "ProteinExtractor:UseSequest"),
+	 * PROTEINEXTRACTOR_SEQUESTPEPTIDESCORETHRESHOLD("MS:1001436",
+	 * "ProteinExtractor:SequestPeptideScoreThreshold"),
+	 * PROTEINEXTRACTOR_MASCOTUSEIDENTITYSCORE("MS:1001433",
+	 * "ProteinExtractor:MascotUseIdentityScore"),
+	 * PROTEINEXTRACTOR_MASCOTWEIGHTING("MS:1001434",
+	 * "ProteinExtractor:MascotWeighting"),
+	 * PROTEINEXTRACTOR_USEPROTEINSOLVER("MS:1001439",
+	 * "ProteinExtractor:UseProteinSolver"),
+	 * PROTEINEXTRACTOR_SEQUESTUNIQUESCORE("MS:1001437",
+	 * "ProteinExtractor:SequestUniqueScore"),
+	 * PROTEINEXTRACTOR_SEQUESTWEIGHTING("MS:1001438",
+	 * "ProteinExtractor:SequestWeighting"), SEQUEST_SORT_BY_TIC("MS:1001069",
+	 * "sequest:sort_by_TIC"), SEQUEST_SORT_BY_SP("MS:1001068",
+	 * "sequest:sort_by_Sp"), SEQUEST_PROCESSALL("MS:1001095",
+	 * "sequest:ProcessAll"), SEQUEST_TOPPERCENTMOSTINTENSE("MS:1001096",
+	 * "sequest:TopPercentMostIntense"), SEQUEST_SORT_BY_IONS("MS:1001048",
+	 * "sequest:sort_by_Ions"), SEQUEST_SORT_BY_MH("MS:1001049",
+	 * "sequest:sort_by_MH+"), MASCOT_INCLUDEERRORTOLERANTMATCHES("MS:1001324",
+	 * "mascot:IncludeErrorTolerantMatches"),
+	 * MASCOT_USEUNIGENECLUSTERING("MS:1001323", "mascot:UseUnigeneClustering"),
+	 * MASCOT_SHOWDECOYMATCHES("MS:1001325", "mascot:ShowDecoyMatches"),
+	 * SEQUEST_OUTPUTLINES("MS:1001007", "sequest:OutputLines"),
+	 * SEQUEST_CHROMATOGRAM("MS:1001102", "sequest:Chromatogram"),
+	 * SEQUEST_VIEWCV("MS:1001006", "sequest:ViewCV"),
+	 * SEQUEST_CLEAVESAT("MS:1001005", "sequest:CleavesAt"),
+	 * PROTEINEXTRACTOR_USEMASCOT("MS:1001430", "ProteinExtractor:UseMascot"),
+	 * PROTEINEXTRACTOR_MASCOTUNIQUESCORE("MS:1001432",
+	 * "ProteinExtractor:MascotUniqueScore"),
+	 * SEQUEST_DESCRIPTIONLINES("MS:1001009", "sequest:DescriptionLines"),
+	 * PROTEINEXTRACTOR_MASCOTPEPTIDESCORETHRESHOLD("MS:1001431",
+	 * "ProteinExtractor:MascotPeptideScoreThreshold"),
+	 * SEQUEST_SORT_BY_Z("MS:1001094", "sequest:sort_by_z"),
+	 * PROTEINEXTRACTOR_METHODNAME("MS:1001424", "ProteinExtractor:Methodname"),
+	 * PROTEINEXTRACTOR_GENERATENONREDUNDANT("MS:1001425",
+	 * "ProteinExtractor:GenerateNonRedundant"),
+	 * PROTEINEXTRACTOR_INCLUDEIDENTIFIED("MS:1001426",
+	 * "ProteinExtractor:IncludeIdentified"), SEQUEST_SORT_BY_P("MS:1001050",
+	 * "sequest:sort_by_P"), PROTEINEXTRACTOR_MAXNUMBEROFPROTEINS("MS:1001427",
+	 * "ProteinExtractor:MaxNumberOfProteins"),
+	 * PROTEINEXTRACTOR_MAXPROTEINMASS("MS:1001428",
+	 * "ProteinExtractor:MaxProteinMass"),
+	 * PROTEINEXTRACTOR_MINNUMBEROFPEPTIDES("MS:1001429",
+	 * "ProteinExtractor:MinNumberOfPeptides"),
+	 * SEQUEST_SORT_BY_REF("MS:1001053", "sequest:sort_by_Ref"),
+	 * SEQUEST_SORT_BY_PREVIOUSAMINOACID("MS:1001052",
+	 * "sequest:sort_by_PreviousAminoAcid"), SEQUEST_CONSENSUS("MS:1001038",
+	 * "sequest:Consensus"), SEQUEST_FULL("MS:1001111", "sequest:Full"),
+	 * MASCOT_PROTEINSCORINGMETHOD("MS:1001318", "mascot:ProteinScoringMethod"),
+	 * SEQUEST_SHOWFRAGMENTIONS("MS:1001037", "sequest:ShowFragmentIons"),
+	 * SEQUEST_MODECV("MS:1001110", "sequest:modeCV"),
+	 * MASCOT_MINMSMSTHRESHOLD("MS:1001319", "mascot:MinMSMSThreshold"),
+	 * MASCOT_SIGTHRESHOLD("MS:1001316", "mascot:SigThreshold"),
+	 * MASCOT_MAXPROTEINHITS("MS:1001317", "mascot:MaxProteinHits"),
+	 * SEQUEST_INFOANDLOG("MS:1001103", "sequest:InfoAndLog"),
+	 * SEQUEST_SELECTCV("MS:1001128", "sequest:selectCV"),
+	 * SEQUEST_SORT_BY_DCN("MS:1001046", "sequest:sort_by_dCn"),
+	 * SEQUEST_SORT_BY_DM("MS:1001047", "sequest:sort_by_dM"),
+	 * SEQUEST_TOPNUMBER("MS:1001106", "sequest:TopNumber"),
+	 * SEQUEST_FAST("MS:1001126", "sequest:Fast"),
+	 * MASCOT_REQUIREBOLDRED("MS:1001322", "mascot:RequireBoldRed"),
+	 * SEQUEST_SORTCV("MS:1001041", "sequest:sortCV"),
+	 * MASCOT_SHOWHOMOLOGOUSPROTEINSWITHSUBSETOFPEPTIDES("MS:1001321",
+	 * "mascot:ShowHomologousProteinsWithSubsetOfPeptides"),
+	 * SEQUEST_LIMITTO("MS:1001042", "sequest:LimitTo"),
+	 * SEQUEST_CULLTO("MS:1001109", "sequest:CullTo"),
+	 * MASCOT_SHOWHOMOLOGOUSPROTEINSWITHSAMEPEPTIDES("MS:1001320",
+	 * "mascot:ShowHomologousProteinsWithSamePeptides"),
+	 * PHENYX_DEFAULT_PARENT_CHARGE("MS:1001377",
+	 * "Phenyx:Default Parent Charge"), PHENYX_SCORING_MODEL("MS:1001376",
+	 * "Phenyx:Scoring Model"), PHENYX_INSTRUMENT_TYPE("MS:1001375",
+	 * "Phenyx:Instrument Type"), SEQUEST_PROCESSCV("MS:1001087",
+	 * "sequest:ProcessCV"), SEQUEST_SORT_BY_XCORR("MS:1001086",
+	 * "sequest:sort_by_XCorr"), PHENYX_TRUST_PARENT_CHARGE("MS:1001378",
+	 * "Phenyx:Trust Parent Charge"), PHENYX_TURBO("MS:1001379",
+	 * "Phenyx:Turbo"), SEQUEST_FORMATANDLINKS("MS:1001120",
+	 * "sequest:FormatAndLinks"), SEQUEST_SELECTDEFAULT("MS:1001144",
+	 * "sequest:SelectDefault"), SEQUEST_SEQUENCEHEADERFILTER("MS:1001028",
+	 * "sequest:SequenceHeaderFilter"),
+	 * SEQUEST_NORMALIZEXCORRVALUES("MS:1001026",
+	 * "sequest:NormalizeXCorrValues"),
+	 * TODOSEQUEST_SELECTADVANCEDCV("MS:1001145",
+	 * "TODOsequest:SelectAdvancedCV"), SEQUEST_SORT_BY_SF("MS:1001072",
+	 * "sequest:sort_by_Sf"), SEQUEST_SORT_BY_SEQUENCE("MS:1001071",
+	 * "sequest:sort_by_Sequence"), SEQUEST_SORT_BY_SCAN("MS:1001070",
+	 * "sequest:sort_by_Scan"), SEQUEST_SEQUENCEPARTIALFILTER("MS:1001032",
+	 * "sequest:SequencePartialFilter"), PHENYX_TURBO_ERRORTOL("MS:1001380",
+	 * "Phenyx:Turbo:ErrorTol"), OMSSA_E_VALUE_THRESHOLD("MS:1001449",
+	 * "OMSSA e-value threshold"), PHENYX_TURBO_SERIES("MS:1001382",
+	 * "Phenyx:Turbo:Series"), PHENYX_TURBO_COVERAGE("MS:1001381",
+	 * "Phenyx:Turbo:Coverage"), PHENYX_MINPEPZSCORE("MS:1001384",
+	 * "Phenyx:MinPepzscore"), PHENYX_MINPEPLENGTH("MS:1001383",
+	 * "Phenyx:MinPepLength"), PROTEINEXTRACTOR_PHENYXUNIQUESCORE("MS:1001445",
+	 * "ProteinExtractor:PhenyxUniqueScore"), PHENYX_AC_SCORE("MS:1001386",
+	 * "Phenyx:AC Score"),
+	 * PROTEINEXTRACTOR_PHENYXPEPTIDESCORETHRESHOLD("MS:1001444",
+	 * "ProteinExtractor:PhenyxPeptideScoreThreshold"),
+	 * PHENYX_MAXPEPPVALUE("MS:1001385", "Phenyx:MaxPepPvalue"),
+	 * PROTEINEXTRACTOR_PHENYXWEIGHTING("MS:1001446",
+	 * "ProteinExtractor:PhenyxWeighting"),
+	 * PHENYX_CONFLICT_RESOLUTION("MS:1001387", "Phenyx:Conflict Resolution"),
+	 * MINIMUM_NUMBER_OF_ENZYMATIC_TERMINI("MS:1001578",
+	 * "Minimum Number of Enzymatic Termini"),
+	 * SCAFFOLD__MINIMUM_PEPTIDE_PROBABILITY("MS:1001577",
+	 * "Scaffold: Minimum Peptide Probability"),
+	 * SCAFFOLD__MINIMUM_PROTEIN_PROBABILITY("MS:1001576",
+	 * "Scaffold: Minimum Protein Probability"),
+	 * SCAFFOLD__MINIMUM_PEPTIDE_COUNT("MS:1001575",
+	 * "Scaffold: Minimum Peptide Count"),
+	 * IONS_SERIES_CONSIDERED_IN_SEARCH("MS:1001066",
+	 * "ions series considered in search"), PARAM__X_ION("MS:1001261",
+	 * "param: x ion"), PARAM__W_ION("MS:1001260", "param: w ion"),
+	 * PARAM__Z_ION("MS:1001263", "param: z ion"), PARAM__Y_ION("MS:1001262",
+	 * "param: y ion"), PARAM__Y_ION_H2O("MS:1001152", "param: y ion-H2O"),
+	 * PARAM__A_ION_NH3("MS:1001146", "param: a ion-NH3"),
+	 * PARAM__Y_ION_NH3("MS:1001151", "param: y ion-NH3"),
+	 * PARAM__B_ION_H2O("MS:1001150", "param: b ion-H2O"),
+	 * PARAM__INTERNAL_YB_ION("MS:1001406", "param: internal yb ion"),
+	 * PARAM__INTERNAL_YA_ION("MS:1001407", "param: internal ya ion"),
+	 * PARAM__B_ION_NH3("MS:1001149", "param: b ion-NH3"),
+	 * PARAM__A_ION("MS:1001108", "param: a ion"), PARAM__B_ION("MS:1001118",
+	 * "param: b ion"), PARAM__C_ION("MS:1001119", "param: c ion"),
+	 * PARAM__A_ION_H2O("MS:1001148", "param: a ion-H2O"),
+	 * PARAM__V_ION("MS:1001257", "param: v ion"), PARAM__D_ION("MS:1001258",
+	 * "param: d ion"), PARAM__IMMONIUM_ION("MS:1001259",
+	 * "param: immonium ion"), PARAM__Z_1_ION("MS:1001408", "param: z+1 ion"),
+	 * PARAM__Z_2_ION("MS:1001409", "param: z+2 ion");
+	 */
+
+	public static final Accession PHENYX_SCORING_MODEL = new Accession("MS:1001376");
+	public static final Accession SEARCH_ENGINE_INPUT_PARAMETER = new Accession("MS:1002093");
+	public static final Accession ION_SERIES_CONSIDERED_IN_THE_SEARCH = new Accession("MS:1001066");
+	private static AdditionalParameterName instance;
+
+	public static AdditionalParameterName getInstance(ControlVocabularyManager cvManager) {
+		if (instance == null)
+			instance = new AdditionalParameterName(cvManager);
+		return instance;
+	}
+
+	private AdditionalParameterName(ControlVocabularyManager cvManager) {
+		super(cvManager);
+
+		String[] parentAccessionsTMP = { SEARCH_ENGINE_INPUT_PARAMETER.toString(),
+				ION_SERIES_CONSIDERED_IN_THE_SEARCH.toString() };
+		this.parentAccessions = parentAccessionsTMP;
+
+		this.miapeSection = 305;
+
+	}
+
+}

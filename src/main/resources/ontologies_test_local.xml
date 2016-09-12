@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvSourceList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="FILE">
+  <!--  To load a local obo file it is neccessary to add the prefix "classpath:" before to the name of the obo file -->
+   
+<!--  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology" -->
+<!--               uri="classpath:quality.obo" -->
+<!--               format="OBO" name="Quality Ontology" identifier="PATO" version="1.2"/> -->
+                
+<!--   <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology" -->
+<!--               uri="classpath:unit.obo" -->
+<!--               format="OBO" name="Unit Ontology" identifier="UO" version="1.2"/> -->
+              
+
+  
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:psi-ms.obo"
+              format="OBO" name="PSI Mass Spectrometry Ontology" identifier="MS" version="1.38"/>
+              
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:BrendaTissue.obo"              
+              format="OBO" name="BRENDA tissue / enzyme source" identifier="BTO" version="23:03:2012 21:39"/>
+              
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:human_disease.obo"              
+              format="OBO" name="Human Disease" identifier="DOID" version="13:06:2012 15:46"/>
+              
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:pride_cv.obo"
+              format="OBO" name="PRIDE Ontology" identifier="PRIDE" version="1.0"/>
+              
+  <cvSource source="psidev.psi.tools.ontology_manager.impl.local.LocalOntology"
+              uri="classpath:sep.obo"              
+              format="OBO" name="Separation methods" identifier="SEP" version="1.0"/>
+</cvSourceList>
+
+
+        
