@@ -25,8 +25,7 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.Atom;
 
-public class ExtendedIdentifiedPeptide extends IdentificationItem implements
-		IdentifiedPeptide {
+public class ExtendedIdentifiedPeptide extends IdentificationItem implements IdentifiedPeptide {
 	private static HashMap<String, List<String>> sequenceConversion = new HashMap<String, List<String>>();
 
 	private final IdentifiedPeptide peptide;
@@ -54,14 +53,12 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 
 	// private boolean filtered = false;
 
-	public ExtendedIdentifiedPeptide(Replicate replicate,
-			IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI) {
+	public ExtendedIdentifiedPeptide(Replicate replicate, IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI) {
 		this(replicate, peptide, miapeMSI, PeptideRelation.NONDISCRIMINATING);
 
 	}
 
-	public ExtendedIdentifiedPeptide(Replicate replicate,
-			IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI,
+	public ExtendedIdentifiedPeptide(Replicate replicate, IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI,
 			PeptideRelation relation) {
 		this(null, null, peptide, miapeMSI, relation);
 		if (replicate != null) {
@@ -70,15 +67,12 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 		}
 	}
 
-	public ExtendedIdentifiedPeptide(String replicateName,
-			String experimentName, IdentifiedPeptide peptide,
+	public ExtendedIdentifiedPeptide(String replicateName, String experimentName, IdentifiedPeptide peptide,
 			MiapeMSIDocument miapeMSI) {
-		this(replicateName, experimentName, peptide, miapeMSI,
-				PeptideRelation.NONDISCRIMINATING);
+		this(replicateName, experimentName, peptide, miapeMSI, PeptideRelation.NONDISCRIMINATING);
 	}
 
-	public ExtendedIdentifiedPeptide(String replicateName,
-			String experimentName, IdentifiedPeptide peptide,
+	public ExtendedIdentifiedPeptide(String replicateName, String experimentName, IdentifiedPeptide peptide,
 			MiapeMSIDocument miapeMSI, PeptideRelation relation) {
 
 		this.replicateName = replicateName;
@@ -129,14 +123,20 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 				if (line.contains("=")) {
 					final String[] pairNameValue = line.split("=");
 
-					if (pairNameValue[0]
-							.startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ))
+					if (pairNameValue[0].startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ))
 						expMass = pairNameValue[1];
 					if (pairNameValue[0].startsWith(MiapeXmlUtil.CALCULATED_MZ))
 						calcMass = pairNameValue[1];
 					if (pairNameValue[0].startsWith(MiapeXmlUtil.ERROR_MZ))
 						errorMass = pairNameValue[1];
 				}
+			}
+		} else {
+			try {
+				Double errorInPPM = Double.valueOf(string);
+				// TODO
+			} catch (NumberFormatException e) {
+
 			}
 		}
 		if (errorMass == null && calcMass != null && expMass != null) {
@@ -212,19 +212,13 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 			if (modificationList != null && !modificationList.isEmpty()) {
 
 				// sort modifications by position
-				Collections.sort(modificationList,
-						new Comparator<PeptideModification>() {
-							@Override
-							public int compare(PeptideModification pepMod1,
-									PeptideModification pepMod2) {
-								return Integer.valueOf(pepMod1.getPosition())
-										.compareTo(
-												Integer.valueOf(pepMod2
-														.getPosition()));
-							}
-						});
-				log.debug("PEptide: " + sequence + " numMods="
-						+ modificationList.size());
+				Collections.sort(modificationList, new Comparator<PeptideModification>() {
+					@Override
+					public int compare(PeptideModification pepMod1, PeptideModification pepMod2) {
+						return Integer.valueOf(pepMod1.getPosition()).compareTo(Integer.valueOf(pepMod2.getPosition()));
+					}
+				});
+				log.debug("PEptide: " + sequence + " numMods=" + modificationList.size());
 				// parse modifications
 				List<String> splits = new ArrayList<String>();
 				String temp = sequence;
@@ -236,8 +230,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 					log.debug("modification: " + sequence + " pos:" + position);
 
 					if (position > 0 && position <= sequence.length()) {
-						String before = sequence.substring(previousPosition,
-								position);
+						String before = sequence.substring(previousPosition, position);
 						splits.add(before);
 						previousPosition = position;
 						after = "";
@@ -271,16 +264,13 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 					if (peptideModification != null) {
 						if (peptideModification.getMonoDelta() != null)
 							deltaMass = peptideModification.getMonoDelta();
-						if (deltaMass == null
-								&& peptideModification.getAvgDelta() != null)
+						if (deltaMass == null && peptideModification.getAvgDelta() != null)
 							deltaMass = peptideModification.getAvgDelta();
 						if (deltaMass == null) {
 
 							if (peptideModification.getReplacementResidue() != null
-									&& !"".equals(peptideModification
-											.getReplacementResidue()))
-								subtitution = peptideModification
-										.getReplacementResidue();
+									&& !"".equals(peptideModification.getReplacementResidue()))
+								subtitution = peptideModification.getReplacementResidue();
 						}
 					}
 					sb.append(splits.get(i));
@@ -288,24 +278,20 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 					if (deltaMass != null) {
 						if (deltaMass > 0)
 							prefix = "+";
-						String delta = "(" + prefix + format.format(deltaMass)
-								+ ")";
+						String delta = "(" + prefix + format.format(deltaMass) + ")";
 						sb.append(delta);
 					}
 					if (subtitution != null) {
 						sb.append("(->" + subtitution + ")");
 					}
 				}
-				if (!ExtendedIdentifiedPeptide.sequenceConversion
-						.containsKey(getSequence())) {
+				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(getSequence())) {
 					List<String> list = new ArrayList<String>();
 					list.add(sb.toString());
-					ExtendedIdentifiedPeptide.sequenceConversion.put(
-							getSequence(), list);
+					ExtendedIdentifiedPeptide.sequenceConversion.put(getSequence(), list);
 				} else {
 
-					final List<String> list = ExtendedIdentifiedPeptide.sequenceConversion
-							.get(getSequence());
+					final List<String> list = ExtendedIdentifiedPeptide.sequenceConversion.get(getSequence());
 					if (list != null) {
 						try {
 							if (!list.contains(sb.toString()))
@@ -321,11 +307,9 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 				}
 				return sb.toString();
 			} else {
-				if (!ExtendedIdentifiedPeptide.sequenceConversion
-						.containsKey(sequence)) {
+				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(sequence)) {
 					List<String> list = new ArrayList<String>();
-					ExtendedIdentifiedPeptide.sequenceConversion.put(sequence,
-							list);
+					ExtendedIdentifiedPeptide.sequenceConversion.put(sequence, list);
 				}
 			}
 		}
@@ -367,12 +351,9 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 	}
 
 	private String getModificationString(PeptideModification peptideModification) {
-		return peptideModification.getName()
-				+ peptideModification.getPosition()
-				+ peptideModification.getReplacementResidue()
-				+ peptideModification.getResidues()
-				+ peptideModification.getAvgDelta()
-				+ peptideModification.getMonoDelta()
+		return peptideModification.getName() + peptideModification.getPosition()
+				+ peptideModification.getReplacementResidue() + peptideModification.getResidues()
+				+ peptideModification.getAvgDelta() + peptideModification.getMonoDelta()
 				+ peptideModification.getNeutralLoss();
 	}
 
@@ -425,7 +406,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 	 * false, the key will be the sequence of the peptide. If
 	 * distiguishModificatedPeptides is true, the key will be the sequence
 	 * appended to a string that comes from the modifications
-	 * 
+	 *
 	 * @param distiguishModificatedPeptides
 	 * @return
 	 */
@@ -590,8 +571,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 
 	@Override
 	public Float getScore() {
-		SortingParameters sorting = SortingManager.getInstance()
-				.getPeptideSortingByPeptideScore(this);
+		SortingParameters sorting = SortingManager.getInstance().getPeptideSortingByPeptideScore(this);
 		if (sorting == null)
 			return null;
 		return this.getScore(sorting.getScoreName());
@@ -604,7 +584,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 
 	/**
 	 * Gets the MIAPE MSI document in which the peptide was reported
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -635,8 +615,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements
 				currentAA = AminoAcid.getAminoAcid(getSequence().charAt(aa));
 				mass += currentAA.monoisotopicMass;
 			} catch (NullPointerException e) {
-				throw new IllegalArgumentException("Unknown amino acid: "
-						+ getSequence().charAt(aa) + "!");
+				throw new IllegalArgumentException("Unknown amino acid: " + getSequence().charAt(aa) + "!");
 			}
 		}
 

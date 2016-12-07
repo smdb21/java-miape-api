@@ -17,9 +17,12 @@ import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.InputData;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
+import org.proteored.miapeapi.xml.mzidentml.util.Utils;
+import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import edu.scripps.yates.dtaselectparser.util.DTASelectModification;
 import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
+import edu.scripps.yates.utilities.masses.MassesUtil;
 
 public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	private final DTASelectPSM dtaSelectPSM;
@@ -208,11 +211,29 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public String getMassDesviation() {
-		final Double ppmError = dtaSelectPSM.getPpmError();
-		if (ppmError != null) {
-			return ppmError.toString();
+		StringBuilder sb = new StringBuilder();
+		Double calculatedMassH = dtaSelectPSM.getCalcMh();
+		Integer charge = null;
+		charge = Integer.valueOf(getCharge());
+		if (calculatedMassH != null && charge != null) {
+			sb.append(MiapeXmlUtil.CALCULATED_MZ + "=");
+			final double mz = (calculatedMassH - MassesUtil.H) / charge * 1.0;
+			sb.append(mz);
+			sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 		}
-		return null;
+		Double experimentalMassH = dtaSelectPSM.getMh();
+		if (experimentalMassH != null && charge != null) {
+			sb.append(MiapeXmlUtil.EXPERIMENTAL_MZ + "=");
+			final double mz = (experimentalMassH - MassesUtil.H) / charge * 1.0;
+			sb.append(mz);
+		}
+
+		return Utils.checkReturnedString(sb);
+		// final Double ppmError = dtaSelectPSM.getPpmError();
+		// if (ppmError != null) {
+		// return ppmError.toString();
+		// }
+		// return null;
 	}
 
 	@Override
