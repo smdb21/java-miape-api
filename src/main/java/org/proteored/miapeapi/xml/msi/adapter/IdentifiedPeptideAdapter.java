@@ -26,8 +26,8 @@ public class IdentifiedPeptideAdapter implements Adapter<MSIIdentifiedPeptide> {
 	private final MSIControlVocabularyXmlFactory cvFactory;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	public IdentifiedPeptideAdapter(IdentifiedPeptide identifiedPeptide,
-			ObjectFactory factory, MSIControlVocabularyXmlFactory cvFactory) {
+	public IdentifiedPeptideAdapter(IdentifiedPeptide identifiedPeptide, ObjectFactory factory,
+			MSIControlVocabularyXmlFactory cvFactory) {
 		this.factory = factory;
 		this.identifiedPeptide = identifiedPeptide;
 		// this.proteinRef = proteinRef;
@@ -38,38 +38,32 @@ public class IdentifiedPeptideAdapter implements Adapter<MSIIdentifiedPeptide> {
 	public MSIIdentifiedPeptide adapt() {
 		// log.info("Adapting peptide: " + identifiedPeptide.getSequence());
 
-		MSIIdentifiedPeptide identifiedPeptideXML = factory
-				.createMSIIdentifiedPeptide();
+		MSIIdentifiedPeptide identifiedPeptideXML = factory.createMSIIdentifiedPeptide();
 		String idString = "";
 		int id = identifiedPeptide.getId();
 		if (id == -1) {
 			id = MiapeXmlUtil.PeptideCounter.increaseCounter();
 			idString = MiapeXmlUtil.IdentifierPrefixes.PEPTIDE.getPrefix() + id;
 		} else {
-			idString = MiapeXmlUtil.IdentifierPrefixes.PEPTIDE.getPrefix()
-					+ identifiedPeptide.getId();
+			idString = MiapeXmlUtil.IdentifierPrefixes.PEPTIDE.getPrefix() + identifiedPeptide.getId();
 		}
 		identifiedPeptideXML.setId(idString);
 		identifiedPeptideXML.setCharge(identifiedPeptide.getCharge());
-		identifiedPeptideXML.setMassDeviation(identifiedPeptide
-				.getMassDesviation());
-		Set<PeptideModification> modifications = identifiedPeptide
-				.getModifications();
+		identifiedPeptideXML.setMassDeviation(identifiedPeptide.getMassDesviation());
+		Set<PeptideModification> modifications = identifiedPeptide.getModifications();
 		if (modifications != null) {
 			for (PeptideModification modification : modifications) {
-				identifiedPeptideXML.getMSIPeptideModification().add(
-						new PeptideModificationAdapter(modification, factory,
-								cvFactory).adapt());
+				identifiedPeptideXML.getMSIPeptideModification()
+						.add(new PeptideModificationAdapter(modification, factory, cvFactory).adapt());
 			}
 		}
 
 		int rank = identifiedPeptide.getRank();
-		if (rank > 0)
+		if (rank > 0) {
 			identifiedPeptideXML.setRank(rank);
-
+		}
 		// PRotein References
-		final List<IdentifiedProtein> identifiedProteins = identifiedPeptide
-				.getIdentifiedProteins();
+		final List<IdentifiedProtein> identifiedProteins = identifiedPeptide.getIdentifiedProteins();
 		if (identifiedProteins != null && !identifiedProteins.isEmpty()) {
 			// log.info("Adapting peptide " + identifiedPeptide.getSequence() +
 			// " with "
@@ -81,16 +75,16 @@ public class IdentifiedPeptideAdapter implements Adapter<MSIIdentifiedPeptide> {
 			int i = 1;
 			for (IdentifiedProtein protein : identifiedProteins) {
 				Ref ref = factory.createRef();
-				ref.setId(MiapeXmlUtil.IdentifierPrefixes.PROTEIN.getPrefix()
-						+ protein.getId());
-				log.debug("Adapting protein (" + i + "/"
-						+ identifiedProteins.size() + ") "
-						+ protein.getAccession());
+				ref.setId(MiapeXmlUtil.IdentifierPrefixes.PROTEIN.getPrefix() + protein.getId());
+				log.debug("Adapting protein (" + i + "/" + identifiedProteins.size() + ") " + protein.getAccession());
 				protRefs.getRef().add(ref);
 				i++;
 			}
-			if (!protRefs.getRef().isEmpty())
+			if (!protRefs.getRef().isEmpty()) {
 				identifiedPeptideXML.setProteinRefs(protRefs);
+			} else {
+				log.warn("Peptide with no proteins!");
+			}
 		}
 
 		String spectrumRef = identifiedPeptide.getSpectrumRef();
@@ -101,10 +95,8 @@ public class IdentifiedPeptideAdapter implements Adapter<MSIIdentifiedPeptide> {
 		final Set<PeptideScore> scores = identifiedPeptide.getScores();
 		if (scores != null) {
 			for (PeptideScore peptideScore : scores) {
-				identifiedPeptideXML.getPeptideScore().add(
-						cvFactory.createCV(peptideScore.getName(),
-								peptideScore.getValue(),
-								Score.getInstance(cvFactory.getCvManager())));
+				identifiedPeptideXML.getPeptideScore().add(cvFactory.createCV(peptideScore.getName(),
+						peptideScore.getValue(), Score.getInstance(cvFactory.getCvManager())));
 			}
 		}
 
@@ -112,12 +104,10 @@ public class IdentifiedPeptideAdapter implements Adapter<MSIIdentifiedPeptide> {
 		InputData inputData = identifiedPeptide.getInputData();
 		if (inputData != null) {
 			identifiedPeptideXML
-					.setInputDataRef(MiapeXmlUtil.IdentifierPrefixes.INPUTDATA
-							.getPrefix() + inputData.getId());
+					.setInputDataRef(MiapeXmlUtil.IdentifierPrefixes.INPUTDATA.getPrefix() + inputData.getId());
 		}
 		try {
-			identifiedPeptideXML.setRT(Double.valueOf(identifiedPeptide
-					.getRetentionTimeInSeconds()));
+			identifiedPeptideXML.setRT(Double.valueOf(identifiedPeptide.getRetentionTimeInSeconds()));
 		} catch (Exception e) {
 			// do nothing
 		}
