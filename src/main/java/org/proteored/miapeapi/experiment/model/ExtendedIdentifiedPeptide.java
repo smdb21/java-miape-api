@@ -133,7 +133,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			}
 		} else {
 			try {
-				Double errorInPPM = Double.valueOf(string);
+				// Double errorInPPM = Double.valueOf(string);
 				// TODO
 			} catch (NumberFormatException e) {
 
