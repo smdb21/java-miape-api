@@ -13,36 +13,52 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedProtein;
 import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
+import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
+import org.proteored.miapeapi.experiment.model.sort.ProteinGroupComparisonType;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.util.UniprotId2AccMapping;
 
 import com.compomics.dbtoolkit.io.implementations.FASTADBLoader;
 import com.compomics.util.protein.Protein;
 
-public class ProteinACCFilter implements Filter {
-	private final Set<String> accessions = new HashSet<String>();
+public class ProteinACCFilter implements Filter, Filters<ProteinComparatorKey> {
+	private final Set<ProteinComparatorKey> accessions = new HashSet<ProteinComparatorKey>();
 	private final Software software;
 	private final List<String> sortedAccessions = new ArrayList<String>();;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
+	public ProteinACCFilter(Collection<ProteinComparatorKey> proteinComparatorKeys) {
+		// check if some accession is an ID
+		this.accessions.addAll(proteinComparatorKeys);
+		for (ProteinComparatorKey proteinComparatorKey : proteinComparatorKeys) {
+			this.sortedAccessions.add(proteinComparatorKey.getAccessionString());
+		}
+
+		this.software = null;
+	}
+
 	public ProteinACCFilter(Collection<String> accessions, Software software) {
 		// check if some accession is an ID
 		for (String acc : accessions) {
+			ProteinComparatorKey pck = new ProteinComparatorKey(acc, ProteinGroupComparisonType.BEST_PROTEIN);
 			try {
-				final UniprotId2AccMapping instance = UniprotId2AccMapping
-						.getInstance();
+				final UniprotId2AccMapping instance = UniprotId2AccMapping.getInstance();
 				if (instance != null) {
 					String accFromID = instance.getAccFromID(acc);
 					if (accFromID != null) {
-						this.accessions.add(accFromID);
+						pck = new ProteinComparatorKey(accFromID, ProteinGroupComparisonType.BEST_PROTEIN);
+						this.accessions.add(pck);
 						sortedAccessions.add(accFromID);
 					} else {
-						this.accessions.add(acc);
+						this.accessions.add(pck);
 						sortedAccessions.add(acc);
 					}
 				}
 			} catch (IOException e) {
-				this.accessions.addAll(accessions);
+				for (String acc2 : accessions) {
+					pck = new ProteinComparatorKey(acc2, ProteinGroupComparisonType.BEST_PROTEIN);
+					this.accessions.add(pck);
+				}
 				sortedAccessions.addAll(accessions);
 			}
 		}
@@ -50,8 +66,8 @@ public class ProteinACCFilter implements Filter {
 		this.software = software;
 	}
 
-	public ProteinACCFilter(File fastaFile, Software software)
-			throws IOException {
+	public ProteinACCFilter(File fastaFile, Software software) throws IOException {
+
 		FASTADBLoader fastaLoader = new FASTADBLoader();
 		fastaLoader.load(fastaFile.getAbsolutePath());
 		final long countNumberOfEntries = fastaLoader.countNumberOfEntries();
@@ -59,12 +75,12 @@ public class ProteinACCFilter implements Filter {
 			final Protein nextProtein = fastaLoader.nextProtein();
 			if (nextProtein == null)
 				break;
-			accessions.add(nextProtein.getHeader().getAccession());
+			accessions.add(new ProteinComparatorKey(nextProtein.getHeader().getAccession(),
+					ProteinGroupComparisonType.BEST_PROTEIN));
 			sortedAccessions.add(nextProtein.getHeader().getAccession());
 		}
 		this.software = software;
-		log.info("Loaded " + accessions.size() + " proteins from "
-				+ fastaFile.getAbsolutePath());
+		log.info("Loaded " + accessions.size() + " proteins from " + fastaFile.getAbsolutePath());
 	}
 
 	@Override
@@ -75,7 +91,7 @@ public class ProteinACCFilter implements Filter {
 			ProteinACCFilter filter = (ProteinACCFilter) obj;
 			if (filter.accessions.size() != accessions.size())
 				return false;
-			for (String accession : accessions) {
+			for (ProteinComparatorKey accession : accessions) {
 				if (!filter.accessions.contains(accession))
 					return false;
 			}
@@ -85,30 +101,25 @@ public class ProteinACCFilter implements Filter {
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups,
-			IdentificationSet currentIdSet) {
+	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 		if (accessions != null && !accessions.isEmpty()) {
-			log.info("Filtering " + proteinGroups.size()
-					+ " protein groups by a list of protein Accessions of "
+			log.info("Filtering " + proteinGroups.size() + " protein groups by a list of protein Accessions of "
 					+ accessions.size() + " proteins");
 			List<ExtendedIdentifiedProtein> proteins = new ArrayList<ExtendedIdentifiedProtein>();
 			if (proteinGroups != null) {
 				for (ProteinGroup proteinGroup : proteinGroups) {
-					for (ExtendedIdentifiedProtein protein : proteinGroup) {
-						if (accessions.contains(protein.getAccession())) {
-							proteins.add(protein);
-						} else {
-							log.debug("Protein " + protein.getAccession()
-									+ " is not a human protein??");
-						}
+					// for (ExtendedIdentifiedProtein protein : proteinGroup) {
+					// if (isValid(protein.getAccession())) {
+					if (isValid(new ProteinComparatorKey(proteinGroup.getAccessions(),
+							ProteinGroupComparisonType.SHARE_ONE_PROTEIN))) {
+						proteins.addAll(proteinGroup);
 					}
 				}
 				log.info("Running PAnalyzer before to return the groups in the protein acc filter");
-				PAnalyzer panalyzer = new PAnalyzer();
+				PAnalyzer panalyzer = new PAnalyzer(false);
 				ret = panalyzer.run(proteins);
-				log.info("Filtered from " + proteinGroups.size() + " to "
-						+ ret.size() + " protein groups");
+				log.info("Filtered from " + proteinGroups.size() + " to " + ret.size() + " protein groups");
 			}
 
 		}
@@ -127,8 +138,7 @@ public class ProteinACCFilter implements Filter {
 
 	@Override
 	public String toString() {
-		return "Proteins filtered by a list of " + accessions.size()
-				+ " protein accessions";
+		return "Proteins filtered by a list of " + accessions.size() + " protein accessions";
 	}
 
 	@Override
@@ -144,6 +154,30 @@ public class ProteinACCFilter implements Filter {
 	public List<String> getSortedAccessions() {
 		return sortedAccessions;
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.proteored.miapeapi.experiment.model.filters.Filters#isValid(java.lang
+	 * .Object)
+	 */
+	@Override
+	public boolean isValid(ProteinComparatorKey acc) {
+		return accessions.contains(acc);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.proteored.miapeapi.experiment.model.filters.Filters#canCheck(java.
+	 * lang.Object)
+	 */
+	@Override
+	public boolean canCheck(Object obj) {
+		return obj instanceof ProteinComparatorKey;
 	}
 
 }

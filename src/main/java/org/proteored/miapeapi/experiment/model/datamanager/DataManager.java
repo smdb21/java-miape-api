@@ -388,11 +388,11 @@ public abstract class DataManager {
 									// .getId())) {
 									extendedIdentifiedProtein = new ExtendedIdentifiedProtein((Replicate) idSet,
 											protein, miapeMSIDocument);
-									// if (useStaticCollections)
-									// staticProteins.put(
-									// extendedIdentifiedProtein
-									// .getId(),
-									// extendedIdentifiedProtein);
+											// if (useStaticCollections)
+											// staticProteins.put(
+											// extendedIdentifiedProtein
+											// .getId(),
+											// extendedIdentifiedProtein);
 
 									// } else {
 									// extendedIdentifiedProtein =
@@ -646,7 +646,13 @@ public abstract class DataManager {
 	}
 
 	public void setFilters(List<Filter> filters) {
-		removeFilters();
+		setFilters(filters, true);
+	}
+
+	public void setFilters(List<Filter> filters, boolean removeFiltersBefore) {
+		if (removeFiltersBefore) {
+			removeFilters();
+		}
 
 		if (filters != null && !filters.isEmpty()) {
 			// log.info("Setting " + filters.size() + " filters to " +
@@ -659,9 +665,9 @@ public abstract class DataManager {
 		List<Filter> filtersToSet = new ArrayList<Filter>();
 		for (Filter filter : filters) {
 
-			if (!(filter instanceof FDRFilter))
+			if (!(filter instanceof FDRFilter)) {
 				filtersToSet.add(filter);
-			else {
+			} else {
 				// If this is a FDRFilter
 				FDRFilter fdrFilter = (FDRFilter) filter;
 				// if the name of the replicate is not specified, it is applied
@@ -679,7 +685,9 @@ public abstract class DataManager {
 			}
 		}
 		if (!filtersToSet.isEmpty()) {
-			this.filters.clear();
+			if (removeFiltersBefore) {
+				this.filters.clear();
+			}
 			this.filters.addAll(filtersToSet);
 
 			peptideOccurrenceList.clear();
@@ -747,7 +755,7 @@ public abstract class DataManager {
 			// in case of not having next level, reset protein groups and return
 			if (getFilters().isEmpty()) {
 				resetPeptidesFromProteins(nonFilteredIdentifiedProteins);
-				PAnalyzer panalyzer = new PAnalyzer();
+				PAnalyzer panalyzer = new PAnalyzer(false);
 				identifiedProteinGroups = panalyzer.run(nonFilteredIdentifiedProteins);
 				return identifiedProteinGroups;
 			}
@@ -803,7 +811,7 @@ public abstract class DataManager {
 						List<ExtendedIdentifiedProtein> nextLevelProteins = getNextLevelIdentifiedProteins();
 
 						// Run panalyzer
-						PAnalyzer panalyzer = new PAnalyzer();
+						PAnalyzer panalyzer = new PAnalyzer(false);
 						toFilter = panalyzer.run(nextLevelProteins);
 					} else {
 						// if there is only one replicate, get all directly
@@ -818,7 +826,7 @@ public abstract class DataManager {
 					List<ExtendedIdentifiedProtein> nextLevelProteins = getNextLevelIdentifiedProteins();
 
 					// Run panalyzer
-					PAnalyzer panalyzer = new PAnalyzer();
+					PAnalyzer panalyzer = new PAnalyzer(false);
 					toFilter = panalyzer.run(nextLevelProteins);
 				} else {
 					// if there is only one replicate, get all directly
@@ -830,8 +838,9 @@ public abstract class DataManager {
 			}
 			// Get filters
 			List<Filter> filters = getFilters();
-			if (filters != null && !filters.isEmpty())
+			if (filters != null && !filters.isEmpty()) {
 				log.info("Filtering " + toFilter.size() + " protein groups");
+			}
 			identifiedProteinGroups = applyFilters(toFilter, filters);
 			if (processInParallel) {
 				identifiedPeptides = getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
@@ -919,7 +928,7 @@ public abstract class DataManager {
 	public List<ProteinGroup> getNonFilteredIdentifiedProteinGroups() {
 		resetPeptidesFromProteins(nonFilteredIdentifiedProteins);
 
-		PAnalyzer pAnalyzer = new PAnalyzer();
+		PAnalyzer pAnalyzer = new PAnalyzer(false);
 		List<ProteinGroup> groups = pAnalyzer.run(nonFilteredIdentifiedProteins);
 		return groups;
 	}
@@ -1159,10 +1168,26 @@ public abstract class DataManager {
 		return 0;
 	}
 
+	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey) {
+		final ProteinGroupOccurrence proteinGroupOccurrence = this
+				.getProteinGroupOccurrenceByProteinGroupKey(proteinGroupKey);
+		if (proteinGroupOccurrence != null)
+			return proteinGroupOccurrence.getItemList().size();
+		return 0;
+	}
+
 	public ProteinGroupOccurrence getProteinGroupOccurrence(ProteinGroup proteinGroup) {
 		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
 		if (proteinOcurrenceList.containsKey(proteinGroup.getKey()))
 			return proteinOcurrenceList.get(proteinGroup.getKey());
+		return null;
+
+	}
+
+	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey) {
+		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
+		if (proteinOcurrenceList.containsKey(proteinGroupKey))
+			return proteinOcurrenceList.get(proteinGroupKey);
 		return null;
 
 	}
@@ -2452,7 +2477,7 @@ public abstract class DataManager {
 		log.info("Peptides accepted=" + numPeptideAccepted + "  Peptides rejected=" + numPeptidesRejected
 				+ "   Proteins accepted=" + numProteinsAccepted + "  Proteins rejected=" + numProteinsRejected);
 		// run panalyzer
-		PAnalyzer panalyzer = new PAnalyzer();
+		PAnalyzer panalyzer = new PAnalyzer(false);
 		ret = panalyzer.run(totalProteins);
 		log.info("Filtering protein groups by peptides: from " + proteinGroups.size() + " to " + ret.size());
 		return ret;

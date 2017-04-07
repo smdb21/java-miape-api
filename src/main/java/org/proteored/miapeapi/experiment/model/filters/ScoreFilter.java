@@ -17,8 +17,7 @@ import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 
 public class ScoreFilter implements Filter {
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private final float threshold;
 	private final ComparatorOperator operator;
@@ -37,9 +36,8 @@ public class ScoreFilter implements Filter {
 	 *            that complies the comparison are not excluded in the filter
 	 * @param item
 	 */
-	public ScoreFilter(float threshold, String scoreName,
-			ComparatorOperator includeOperator, IdentificationItemEnum item,
-			Software software) {
+	public ScoreFilter(float threshold, String scoreName, ComparatorOperator includeOperator,
+			IdentificationItemEnum item, Software software) {
 		this.operator = includeOperator;
 		this.threshold = threshold;
 		if (IdentificationItemEnum.PEPTIDE.equals(item))
@@ -76,19 +74,17 @@ public class ScoreFilter implements Filter {
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups,
-			IdentificationSet currentIdSet) {
+	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		if (appliedToPeptides) {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 			Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides);
-			return DataManager.filterProteinGroupsByPeptides(proteinGroups,
-					filteredPeptides, currentIdSet.getCvManager());
+			return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides,
+					currentIdSet.getCvManager());
 
 		} else {
-			log.info("Filtering " + proteinGroups.size()
-					+ " protein groups by " + this.scoreName + " " + operator
-					+ " " + threshold);
+			log.info("Filtering " + proteinGroups.size() + " protein groups by " + this.scoreName + " " + operator + " "
+					+ threshold);
 			List<ExtendedIdentifiedProtein> proteins = new ArrayList<ExtendedIdentifiedProtein>();
 			for (ProteinGroup proteinGroup : proteinGroups) {
 				for (ExtendedIdentifiedProtein identifiedProtein : proteinGroup) {
@@ -102,10 +98,9 @@ public class ScoreFilter implements Filter {
 				}
 			}
 			log.info("Running PAnalyzer before to return the groups in the Score filter");
-			PAnalyzer pAnalyzer = new PAnalyzer();
+			PAnalyzer pAnalyzer = new PAnalyzer(false);
 			List<ProteinGroup> ret = pAnalyzer.run(proteins);
-			log.info("Resulting " + ret.size() + " after filtering "
-					+ proteinGroups.size() + " protein groups");
+			log.info("Resulting " + ret.size() + " after filtering " + proteinGroups.size() + " protein groups");
 			return ret;
 		}
 	}
@@ -122,14 +117,12 @@ public class ScoreFilter implements Filter {
 		} else if (this.operator.equals(ComparatorOperator.MORE_OR_EQUAL)) {
 			return scoreValue >= this.threshold;
 		}
-		throw new UnsupportedOperationException(
-				"The filter has not a valid comparator");
+		throw new UnsupportedOperationException("The filter has not a valid comparator");
 	}
 
-	private Set<Integer> filterPeptides(
-			List<ExtendedIdentifiedPeptide> identifiedPeptides) {
-		log.info("Filtering " + identifiedPeptides.size() + " peptides by "
-				+ this.scoreName + " " + operator + " " + threshold);
+	private Set<Integer> filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides) {
+		log.info("Filtering " + identifiedPeptides.size() + " peptides by " + this.scoreName + " " + operator + " "
+				+ threshold);
 
 		Set<Integer> ret = new HashSet<Integer>();
 		for (ExtendedIdentifiedPeptide identifiedPeptide : identifiedPeptides) {
@@ -148,8 +141,7 @@ public class ScoreFilter implements Filter {
 			}
 
 		}
-		log.info("Resulting " + ret.size() + " peptides after filtering "
-				+ identifiedPeptides.size() + " peptides");
+		log.info("Resulting " + ret.size() + " peptides after filtering " + identifiedPeptides.size() + " peptides");
 		return ret;
 	}
 

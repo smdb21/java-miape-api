@@ -524,4 +524,10 @@ public interface IdentificationSet<T> {
 
 	public int getPeptideChargeOccurrenceNumber(String sequencePlusChargeKey, Boolean distinguishModPep);
 
+	/**
+	 * @param proteinGroupKey
+	 * @return
+	 */
+	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey);
+
 }

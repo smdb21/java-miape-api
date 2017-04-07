@@ -124,6 +124,11 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
 	}
 
+	@Override
+	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey) {
+		return dataManager.getProteinGroupOccurrenceNumberByProteinGroupKey(proteinGroupKey);
+	}
+
 	/**
 	 * Gets a hashmap that indicates how many times has been identified each
 	 * peptide in the total number of experiments.
@@ -349,8 +354,9 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	@Override
 	public void setFilters(List<Filter> filters) {
 		dataManager.setFilters(filters);
-		for (Experiment idSet : getNextLevelIdentificationSetList())
+		for (Experiment idSet : getNextLevelIdentificationSetList()) {
 			idSet.setFilters(filters);
+		}
 	}
 
 	@Override

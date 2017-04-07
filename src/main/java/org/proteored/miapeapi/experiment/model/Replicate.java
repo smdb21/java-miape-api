@@ -675,4 +675,9 @@ public class Replicate implements IdentificationSet<Void> {
 	public int getPeptideChargeOccurrenceNumber(String sequencePlusChargeKey, Boolean distinguishModPep) {
 		return dataManager.getPeptideChargeOccurrenceNumber(sequencePlusChargeKey, distinguishModPep);
 	}
+
+	@Override
+	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey) {
+		return dataManager.getProteinGroupOccurrenceNumberByProteinGroupKey(proteinGroupKey);
+	}
 }

@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
 import org.proteored.miapeapi.experiment.model.interfaces.Occurrence;
 import org.proteored.miapeapi.experiment.model.interfaces.PeptideContainer;
+import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
+import org.proteored.miapeapi.experiment.model.sort.ProteinGroupComparisonType;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
 import org.proteored.miapeapi.interfaces.Software;
@@ -35,6 +37,10 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 
 	public String getKey() {
 		return key;
+	}
+
+	public ProteinComparatorKey getKey(ProteinGroupComparisonType comparisonType) {
+		return new ProteinComparatorKey(getKey(), comparisonType);
 	}
 
 	@Override

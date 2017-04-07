@@ -555,4 +555,50 @@ public class ComparatorManager {
 			}
 		};
 	}
+
+	/**
+	 * @return
+	 */
+	public static Comparator<? super ExtendedIdentifiedProtein> getProteinComparatorByEvidence() {
+		return new Comparator<ExtendedIdentifiedProtein>() {
+
+			@Override
+			public int compare(ExtendedIdentifiedProtein o1, ExtendedIdentifiedProtein o2) {
+
+				int ret = o1.getEvidence().compareTo(o2.getEvidence());
+				if (ret != 0) {
+					return ret;
+				}
+				ret = o2.getPeptideNumber().compareTo(o1.getPeptideNumber());
+				if (ret != 0) {
+					return ret;
+				}
+				ret = Integer.compare(o2.getPeptides().size(), o1.getPeptides().size());
+				if (ret != 0) {
+					return ret;
+				}
+				if (o1.getProteinSequence() != null && o2.getProteinSequence() != null) {
+					try {
+						int len1 = o1.getProteinSequence().length();
+						int len2 = o2.getProteinSequence().length();
+						return Integer.compare(len2, len1);
+					} catch (Exception e) {
+
+					}
+				}
+				// if we are here, the peptides and psms are the same, so we
+				// return the one with less coverage, which will be the one with
+				// longer sequence
+				String coverage1 = o1.getCoverage();
+				String coverage2 = o2.getCoverage();
+				if (coverage1 != null && coverage2 != null) {
+					ret = Double.valueOf(coverage1).compareTo(Double.valueOf(coverage2));
+					if (ret != 0) {
+						return ret;
+					}
+				}
+				return 0;
+			}
+		};
+	}
 }

@@ -20,8 +20,7 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 
 public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private ProteinEvidence evidence;
 	private ExtendedIdentifiedPeptide bestPeptide;
 	private String selectedProteinSequence;
@@ -39,12 +38,10 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 			throw new IllegalMiapeArgumentException("group is null");
 
 		for (InferenceProtein inferenceProtein : iProteinGroup) {
-			List<ExtendedIdentifiedProtein> proteinsMerged = inferenceProtein
-					.getProteinsMerged();
+			List<ExtendedIdentifiedProtein> proteinsMerged = inferenceProtein.getProteinsMerged();
 			for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
 				extendedIdentifiedProtein.setGroup(this);
-				extendedIdentifiedProtein.setEvidence(inferenceProtein
-						.getEvidence());
+				extendedIdentifiedProtein.setEvidence(inferenceProtein.getEvidence());
 			}
 			this.addAll(proteinsMerged);
 		}
@@ -94,8 +91,8 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 			for (ExtendedIdentifiedProtein protein : this) {
 				String proteinAcc = protein.getAccession();
 
-				this.selectedProteinSequence = ProteinSequenceRetrieval
-						.getProteinSequence(proteinAcc, retrieveFromTheInternet);
+				this.selectedProteinSequence = ProteinSequenceRetrieval.getProteinSequence(proteinAcc,
+						retrieveFromTheInternet);
 				if (this.selectedProteinSequence != null)
 					return this.selectedProteinSequence;
 			}
@@ -128,7 +125,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 				List<ExtendedIdentifiedProtein> proteins = new ArrayList<ExtendedIdentifiedProtein>();
 				proteins.addAll(this);
 				proteins.addAll((ProteinGroup) object);
-				PAnalyzer pa = new PAnalyzer();
+				PAnalyzer pa = new PAnalyzer(false);
 				List<ProteinGroup> groups = pa.run(proteins);
 				if (groups.size() == 1)
 					return true;
@@ -202,6 +199,24 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 		Collections.sort(accessions);
 		return accessions;
 
+	}
+
+	/**
+	 * Gets the first accession of the list of proteins
+	 * 
+	 * @return
+	 */
+	public String getAccessionsString() {
+		List<String> accList = getAccessions();
+
+		String ret = "";
+		for (String accession : accList) {
+			if (!"".equals(ret))
+				ret = ret + ",";
+			ret = ret + accession;
+		}
+
+		return ret;
 	}
 
 	@Override
@@ -405,8 +420,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public Float getBestPeptideScore() {
-		ExtendedIdentifiedPeptide bestPeptideByScore = this
-				.getBestPeptideByScore();
+		ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore();
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore();
 		}
@@ -414,8 +428,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public Float getBestPeptideScore(String scoreName) {
-		ExtendedIdentifiedPeptide bestPeptideByScore = this
-				.getBestPeptideByScore(scoreName);
+		ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore(scoreName);
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore(scoreName);
 		}

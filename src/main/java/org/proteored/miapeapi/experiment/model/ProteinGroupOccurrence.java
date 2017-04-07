@@ -13,7 +13,10 @@ import org.proteored.miapeapi.experiment.model.interfaces.Occurrence;
 import org.proteored.miapeapi.experiment.model.interfaces.PeptideContainer;
 import org.proteored.miapeapi.experiment.model.interfaces.ProteinContainer;
 import org.proteored.miapeapi.experiment.model.interfaces.ProteinGroupContainer;
+import org.proteored.miapeapi.experiment.model.sort.ComparatorManager;
 import org.proteored.miapeapi.experiment.model.sort.Order;
+import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
+import org.proteored.miapeapi.experiment.model.sort.ProteinGroupComparisonType;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingManager;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
@@ -22,10 +25,9 @@ import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
-import org.proteored.miapeapi.xml.util.ProteinGroupComparisonType;
 
-public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
-		ProteinContainer, PeptideContainer, ProteinGroupContainer {
+public class ProteinGroupOccurrence
+		implements Occurrence<ProteinGroup>, ProteinContainer, PeptideContainer, ProteinGroupContainer {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private final List<ProteinGroup> proteinGroups = new ArrayList<ProteinGroup>();
@@ -41,6 +43,8 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 
 	private List<String> accessions;
 
+	private List<String> accessionsByEvidence;
+
 	public ProteinGroupOccurrence() {
 
 	}
@@ -52,24 +56,22 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 	 * @param proteinSelection
 	 * @return
 	 */
-	public String getKey(ProteinGroupComparisonType proteinSelection) {
+	public ProteinComparatorKey getKey(ProteinGroupComparisonType proteinSelection) {
 
-		if (ProteinGroupComparisonType.ALL_PROTEINS.equals(proteinSelection)) {
-			return getFirstOccurrence().getKey();
+		switch (proteinSelection) {
+		case ALL_PROTEINS:
+			return new ProteinComparatorKey(getAccessions(), proteinSelection);
+		case BEST_PROTEIN:
+			return new ProteinComparatorKey(this.getBestProtein().getAccession(), proteinSelection);
+		case HIGHER_EVIDENCE_PROTEIN:
+			String acc = getAccessionsByEvidence().get(0);
+			return new ProteinComparatorKey(acc, proteinSelection);
+		case SHARE_ONE_PROTEIN:
+			return new ProteinComparatorKey(getAccessions(), proteinSelection);
 
-		} else if (ProteinGroupComparisonType.BEST_PROTEIN
-				.equals(proteinSelection)) {
-			return this.getBestProtein().getAccession();
-
-		} else if (ProteinGroupComparisonType.FIRST_PROTEIN
-				.equals(proteinSelection)) {
-			return getAccessions().get(0);
-
-		} else if (ProteinGroupComparisonType.SHARE_ONE_PROTEIN
-				.equals(proteinSelection)) {
+		default:
 			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -108,6 +110,25 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 		Collections.sort(accessions);
 
 		return accessions;
+	}
+
+	public List<String> getAccessionsByEvidence() {
+		if (accessionsByEvidence != null && !accessionsByEvidence.isEmpty()) {
+			return accessionsByEvidence;
+		}
+		accessionsByEvidence = new ArrayList<String>();
+		List<ExtendedIdentifiedProtein> proteinList = new ArrayList<ExtendedIdentifiedProtein>();
+		for (ProteinGroup pg : proteinGroups) {
+			proteinList.addAll(pg);
+		}
+		Collections.sort(proteinList, ComparatorManager.getProteinComparatorByEvidence());
+		for (ExtendedIdentifiedProtein protein : proteinList) {
+			if (protein.getAccession() == null) {
+				log.info("protein with no acc");
+			}
+			accessionsByEvidence.add(protein.getAccession());
+		}
+		return accessionsByEvidence;
 	}
 
 	@Override
@@ -243,8 +264,7 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 		if (bestProteinGroup != null)
 			return bestProteinGroup;
 
-		SortingParameters sorting = SortingManager.getInstance()
-				.getProteinGroupOccurrenceSortingByProteinScore(this);
+		SortingParameters sorting = SortingManager.getInstance().getProteinGroupOccurrenceSortingByProteinScore(this);
 		if (sorting == null)
 			return null;
 		Order order = sorting.getOrder();
@@ -271,14 +291,12 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 																	// lowest
 																	// score
 								if (Float.valueOf(score.getValue()) < finalScore) {
-									finalScore = Float
-											.valueOf(score.getValue());
+									finalScore = Float.valueOf(score.getValue());
 									ret = proteinGroup;
 								}
 							} else {
 								if (Float.valueOf(score.getValue()) > finalScore) {
-									finalScore = Float
-											.valueOf(score.getValue());
+									finalScore = Float.valueOf(score.getValue());
 									ret = proteinGroup;
 								}
 							}
@@ -298,8 +316,7 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 	 */
 	public Float getMeanProteinCoverage(boolean retrieveSequenceFromTheInternet) {
 		if (meanProteinCoverage == null)
-			meanProteinCoverage = Float.valueOf(ProteinMerger.getCoverage(this,
-					null, retrieveSequenceFromTheInternet));
+			meanProteinCoverage = Float.valueOf(ProteinMerger.getCoverage(this, null, retrieveSequenceFromTheInternet));
 		return meanProteinCoverage;
 	}
 
@@ -309,12 +326,10 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 		Set<Integer> peptideIds = new HashSet<Integer>();
 		if (proteinGroups != null) {
 			for (ProteinGroup proteinGroup : proteinGroups) {
-				final List<ExtendedIdentifiedPeptide> peptides = proteinGroup
-						.getPeptides();
+				final List<ExtendedIdentifiedPeptide> peptides = proteinGroup.getPeptides();
 				if (peptides != null) {
 					for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
-						if (!peptideIds.contains(extendedIdentifiedPeptide
-								.getId())) {
+						if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
 							peptideIds.add(extendedIdentifiedPeptide.getId());
 							ret.add(extendedIdentifiedPeptide);
 						}
@@ -378,8 +393,7 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 		List<Database> ret = new ArrayList<Database>();
 		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
 		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<InputParameter> inputParameters = miapeMSIDocument
-					.getInputParameters();
+			Set<InputParameter> inputParameters = miapeMSIDocument.getInputParameters();
 			if (inputParameters != null) {
 				for (InputParameter inputParameter : inputParameters) {
 					Set<Database> databases = inputParameter.getDatabases();
@@ -387,17 +401,12 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 						for (Database database : databases) {
 							boolean found = false;
 							for (Database selectedDatabase : ret) {
-								String selectedDatabaseName = selectedDatabase
-										.getName();
+								String selectedDatabaseName = selectedDatabase.getName();
 								if (selectedDatabase != null)
-									if (selectedDatabaseName.equals(database
-											.getName())) {
-										String selectedDatabaseVersion = selectedDatabase
-												.getNumVersion();
+									if (selectedDatabaseName.equals(database.getName())) {
+										String selectedDatabaseVersion = selectedDatabase.getNumVersion();
 										if (selectedDatabaseVersion != null) {
-											if (selectedDatabaseVersion
-													.equals(database
-															.getNumVersion()))
+											if (selectedDatabaseVersion.equals(database.getNumVersion()))
 												found = true;
 										} else if (selectedDatabaseVersion == null
 												&& database.getNumVersion() == null) {
@@ -430,18 +439,14 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 				for (Software software : softwares) {
 					boolean found = false;
 					for (Software selectedSoftware : ret) {
-						String selectedDatabaseName = selectedSoftware
-								.getName();
+						String selectedDatabaseName = selectedSoftware.getName();
 						if (selectedSoftware != null)
 							if (selectedDatabaseName.equals(software.getName())) {
-								String selectedSoftwareVersion = selectedSoftware
-										.getVersion();
+								String selectedSoftwareVersion = selectedSoftware.getVersion();
 								if (selectedSoftwareVersion != null) {
-									if (selectedSoftwareVersion.equals(software
-											.getVersion()))
+									if (selectedSoftwareVersion.equals(software.getVersion()))
 										found = true;
-								} else if (selectedSoftwareVersion == null
-										&& software.getVersion() == null) {
+								} else if (selectedSoftwareVersion == null && software.getVersion() == null) {
 									found = true;
 								}
 							}
@@ -592,8 +597,7 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 	@Override
 	public Float getBestPeptideScore() {
 
-		final ExtendedIdentifiedPeptide bestPeptideByScore = this
-				.getBestPeptide();
+		final ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptide();
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore();
 		}
@@ -603,8 +607,7 @@ public class ProteinGroupOccurrence implements Occurrence<ProteinGroup>,
 	@Override
 	public Float getBestPeptideScore(String scoreName) {
 
-		final ExtendedIdentifiedPeptide bestPeptideByScore = this
-				.getBestPeptide(scoreName);
+		final ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptide(scoreName);
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore(scoreName);
 		}
