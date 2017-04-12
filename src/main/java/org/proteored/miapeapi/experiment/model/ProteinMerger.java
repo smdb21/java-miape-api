@@ -8,9 +8,10 @@ import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+
 public class ProteinMerger {
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	/**
 	 * Gets the mean of the protein coverages of the proteins in the
@@ -25,27 +26,24 @@ public class ProteinMerger {
 	 *            internet if they are not available in the
 	 *            {@link ExtendedIdentifiedProtein} objects of the
 	 *            {@link ProteinGroupOccurrence}
+	 * @param upr
 	 * @return
 	 */
-	public static String getCoverage(
-			ProteinGroupOccurrence proteinGroupOccurrence, FDRFilter filter,
-			boolean retrieveProteinSeqIfNotAvailable) {
+	public static String getCoverage(ProteinGroupOccurrence proteinGroupOccurrence, FDRFilter filter,
+			boolean retrieveProteinSeqIfNotAvailable, UniprotProteinLocalRetriever upr) {
 		List<Double> coverages = new ArrayList<Double>();
 		if (proteinGroupOccurrence != null) {
 			List<String> accessions = proteinGroupOccurrence.getAccessions();
-			ProteinSequenceRetrieval.getProteinSequence(accessions,
-					retrieveProteinSeqIfNotAvailable);
+			ProteinSequenceRetrieval.getProteinSequence(accessions, retrieveProteinSeqIfNotAvailable, upr);
 			for (String accession : accessions) {
-				final List<ExtendedIdentifiedProtein> proteins = proteinGroupOccurrence
-						.getProteins(accession);
+				final List<ExtendedIdentifiedProtein> proteins = proteinGroupOccurrence.getProteins(accession);
 				// take the peptides of all ocurrences of the same protein
 				List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 				for (ExtendedIdentifiedProtein protein : proteins) {
 					peptides.addAll(protein.getPeptides());
 				}
 
-				if (proteinGroupOccurrence.isDecoy()
-						|| (filter != null && filter.isDecoy(accession)))
+				if (proteinGroupOccurrence.isDecoy() || (filter != null && filter.isDecoy(accession)))
 					continue;
 
 				// Get the protein sequence
@@ -59,18 +57,17 @@ public class ProteinMerger {
 				// if the protein sequence is not stored yet, retrieve from
 				// the internet
 				if (sequence == null) {
-					sequence = ProteinSequenceRetrieval.getProteinSequence(
-							accession, retrieveProteinSeqIfNotAvailable);
+					sequence = ProteinSequenceRetrieval.getProteinSequence(accession, retrieveProteinSeqIfNotAvailable,
+							upr);
 					if (sequence != null)
 						// set to all proteins
 						for (ExtendedIdentifiedProtein protein : proteins) {
-							protein.setProteinSequence(sequence);
+						protein.setProteinSequence(sequence);
 						}
 				}
 
 				// Calculate the protein coverage using all the peptides
-				Double coverage = MiapeXmlUtil.calculateProteinCoverage(
-						sequence, peptides);
+				Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
 				if (coverage != null) {
 					coverages.add(coverage);
 				}
@@ -101,8 +98,8 @@ public class ProteinMerger {
 	 *            {@link ProteinGroup}
 	 * @return
 	 */
-	public static String getCoverage(ProteinGroup proteinGroup,
-			FDRFilter filter, boolean retrieveProteinSeqIfNotAvailable) {
+	public static String getCoverage(ProteinGroup proteinGroup, FDRFilter filter,
+			boolean retrieveProteinSeqIfNotAvailable, UniprotProteinLocalRetriever upr) {
 		List<Double> coverages = new ArrayList<Double>();
 		if (proteinGroup != null) {
 			List<String> accessions = proteinGroup.getAccessions();
@@ -113,8 +110,7 @@ public class ProteinMerger {
 					peptides.addAll(protein.getPeptides());
 				}
 
-				if (proteinGroup.isDecoy()
-						|| (filter != null && filter.isDecoy(accession)))
+				if (proteinGroup.isDecoy() || (filter != null && filter.isDecoy(accession)))
 					continue;
 
 				// Get the protein sequence
@@ -129,8 +125,8 @@ public class ProteinMerger {
 				// the internet
 				if (sequence == null) {
 
-					sequence = ProteinSequenceRetrieval.getProteinSequence(
-							accession, retrieveProteinSeqIfNotAvailable);
+					sequence = ProteinSequenceRetrieval.getProteinSequence(accession, retrieveProteinSeqIfNotAvailable,
+							upr);
 
 					// set to all proteins
 					for (ExtendedIdentifiedProtein protein : proteinGroup) {
@@ -139,8 +135,7 @@ public class ProteinMerger {
 				}
 
 				// Calculate the protein coverage using all the peptides
-				Double coverage = MiapeXmlUtil.calculateProteinCoverage(
-						sequence, peptides);
+				Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
 				if (coverage != null) {
 					coverages.add(coverage);
 
