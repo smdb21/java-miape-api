@@ -5,6 +5,7 @@ package org.proteored.miapeapi.experiment.model.sort;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,11 +68,17 @@ public class ProteinComparatorKey {
 		if (accList != null && !accList.isEmpty() && accList.size() == 1) {
 			return accList.get(0);
 		}
+		Collections.sort(accList);
 		StringBuilder sb = new StringBuilder();
 		for (String acc : accList) {
 			sb.append(acc).append(",");
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public String toString() {
+		return getAccessionString();
 	}
 
 }
