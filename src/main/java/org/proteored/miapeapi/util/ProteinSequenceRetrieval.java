@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -23,6 +24,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.compomics.util.protein.Protein;
+
+import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+import edu.scripps.yates.annotations.uniprot.xml.Entry;
+import edu.scripps.yates.annotations.uniprot.xml.SequenceType;
+import edu.scripps.yates.utilities.fasta.FastaParser;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DatabaseInfo;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfConnException;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfException;
@@ -30,15 +37,12 @@ import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfParamsException;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.InputException;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.WSDBFetchServerProxy;
 
-import com.compomics.util.protein.Protein;
-
 public class ProteinSequenceRetrieval {
 	private static final WSDBFetchServerProxy ws = new WSDBFetchServerProxy();
 	private static DatabaseInfo[] databases;
 	private static String[] proteinDBs = { "uniprotkb", "ipi" };
 	private static HashMap<String, String> sequenceMap = new HashMap<String, String>();
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private static JAXBContext jc;
 
@@ -53,27 +57,24 @@ public class ProteinSequenceRetrieval {
 	 * @throws InputException
 	 * @throws RemoteException
 	 */
-	public static String getProteinSequence(String proteinAcc,
-			boolean retrieveFromInternetIfNotCached) {
+	public static String getProteinSequence(String proteinAcc, boolean retrieveFromInternetIfNotCached,
+			UniprotProteinLocalRetriever upr) {
 
 		List<String> proteinAccs = new ArrayList<String>();
 		proteinAccs.add(proteinAcc);
-		HashMap<String, String> proteinSequence = ProteinSequenceRetrieval
-				.getProteinSequence(proteinAccs,
-						retrieveFromInternetIfNotCached);
+		HashMap<String, String> proteinSequence = getProteinSequence(proteinAccs, retrieveFromInternetIfNotCached, upr);
 		return proteinSequence.get(proteinAcc);
 
 	}
 
 	public static String getProteinNameFromUniprot(String proteinAcc) {
-		String urlText = "http://www.uniprot.org/uniprot/" + proteinAcc
-				+ ".xml";
+		String urlText = "http://www.uniprot.org/uniprot/" + proteinAcc + ".xml";
 		return ProteinSequenceRetrieval.parseProteinNameXMLFromUniprot(urlText);
 
 	}
 
-	public static HashMap<String, String> getProteinSequence(
-			List<String> proteinAccs, boolean retrieveFromInternetIfNotCached) {
+	public static HashMap<String, String> getProteinSequence(List<String> proteinAccs,
+			boolean retrieveFromInternetIfNotCached, UniprotProteinLocalRetriever upr) {
 		HashMap<String, String> ret = new HashMap<String, String>();
 
 		try {
@@ -89,27 +90,42 @@ public class ProteinSequenceRetrieval {
 				if (!retrieveFromInternetIfNotCached)
 					continue;
 
-				if (isUniProtACC(proteinAcc)) {
-					uniprotAccs.add(proteinAcc);
+				if (FastaParser.isUniProtACC(proteinAcc)) {
+					uniprotAccs.add(FastaParser.getUniProtACC(proteinAcc));
 				} else {
-					ncbiAccs.add(proteinAcc);
+					String ncbiacc = FastaParser.getNCBIACC(proteinAcc);
+					if (ncbiacc != null) {
+						ncbiAccs.add(ncbiacc);
+					}
 				}
 
 			}
 
 			// Retrieve Uniprot Accs
-			for (String proteinAcc : uniprotAccs) {
-				String urlText = "http://www.uniprot.org/uniprot/" + proteinAcc
-						+ ".xml";
-				// String seqXML = URLDownloader.downloadURL(new URL(
-				// URLParamEncoder.encode(urlText)));
-				String seq = parseSeqXMLFromUniprot(urlText);
-				seq = skipFastaHeader(seq);
-				sequenceMap.put(proteinAcc, seq);
-				ret.put(proteinAcc, seq);
-				log.debug("Sequence from protein: " + proteinAcc
-						+ " has been stored.");
-				log.debug(sequenceMap.size() + " sequences stored");
+			if (!uniprotAccs.isEmpty()) {
+				if (upr != null) {
+					Map<String, Entry> annotatedProteins = upr.getAnnotatedProteins(null, uniprotAccs);
+					for (String uniprotAcc : uniprotAccs) {
+						if (annotatedProteins.containsKey(uniprotAcc)) {
+							SequenceType sequence = annotatedProteins.get(uniprotAcc).getSequence();
+							if (sequence != null && sequence.getValue() != null) {
+								ret.put(uniprotAcc, sequence.getValue().replace("\n", ""));
+							}
+						}
+					}
+				} else {
+					for (String proteinAcc : uniprotAccs) {
+						String urlText = "http://www.uniprot.org/uniprot/" + proteinAcc + ".xml";
+						// String seqXML = URLDownloader.downloadURL(new URL(
+						// URLParamEncoder.encode(urlText)));
+						String seq = parseSeqXMLFromUniprot(urlText);
+						seq = skipFastaHeader(seq);
+						sequenceMap.put(proteinAcc, seq);
+						ret.put(proteinAcc, seq);
+						log.debug("Sequence from protein: " + proteinAcc + " has been stored.");
+						log.debug(sequenceMap.size() + " sequences stored");
+					}
+				}
 			}
 
 			// Retrieve NCBI Accs
@@ -132,8 +148,7 @@ public class ProteinSequenceRetrieval {
 					String seq = seqs.get(proteinAcc);
 					sequenceMap.put(proteinAcc, seq);
 					ret.put(proteinAcc, seq);
-					log.info("Sequence from protein: " + proteinAcc
-							+ " has been stored.");
+					log.info("Sequence from protein: " + proteinAcc + " has been stored.");
 					log.info(sequenceMap.size() + " sequences stored");
 				}
 
@@ -245,15 +260,13 @@ public class ProteinSequenceRetrieval {
 		if (proteinAcc.length() == 6)
 			return true;
 		if (proteinAcc.length() > 6
-				&& (proteinAcc.substring(6, 7).equals(".") || proteinAcc
-						.substring(6, 7).equals("-")))
+				&& (proteinAcc.substring(6, 7).equals(".") || proteinAcc.substring(6, 7).equals("-")))
 			return true;
 		return false;
 	}
 
 	public static String[] getValidDatabases() {
-		final DatabaseInfo[] databases = ProteinSequenceRetrieval
-				.getDatabases();
+		final DatabaseInfo[] databases = ProteinSequenceRetrieval.getDatabases();
 		String[] ret = new String[databases.length];
 		int i = 0;
 		for (DatabaseInfo databaseInfo : databases) {
