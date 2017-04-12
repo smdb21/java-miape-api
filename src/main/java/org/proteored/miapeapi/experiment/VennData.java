@@ -1,10 +1,12 @@
 package org.proteored.miapeapi.experiment;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -21,14 +23,14 @@ public class VennData {
 	private final HashMap<ProteinComparatorKey, Object> hash3 = new HashMap<ProteinComparatorKey, Object>();
 
 	private final ProteinGroupComparisonType proteinComparisonType;
-	private Set<ProteinComparatorKey> keys1 = new HashSet<ProteinComparatorKey>();
-	private Set<ProteinComparatorKey> keys2 = new HashSet<ProteinComparatorKey>();
-	private Set<ProteinComparatorKey> keys3 = new HashSet<ProteinComparatorKey>();
+	private List<ProteinComparatorKey> keys1 = new ArrayList<ProteinComparatorKey>();
+	private List<ProteinComparatorKey> keys2 = new ArrayList<ProteinComparatorKey>();
+	private List<ProteinComparatorKey> keys3 = new ArrayList<ProteinComparatorKey>();
 	private HashMap<Object, String> hash = new HashMap<Object, String>();
 	private final Boolean countNonConclusiveProteins;
-	private Set<ProteinComparatorKey> uniqueTo1Keys;
-	private Set<ProteinComparatorKey> uniqueTo2Keys;
-	private Set<ProteinComparatorKey> uniqueTo3Keys;
+	private List<ProteinComparatorKey> uniqueTo1Keys;
+	private List<ProteinComparatorKey> uniqueTo2Keys;
+	private List<ProteinComparatorKey> uniqueTo3Keys;
 	private Set<ProteinComparatorKey> union12;
 	private Set<ProteinComparatorKey> union13;
 	private Set<ProteinComparatorKey> union23;
@@ -56,16 +58,17 @@ public class VennData {
 			log.debug("Collection 3 is empty!");
 		}
 		this.countNonConclusiveProteins = countNonConclusiveProteins;
-		log.debug("Processing collection 1");
+		log.info("Processing collection 1");
 		processCollections(col1, keys1, hash1);
-		log.debug("Processing collection 2");
+		log.info("Processing collection 2");
 		processCollections(col2, keys2, hash2);
-		log.debug("Processing collection 3");
+		log.info("Processing collection 3");
 		processCollections(col3, keys3, hash3);
+		log.info("keys1=" + keys1.size() + "keys2=" + keys2.size() + "keys3=" + keys3.size());
 
 	}
 
-	private void processCollections(Collection<Object> referenceCollection, Set<ProteinComparatorKey> keys1,
+	private void processCollections(Collection<Object> referenceCollection, List<ProteinComparatorKey> keys1,
 			HashMap<ProteinComparatorKey, Object> hash1) {
 
 		int uniques = 0; // number of unique objects in reference collection
@@ -118,7 +121,9 @@ public class VennData {
 					// numDiscarded++;
 					// continue;
 					// }
-
+					if (pgo.getAccessions().contains("Q04917")) {
+						log.info(pgo);
+					}
 					ProteinComparatorKey pgoKey = pgo.getKey(this.proteinComparisonType);
 					// String objKey = getUniqueKey();
 					// if (this.hash.containsKey(pgoKey)) {
@@ -162,51 +167,51 @@ public class VennData {
 	}
 
 	public Collection<Object> getIntersection123() {
-		Set<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys2, keys3);
+		List<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys2, keys3);
 		Set<Object> ret = getObjectsByKeys(intersectionKeys);
 		return ret;
 	}
 
-	public Set<ProteinComparatorKey> getIntersection123Keys() {
+	public List<ProteinComparatorKey> getIntersection123Keys() {
 		return getIntersection(keys1, keys2, keys3);
 	}
 
 	public Collection<Object> getIntersection12() {
-		Set<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys2);
+		List<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys2);
 		Set<Object> ret = getObjectsByKeys(intersectionKeys);
 		return ret;
 	}
 
-	public Set<ProteinComparatorKey> getIntersection12Keys() {
+	public List<ProteinComparatorKey> getIntersection12Keys() {
 		return getIntersection(keys1, keys2);
 	}
 
 	public Collection<Object> getIntersection23() {
-		Set<ProteinComparatorKey> intersectionKeys = getIntersection(keys2, keys3);
+		List<ProteinComparatorKey> intersectionKeys = getIntersection(keys2, keys3);
 		Set<Object> ret = getObjectsByKeys(intersectionKeys);
 		return ret;
 	}
 
-	public Set<ProteinComparatorKey> getIntersection23Keys() {
+	public List<ProteinComparatorKey> getIntersection23Keys() {
 		return getIntersection(keys2, keys3);
 	}
 
 	public Collection<Object> getIntersection13() {
-		Set<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys3);
+		List<ProteinComparatorKey> intersectionKeys = getIntersection(keys1, keys3);
 		Set<Object> ret = getObjectsByKeys(intersectionKeys);
 		return ret;
 	}
 
-	public Set<ProteinComparatorKey> getIntersection13Keys() {
+	public List<ProteinComparatorKey> getIntersection13Keys() {
 		return getIntersection(keys1, keys3);
 	}
 
 	public Collection<Object> getUniqueTo1() {
-		Set<ProteinComparatorKey> uniqueTo1 = getUniqueToFirstSet(keys1, keys2, keys3);
+		List<ProteinComparatorKey> uniqueTo1 = getUniqueToFirstSet(keys1, keys2, keys3);
 		return this.getObjectsByKeys(uniqueTo1);
 	}
 
-	public Set<ProteinComparatorKey> getUniqueTo1Keys() {
+	public List<ProteinComparatorKey> getUniqueTo1Keys() {
 		if (uniqueTo1Keys == null) {
 			uniqueTo1Keys = getUniqueToFirstSet(keys1, keys2, keys3);
 		}
@@ -214,11 +219,11 @@ public class VennData {
 	}
 
 	public Collection<Object> getUniqueTo2() {
-		Set<ProteinComparatorKey> uniqueTo2 = getUniqueToFirstSet(keys2, keys1, keys3);
+		List<ProteinComparatorKey> uniqueTo2 = getUniqueToFirstSet(keys2, keys1, keys3);
 		return this.getObjectsByKeys(uniqueTo2);
 	}
 
-	public Set<ProteinComparatorKey> getUniqueTo2Keys() {
+	public List<ProteinComparatorKey> getUniqueTo2Keys() {
 		if (uniqueTo2Keys == null) {
 			uniqueTo2Keys = getUniqueToFirstSet(keys2, keys1, keys3);
 		}
@@ -226,41 +231,36 @@ public class VennData {
 	}
 
 	public Collection<Object> getUniqueTo3() {
-		Set<ProteinComparatorKey> uniqueTo3 = getUniqueToFirstSet(keys3, keys1, keys2);
+		List<ProteinComparatorKey> uniqueTo3 = getUniqueToFirstSet(keys3, keys1, keys2);
 		return this.getObjectsByKeys(uniqueTo3);
 	}
 
-	public Set<ProteinComparatorKey> getUniqueTo3Keys() {
+	public List<ProteinComparatorKey> getUniqueTo3Keys() {
 		if (uniqueTo3Keys == null) {
 			uniqueTo3Keys = getUniqueToFirstSet(keys3, keys1, keys2);
 		}
 		return uniqueTo3Keys;
 	}
 
-	private Set<ProteinComparatorKey> getUniqueToFirstSet(Set<ProteinComparatorKey> hashToIsolate,
-			Set<ProteinComparatorKey> hash2, Set<ProteinComparatorKey> hash3) {
-		Set<ProteinComparatorKey> toIsolateSet2 = new HashSet<ProteinComparatorKey>();
+	private List<ProteinComparatorKey> getUniqueToFirstSet(Collection<ProteinComparatorKey> hashToIsolate,
+			Collection<ProteinComparatorKey> hash2, Collection<ProteinComparatorKey> hash3) {
+		List<ProteinComparatorKey> toIsolateSet2 = new ArrayList<ProteinComparatorKey>();
+		log.info("Unique to isolate size=" + hashToIsolate.size());
 		if (hashToIsolate != null) {
 			toIsolateSet2.addAll(hashToIsolate);
 			Iterator<ProteinComparatorKey> toIsolateIterator = toIsolateSet2.iterator();
-			if (hash2 != null) {
-				while (toIsolateIterator.hasNext()) {
-					ProteinComparatorKey item = toIsolateIterator.next();
-					if (hash2.contains(item)) {
-						toIsolateIterator.remove();
-					}
-				}
-			}
-			toIsolateIterator = toIsolateSet2.iterator();
-			if (hash3 != null) {
-				while (toIsolateIterator.hasNext()) {
-					ProteinComparatorKey item = toIsolateIterator.next();
-					if (hash3.contains(item)) {
-						toIsolateIterator.remove();
-					}
-				}
-			}
 
+			while (toIsolateIterator.hasNext()) {
+				ProteinComparatorKey item = toIsolateIterator.next();
+				if (item.getAccessionString().contains("Q04917")) {
+					log.info(item.getAccessionString());
+				}
+				if (hash2 != null && hash2.contains(item)) {
+					toIsolateIterator.remove();
+				} else if (hash3 != null && hash3.contains(item)) {
+					toIsolateIterator.remove();
+				}
+			}
 		}
 		return toIsolateSet2;
 	}
@@ -320,7 +320,7 @@ public class VennData {
 
 	}
 
-	private Set<Object> getObjectsByKeys(Set<ProteinComparatorKey> keys) {
+	private Set<Object> getObjectsByKeys(Collection<ProteinComparatorKey> keys) {
 		Set<Object> ret = new HashSet<Object>();
 
 		for (ProteinComparatorKey key : keys) {
@@ -349,28 +349,34 @@ public class VennData {
 	 * @param list3
 	 * @return
 	 */
-	private Set<ProteinComparatorKey> getIntersection(Set<ProteinComparatorKey> list1, Set<ProteinComparatorKey> list2,
-			Set<ProteinComparatorKey> list3) {
+	private List<ProteinComparatorKey> getIntersection(Collection<ProteinComparatorKey> list1,
+			Collection<ProteinComparatorKey> list2, Collection<ProteinComparatorKey> list3) {
 
 		if (list1 == null || list1.isEmpty() || list2 == null || list2.isEmpty() || list3 == null || list3.isEmpty()) {
 
-			return Collections.EMPTY_SET;
+			return Collections.emptyList();
 		}
-		HashSet<ProteinComparatorKey> ret = new HashSet<ProteinComparatorKey>();
-		for (ProteinComparatorKey key : list1) {
-			int numFound = 0;
 
-			if (list2 != null) {
-				if (list2.contains(key)) {
-					numFound++;
-				}
-			}
-			if (list3 != null) {
-				if (list3.contains(key)) {
-					numFound++;
-				}
-			}
-			if (numFound == 2) {
+		// loop with the sortest
+		Collection<ProteinComparatorKey> shortest = list1;
+		Collection<ProteinComparatorKey> longest;
+		Collection<ProteinComparatorKey> longest2;
+		if (shortest.size() > list2.size()) {
+			shortest = list2;
+			longest = list1;
+		} else {
+			longest = list2;
+		}
+		if (shortest.size() > list3.size()) {
+			longest2 = shortest;
+			shortest = list3;
+		} else {
+			longest2 = list3;
+		}
+
+		List<ProteinComparatorKey> ret = new ArrayList<ProteinComparatorKey>();
+		for (ProteinComparatorKey key : shortest) {
+			if (longest.contains(key) && longest2.contains(key)) {
 				ret.add(key);
 			}
 		}
@@ -378,17 +384,17 @@ public class VennData {
 		return ret;
 	}
 
-	private Set<ProteinComparatorKey> getIntersection(Set<ProteinComparatorKey> list1,
-			Set<ProteinComparatorKey> list2) {
+	private List<ProteinComparatorKey> getIntersection(Collection<ProteinComparatorKey> list1,
+			Collection<ProteinComparatorKey> list2) {
 
 		if (list1 == null || list1.isEmpty() || list2 == null || list2.isEmpty()) {
 
-			return Collections.EMPTY_SET;
+			return Collections.emptyList();
 		}
-		HashSet<ProteinComparatorKey> ret = new HashSet<ProteinComparatorKey>();
+		List<ProteinComparatorKey> ret = new ArrayList<ProteinComparatorKey>();
 		// loop with the sortest
-		Set<ProteinComparatorKey> shortest;
-		Set<ProteinComparatorKey> longest;
+		Collection<ProteinComparatorKey> shortest;
+		Collection<ProteinComparatorKey> longest;
 		if (list1.size() > list2.size()) {
 			shortest = list2;
 			longest = list1;
@@ -413,31 +419,33 @@ public class VennData {
 	 * @param list3
 	 * @return
 	 */
-	private Set<ProteinComparatorKey> getUnion(Set<ProteinComparatorKey> list1, Set<ProteinComparatorKey> list2,
-			Set<ProteinComparatorKey> list3) {
+	private Set<ProteinComparatorKey> getUnion(Collection<ProteinComparatorKey> list1,
+			Collection<ProteinComparatorKey> list2, Collection<ProteinComparatorKey> list3) {
 		// Since the HashSet doesn't allow to add repeated elements, add all to
 		// the set
-		HashSet<ProteinComparatorKey> ret = new HashSet<ProteinComparatorKey>();
-		if (list1 != null)
+		Set<ProteinComparatorKey> ret = new HashSet<ProteinComparatorKey>();
+		if (list1 != null) {
 			ret.addAll(list1);
-		if (list2 != null)
+		}
+		if (list2 != null) {
 			ret.addAll(list2);
-		if (list3 != null)
+		}
+		if (list3 != null) {
 			ret.addAll(list3);
-
+		}
 		return ret;
 	}
 
 	public int getSize1() {
-		return this.hash1.size();
+		return this.keys1.size();
 	}
 
 	public int getSize2() {
-		return this.hash2.size();
+		return this.keys2.size();
 	}
 
 	public int getSize3() {
-		return this.hash3.size();
+		return this.keys3.size();
 	}
 
 	public Collection getCollection1() {
