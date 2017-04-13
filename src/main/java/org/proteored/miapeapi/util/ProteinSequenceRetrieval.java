@@ -26,9 +26,9 @@ import org.xml.sax.SAXException;
 
 import com.compomics.util.protein.Protein;
 
+import edu.scripps.yates.annotations.uniprot.UniprotEntryUtil;
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
 import edu.scripps.yates.annotations.uniprot.xml.Entry;
-import edu.scripps.yates.annotations.uniprot.xml.SequenceType;
 import edu.scripps.yates.utilities.fasta.FastaParser;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DatabaseInfo;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfConnException;
@@ -107,9 +107,9 @@ public class ProteinSequenceRetrieval {
 					Map<String, Entry> annotatedProteins = upr.getAnnotatedProteins(null, uniprotAccs);
 					for (String uniprotAcc : uniprotAccs) {
 						if (annotatedProteins.containsKey(uniprotAcc)) {
-							SequenceType sequence = annotatedProteins.get(uniprotAcc).getSequence();
-							if (sequence != null && sequence.getValue() != null) {
-								ret.put(uniprotAcc, sequence.getValue().replace("\n", ""));
+							String sequence = UniprotEntryUtil.getProteinSequence(annotatedProteins.get(uniprotAcc));
+							if (sequence != null) {
+								ret.put(uniprotAcc, sequence);
 							}
 						}
 					}
