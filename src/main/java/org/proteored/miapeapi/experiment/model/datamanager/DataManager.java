@@ -388,11 +388,11 @@ public abstract class DataManager {
 									// .getId())) {
 									extendedIdentifiedProtein = new ExtendedIdentifiedProtein((Replicate) idSet,
 											protein, miapeMSIDocument);
-											// if (useStaticCollections)
-											// staticProteins.put(
-											// extendedIdentifiedProtein
-											// .getId(),
-											// extendedIdentifiedProtein);
+									// if (useStaticCollections)
+									// staticProteins.put(
+									// extendedIdentifiedProtein
+									// .getId(),
+									// extendedIdentifiedProtein);
 
 									// } else {
 									// extendedIdentifiedProtein =
@@ -2501,5 +2501,13 @@ public abstract class DataManager {
 		int total = peptidePlusCharge.size();
 		log.debug(idSet.getName() + "---->Peptides  " + numDifPeptides + " = " + total);
 		return total;
+	}
+
+	public int getNumPSMsForAPeptide(String sequenceKey) {
+		if (peptideOccurrenceList.containsKey(sequenceKey)) {
+			PeptideOccurrence peptideOccurrence = peptideOccurrenceList.get(sequenceKey);
+			return peptideOccurrence.getPeptides().size();
+		}
+		return 0;
 	}
 }

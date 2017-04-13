@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.taglibs.standard.tag.common.core.ForEachSupport;
 import org.jfree.data.statistics.Statistics;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
@@ -158,8 +159,16 @@ public class Experiment implements IdentificationSet<Replicate> {
 	 */
 	@Override
 	public int getProteinGroupOccurrenceNumber(ProteinGroup proteinGroup) {
-
-		return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
+		try {
+			int num = 0;
+			List<Replicate> nextLevelIdentificationSetList = getNextLevelIdentificationSetList();
+			for (Replicate replicate : nextLevelIdentificationSetList) {
+				num += replicate.getProteinGroupOccurrenceNumber(proteinGroup);
+			}
+			return num;
+		} catch (UnsupportedOperationException e) {
+			return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
+		}
 	}
 
 	/**
@@ -790,5 +799,15 @@ public class Experiment implements IdentificationSet<Replicate> {
 	@Override
 	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey) {
 		return dataManager.getProteinGroupOccurrenceNumberByProteinGroupKey(proteinGroupKey);
+	}
+
+	@Override
+	public int getNumPSMsForAPeptide(String sequenceKey) {
+		return dataManager.getNumPSMsForAPeptide(sequenceKey);
+	}
+
+	@Override
+	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey) {
+		return dataManager.getProteinGroupOccurrenceByProteinGroupKey(proteinGroupKey);
 	}
 }

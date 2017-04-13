@@ -121,7 +121,16 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	 */
 	@Override
 	public int getProteinGroupOccurrenceNumber(ProteinGroup proteinGroup) {
-		return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
+		try {
+			int num = 0;
+			List<Experiment> nextLevelIdentificationSetList = getNextLevelIdentificationSetList();
+			for (Experiment experiment : nextLevelIdentificationSetList) {
+				num += experiment.getProteinGroupOccurrenceNumber(proteinGroup);
+			}
+			return num;
+		} catch (UnsupportedOperationException e) {
+			return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
+		}
 	}
 
 	@Override
@@ -815,5 +824,15 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	@Override
 	public int getPeptideChargeOccurrenceNumber(String sequencePlusChargeKey, Boolean distinguishModPep) {
 		return dataManager.getPeptideChargeOccurrenceNumber(sequencePlusChargeKey, distinguishModPep);
+	}
+
+	@Override
+	public int getNumPSMsForAPeptide(String sequenceKey) {
+		return dataManager.getNumPSMsForAPeptide(sequenceKey);
+	}
+
+	@Override
+	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey) {
+		return dataManager.getProteinGroupOccurrenceByProteinGroupKey(proteinGroupKey);
 	}
 }

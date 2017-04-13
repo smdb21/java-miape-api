@@ -530,4 +530,7 @@ public interface IdentificationSet<T> {
 	 */
 	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey);
 
+	public int getNumPSMsForAPeptide(String sequenceKey);
+
+	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey);
 }

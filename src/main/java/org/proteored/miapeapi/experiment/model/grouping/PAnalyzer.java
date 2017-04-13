@@ -40,10 +40,30 @@ public class PAnalyzer {
 	private PanalyzerStats mStats;
 	private final boolean separateNonConclusiveProteins;
 
+	private boolean ignoreProteinId;
+
+	/**
+	 * ignoreProteinId=true
+	 * 
+	 * @param separateNonConclusiveProteins
+	 */
 	public PAnalyzer(boolean separateNonConclusiveProteins) {
+		this(separateNonConclusiveProteins, true);
+	}
+
+	/**
+	 * 
+	 * @param separateNonConclusiveProteins
+	 * @param ignoreProteinId
+	 *            if true, even protein with the same id are considered. It
+	 *            happens that the id may be repeated and we want them to be
+	 *            separated
+	 */
+	public PAnalyzer(boolean separateNonConclusiveProteins, boolean ignoreProteinId) {
 		mProts = new HashMap<String, InferenceProtein>();
 		mPepts = new HashMap<String, InferencePeptide>();
 		mGroups = new ArrayList<ProteinGroupInference>();
+		this.ignoreProteinId = ignoreProteinId;
 		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
 	}
 
@@ -149,7 +169,7 @@ public class PAnalyzer {
 		Set<Integer> proteinIds = new HashSet<Integer>();
 
 		for (ExtendedIdentifiedProtein prot : proteins) {
-			if (!proteinIds.contains(prot.getId())) {
+			if (ignoreProteinId || !proteinIds.contains(prot.getId())) {
 				proteinIds.add(prot.getId());
 				iProt = mProts.get(prot.getAccession());
 				if (iProt == null) {

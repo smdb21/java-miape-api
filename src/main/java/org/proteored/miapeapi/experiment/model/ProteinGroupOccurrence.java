@@ -26,6 +26,8 @@ import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
+import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+
 public class ProteinGroupOccurrence
 		implements Occurrence<ProteinGroup>, ProteinContainer, PeptideContainer, ProteinGroupContainer {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -124,10 +126,12 @@ public class ProteinGroupOccurrence
 		Collections.sort(proteinList, ComparatorManager.getProteinComparatorByEvidence());
 		for (ExtendedIdentifiedProtein protein : proteinList) {
 			if (protein.getAccession() == null) {
-				log.info("protein with no acc");
+				log.warn("protein with no acc");
+			} else {
+				accessionsByEvidence.add(protein.getAccession());
 			}
-			accessionsByEvidence.add(protein.getAccession());
 		}
+
 		return accessionsByEvidence;
 	}
 
@@ -312,11 +316,13 @@ public class ProteinGroupOccurrence
 	}
 
 	/**
+	 * @param upr
 	 * @return the coverage
 	 */
-	public Float getMeanProteinCoverage(boolean retrieveSequenceFromTheInternet) {
+	public Float getMeanProteinCoverage(boolean retrieveSequenceFromTheInternet, UniprotProteinLocalRetriever upr) {
 		if (meanProteinCoverage == null)
-			meanProteinCoverage = Float.valueOf(ProteinMerger.getCoverage(this, null, retrieveSequenceFromTheInternet));
+			meanProteinCoverage = Float
+					.valueOf(ProteinMerger.getCoverage(this, null, retrieveSequenceFromTheInternet, upr));
 		return meanProteinCoverage;
 	}
 

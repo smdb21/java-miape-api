@@ -19,6 +19,8 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 
+import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+
 public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private ProteinEvidence evidence;
@@ -76,7 +78,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 		return this.getKey();
 	}
 
-	public String getProteinSequence(boolean retrieveFromTheInternet) {
+	public String getProteinSequence(boolean retrieveFromTheInternet, UniprotProteinLocalRetriever upr) {
 		if (this.selectedProteinSequence == null) {
 
 			// First look at local data
@@ -92,7 +94,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 				String proteinAcc = protein.getAccession();
 
 				this.selectedProteinSequence = ProteinSequenceRetrieval.getProteinSequence(proteinAcc,
-						retrieveFromTheInternet);
+						retrieveFromTheInternet, upr);
 				if (this.selectedProteinSequence != null)
 					return this.selectedProteinSequence;
 			}

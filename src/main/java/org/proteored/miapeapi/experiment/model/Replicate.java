@@ -680,4 +680,14 @@ public class Replicate implements IdentificationSet<Void> {
 	public int getProteinGroupOccurrenceNumberByProteinGroupKey(String proteinGroupKey) {
 		return dataManager.getProteinGroupOccurrenceNumberByProteinGroupKey(proteinGroupKey);
 	}
+
+	@Override
+	public int getNumPSMsForAPeptide(String sequenceKey) {
+		return dataManager.getNumPSMsForAPeptide(sequenceKey);
+	}
+
+	@Override
+	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey) {
+		return dataManager.getProteinGroupOccurrenceByProteinGroupKey(proteinGroupKey);
+	}
 }
