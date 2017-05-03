@@ -20,10 +20,13 @@ import org.proteored.miapeapi.interfaces.msi.InputData;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
+import org.proteored.miapeapi.util.ModificationMapping;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.Atom;
+
+import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
 public class ExtendedIdentifiedPeptide extends IdentificationItem implements IdentifiedPeptide {
 	private static HashMap<String, List<String>> sequenceConversion = new HashMap<String, List<String>>();
@@ -50,6 +53,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	protected PeptideRelation relation;
 
 	private SortingParameters sortingParameters;
+
+	private SlimModCollection preferredModifications;
 
 	// private boolean filtered = false;
 
@@ -133,8 +138,15 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			}
 		} else {
 			try {
-				// Double errorInPPM = Double.valueOf(string);
-				// TODO
+				double errorMZ = Double.valueOf(string);
+				errorMass = String.valueOf(errorMZ);
+
+				int charge = Integer.valueOf(getCharge());
+				double calcMzDouble = ModificationMapping.getAASequenceImpl(getSequence(), getModifications())
+						.getMz(charge);
+				calcMass = String.valueOf(calcMzDouble);
+				double expMZDouble = calcMzDouble - errorMZ;
+				expMass = String.valueOf(expMZDouble);
 			} catch (NumberFormatException e) {
 
 			}

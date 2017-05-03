@@ -37,13 +37,11 @@ public class MiapeMSIDocumentBuilder extends AbstractMiapeDocumentBuilder {
 		super(project, documentName, owner);
 	}
 
-	MiapeMSIDocumentBuilder(Project project, String name, User owner,
-			PersistenceManager db) {
+	MiapeMSIDocumentBuilder(Project project, String name, User owner, PersistenceManager db) {
 		super(project, name, owner, db);
 	}
 
-	MiapeMSIDocumentBuilder(Project project, String name, User owner,
-			PersistenceManager db, XmlManager xmlManager,
+	MiapeMSIDocumentBuilder(Project project, String name, User owner, PersistenceManager db, XmlManager xmlManager,
 			ControlVocabularyManager cvUtil) {
 		super(project, name, owner, db, xmlManager, cvUtil);
 	}
@@ -83,14 +81,12 @@ public class MiapeMSIDocumentBuilder extends AbstractMiapeDocumentBuilder {
 		return this;
 	}
 
-	public MiapeMSIDocumentBuilder identifiedProteinSets(
-			Set<IdentifiedProteinSet> value) {
+	public MiapeMSIDocumentBuilder identifiedProteinSets(Set<IdentifiedProteinSet> value) {
 		identifiedProteinSets = value;
 		return this;
 	}
 
-	public MiapeMSIDocumentBuilder identifiedPeptides(
-			List<IdentifiedPeptide> value) {
+	public MiapeMSIDocumentBuilder identifiedPeptides(List<IdentifiedPeptide> value) {
 		identifiedPeptides = value;
 		return this;
 	}
@@ -105,8 +101,7 @@ public class MiapeMSIDocumentBuilder extends AbstractMiapeDocumentBuilder {
 		return this;
 	}
 
-	public MiapeMSIDocumentBuilder additionalInformations(
-			Set<MSIAdditionalInformation> value) {
+	public MiapeMSIDocumentBuilder additionalInformations(Set<MSIAdditionalInformation> value) {
 		additionalInformations = value;
 		return this;
 	}

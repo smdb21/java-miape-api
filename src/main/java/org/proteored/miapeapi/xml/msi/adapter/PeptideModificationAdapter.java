@@ -18,17 +18,15 @@ import uk.ac.ebi.pridemod.PrideModController;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
 
-public class PeptideModificationAdapter implements
-		Adapter<MSIPeptideModification> {
+public class PeptideModificationAdapter implements Adapter<MSIPeptideModification> {
 	private static SlimModCollection preferredModifications;
 	private final PeptideModification modification;
 	private final ObjectFactory factory;
 	private final MSIControlVocabularyXmlFactory cvFactory;
-	ClassPathResource resource = new ClassPathResource(
-			"modification_mappings.xml");
+	ClassPathResource resource = new ClassPathResource("modification_mappings.xml");
 
-	public PeptideModificationAdapter(PeptideModification modification,
-			ObjectFactory factory, MSIControlVocabularyXmlFactory cvFactory) {
+	public PeptideModificationAdapter(PeptideModification modification, ObjectFactory factory,
+			MSIControlVocabularyXmlFactory cvFactory) {
 		this.modification = modification;
 		this.cvFactory = cvFactory;
 		this.factory = factory;
@@ -37,48 +35,39 @@ public class PeptideModificationAdapter implements
 	@Override
 	public MSIPeptideModification adapt() {
 		if (modification != null) {
-			MSIPeptideModification xmlModification = factory
-					.createMSIPeptideModification();
+			MSIPeptideModification xmlModification = factory.createMSIPeptideModification();
 			SlimModCollection modificationMapping = getModificationMapping();
-			SlimModification slimMod = modificationMapping
-					.getbyName(modification.getName());
+			SlimModification slimMod = modificationMapping.getbyName(modification.getName());
 			if (slimMod == null) {
 				// search by delta mass
 				if (modification.getMonoDelta() != null)
-					modificationMapping = modificationMapping.getbyDelta(
-							modification.getMonoDelta(), 0.001);
+					modificationMapping = modificationMapping.getbyDelta(modification.getMonoDelta(), 0.03);
 				// filter by residues
-				if (modificationMapping.size() > 1
-						&& modification.getResidues() != null
-						&& !"".equals(modification.getResidues())
-						&& !modificationMapping.isEmpty())
-					modificationMapping = modificationMapping
-							.getbySpecificity(modification.getResidues());
+				if (modificationMapping.size() > 1 && modification.getResidues() != null
+						&& !"".equals(modification.getResidues()) && !modificationMapping.isEmpty())
+					modificationMapping = modificationMapping.getbySpecificity(modification.getResidues());
 				// if just there is one, take the first
 				if (modificationMapping.size() == 1)
 					slimMod = modificationMapping.get(0);
 			}
 			if (slimMod != null) {
 				final ParamType paramType = factory.createParamType();
-				FuGECommonOntologyCvParamType cvParam = factory
-						.createFuGECommonOntologyCvParamType();
+				FuGECommonOntologyCvParamType cvParam = factory.createFuGECommonOntologyCvParamType();
 				cvParam.setAccession(slimMod.getIdPsiMod());
 				cvParam.setName(slimMod.getPsiModDesc());
 				cvParam.setCvRef(PSIModOntology.getCVLabel());
 				paramType.setCvParam(cvParam);
 				xmlModification.setName(paramType);
 			} else {
-				final ParamType paramType = cvFactory.createCV(modification
-						.getName(), null, PeptideModificationName
-						.getInstance(cvFactory.getCvManager()));
+				final ParamType paramType = cvFactory.createCV(modification.getName(), null,
+						PeptideModificationName.getInstance(cvFactory.getCvManager()));
 				xmlModification.setName(paramType);
 			}
 			xmlModification.setAvgDelta(modification.getAvgDelta());
 			xmlModification.setMonoDelta(modification.getMonoDelta());
 			xmlModification.setPosition(modification.getPosition());
 			xmlModification.setResidues(modification.getResidues());
-			xmlModification.setReplacementResidue(modification
-					.getReplacementResidue());
+			xmlModification.setReplacementResidue(modification.getReplacementResidue());
 			xmlModification.setNeutralLoss(modification.getNeutralLoss());
 			xmlModification.setEvidence(modification.getModificationEvidence());
 			return xmlModification;
@@ -91,8 +80,7 @@ public class PeptideModificationAdapter implements
 			URL url;
 			try {
 				url = resource.getURL();
-				PeptideModificationAdapter.preferredModifications = PrideModController
-						.parseSlimModCollection(url);
+				PeptideModificationAdapter.preferredModifications = PrideModController.parseSlimModCollection(url);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

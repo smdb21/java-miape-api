@@ -10,10 +10,10 @@ import org.proteored.miapeapi.cv.msi.PeptideModificationName;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.springframework.core.io.ClassPathResource;
 
+import de.proteinms.xtandemparser.interfaces.Modification;
 import uk.ac.ebi.pridemod.PrideModController;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
-import de.proteinms.xtandemparser.interfaces.Modification;
 
 public class PeptideModificationImpl implements PeptideModification {
 	private static SlimModCollection preferredModifications;
@@ -21,11 +21,9 @@ public class PeptideModificationImpl implements PeptideModification {
 	private String residue;
 	private final Integer domainStart;
 	private final ControlVocabularyManager cvManager;
-	private final ClassPathResource resource = new ClassPathResource(
-			"modification_mappings.xml");
+	private final ClassPathResource resource = new ClassPathResource("modification_mappings.xml");
 
-	public PeptideModificationImpl(Modification modification,
-			Integer domainStart, ControlVocabularyManager cvManager) {
+	public PeptideModificationImpl(Modification modification, Integer domainStart, ControlVocabularyManager cvManager) {
 		this.modification = modification;
 
 		this.domainStart = domainStart;
@@ -48,42 +46,34 @@ public class PeptideModificationImpl implements PeptideModification {
 		try {
 			// try first with the PRIDE mapping
 			SlimModCollection modificationMapping = getModificationMapping();
-			SlimModification slimMod = modificationMapping
-					.getbyName(modification.getName());
+			SlimModification slimMod = modificationMapping.getbyName(modification.getName());
 			if (slimMod != null) {
 				return slimMod.getPsiModDesc();
 			}
-			SlimModCollection slimMods = modificationMapping.getbyDelta(
-					modification.getMass(), 0.001);
+			SlimModCollection slimMods = modificationMapping.getbyDelta(modification.getMass(), 0.001);
 			if (slimMods != null && !slimMods.isEmpty()) {
 				return slimMods.get(0).getPsiModDesc();
 			}
 			// TODO add more modifications!
 			// read from a file?
-			if (getResidues().equals("C")
-					&& compareWithError(getMonoDelta(), 57.022)) {
-				final ControlVocabularyTerm cvTerm = cvManager
-						.getCVTermByAccession(new Accession(
-								PeptideModificationName.UNIMOD4),
-								PeptideModificationName.getInstance(cvManager));
+			if (getResidues().equals("C") && compareWithError(getMonoDelta(), 57.022)) {
+				final ControlVocabularyTerm cvTerm = cvManager.getCVTermByAccession(
+						new Accession(PeptideModificationName.UNIMOD4), PeptideModificationName.getInstance(cvManager));
 				if (cvTerm != null)
 					return cvTerm.getPreferredName();
 				else
 					return "Carbamidomethyl";
 			}
-			if (getResidues().equals("E")
-					&& compareWithError(getMonoDelta(), -18.0106)) {
-				final ControlVocabularyTerm cvTerm = cvManager
-						.getCVTermByAccession(new Accession(
-								PeptideModificationName.UNIMOD27),
-								PeptideModificationName.getInstance(cvManager));
+			if (getResidues().equals("E") && compareWithError(getMonoDelta(), -18.0106)) {
+				final ControlVocabularyTerm cvTerm = cvManager.getCVTermByAccession(
+						new Accession(PeptideModificationName.UNIMOD27),
+						PeptideModificationName.getInstance(cvManager));
 				if (cvTerm != null)
 					return cvTerm.getPreferredName();
 				else
 					return "Glu->pyro-Glu";
 			}
-			final ControlVocabularyTerm pepModifDetailsTerm = PeptideModificationName
-					.getPepModifDetailsTerm(cvManager);
+			final ControlVocabularyTerm pepModifDetailsTerm = PeptideModificationName.getPepModifDetailsTerm(cvManager);
 			if (pepModifDetailsTerm != null)
 				return pepModifDetailsTerm.getPreferredName();
 		} catch (Exception e) {
@@ -109,8 +99,7 @@ public class PeptideModificationImpl implements PeptideModification {
 	public int getPosition() {
 
 		try {
-			return Integer.parseInt(modification.getLocation()) - domainStart
-					+ 1;
+			return Integer.parseInt(modification.getLocation()) - domainStart + 1;
 		} catch (NumberFormatException e) {
 			return -1;
 		}
@@ -156,8 +145,7 @@ public class PeptideModificationImpl implements PeptideModification {
 			URL url;
 			try {
 				url = resource.getURL();
-				PeptideModificationImpl.preferredModifications = PrideModController
-						.parseSlimModCollection(url);
+				PeptideModificationImpl.preferredModifications = PrideModController.parseSlimModCollection(url);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
