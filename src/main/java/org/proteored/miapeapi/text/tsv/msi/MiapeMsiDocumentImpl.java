@@ -524,7 +524,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 					String[] split = proteinAcc.split(separator2.getSymbol());
 					for (String string : split) {
-						ret.add(string);
+
+						ret.add(FastaParser.getACC(string).getFirstelement());
 					}
 					ret = convertUniprotIDToAcc(ret);
 					return ret;
