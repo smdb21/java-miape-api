@@ -80,7 +80,9 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	private Double getTheoreticalMZ() {
 
-		AASequenceImpl seq = ModificationMapping.getAASequenceImpl(getSequence(), getModifications());
+		Set<PeptideModification> modifications2 = getModifications();
+
+		AASequenceImpl seq = ModificationMapping.getAASequenceImpl(getSequence(), modifications2);
 		try {
 			int z = Integer.valueOf(getCharge());
 			double mz = seq.getMz(z);

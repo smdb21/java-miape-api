@@ -12,6 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 import com.compomics.util.protein.AASequenceImpl;
 import com.compomics.util.protein.ModificationImplementation;
 
+import edu.scripps.yates.utilities.masses.AssignMass;
 import uk.ac.ebi.pridemod.PrideModController;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
@@ -110,12 +111,14 @@ public class ModificationMapping {
 			HashMap<String, double[]> delta = new HashMap<String, double[]>();
 			double[] deltas = new double[2];
 			if (peptideModification.getMonoDelta() != null) {
-				deltas[0] = peptideModification.getMonoDelta();
+				deltas[0] = peptideModification.getMonoDelta()
+						+ AssignMass.getInstance(true).getMass(peptideModification.getResidues().charAt(0));
 			} else {
 				deltas[0] = 0.0;
 			}
 			if (peptideModification.getAvgDelta() != null) {
-				deltas[1] = peptideModification.getAvgDelta();
+				deltas[1] = peptideModification.getAvgDelta()
+						+ AssignMass.getInstance(false).getMass(peptideModification.getResidues().charAt(0));
 			} else {
 				deltas[1] = deltas[0];
 			}

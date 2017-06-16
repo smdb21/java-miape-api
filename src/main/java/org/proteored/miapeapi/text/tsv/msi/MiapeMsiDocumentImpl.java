@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -610,7 +611,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		} catch (Exception e) {
 
 		}
-		return "peptide modification details";
+		DecimalFormat format = new DecimalFormat("#.###");
+		return "[" + aa + format.format(deltaMass) + "]";
 	}
 
 	private boolean compareWithError(double num1, double num2) {
