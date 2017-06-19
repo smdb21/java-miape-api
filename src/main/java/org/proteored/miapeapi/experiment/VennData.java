@@ -137,11 +137,13 @@ public abstract class VennData<T> {
 	}
 
 	public Collection<Object> getUniqueTo1() {
+		processCollections();
 		List<T> uniqueTo1 = getUniqueToFirstSet(keys1, keys2, keys3);
 		return this.getObjectsByKeys(uniqueTo1);
 	}
 
 	public List<T> getUniqueTo1Keys() {
+		processCollections();
 		if (uniqueTo1Keys == null) {
 			uniqueTo1Keys = getUniqueToFirstSet(keys1, keys2, keys3);
 		}
@@ -149,11 +151,13 @@ public abstract class VennData<T> {
 	}
 
 	public Collection<Object> getUniqueTo2() {
+		processCollections();
 		List<T> uniqueTo2 = getUniqueToFirstSet(keys2, keys1, keys3);
 		return this.getObjectsByKeys(uniqueTo2);
 	}
 
 	public List<T> getUniqueTo2Keys() {
+		processCollections();
 		if (uniqueTo2Keys == null) {
 			uniqueTo2Keys = getUniqueToFirstSet(keys2, keys1, keys3);
 		}
@@ -161,11 +165,13 @@ public abstract class VennData<T> {
 	}
 
 	public Collection<Object> getUniqueTo3() {
+		processCollections();
 		List<T> uniqueTo3 = getUniqueToFirstSet(keys3, keys1, keys2);
 		return this.getObjectsByKeys(uniqueTo3);
 	}
 
 	public List<T> getUniqueTo3Keys() {
+		processCollections();
 		if (uniqueTo3Keys == null) {
 			uniqueTo3Keys = getUniqueToFirstSet(keys3, keys1, keys2);
 		}
@@ -173,6 +179,7 @@ public abstract class VennData<T> {
 	}
 
 	private List<T> getUniqueToFirstSet(Collection<T> hashToIsolate, Collection<T> hash2, Collection<T> hash3) {
+		processCollections();
 		List<T> toIsolateSet2 = new ArrayList<T>();
 		log.info("Unique to isolate size=" + hashToIsolate.size());
 		if (hashToIsolate != null) {
