@@ -1285,7 +1285,10 @@ public abstract class DataManager {
 		for (PeptideOccurrence peptideOccurrence : peptideChargeOcurrenceList.values()) {
 			final List<ExtendedIdentifiedPeptide> itemList = peptideOccurrence.getItemList();
 			for (ExtendedIdentifiedPeptide peptide : itemList) {
-				String sequenceChargeKey = peptide.getSequence() + "_" + peptide.getCharge();
+				String sequenceChargeKey = peptide.getSequence();
+				if (peptide.getCharge() != null) {
+					sequenceChargeKey += "_" + peptide.getCharge();
+				}
 				if (!ret.containsKey(sequenceChargeKey)) {
 					PeptideOccurrence newPeptideOccurrence = new PeptideOccurrence(sequenceChargeKey);
 					newPeptideOccurrence.addOccurrence(peptide);
