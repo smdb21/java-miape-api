@@ -257,54 +257,7 @@
 <!-- 				</exclusion> -->
 <!-- 			</exclusions> -->
 <!-- 		</dependency> -->
-		<!-- Thermo MSF PARSER -->
-		<dependency>
-			<groupId>com.compomics</groupId>
-			<artifactId>thermo_msf_parser</artifactId>
-			<version>2.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>batik</groupId>
-					<artifactId>batik-all</artifactId>
-				</exclusion>
-				 <exclusion>
-                    <artifactId>pdf-transcoder</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-				<exclusion>
-					<groupId>com.compomics</groupId>
-					<artifactId>utilities</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>itext</groupId>
-					<artifactId>iText</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jfree</groupId>
-					<artifactId>jfreechart</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jfree</groupId>
-					<artifactId>jcommon</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>cpdetector</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>lmjunit</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>statlib</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>xxindex</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		
 		<dependency>
 			<groupId>com.compomics</groupId>
 			<artifactId>utilities</artifactId>
@@ -468,8 +421,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 				<executions>
 			    	<execution>
