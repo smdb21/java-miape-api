@@ -18,10 +18,11 @@ public class ProteinComparatorKey {
 
 	public ProteinComparatorKey(String acc, ProteinGroupComparisonType comparationType) {
 		if (acc == null) {
-			throw new IllegalArgumentException("asdf");
+			throw new IllegalArgumentException("acc cannot be null");
 		}
 		accList.add(acc);
 		this.comparationType = comparationType;
+
 	}
 
 	public ProteinComparatorKey(Collection<String> accs, ProteinGroupComparisonType comparationType) {
@@ -30,6 +31,9 @@ public class ProteinComparatorKey {
 		}
 		accList.addAll(accs);
 		this.comparationType = comparationType;
+		if (comparationType == null) {
+			System.out.println("ASDF");
+		}
 	}
 
 	@Override
