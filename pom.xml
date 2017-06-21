@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   
     <groupId>org.proteored.miape.api</groupId>
-    <version>1.8.23-SNAPSHOT</version>
+    <version>1.9</version>
     
   	<artifactId>miape-api</artifactId>
   	<distributionManagement>
@@ -417,9 +417,8 @@
 <!--  				</executions>  -->
 <!--  			</plugin>  -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
+				<version>3.5.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
