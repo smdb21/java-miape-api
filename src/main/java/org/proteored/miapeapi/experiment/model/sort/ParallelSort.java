@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import edu.scripps.yates.cores.SystemCoreManager;
+
 public class ParallelSort {
 	static int usedCores;
 	private static Comparator comparator;

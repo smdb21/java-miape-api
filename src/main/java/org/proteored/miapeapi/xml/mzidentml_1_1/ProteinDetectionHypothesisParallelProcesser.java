@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import pi.ParIterator;
-import pi.reductions.Reducible;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.reductions.Reducible;
 import uk.ac.ebi.jmzidml.model.mzidml.DBSequence;
 import uk.ac.ebi.jmzidml.model.mzidml.PeptideHypothesis;
 import uk.ac.ebi.jmzidml.model.mzidml.ProteinDetectionHypothesis;

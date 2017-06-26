@@ -5,8 +5,8 @@ import java.util.HashMap;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.ProteinGroupOccurrence;
 
-import pi.ParIterator;
-import pi.reductions.Reducible;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.reductions.Reducible;
 
 public class ProteinGroupOcurrenceParallelCreator extends Thread {
 	private final ParIterator<ProteinGroup> iterator;

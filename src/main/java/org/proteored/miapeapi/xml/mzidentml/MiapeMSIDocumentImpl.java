@@ -22,7 +22,6 @@ import org.proteored.miapeapi.cv.ms.RetentionTime;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
-import org.proteored.miapeapi.experiment.model.sort.SystemCoreManager;
 import org.proteored.miapeapi.interfaces.Contact;
 import org.proteored.miapeapi.interfaces.MiapeDate;
 import org.proteored.miapeapi.interfaces.Project;
@@ -82,11 +81,12 @@ import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
-import pi.ParIterator;
-import pi.ParIterator.Schedule;
-import pi.ParIteratorFactory;
-import pi.reductions.Reducible;
-import pi.reductions.Reduction;
+import edu.scripps.yates.cores.SystemCoreManager;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.ParIteratorFactory;
+import edu.scripps.yates.pi.ParIterator.Schedule;
+import edu.scripps.yates.pi.reductions.Reducible;
+import edu.scripps.yates.pi.reductions.Reduction;
 
 public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private int msDocumentID;

@@ -8,8 +8,8 @@ import java.util.Set;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 
-import pi.ParIterator;
-import pi.reductions.Reducible;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.reductions.Reducible;
 
 public class PeptidesFromProteinGroupsParallelExtractor extends Thread {
 

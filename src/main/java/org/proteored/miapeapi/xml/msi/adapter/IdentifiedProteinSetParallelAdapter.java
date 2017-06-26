@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.proteored.miapeapi.experiment.model.sort.SystemCoreManager;
 import org.proteored.miapeapi.interfaces.Adapter;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProteinSet;
@@ -20,6 +19,7 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.InnerIteratorSync;
 import org.proteored.miapeapi.xml.util.parallel.InnerLock;
 
+import edu.scripps.yates.cores.SystemCoreManager;
 import uk.ac.ebi.jmzml.model.mzml.Spectrum;
 
 public class IdentifiedProteinSetParallelAdapter implements

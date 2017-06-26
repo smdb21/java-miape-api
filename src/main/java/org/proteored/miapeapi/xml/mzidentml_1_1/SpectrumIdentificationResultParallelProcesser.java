@@ -24,8 +24,8 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
-import pi.ParIterator;
-import pi.reductions.Reducible;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.reductions.Reducible;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractParam;
 import uk.ac.ebi.jmzidml.model.mzidml.CvParam;
 import uk.ac.ebi.jmzidml.model.mzidml.Peptide;

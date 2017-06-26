@@ -30,7 +30,6 @@ import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
 import org.proteored.miapeapi.experiment.model.grouping.PanalyzerStats;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
-import org.proteored.miapeapi.experiment.model.sort.SystemCoreManager;
 import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
@@ -42,11 +41,12 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.spring.SpringHandler;
 
-import pi.ParIterator;
-import pi.ParIterator.Schedule;
-import pi.ParIteratorFactory;
-import pi.reductions.Reducible;
-import pi.reductions.Reduction;
+import edu.scripps.yates.cores.SystemCoreManager;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.ParIteratorFactory;
+import edu.scripps.yates.pi.ParIterator.Schedule;
+import edu.scripps.yates.pi.reductions.Reducible;
+import edu.scripps.yates.pi.reductions.Reduction;
 
 public abstract class DataManager {
 	// Peptides less than this length, will be discarded

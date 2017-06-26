@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.PeptideOccurrence;
 
-import pi.ParIterator;
-import pi.reductions.Reducible;
+import edu.scripps.yates.pi.ParIterator;
+import edu.scripps.yates.pi.reductions.Reducible;
 
 public class PeptideOcurrenceParallelCreator extends Thread {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
