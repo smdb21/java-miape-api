@@ -1,8 +1,6 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -10,6 +8,8 @@ import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 public class PeptidesForMRMFilter implements Filter {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -23,9 +23,8 @@ public class PeptidesForMRMFilter implements Filter {
 	private final boolean requireUnique;
 	private final Software software;
 
-	public PeptidesForMRMFilter(boolean ignoreM, boolean ignoreW,
-			boolean ignoreQAtBeginning, boolean ignoreMissedCleavages,
-			Integer minLength, Integer maxLength, boolean requireUnique,
+	public PeptidesForMRMFilter(boolean ignoreM, boolean ignoreW, boolean ignoreQAtBeginning,
+			boolean ignoreMissedCleavages, Integer minLength, Integer maxLength, boolean requireUnique,
 			Software software) {
 		this.ignoreM = ignoreM;
 		this.ignoreMissedCleavages = ignoreMissedCleavages;
@@ -43,23 +42,19 @@ public class PeptidesForMRMFilter implements Filter {
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> identifiedProteins,
-			IdentificationSet currentIdSet) {
+	public List<ProteinGroup> filter(List<ProteinGroup> identifiedProteins, IdentificationSet currentIdSet) {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(identifiedProteins);
-		Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides,
-				currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(identifiedProteins,
-				filteredPeptides, currentIdSet.getCvManager());
+		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+		return DataManager.filterProteinGroupsByPeptides(identifiedProteins, filteredPeptides,
+				currentIdSet.getCvManager());
 	}
 
-	private Set<Integer> filterPeptides(
-			List<ExtendedIdentifiedPeptide> identifiedPeptides,
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
-		log.info("Filtering " + identifiedPeptides.size()
-				+ " peptides by MRM criteria.");
+		log.info("Filtering " + identifiedPeptides.size() + " peptides by MRM criteria.");
 
-		Set<Integer> ret = new HashSet<Integer>();
+		TIntHashSet ret = new TIntHashSet();
 		for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : identifiedPeptides) {
 
 			String sequence = extendedIdentifiedPeptide.getSequence();
@@ -99,8 +94,7 @@ public class PeptidesForMRMFilter implements Filter {
 			}
 
 		}
-		log.info("Filtered " + ret.size() + " out of "
-				+ identifiedPeptides.size() + " peptides");
+		log.info("Filtered " + ret.size() + " out of " + identifiedPeptides.size() + " peptides");
 
 		return ret;
 	}
@@ -113,8 +107,7 @@ public class PeptidesForMRMFilter implements Filter {
 			PeptidesForMRMFilter filter = (PeptidesForMRMFilter) obj;
 			if (areNotEqual(this.ignoreM, filter.ignoreM))
 				return false;
-			if (areNotEqual(this.ignoreMissedCleavages,
-					filter.ignoreMissedCleavages))
+			if (areNotEqual(this.ignoreMissedCleavages, filter.ignoreMissedCleavages))
 				return false;
 			if (areNotEqual(this.ignoreQAtBeginning, filter.ignoreQAtBeginning))
 				return false;
@@ -122,11 +115,9 @@ public class PeptidesForMRMFilter implements Filter {
 				return false;
 			if (areNotEqual(this.requireUnique, filter.requireUnique))
 				return false;
-			if (this.minLength != null && filter.minLength != null
-					&& this.minLength != filter.minLength)
+			if (this.minLength != null && filter.minLength != null && this.minLength != filter.minLength)
 				return false;
-			if (this.maxLength != null && filter.maxLength != null
-					&& this.maxLength != filter.maxLength)
+			if (this.maxLength != null && filter.maxLength != null && this.maxLength != filter.maxLength)
 				return false;
 			return true;
 		} else

@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.mzml;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import org.proteored.miapeapi.interfaces.ms.InstrumentConfiguration;
 import org.proteored.miapeapi.interfaces.ms.Maldi;
 import org.proteored.miapeapi.interfaces.ms.Other_IonSource;
 
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.jmzml.model.mzml.AnalyzerComponent;
 import uk.ac.ebi.jmzml.model.mzml.ReferenceableParamGroupList;
 import uk.ac.ebi.jmzml.model.mzml.SourceComponent;
@@ -24,16 +24,14 @@ public class InstrumentConfigurationImpl implements InstrumentConfiguration {
 	private List<Maldi> maldis = new ArrayList<Maldi>();
 	private List<Esi> esis = new ArrayList<Esi>();
 	private List<Other_IonSource> otherIonSources = new ArrayList<Other_IonSource>();
-	private Set<ActivationDissociation> activationDissociation = new HashSet<ActivationDissociation>();
-	// private Set<IonOptic> ionOptics = new HashSet<IonOptic>();
+	private Set<ActivationDissociation> activationDissociation = new THashSet<ActivationDissociation>();
+	// private Set<IonOptic> ionOptics = new THashSet<IonOptic>();
 	private List<Analyser> analyzers = new ArrayList<Analyser>();
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private final ControlVocabularyManager cvManager;
 
-	public InstrumentConfigurationImpl(
-			uk.ac.ebi.jmzml.model.mzml.InstrumentConfiguration instrumentConfiguration,
-			ReferenceableParamGroupList referenceableParamGroupList,
-			ControlVocabularyManager cvManager) {
+	public InstrumentConfigurationImpl(uk.ac.ebi.jmzml.model.mzml.InstrumentConfiguration instrumentConfiguration,
+			ReferenceableParamGroupList referenceableParamGroupList, ControlVocabularyManager cvManager) {
 		this.mzMLInstrumentConfiguration = instrumentConfiguration;
 		this.referenceableParamGroupList = referenceableParamGroupList;
 		this.cvManager = cvManager;
@@ -49,15 +47,13 @@ public class InstrumentConfigurationImpl implements InstrumentConfiguration {
 						referenceableParamGroupList);
 			}
 			if (mzMLInstrumentConfiguration.getComponentList().getSource() != null) {
-				processSources(mzMLInstrumentConfiguration.getComponentList().getSource(),
-						referenceableParamGroupList);
+				processSources(mzMLInstrumentConfiguration.getComponentList().getSource(), referenceableParamGroupList);
 			}
 		}
 
 	}
 
-	private void processSources(List<SourceComponent> source,
-			ReferenceableParamGroupList referenceableParamGroupList) {
+	private void processSources(List<SourceComponent> source, ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing sources");
 
 		if (source != null) {
@@ -89,8 +85,7 @@ public class InstrumentConfigurationImpl implements InstrumentConfiguration {
 		if (analyzers != null) {
 			for (AnalyzerComponent analyzerComponent : analyzers) {
 
-				this.analyzers.add(new AnalyzerImpl(analyzerComponent, referenceableParamGroupList,
-						cvManager));
+				this.analyzers.add(new AnalyzerImpl(analyzerComponent, referenceableParamGroupList, cvManager));
 			}
 		}
 		log.info("end processing analyzers");

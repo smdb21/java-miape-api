@@ -1,8 +1,6 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,8 +22,10 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
-import edu.scripps.yates.pi.ParIterator;
-import edu.scripps.yates.pi.reductions.Reducible;
+import edu.scripps.yates.utilities.pi.ParIterator;
+import edu.scripps.yates.utilities.pi.reductions.Reducible;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractParam;
 import uk.ac.ebi.jmzidml.model.mzidml.CvParam;
 import uk.ac.ebi.jmzidml.model.mzidml.Peptide;
@@ -50,12 +50,9 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 	private final MapSync<String, InputData> syncInputDataHash;
 
 	public SpectrumIdentificationResultParallelProcesser(
-			ParIterator<SpectrumIdentificationResult> spectrumIdentificationResultParallelIterator,
-			int processID,
-			ControlVocabularyManager cvManager,
-			MzIdentMLUnmarshaller mzIdentMLUnmarshaller,
-			MapSync<String, InputData> syncInputDataHash,
-			Reducible<List<IdentifiedPeptide>> peptides,
+			ParIterator<SpectrumIdentificationResult> spectrumIdentificationResultParallelIterator, int processID,
+			ControlVocabularyManager cvManager, MzIdentMLUnmarshaller mzIdentMLUnmarshaller,
+			MapSync<String, InputData> syncInputDataHash, Reducible<List<IdentifiedPeptide>> peptides,
 			MapSync<String, ProteinDetectionHypothesis> proteinDetectionHypotesisWithPeptideEvidence,
 
 			Reducible<Map<String, IdentifiedProtein>> proteinHash) {
@@ -75,7 +72,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 		List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
 		peptideListLocal.set(peptideList);
 
-		Map<String, IdentifiedProtein> proteinHash = new HashMap<String, IdentifiedProtein>();
+		Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 		proteinHashLocal.set(proteinHash);
 
 		log.debug("Starting SIR processing from thread " + threadNumber);
@@ -90,36 +87,29 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 					// :
 					// spectrumIdentificationResult) {
 
-					log.debug("Processed " + count++ + " in core "
-							+ threadNumber);
+					log.debug("Processed " + count++ + " in core " + threadNumber);
 
 					String RT = getRetentionTimeInSeconds(spectIdentResultXML);
 
 					// TODO this is very important! Be careful.
 					// final String spectrumID =
 					// spectIdentResultXML.getSpectrumID();
-					String spectrumRef = parseSpectrumRef(spectIdentResultXML
-							.getSpectrumID());
+					String spectrumRef = parseSpectrumRef(spectIdentResultXML.getSpectrumID());
 
 					// Input data
 					// check if the spectraData is already captured. If not,
 					// add
 					// a
 					// new input Data
-					String spectraDataRef = spectIdentResultXML
-							.getSpectraDataRef();
+					String spectraDataRef = spectIdentResultXML.getSpectraDataRef();
 					InputData inputData = null;
 					try {
 						if (!syncInputDataHash.containsKey(spectraDataRef)) {
-							SpectraData spectraDataXML = mzIdentMLUnmarshaller
-									.unmarshal(SpectraData.class,
-											spectraDataRef);
-							Integer inputDataID = MiapeXmlUtil.InputDataCounter
-									.increaseCounter();
-							inputData = new InputDataImpl(spectraDataXML,
-									inputDataID);
-							syncInputDataHash.put(spectraDataXML.getId(),
-									inputData);
+							SpectraData spectraDataXML = mzIdentMLUnmarshaller.unmarshal(SpectraData.class,
+									spectraDataRef);
+							Integer inputDataID = MiapeXmlUtil.InputDataCounter.increaseCounter();
+							inputData = new InputDataImpl(spectraDataXML, inputDataID);
+							syncInputDataHash.put(spectraDataXML.getId(), inputData);
 						}
 						inputData = syncInputDataHash.get(spectraDataRef);
 					} catch (JAXBException e1) {
@@ -127,7 +117,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 					}
 					// log.info(spectIdentResultXML.getSpectrumIdentificationItem().size()
 					// + " SpectrumIdentificationItems");
-					Set<PeptideScore> scoresFromFirstPeptide = new HashSet<PeptideScore>();
+					Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
 					List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
 							.getSpectrumIdentificationItem();
 					for (SpectrumIdentificationItem spectIdentItemXML : spectrumIdentificationItems) {
@@ -138,17 +128,14 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 						// if (spectIdentItemXML.isPassThreshold()) {
 
 						// CREATE Peptide
-						Integer peptideID = MiapeXmlUtil.PeptideCounter
-								.increaseCounter();
+						Integer peptideID = MiapeXmlUtil.PeptideCounter.increaseCounter();
 						Peptide peptideXML = null;
 
 						if (spectIdentItemXML.getPeptideRef() != null) {
 							if (peptideXML == null) {
 								try {
-									peptideXML = mzIdentMLUnmarshaller
-											.unmarshal(Peptide.class,
-													spectIdentItemXML
-															.getPeptideRef());
+									peptideXML = mzIdentMLUnmarshaller.unmarshal(Peptide.class,
+											spectIdentItemXML.getPeptideRef());
 								} catch (JAXBException e) {
 									log.debug(e.getMessage());
 								} catch (IllegalArgumentException e) {
@@ -157,24 +144,18 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 							}
 						}
 						if (peptideXML == null) {
-							peptideXML = getPeptideFromPeptideEvidences(spectIdentItemXML
-									.getPeptideEvidenceRef());
+							peptideXML = getPeptideFromPeptideEvidences(spectIdentItemXML.getPeptideEvidenceRef());
 						}
 						if (peptideXML == null) {
-							throw new IllegalMiapeArgumentException("Peptide "
-									+ spectIdentItemXML.getPeptideRef()
+							throw new IllegalMiapeArgumentException("Peptide " + spectIdentItemXML.getPeptideRef()
 									+ " cannot be found in mzIdentML file");
 						} else {
 
 							boolean includePeptide = false;
 							final Set<PeptideScore> scores = IdentifiedPeptideImpl
-									.getScoresFromThisPeptide(
-											spectIdentItemXML, peptideXML,
-											cvManager);
+									.getScoresFromThisPeptide(spectIdentItemXML, peptideXML, cvManager);
 							if (scores == null || scores.isEmpty()) {
-								log.info("Skipping SII:"
-										+ spectIdentItemXML.getId()
-										+ " because no scores have found");
+								log.info("Skipping SII:" + spectIdentItemXML.getId() + " because no scores have found");
 								continue;
 							}
 							if (spectIdentItemXML.getRank() == 1) {
@@ -185,28 +166,21 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 
 								// if the rank n has the same scores, also
 								// include it
-								if (comparePeptideScores(
-										scoresFromFirstPeptide, scores) == 0) {
+								if (comparePeptideScores(scoresFromFirstPeptide, scores) == 0) {
 									includePeptide = true;
-									log.debug("Peptide with rank "
-											+ spectIdentItemXML.getRank()
+									log.debug("Peptide with rank " + spectIdentItemXML.getRank()
 											+ " is going to be included");
 								}
 							}
 							if (!includePeptide) {
 								break;
 							} else {
-								IdentifiedPeptide peptide = new IdentifiedPeptideImpl(
-										spectIdentItemXML, peptideXML,
-										inputData, spectrumRef, peptideID,
-										cvManager, pdhWithPeptideEvidence,
+								IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
+										inputData, spectrumRef, peptideID, cvManager, pdhWithPeptideEvidence,
 										proteinHash, RT);
-								if (peptide.getScores() == null
-										|| peptide.getScores().isEmpty())
+								if (peptide.getScores() == null || peptide.getScores().isEmpty())
 									throw new IllegalMiapeArgumentException(
-											"The peptide from SII:"
-													+ spectIdentItemXML.getId()
-													+ " has no scores!");
+											"The peptide from SII:" + spectIdentItemXML.getId() + " has no scores!");
 								// Add the peptide to the peptide list
 								peptideList.add(peptide);
 
@@ -218,42 +192,33 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 				}
 			}
 
-			log.info("Thread " + threadNumber + " -> " + peptideList.size()
-					+ " peptides and " + proteinHash.size() + " proteins");
+			log.info("Thread " + threadNumber + " -> " + peptideList.size() + " peptides and " + proteinHash.size()
+					+ " proteins");
 		}
 
 	}
 
-	private String getRetentionTimeInSeconds(
-			SpectrumIdentificationResult spectIdentResultXML) {
+	private String getRetentionTimeInSeconds(SpectrumIdentificationResult spectIdentResultXML) {
 		if (spectIdentResultXML != null) {
 			if (spectIdentResultXML.getParamGroup() != null) {
-				for (AbstractParam paramType : spectIdentResultXML
-						.getParamGroup()) {
+				for (AbstractParam paramType : spectIdentResultXML.getParamGroup()) {
 					if (paramType instanceof CvParam) {
 						CvParam cvparam = (CvParam) paramType;
-						ControlVocabularyTerm cvTerm = RetentionTime
-								.getInstance(cvManager).getCVTermByAccession(
-										new Accession(cvparam.getAccession()));
+						ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
+								.getCVTermByAccession(new Accession(cvparam.getAccession()));
 						if (cvTerm != null) {
 							if (cvparam.getValue() != null) {
 								try {
-									double num = Double.valueOf(cvparam
-											.getValue());
+									double num = Double.valueOf(cvparam.getValue());
 									// check unit
-									String unitAccession = cvparam
-											.getUnitAccession();
+									String unitAccession = cvparam.getUnitAccession();
 									if (unitAccession != null) {
 										if ("UO:0000010".equals(unitAccession)) {
-											log.debug("Retention time in seconds: "
-													+ num);
-										} else if ("UO:0000031"
-												.equals(unitAccession)) {
-											log.debug("Retention time in minutes: "
-													+ num);
+											log.debug("Retention time in seconds: " + num);
+										} else if ("UO:0000031".equals(unitAccession)) {
+											log.debug("Retention time in minutes: " + num);
 											num = num * 60;
-											log.debug("Retention time converted to seconds: "
-													+ num);
+											log.debug("Retention time converted to seconds: " + num);
 										}
 									}
 									return String.valueOf(num);
@@ -271,35 +236,24 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 		if (spectrumIdentificationItems != null) {
 			for (SpectrumIdentificationItem spectrumIdentificationItem : spectrumIdentificationItems) {
 				if (spectrumIdentificationItem.getParamGroup() != null) {
-					for (AbstractParam paramType : spectrumIdentificationItem
-							.getParamGroup()) {
+					for (AbstractParam paramType : spectrumIdentificationItem.getParamGroup()) {
 						if (paramType instanceof CvParam) {
 							CvParam cvparam = (CvParam) paramType;
-							ControlVocabularyTerm cvTerm = RetentionTime
-									.getInstance(cvManager)
-									.getCVTermByAccession(
-											new Accession(cvparam
-													.getAccession()));
+							ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
+									.getCVTermByAccession(new Accession(cvparam.getAccession()));
 							if (cvTerm != null) {
 								if (cvparam.getValue() != null) {
 									try {
-										double num = Double.valueOf(cvparam
-												.getValue());
+										double num = Double.valueOf(cvparam.getValue());
 										// check unit
-										String unitAccession = cvparam
-												.getUnitAccession();
+										String unitAccession = cvparam.getUnitAccession();
 										if (unitAccession != null) {
-											if ("UO:0000010"
-													.equals(unitAccession)) {
-												log.debug("Retention time in seconds: "
-														+ num);
-											} else if ("UO:0000031"
-													.equals(unitAccession)) {
-												log.debug("Retention time in minutes: "
-														+ num);
+											if ("UO:0000010".equals(unitAccession)) {
+												log.debug("Retention time in seconds: " + num);
+											} else if ("UO:0000031".equals(unitAccession)) {
+												log.debug("Retention time in minutes: " + num);
 												num = num * 60;
-												log.debug("Retention time converted to seconds: "
-														+ num);
+												log.debug("Retention time converted to seconds: " + num);
 											}
 										}
 										return String.valueOf(num);
@@ -407,29 +361,23 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 	 * @param peptideEvidenceRefs
 	 * @return
 	 */
-	private Peptide getPeptideFromPeptideEvidences(
-			List<PeptideEvidenceRef> peptideEvidenceRefs) {
+	private Peptide getPeptideFromPeptideEvidences(List<PeptideEvidenceRef> peptideEvidenceRefs) {
 		if (peptideEvidenceRefs != null && !peptideEvidenceRefs.isEmpty()) {
 			for (PeptideEvidenceRef peptideEvidenceRef : peptideEvidenceRefs) {
-				final PeptideEvidence peptideEvidence = peptideEvidenceRef
-						.getPeptideEvidence();
+				final PeptideEvidence peptideEvidence = peptideEvidenceRef.getPeptideEvidence();
 				if (peptideEvidence != null) {
 					if (peptideEvidence.getPeptide() != null)
 						return peptideEvidence.getPeptide();
 
 					final String peptideRef = peptideEvidence.getPeptideRef();
 					try {
-						return mzIdentMLUnmarshaller.unmarshal(Peptide.class,
-								peptideRef);
+						return mzIdentMLUnmarshaller.unmarshal(Peptide.class, peptideRef);
 					} catch (JAXBException e) {
-						log.info("JAXBException for unmarshal Peptide with ID:"
-								+ peptideRef);
+						log.info("JAXBException for unmarshal Peptide with ID:" + peptideRef);
 					} catch (NumberFormatException e) {
-						log.info("Number format exception for unmarshal Peptide with ID:"
-								+ peptideRef);
+						log.info("Number format exception for unmarshal Peptide with ID:" + peptideRef);
 					} catch (IllegalArgumentException e) {
-						log.info("IllegalArgumentException for unmarshal Peptide with ID:"
-								+ peptideRef);
+						log.info("IllegalArgumentException for unmarshal Peptide with ID:" + peptideRef);
 					}
 				}
 			}
@@ -438,8 +386,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 		return null;
 	}
 
-	private int comparePeptideScores(Set<PeptideScore> scoresFromFirstPeptide,
-			Set<PeptideScore> scores) {
+	private int comparePeptideScores(Set<PeptideScore> scoresFromFirstPeptide, Set<PeptideScore> scores) {
 		if (scoresFromFirstPeptide != null && scores != null) {
 			if (scores.size() == scoresFromFirstPeptide.size()) {
 				for (PeptideScore peptideScore : scores) {
@@ -452,8 +399,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 		return -1;
 	}
 
-	private boolean foundPeptideScore(PeptideScore peptideScore,
-			Set<PeptideScore> scoresFromFirstPeptide) {
+	private boolean foundPeptideScore(PeptideScore peptideScore, Set<PeptideScore> scoresFromFirstPeptide) {
 		for (PeptideScore peptideScore2 : scoresFromFirstPeptide) {
 			if (peptideScore2.getName().equals(peptideScore.getName()))
 				if (peptideScore2.getValue().equals(peptideScore.getValue()))

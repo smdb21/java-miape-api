@@ -2,7 +2,6 @@ package org.proteored.miapeapi.xml.xtandem.msi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -17,20 +16,20 @@ import de.proteinms.xtandemparser.parser.XTandemParser;
 import de.proteinms.xtandemparser.xtandem.InputParams;
 import de.proteinms.xtandemparser.xtandem.PerformParams;
 import de.proteinms.xtandemparser.xtandem.XTandemFile;
+import gnu.trove.set.hash.THashSet;
 
 public class InputParameterImpl implements InputParameter {
 
 	private HashMap<String, String> inputParamMap = null;
 	private InputParams inputParameters = null;
 	private PerformParams performParameters = null;
-	private final Set<Database> databases = new HashSet<Database>();
+	private final Set<Database> databases = new THashSet<Database>();
 	private Integer identifier = null;
 	private Software software = null;
-	private final Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
+	private final Set<AdditionalParameter> additionalParameters = new THashSet<AdditionalParameter>();
 	private final ControlVocabularyManager cvManager;
 
-	public InputParameterImpl(XTandemFile xFile, XTandemParser parser,
-			Integer inputParamID, Software software,
+	public InputParameterImpl(XTandemFile xFile, XTandemParser parser, Integer inputParamID, Software software,
 			ControlVocabularyManager cvManager) {
 		try {
 			inputParamMap = parser.getInputParamMap();
@@ -49,23 +48,17 @@ public class InputParameterImpl implements InputParameter {
 
 	private void processDatabases() {
 		if (performParameters != null) {
-			final String sequenceSource_1 = performParameters
-					.getSequenceSource_1();
+			final String sequenceSource_1 = performParameters.getSequenceSource_1();
 			if (sequenceSource_1 != null && !"".equals(sequenceSource_1)) {
-				databases.add(new DatabaseImpl(sequenceSource_1,
-						performParameters.getSequenceSourceDescription_1()));
+				databases.add(new DatabaseImpl(sequenceSource_1, performParameters.getSequenceSourceDescription_1()));
 			}
-			final String sequenceSource_2 = performParameters
-					.getSequenceSource_2();
+			final String sequenceSource_2 = performParameters.getSequenceSource_2();
 			if (sequenceSource_2 != null && !"".equals(sequenceSource_2)) {
-				databases.add(new DatabaseImpl(sequenceSource_2,
-						performParameters.getSequenceSourceDescription_2()));
+				databases.add(new DatabaseImpl(sequenceSource_2, performParameters.getSequenceSourceDescription_2()));
 			}
-			final String sequenceSource_3 = performParameters
-					.getSequenceSource_3();
+			final String sequenceSource_3 = performParameters.getSequenceSource_3();
 			if (sequenceSource_3 != null && !"".equals(sequenceSource_3)) {
-				databases.add(new DatabaseImpl(sequenceSource_3,
-						performParameters.getSequenceSourceDescription_3()));
+				databases.add(new DatabaseImpl(sequenceSource_3, performParameters.getSequenceSourceDescription_3()));
 			}
 		}
 
@@ -101,8 +94,7 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getMisscleavages() {
 		if (inputParameters != null)
-			return String
-					.valueOf(inputParameters.getScoringMissCleavageSites());
+			return String.valueOf(inputParameters.getScoringMissCleavageSites());
 		return null;
 	}
 
@@ -110,21 +102,15 @@ public class InputParameterImpl implements InputParameter {
 	public String getAdditionalCleavages() {
 		if (inputParameters != null) {
 			StringBuilder sb = new StringBuilder();
-			final String proteinC_termCleavMassChange = inputParameters
-					.getProteinC_termCleavMassChange();
-			if (proteinC_termCleavMassChange != null
-					&& !"".equals(proteinC_termCleavMassChange)) {
-				sb.append("protein, cleavage C-terminal mass change="
-						+ proteinC_termCleavMassChange);
+			final String proteinC_termCleavMassChange = inputParameters.getProteinC_termCleavMassChange();
+			if (proteinC_termCleavMassChange != null && !"".equals(proteinC_termCleavMassChange)) {
+				sb.append("protein, cleavage C-terminal mass change=" + proteinC_termCleavMassChange);
 			}
-			final String proteinN_termCleavMassChange = inputParameters
-					.getProteinN_termCleavMassChange();
-			if (proteinN_termCleavMassChange != null
-					&& !"".equals(proteinN_termCleavMassChange)) {
+			final String proteinN_termCleavMassChange = inputParameters.getProteinN_termCleavMassChange();
+			if (proteinN_termCleavMassChange != null && !"".equals(proteinN_termCleavMassChange)) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("protein, cleavage N-terminal mass change="
-						+ proteinN_termCleavMassChange);
+				sb.append("protein, cleavage N-terminal mass change=" + proteinN_termCleavMassChange);
 			}
 
 			if (!"".equals(sb.toString()))
@@ -140,50 +126,37 @@ public class InputParameterImpl implements InputParameter {
 			StringBuilder sb = new StringBuilder();
 
 			// protein, C-terminal mass change
-			final double proteinC_termResModMass = inputParameters
-					.getProteinC_termResModMass();
+			final double proteinC_termResModMass = inputParameters.getProteinC_termResModMass();
 			if (proteinC_termResModMass != 0) {
-				sb.append("protein, C-terminal mass change="
-						+ proteinC_termResModMass);
+				sb.append("protein, C-terminal mass change=" + proteinC_termResModMass);
 			}
 			// protein, N-terminal mass change
-			final double proteinN_termResModMass = inputParameters
-					.getProteinN_termResModMass();
+			final double proteinN_termResModMass = inputParameters.getProteinN_termResModMass();
 			if (proteinN_termResModMass != 0) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("protein, N-terminal mass change="
-						+ proteinN_termResModMass);
+				sb.append("protein, N-terminal mass change=" + proteinN_termResModMass);
 			}
 			// residue, modification mass
-			final ArrayList<String> residueModificationMass = inputParameters
-					.getResidueModificationMass();
-			if (residueModificationMass != null
-					&& !residueModificationMass.isEmpty()) {
+			final ArrayList<String> residueModificationMass = inputParameters.getResidueModificationMass();
+			if (residueModificationMass != null && !residueModificationMass.isEmpty()) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("residue, modification mass="
-						+ residueModificationMass);
+				sb.append("residue, modification mass=" + residueModificationMass);
 			}
 			// residue, potential modification mass
-			final String residuePotentialModificationMass = inputParameters
-					.getResiduePotModMass();
-			if (residuePotentialModificationMass != null
-					&& !"".equals(residuePotentialModificationMass)) {
+			final String residuePotentialModificationMass = inputParameters.getResiduePotModMass();
+			if (residuePotentialModificationMass != null && !"".equals(residuePotentialModificationMass)) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("residue, modification mass="
-						+ residuePotentialModificationMass);
+				sb.append("residue, modification mass=" + residuePotentialModificationMass);
 			}
 			// residue, potential modification motif
-			final String residuePotentialModificationMotif = inputParameters
-					.getResiduePotModMotiv();
-			if (residuePotentialModificationMotif != null
-					&& !"".equals(residuePotentialModificationMotif)) {
+			final String residuePotentialModificationMotif = inputParameters.getResiduePotModMotiv();
+			if (residuePotentialModificationMotif != null && !"".equals(residuePotentialModificationMotif)) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("residue, modification mass="
-						+ residuePotentialModificationMotif);
+				sb.append("residue, modification mass=" + residuePotentialModificationMotif);
 			}
 			// refine, modification mass
 			final String refineModMass = inputParameters.getRefineModMass();
@@ -194,46 +167,38 @@ public class InputParameterImpl implements InputParameter {
 			// refine, potential modification mass
 			final ArrayList<String> refinePotentialModificationMass = inputParameters
 					.getRefinePotentialModificationMass();
-			if (refinePotentialModificationMass != null
-					&& !refinePotentialModificationMass.isEmpty()) {
+			if (refinePotentialModificationMass != null && !refinePotentialModificationMass.isEmpty()) {
 				for (String potentialModMass : refinePotentialModificationMass) {
 					if (!"".equals(sb.toString()))
 						sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-					sb.append("refine, potential modification mass="
-							+ potentialModMass);
+					sb.append("refine, potential modification mass=" + potentialModMass);
 				}
 
 			}
 			// refine, potential modification motif
 			final ArrayList<String> refinePotentialModificationMotif = inputParameters
 					.getRefinePotentialModificationMotif();
-			if (refinePotentialModificationMotif != null
-					&& !refinePotentialModificationMotif.isEmpty()) {
+			if (refinePotentialModificationMotif != null && !refinePotentialModificationMotif.isEmpty()) {
 				for (String potentialModMotif : refinePotentialModificationMotif) {
 					if (!"".equals(sb.toString()))
 						sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-					sb.append("refine, potential modification motif="
-							+ potentialModMotif);
+					sb.append("refine, potential modification motif=" + potentialModMotif);
 				}
 			}
 
 			// refine, potential C-terminus modifications
-			final String refinePotC_termMods = inputParameters
-					.getRefinePotC_termMods();
+			final String refinePotC_termMods = inputParameters.getRefinePotC_termMods();
 			if (refinePotC_termMods != null) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("refine, potential C-terminus modifications="
-						+ refinePotC_termMods);
+				sb.append("refine, potential C-terminus modifications=" + refinePotC_termMods);
 			}
 			// refine, potential N-terminus modifications
-			final String refinePotN_termMods = inputParameters
-					.getRefinePotN_termMods();
+			final String refinePotN_termMods = inputParameters.getRefinePotN_termMods();
 			if (refinePotN_termMods != null) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("refine, potential N-terminus modifications="
-						+ refinePotN_termMods);
+				sb.append("refine, potential N-terminus modifications=" + refinePotN_termMods);
 			}
 			if (!"".equals(sb.toString()))
 				return sb.toString();
@@ -243,27 +208,22 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getMinScore() {
-		return "e-value <= "
-				+ String.valueOf(inputParameters.getMaxValidExpectValue());
+		return "e-value <= " + String.valueOf(inputParameters.getMaxValidExpectValue());
 	}
 
 	@Override
 	public String getPrecursorMassTolerance() {
 		if (inputParameters != null) {
 			StringBuilder sb = new StringBuilder();
-			final double spectrumParentMonoIsoMassErrorMinus = inputParameters
-					.getSpectrumParentMonoIsoMassErrorMinus();
+			final double spectrumParentMonoIsoMassErrorMinus = inputParameters.getSpectrumParentMonoIsoMassErrorMinus();
 			if (spectrumParentMonoIsoMassErrorMinus != 0) {
-				sb.append("Parent monoisotopic mass error minus="
-						+ spectrumParentMonoIsoMassErrorMinus);
+				sb.append("Parent monoisotopic mass error minus=" + spectrumParentMonoIsoMassErrorMinus);
 			}
-			final double spectrumParentMonoIsoMassErrorPlus = inputParameters
-					.getSpectrumParentMonoIsoMassErrorPlus();
+			final double spectrumParentMonoIsoMassErrorPlus = inputParameters.getSpectrumParentMonoIsoMassErrorPlus();
 			if (spectrumParentMonoIsoMassErrorPlus != 0) {
 				if (!"".equals(sb.toString()))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-				sb.append("Parent monoisotopic mass error plus="
-						+ spectrumParentMonoIsoMassErrorPlus);
+				sb.append("Parent monoisotopic mass error plus=" + spectrumParentMonoIsoMassErrorPlus);
 			}
 			if (!"".equals(sb.toString()))
 				return sb.toString();
@@ -279,8 +239,7 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getFragmentMassTolerance() {
-		final double spectrumMonoIsoMassError = inputParameters
-				.getSpectrumMonoIsoMassError();
+		final double spectrumMonoIsoMassError = inputParameters.getSpectrumMonoIsoMassError();
 		if (spectrumMonoIsoMassError != 0)
 			return String.valueOf(spectrumMonoIsoMassError);
 		return null;
@@ -289,10 +248,8 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getPrecursorMassToleranceUnit() {
 		if (inputParameters != null) {
-			final String spectrumParentMonoIsoMassErrorUnit = inputParameters
-					.getSpectrumParentMonoIsoMassErrorUnits();
-			if (spectrumParentMonoIsoMassErrorUnit != null
-					&& !"".equals(spectrumParentMonoIsoMassErrorUnit)) {
+			final String spectrumParentMonoIsoMassErrorUnit = inputParameters.getSpectrumParentMonoIsoMassErrorUnits();
+			if (spectrumParentMonoIsoMassErrorUnit != null && !"".equals(spectrumParentMonoIsoMassErrorUnit)) {
 				return spectrumParentMonoIsoMassErrorUnit;
 			}
 		}
@@ -307,10 +264,8 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getFragmentMassToleranceUnit() {
-		final String spectrumParentMonoIsoMassErrorUnits = inputParameters
-				.getSpectrumParentMonoIsoMassErrorUnits();
-		if (spectrumParentMonoIsoMassErrorUnits != null
-				&& !"".equals(spectrumParentMonoIsoMassErrorUnits))
+		final String spectrumParentMonoIsoMassErrorUnits = inputParameters.getSpectrumParentMonoIsoMassErrorUnits();
+		if (spectrumParentMonoIsoMassErrorUnits != null && !"".equals(spectrumParentMonoIsoMassErrorUnits))
 			return spectrumParentMonoIsoMassErrorUnits;
 		return null;
 	}
@@ -343,8 +298,7 @@ public class InputParameterImpl implements InputParameter {
 	public Set<AdditionalParameter> getAdditionalParameters() {
 		if (inputParamMap != null) {
 			for (String param : inputParamMap.keySet()) {
-				additionalParameters.add(new AdditionalParameterImpl(param,
-						inputParamMap.get(param)));
+				additionalParameters.add(new AdditionalParameterImpl(param, inputParamMap.get(param)));
 			}
 		}
 		if (!additionalParameters.isEmpty())

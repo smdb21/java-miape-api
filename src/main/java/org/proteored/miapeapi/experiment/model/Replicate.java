@@ -3,9 +3,8 @@ package org.proteored.miapeapi.experiment.model;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -22,6 +21,10 @@ import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.spring.SpringHandler;
 import org.proteored.miapeapi.util.MiapeReportsLinkGenerator;
+
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 /**
  * Class that represents a replicate. A replicate contains a MIAPE MS and a
@@ -147,12 +150,12 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public HashMap<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
+	public Map<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
 		return dataManager.getProteinGroupOccurrenceList();
 	}
 
 	@Override
-	public HashMap<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep) {
+	public Map<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep) {
 		return dataManager.getPeptideOcurrenceList(distinguishModPep);
 	}
 
@@ -279,7 +282,7 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public HashMap<Integer, Integer> getModificationOccurrenceDistribution(String modif) {
+	public TIntIntHashMap getModificationOccurrenceDistribution(String modif) {
 		return dataManager.getModificationOccurrenceDistribution(modif);
 	}
 
@@ -289,22 +292,22 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public int getProteinGroupTP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupTP(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupFN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupFN(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupTN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupTN(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupFP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupFP(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
@@ -363,7 +366,7 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public HashMap<Integer, Integer> getMissedCleavagesOccurrenceDistribution() {
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
 		return dataManager.getMissedCleavagesOccurrenceDistribution();
 	}
 
@@ -486,22 +489,22 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public int getPeptideTP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideTP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideTP(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideFN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideFN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideFN(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideTN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideTN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideTN(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideFP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideFP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideFP(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
@@ -589,8 +592,8 @@ public class Replicate implements IdentificationSet<Void> {
 		return null;
 	}
 
-	public HashMap<Integer, URL> getMSReportURLs(int userId) {
-		HashMap<Integer, URL> reports = new HashMap<Integer, URL>();
+	public TIntObjectHashMap<URL> getMSReportURLs(int userId) {
+		TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
 		for (MiapeMSDocument miapeMS : miapeMSs) {
 			URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMS.getId(), "MS");
 			reports.put(miapeMS.getId(), miapePublicLink);
@@ -598,8 +601,8 @@ public class Replicate implements IdentificationSet<Void> {
 		return reports;
 	}
 
-	public HashMap<Integer, URL> getMSIReportURLs(int userId) {
-		HashMap<Integer, URL> reports = new HashMap<Integer, URL>();
+	public TIntObjectHashMap<URL> getMSIReportURLs(int userId) {
+		TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
 
 		for (MiapeMSIDocument miapeMSI : miapeMSIs) {
 			URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMSI.getId(), "MSI");
@@ -636,7 +639,7 @@ public class Replicate implements IdentificationSet<Void> {
 	@Override
 	public Set<Spectrometer> getSpectrometers() {
 		final List<MiapeMSDocument> miapeMSs = getMiapeMSs();
-		Set<Spectrometer> spectrometers = new HashSet<Spectrometer>();
+		Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
 		for (MiapeMSDocument miapeMSDocument : miapeMSs) {
 			if (miapeMSDocument.getSpectrometers() != null)
 				spectrometers.addAll(miapeMSDocument.getSpectrometers());
@@ -647,7 +650,7 @@ public class Replicate implements IdentificationSet<Void> {
 	@Override
 	public Set<InputParameter> getInputParameters() {
 		final List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		Set<InputParameter> inputParameters = new HashSet<InputParameter>();
+		Set<InputParameter> inputParameters = new THashSet<InputParameter>();
 		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
 			if (miapeMSIDocument.getInputParameters() != null)
 				inputParameters.addAll(miapeMSIDocument.getInputParameters());
@@ -661,7 +664,7 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public HashMap<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep) {
+	public Map<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep) {
 		return dataManager.getPeptideChargeOcurrenceList(distinguishModPep);
 	}
 

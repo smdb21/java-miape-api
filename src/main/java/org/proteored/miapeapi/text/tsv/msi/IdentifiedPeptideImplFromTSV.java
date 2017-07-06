@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.text.tsv.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -15,12 +14,14 @@ import org.proteored.miapeapi.util.ModificationMapping;
 
 import com.compomics.util.protein.AASequenceImpl;
 
+import gnu.trove.set.hash.THashSet;
+
 public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	private final String sequence;
 	private final int id;
 	private List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
-	private Set<PeptideScore> scores = new HashSet<PeptideScore>();
-	private Set<PeptideModification> modifications = new HashSet<PeptideModification>();
+	private Set<PeptideScore> scores = new THashSet<PeptideScore>();
+	private Set<PeptideModification> modifications = new THashSet<PeptideModification>();
 	private String charge;
 	private Double precursorMZ;
 	private String retentionTime;

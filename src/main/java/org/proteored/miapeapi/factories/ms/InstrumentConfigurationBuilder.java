@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.factories.ms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +10,8 @@ import org.proteored.miapeapi.interfaces.ms.Esi;
 import org.proteored.miapeapi.interfaces.ms.InstrumentConfiguration;
 import org.proteored.miapeapi.interfaces.ms.Maldi;
 import org.proteored.miapeapi.interfaces.ms.Other_IonSource;
+
+import gnu.trove.set.hash.THashSet;
 
 public class InstrumentConfigurationBuilder {
 
@@ -45,7 +46,7 @@ public class InstrumentConfigurationBuilder {
 
 	public InstrumentConfigurationBuilder activationDissociation(ActivationDissociation value) {
 		if (activationDissociation == null)
-			activationDissociation = new HashSet<ActivationDissociation>();
+			activationDissociation = new THashSet<ActivationDissociation>();
 		this.activationDissociation.add(value);
 		return this;
 	}

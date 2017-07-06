@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.test;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.mockito.Mockito;
@@ -29,6 +28,7 @@ import org.proteored.miapeapi.interfaces.ge.Protocol;
 import org.proteored.miapeapi.interfaces.ge.Sample;
 import org.proteored.miapeapi.interfaces.ge.SampleApplication;
 
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeGeMocker {
 	public static final String SAMPLE_DESCRIPTION = "SampleDescription";
@@ -87,9 +87,9 @@ public class MiapeGeMocker {
 	public static final Set<Agent> MOCK_ADDITIONAL_MATRIX_SUBSTANCES = MiapeMocker.mockAdditionalMatrixSubstances(2);
 
 	private static final Set<Buffer> MATRIX_BUFFERS = MiapeMocker.mockBuffers(1);
-	private static final Set<Buffer> MATRIX_POLYMERIZATION_BUFFERS =  MiapeMocker.mockBuffers(2);
+	private static final Set<Buffer> MATRIX_POLYMERIZATION_BUFFERS = MiapeMocker.mockBuffers(2);
 	private static final Set<Buffer> MATRIX_ADD_BUFFERS = MiapeMocker.mockBuffers(3);
-	private static final Set<Buffer> MATRIX_POL_BUFFERS =MiapeMocker.mockBuffers(4);
+	private static final Set<Buffer> MATRIX_POL_BUFFERS = MiapeMocker.mockBuffers(4);
 	private static final ImageAcquisition IMAGE_ACQUISITION = mockImageAcquisition(0);
 	private static final DirectDetection DIRECT_DETECTION = mockDirectDetection(0);
 	public static final Set<Buffer> BUFFERS = MiapeMocker.mockBuffers(0);
@@ -100,12 +100,11 @@ public class MiapeGeMocker {
 	private static Set<ImageGelElectrophoresis> IMAGES;
 	private static final Set<GEAdditionalInformation> ADDIDITIONAL_INFORMATIONS = mockAdditionalInformations();
 	private static final Set<IndirectDetection> INDIRECT_DETECTIONS = mockIndirectDetections();
-	private static Set<Protocol> PROTOCOLS ;
-	private static Set<Sample> SAMPLES ;
+	private static Set<Protocol> PROTOCOLS;
+	private static Set<Sample> SAMPLES;
 	private static Sample SAMPLE;
 	private static Sample SAMPLE2;
 	private static GelMatrix GEL_MATRIX;
-
 
 	public static final String LOWEST_PI = "LowestPi";
 	public static final String LOWEST_MW = "LowestMw";
@@ -120,11 +119,6 @@ public class MiapeGeMocker {
 	public static final String BACKGROUND = "Background";
 	public static final String ADDINFONAME = "ADDINFONAME";
 	public static final String ADDINFOVALUE = "ADDINFOVALUE";
-
-
-
-
-
 
 	public static MiapeGEDocument mockGEMiapeDocument() {
 
@@ -144,13 +138,11 @@ public class MiapeGeMocker {
 		Mockito.when(miape.getImages()).thenReturn(IMAGES);
 		Mockito.when(miape.getAdditionalInformations()).thenReturn(ADDIDITIONAL_INFORMATIONS);
 
-
-
 		return miape;
 	}
 
 	private static Set<GEAdditionalInformation> mockAdditionalInformations() {
-		Set<GEAdditionalInformation> result = new HashSet<GEAdditionalInformation>();
+		Set<GEAdditionalInformation> result = new THashSet<GEAdditionalInformation>();
 		result.add(mockAdditionalInformation(0));
 		return result;
 	}
@@ -159,11 +151,11 @@ public class MiapeGeMocker {
 		GEAdditionalInformation additionalInformation = Mockito.mock(GEAdditionalInformation.class);
 		Mockito.when(additionalInformation.getName()).thenReturn(ADDINFONAME + i);
 		Mockito.when(additionalInformation.getValue()).thenReturn(ADDINFOVALUE + i);
-		return additionalInformation;	
+		return additionalInformation;
 	}
 
 	private static Set<Sample> mockSamples() {
-		Set<Sample> result = new HashSet<Sample>();
+		Set<Sample> result = new THashSet<Sample>();
 		SAMPLE = mockSample(0);
 		result.add(SAMPLE);
 		SAMPLE2 = mockSample(1);
@@ -183,16 +175,16 @@ public class MiapeGeMocker {
 		Mockito.when(lane.getName()).thenReturn(LANE_NAME);
 		Mockito.when(lane.getDescription()).thenReturn(LANE_DESCRIPTION);
 		Mockito.when(lane.getLaneNumber()).thenReturn(LANE_NUMBER);
-		if (i==0) {
+		if (i == 0) {
 			Mockito.when(lane.getReferencedSample()).thenReturn(SAMPLE);
-		}else{
+		} else {
 			Mockito.when(lane.getReferencedSample()).thenReturn(SAMPLE2);
 		}
 		return lane;
 	}
 
 	private static Set<Protocol> mockProtocols() {
-		Set<Protocol> result = new HashSet<Protocol>();
+		Set<Protocol> result = new THashSet<Protocol>();
 		result.add(mockProtocol(0));
 		return result;
 	}
@@ -210,24 +202,24 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<InterdimensionProcess> mockInterdimensionProcesses() {
-		Set<InterdimensionProcess> result = new HashSet<InterdimensionProcess>();
+		Set<InterdimensionProcess> result = new THashSet<InterdimensionProcess>();
 		result.add(mockInterdimensionProcess(0));
 		return result;
 	}
 
 	private static InterdimensionProcess mockInterdimensionProcess(int i) {
-		InterdimensionProcess interdimensionProcess =  Mockito.mock(InterdimensionProcess.class);
+		InterdimensionProcess interdimensionProcess = Mockito.mock(InterdimensionProcess.class);
 		Mockito.when(interdimensionProcess.getName()).thenReturn(INTERDIMENSION_PROCESS_NAME + i);
 		Mockito.when(interdimensionProcess.getProtocol()).thenReturn(INTERDIMENSION_PROCESS_PROTOCOL + i);
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(MiapeMocker.mockBuffer(20));
 		Mockito.when(interdimensionProcess.getInterdimensionBuffers()).thenReturn(buffers);
 
-		Set<Equipment> equipments = new HashSet<Equipment>();
+		Set<Equipment> equipments = new THashSet<Equipment>();
 		equipments.add(MiapeMocker.mockEquipment(21));
 		Mockito.when(interdimensionProcess.getInterdimensionEquipments()).thenReturn(equipments);
 
-		Set<Agent> substances = new HashSet<Agent>();
+		Set<Agent> substances = new THashSet<Agent>();
 		substances.add(MiapeMocker.mockAgent(22));
 		Mockito.when(interdimensionProcess.getInterdimensionReagents()).thenReturn(substances);
 
@@ -235,7 +227,7 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<Dimension> mockDimensions() {
-		Set<Dimension> result = new HashSet<Dimension>();
+		Set<Dimension> result = new THashSet<Dimension>();
 		result.add(mockDimension(0));
 		return result;
 	}
@@ -244,11 +236,11 @@ public class MiapeGeMocker {
 		Dimension dimension = Mockito.mock(Dimension.class);
 		Mockito.when(dimension.getDimension()).thenReturn(DIMENSION_DIMENSION + i);
 		Mockito.when(dimension.getName()).thenReturn(DIMENSION_NAME + i);
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(MiapeMocker.mockBuffer(12));
 		Mockito.when(dimension.getLoadingBuffers()).thenReturn(buffers);
 		Mockito.when(dimension.getSeparationMethod()).thenReturn(SEPARATION + i);
-		Set<GelMatrix> matrixes = new HashSet<GelMatrix>();
+		Set<GelMatrix> matrixes = new THashSet<GelMatrix>();
 		GEL_MATRIX = mockGelMatrix(0);
 		matrixes.add(GEL_MATRIX);
 		Mockito.when(dimension.getMatrixes()).thenReturn(matrixes);
@@ -259,17 +251,17 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<ElectrophoresisProtocol> mockElectrophoresisProtocols() {
-		Set<ElectrophoresisProtocol> result = new HashSet<ElectrophoresisProtocol>();
+		Set<ElectrophoresisProtocol> result = new THashSet<ElectrophoresisProtocol>();
 		result.add(mockElectrophoresisProtocol(0));
 		return result;
 	}
 
 	private static ElectrophoresisProtocol mockElectrophoresisProtocol(int i) {
 		ElectrophoresisProtocol electrophoresisProtocol = Mockito.mock(ElectrophoresisProtocol.class);
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(MiapeMocker.mockBuffer(15));
 		Mockito.when(electrophoresisProtocol.getAdditionalBuffers()).thenReturn(buffers);
-		Set<Buffer> buffers2 = new HashSet<Buffer>();
+		Set<Buffer> buffers2 = new THashSet<Buffer>();
 		buffers2.add(MiapeMocker.mockBuffer(16));
 		Mockito.when(electrophoresisProtocol.getRunningBuffers()).thenReturn(buffers2);
 		Mockito.when(electrophoresisProtocol.getElectrophoresisConditions()).thenReturn(ELECTROPHORESIS_CONDITIONS + i);
@@ -278,7 +270,7 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<IndirectDetection> mockIndirectDetections() {
-		Set<IndirectDetection> result = new HashSet<IndirectDetection>();
+		Set<IndirectDetection> result = new THashSet<IndirectDetection>();
 		result.add(mockIndirectDetection(0));
 		return result;
 	}
@@ -286,20 +278,19 @@ public class MiapeGeMocker {
 	private static IndirectDetection mockIndirectDetection(int i) {
 		IndirectDetection indirectDetection = Mockito.mock(IndirectDetection.class);
 
-
-		Set<IndirectDetectionAgent> additionalAgents = new HashSet<IndirectDetectionAgent>();
+		Set<IndirectDetectionAgent> additionalAgents = new THashSet<IndirectDetectionAgent>();
 		additionalAgents.add(MiapeMocker.mockIndirectDetectionAgent(6));
 		Mockito.when(indirectDetection.getAdditionalAgents()).thenReturn(additionalAgents);
 
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(MiapeMocker.mockBuffer(8));
 		Mockito.when(indirectDetection.getBuffers()).thenReturn(buffers);
 
-		Set<IndirectDetectionAgent> detectionAgents = new HashSet<IndirectDetectionAgent>();
+		Set<IndirectDetectionAgent> detectionAgents = new THashSet<IndirectDetectionAgent>();
 		detectionAgents.add(MiapeMocker.mockIndirectDetectionAgent(7));
 		Mockito.when(indirectDetection.getAgents()).thenReturn(detectionAgents);
 
-		Set<Equipment> equipments = new HashSet<Equipment>();
+		Set<Equipment> equipments = new THashSet<Equipment>();
 		equipments.add(MiapeMocker.mockEquipment(9));
 		Mockito.when(indirectDetection.getDetectionEquipments()).thenReturn(equipments);
 
@@ -312,7 +303,7 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<ImageGelElectrophoresis> mockImages() {
-		Set<ImageGelElectrophoresis> result = new HashSet<ImageGelElectrophoresis>();
+		Set<ImageGelElectrophoresis> result = new THashSet<ImageGelElectrophoresis>();
 		result.add(mockImageGelElectropheresis(0));
 		return result;
 	}
@@ -326,21 +317,23 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<Software> mockSoftwares() {
-		Set<Software> result = new HashSet<Software>();
+		Set<Software> result = new THashSet<Software>();
 		result.add(MiapeMocker.mockSoftware(0));
 		return result;
 	}
+
 	private static Set<ImageAcquisitionSoftware> mockImageAcquisitionSoftwares() {
-		Set<ImageAcquisitionSoftware> result = new HashSet<ImageAcquisitionSoftware>();
+		Set<ImageAcquisitionSoftware> result = new THashSet<ImageAcquisitionSoftware>();
 		result.add(MiapeMocker.mockImageAcquisitionSoftware(0));
 		return result;
 	}
 
 	private static ImageAcquisitionEquipment mockImageAcquisitionEquipment(int i) {
-		ImageAcquisitionEquipment  imageAcquisitionEquipment = Mockito.mock(ImageAcquisitionEquipment.class);
+		ImageAcquisitionEquipment imageAcquisitionEquipment = Mockito.mock(ImageAcquisitionEquipment.class);
 		Mockito.when(imageAcquisitionEquipment.getCalibration()).thenReturn(CALIBRATION + i);
 		Mockito.when(imageAcquisitionEquipment.getType()).thenReturn(IMAGE_ACQUISITION_EQUIPMENT_TYPE + i);
-		Mockito.when(imageAcquisitionEquipment.getParametersUrl()).thenReturn(IMAGE_ACQUISITION_EQUIPMENT_PARAMETERES_URL + i);
+		Mockito.when(imageAcquisitionEquipment.getParametersUrl())
+				.thenReturn(IMAGE_ACQUISITION_EQUIPMENT_PARAMETERES_URL + i);
 		MiapeMocker.addEquipmentData(i, imageAcquisitionEquipment);
 		return imageAcquisitionEquipment;
 	}
@@ -351,7 +344,7 @@ public class MiapeGeMocker {
 		Mockito.when(imageAcquisition.getProtocol()).thenReturn(IMAGE_ACQUISITION_PROTOCOL + i);
 
 		Mockito.when(imageAcquisition.getReferencedGelMatrix()).thenReturn(GEL_MATRIX);
-		Set<ImageAcquisitionEquipment> imageAcquisitionEquipments = new HashSet<ImageAcquisitionEquipment>(); 
+		Set<ImageAcquisitionEquipment> imageAcquisitionEquipments = new THashSet<ImageAcquisitionEquipment>();
 		ImageAcquisitionEquipment mockImageAcquisitionEquipment = mockImageAcquisitionEquipment(0);
 
 		imageAcquisitionEquipments.add(mockImageAcquisitionEquipment);
@@ -364,16 +357,13 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<ImageAcquisition> mockImageAcquisitions() {
-		Set<ImageAcquisition> result = new HashSet<ImageAcquisition>();
+		Set<ImageAcquisition> result = new THashSet<ImageAcquisition>();
 		result.add(IMAGE_ACQUISITION);
 		return result;
 	}
 
-
-
-
 	private static Set<DirectDetection> mockDirectDetections() {
-		Set<DirectDetection> result = new HashSet<DirectDetection>();
+		Set<DirectDetection> result = new THashSet<DirectDetection>();
 		result.add(DIRECT_DETECTION);
 		return result;
 	}
@@ -382,16 +372,16 @@ public class MiapeGeMocker {
 		DirectDetection directDetection = Mockito.mock(DirectDetection.class);
 		Mockito.when(directDetection.getName()).thenReturn(DIRECT_DETECTION_NAME + i);
 		Mockito.when(directDetection.getProtocol()).thenReturn(PROTOCOL + i);
-		Set<DirectDetectionAgent> additionalAgents = new HashSet<DirectDetectionAgent>();
+		Set<DirectDetectionAgent> additionalAgents = new THashSet<DirectDetectionAgent>();
 		additionalAgents.add(MiapeMocker.mockDirectDetectionAgent(0));
 
-		Set<DirectDetectionAgent> detectionAgents = new HashSet<DirectDetectionAgent>();
+		Set<DirectDetectionAgent> detectionAgents = new THashSet<DirectDetectionAgent>();
 		detectionAgents.add(MiapeMocker.mockDirectDetectionAgent(1));
 
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(MiapeMocker.mockBuffer(5));
 
-		Set<Equipment> equipments = new HashSet<Equipment>();
+		Set<Equipment> equipments = new THashSet<Equipment>();
 		equipments.add(MiapeMocker.mockEquipment(5));
 
 		Mockito.when(directDetection.getAdditionalAgents()).thenReturn(additionalAgents);
@@ -402,7 +392,7 @@ public class MiapeGeMocker {
 	}
 
 	private static Set<Equipment> mockDetectionEquipments(int i) {
-		Set<Equipment> equipments = new HashSet<Equipment>();
+		Set<Equipment> equipments = new THashSet<Equipment>();
 		equipments.add(MiapeMocker.mockEquipment(i));
 		return equipments;
 	}
@@ -433,24 +423,21 @@ public class MiapeGeMocker {
 		Mockito.when(matrix.getAdditionalMatrixSubstances()).thenReturn(MOCK_ADDITIONAL_MATRIX_SUBSTANCES);
 		Mockito.when(matrix.getAdditionalMatrixBuffers()).thenReturn(MATRIX_ADD_BUFFERS);
 		Mockito.when(matrix.getPolymerizationMatrixBuffers()).thenReturn(MATRIX_POL_BUFFERS);
-		Set<SampleApplication> sampleApplication = new HashSet<SampleApplication>();
+		Set<SampleApplication> sampleApplication = new THashSet<SampleApplication>();
 		sampleApplication.add(mockSampleApplication(0));
 		Mockito.when(matrix.getSampleApplications()).thenReturn(sampleApplication);
 		return matrix;
 	}
 
-
-
 	private static SampleApplication mockSampleApplication(int i) {
 		SampleApplication sampleApplication = Mockito.mock(SampleApplication.class);
 		Mockito.when(sampleApplication.getDescription()).thenReturn(SAMPLE_APPLICATION_DESCRIPTION + i);
 		Mockito.when(sampleApplication.getName()).thenReturn(SAMPLE_APPLICATION_NAME + i);
-		Set<Lane> lanes = new HashSet<Lane>();
+		Set<Lane> lanes = new THashSet<Lane>();
 		lanes.add(mockLane(0));
 		lanes.add(mockLane(1));
 		Mockito.when(sampleApplication.getLanes()).thenReturn(lanes);
 		return sampleApplication;
 	}
-
 
 }

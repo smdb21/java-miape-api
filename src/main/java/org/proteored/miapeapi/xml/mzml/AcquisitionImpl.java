@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -13,6 +13,7 @@ import org.proteored.miapeapi.interfaces.MatchMode;
 import org.proteored.miapeapi.interfaces.ms.Acquisition;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
 import uk.ac.ebi.jmzml.model.mzml.ReferenceableParamGroupList;
@@ -48,17 +49,15 @@ public class AcquisitionImpl implements Acquisition {
 	private String targetList = null;
 	private final ControlVocabularyManager cvManager;
 
-	public AcquisitionImpl(Software software, ScanSettingsList scanSettingsList,
-			SourceFileList sourceFileList, ReferenceableParamGroupList referenceableParamGroupList,
-			ControlVocabularyManager cvManager) {
+	public AcquisitionImpl(Software software, ScanSettingsList scanSettingsList, SourceFileList sourceFileList,
+			ReferenceableParamGroupList referenceableParamGroupList, ControlVocabularyManager cvManager) {
 		this.cvManager = cvManager;
 
-		HashMap<String, String> diccSoftware = new HashMap<String, String>();
-		HashMap<String, String> diccScanSettings = new HashMap<String, String>();
+		Map<String, String> diccSoftware = new THashMap<String, String>();
+		Map<String, String> diccScanSettings = new THashMap<String, String>();
 		if (software != null) {
-			ParamGroup softwareParamGroup = MzMLControlVocabularyXmlFactory.createParamGroup(
-					software.getCvParam(), software.getUserParam(),
-					software.getReferenceableParamGroupRef());
+			ParamGroup softwareParamGroup = MzMLControlVocabularyXmlFactory.createParamGroup(software.getCvParam(),
+					software.getUserParam(), software.getReferenceableParamGroupRef());
 
 			// version
 			this.version = software.getVersion();
@@ -68,9 +67,8 @@ public class AcquisitionImpl implements Acquisition {
 			this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(softwareParamGroup,
 					referenceableParamGroupList, SoftwareName.getInstance(cvManager));
 			if (name == null) {
-				this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-						softwareParamGroup, referenceableParamGroupList,
-						ACQUISITION_NAME_TEXT_LIST, MatchMode.ANYWHERE);
+				this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(softwareParamGroup,
+						referenceableParamGroupList, ACQUISITION_NAME_TEXT_LIST, MatchMode.ANYWHERE);
 			}
 			if (name == null)
 				this.name = "Acquisition";
@@ -78,36 +76,30 @@ public class AcquisitionImpl implements Acquisition {
 				diccSoftware.put(name, name);
 
 			// manufacturer / vendor
-			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(
-					softwareParamGroup, referenceableParamGroupList,
-					SoftwareManufacturer.getInstance(cvManager));
+			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(softwareParamGroup,
+					referenceableParamGroupList, SoftwareManufacturer.getInstance(cvManager));
 			if (this.manufacturer == null)
-				this.manufacturer = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroupByAccession(softwareParamGroup,
-								referenceableParamGroupList, SOFTWARE_VENDOR_CV);
+				this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(
+						softwareParamGroup, referenceableParamGroupList, SOFTWARE_VENDOR_CV);
 			if (this.manufacturer == null)
-				this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-						softwareParamGroup, referenceableParamGroupList,
-						ACQUISITION_MANUFACTURER_TEXT_LIST, MatchMode.ANYWHERE);
+				this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(softwareParamGroup,
+						referenceableParamGroupList, ACQUISITION_MANUFACTURER_TEXT_LIST, MatchMode.ANYWHERE);
 			diccSoftware.put(manufacturer, manufacturer);
 
 			// catalog number
-			this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-					softwareParamGroup, referenceableParamGroupList, ACQUISITION_CATALOG_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(softwareParamGroup,
+					referenceableParamGroupList, ACQUISITION_CATALOG_TEXT_LIST, MatchMode.ANYWHERE);
 			diccSoftware.put(catalogNumber, catalogNumber);
 
 			// uri / reference
-			this.uri = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-					softwareParamGroup, referenceableParamGroupList, ACQUISITION_URI_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.uri = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(softwareParamGroup,
+					referenceableParamGroupList, ACQUISITION_URI_TEXT_LIST, MatchMode.ANYWHERE);
 			diccSoftware.put(uri, uri);
 
 			// parameters
 			StringBuilder sb = new StringBuilder();
-			List<CVParam> cvList = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(
-					softwareParamGroup, referenceableParamGroupList,
-					AcquisitionParameters.getInstance(cvManager));
+			List<CVParam> cvList = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(softwareParamGroup,
+					referenceableParamGroupList, AcquisitionParameters.getInstance(cvManager));
 			if (cvList != null) {
 				for (CVParam cvParam : cvList) {
 					if (!"".equals(sb.toString()))
@@ -118,14 +110,12 @@ public class AcquisitionImpl implements Acquisition {
 			if (!"".equals(sb.toString()))
 				this.parameters = sb.toString();
 			if (this.parameters == null)
-				this.parameters = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-						softwareParamGroup, referenceableParamGroupList,
-						ACQUISITION_PARAMETERS_TEXT_LIST, MatchMode.ANYWHERE);
+				this.parameters = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(softwareParamGroup,
+						referenceableParamGroupList, ACQUISITION_PARAMETERS_TEXT_LIST, MatchMode.ANYWHERE);
 
 			// transition file
-			this.transitionFile = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-					softwareParamGroup, referenceableParamGroupList,
-					ACQUISITION_TRANSITION_FILE_TEXT_LIST, MatchMode.ANYWHERE);
+			this.transitionFile = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(softwareParamGroup,
+					referenceableParamGroupList, ACQUISITION_TRANSITION_FILE_TEXT_LIST, MatchMode.ANYWHERE);
 
 			// description
 			this.description = MzMLControlVocabularyXmlFactory.parseAllParams(softwareParamGroup,
@@ -138,40 +128,35 @@ public class AcquisitionImpl implements Acquisition {
 		if (scanSettingsList != null) {
 			for (ScanSettings scanSettings : scanSettingsList.getScanSettings()) {
 
-				ParamGroup scanSettingParamGroup = MzMLControlVocabularyXmlFactory
-						.createParamGroup(scanSettings.getCvParam(), scanSettings.getUserParam(),
-								scanSettings.getReferenceableParamGroupRef());
+				ParamGroup scanSettingParamGroup = MzMLControlVocabularyXmlFactory.createParamGroup(
+						scanSettings.getCvParam(), scanSettings.getUserParam(),
+						scanSettings.getReferenceableParamGroupRef());
 				// parameters file
 				final SourceFileRefList sourceFileRefList = scanSettings.getSourceFileRefList();
 				if (sourceFileRefList != null && sourceFileRefList.getCount().longValue() > 0) {
 					for (SourceFileRef sourceFileRef : sourceFileRefList.getSourceFileRef()) {
 						// SourceFile sf = sourceFileRef.getRef();
 						String sourceFileid = sourceFileRef.getRef();
-						SourceFile sourceFile = searchSourceFileInSourceFileList(sourceFileid,
-								sourceFileList);
+						SourceFile sourceFile = searchSourceFileInSourceFileList(sourceFileid, sourceFileList);
 						if (sourceFile != null)
-							this.parametersFile = sourceFile.getName() + " in "
-									+ sourceFile.getLocation();
+							this.parametersFile = sourceFile.getName() + " in " + sourceFile.getLocation();
 					}
 
 				}
 				if (this.parametersFile == null) {
-					this.parametersFile = MzMLControlVocabularyXmlFactory
-							.getValueFromParamGroupByAccession(scanSettingParamGroup,
-									referenceableParamGroupList, MSFileType.PARAMETER_FILE_CV);
+					this.parametersFile = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(
+							scanSettingParamGroup, referenceableParamGroupList, MSFileType.PARAMETER_FILE_CV);
 				}
 				if (this.parametersFile == null) {
-					this.parametersFile = MzMLControlVocabularyXmlFactory
-							.getValueFromParamGroupByName(scanSettingParamGroup,
-									referenceableParamGroupList,
-									ACQUISITION_PARAMETERS_FILE_TEXT_LIST, MatchMode.ANYWHERE);
+					this.parametersFile = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
+							scanSettingParamGroup, referenceableParamGroupList, ACQUISITION_PARAMETERS_FILE_TEXT_LIST,
+							MatchMode.ANYWHERE);
 				}
 				diccScanSettings.put(parametersFile, parametersFile);
 
-				String transitionFileTemp = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroupByName(scanSettingParamGroup,
-								referenceableParamGroupList, ACQUISITION_TRANSITION_FILE_TEXT_LIST,
-								MatchMode.ANYWHERE);
+				String transitionFileTemp = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
+						scanSettingParamGroup, referenceableParamGroupList, ACQUISITION_TRANSITION_FILE_TEXT_LIST,
+						MatchMode.ANYWHERE);
 				if (this.transitionFile != null) {
 					diccScanSettings.put(this.transitionFile, this.transitionFile);
 					diccScanSettings.put(transitionFileTemp, transitionFileTemp);
@@ -189,8 +174,8 @@ public class AcquisitionImpl implements Acquisition {
 						for (ParamGroup targetParamGroup : mzMLTargetList.getTarget()) {
 							if (!"".equals(sb.toString()))
 								sb.append("\n");
-							sb.append(MzMLControlVocabularyXmlFactory.parseAllParams(
-									targetParamGroup, referenceableParamGroupList, null));
+							sb.append(MzMLControlVocabularyXmlFactory.parseAllParams(targetParamGroup,
+									referenceableParamGroupList, null));
 						}
 					}
 				}
@@ -198,8 +183,8 @@ public class AcquisitionImpl implements Acquisition {
 					this.targetList = sb.toString();
 
 				// parameters
-				String paramTemp = MzMLControlVocabularyXmlFactory.parseAllParams(
-						scanSettingParamGroup, referenceableParamGroupList, diccScanSettings);
+				String paramTemp = MzMLControlVocabularyXmlFactory.parseAllParams(scanSettingParamGroup,
+						referenceableParamGroupList, diccScanSettings);
 				if (paramTemp != null)
 					if (parameters != null)
 						parameters = parameters + "\n" + paramTemp;
@@ -210,8 +195,7 @@ public class AcquisitionImpl implements Acquisition {
 		}
 	}
 
-	private SourceFile searchSourceFileInSourceFileList(String sourceFileid,
-			SourceFileList sourceFileList) {
+	private SourceFile searchSourceFileInSourceFileList(String sourceFileid, SourceFileList sourceFileList) {
 		if (sourceFileid == null || "".equals(sourceFileid) || sourceFileList == null
 				|| sourceFileList.getCount().longValue() <= 0)
 			return null;

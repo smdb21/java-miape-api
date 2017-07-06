@@ -2,9 +2,7 @@ package org.proteored.miapeapi.experiment.model.grouping;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -13,17 +11,18 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedProtein;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.spring.SpringHandler;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 /**
  * 
  * @author gorka
  */
 public class PAnalyzerOLD {
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private ControlVocabularyManager cv;
 
-	private final Map<Integer, ExtendedIdentifiedProtein> mProts;
-	private Map<Integer, ExtendedIdentifiedPeptide> mPepts;
+	private final TIntObjectHashMap<ExtendedIdentifiedProtein> mProts;
+	private TIntObjectHashMap<ExtendedIdentifiedPeptide> mPepts;
 	private final List<ProteinGroup> mGroups;
 	private PanalyzerStats mStats;
 
@@ -32,8 +31,8 @@ public class PAnalyzerOLD {
 			this.cv = cvManager;
 		else
 			this.cv = SpringHandler.getInstance().getCVManager();
-		this.mProts = new HashMap<Integer, ExtendedIdentifiedProtein>();
-		this.mPepts = new HashMap<Integer, ExtendedIdentifiedPeptide>();
+		this.mProts = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
+		this.mPepts = new TIntObjectHashMap<ExtendedIdentifiedPeptide>();
 		this.mGroups = new ArrayList<ProteinGroup>();
 	}
 
@@ -62,12 +61,10 @@ public class PAnalyzerOLD {
 		this.mStats = getStats(this.mGroups);
 		long t7 = System.currentTimeMillis();
 
-		log.info("Returning " + mGroups.size() + " protein groups from "
-				+ proteins.size() + " proteins, in "
+		log.info("Returning " + mGroups.size() + " protein groups from " + proteins.size() + " proteins, in "
 				+ (System.currentTimeMillis() - t1) + " milliseconds");
-		log.info("Panalyzer times: " + (t2 - t1) + ", " + (t3 - t2) + ", "
-				+ (t4 - t3) + ", " + (t5 - t4) + ", " + (t6 - t5) + ", "
-				+ (t7 - t6));
+		log.info("Panalyzer times: " + (t2 - t1) + ", " + (t3 - t2) + ", " + (t4 - t3) + ", " + (t5 - t4) + ", "
+				+ (t6 - t5) + ", " + (t7 - t6));
 
 		// SorterUtil.sortProteinGroupsByBestPeptideScore(mGroups);
 		// this.fullGroupDump(System.out);
@@ -97,16 +94,15 @@ public class PAnalyzerOLD {
 
 	private void classifyPeptides() {
 		// Locate unique peptides
-		for (ExtendedIdentifiedPeptide pept : mPepts.values())
+		for (ExtendedIdentifiedPeptide pept : mPepts.valueCollection())
 			if (pept.getProteins().size() == 1) {
 				pept.setRelation(PeptideRelation.UNIQUE);
-				pept.getProteins().get(0)
-						.setEvidence(ProteinEvidence.CONCLUSIVE);
+				pept.getProteins().get(0).setEvidence(ProteinEvidence.CONCLUSIVE);
 			} else
 				pept.setRelation(PeptideRelation.DISCRIMINATING);
 
 		// Locate non-meaningful peptides (first round)
-		for (ExtendedIdentifiedProtein prot : mProts.values())
+		for (ExtendedIdentifiedProtein prot : mProts.valueCollection())
 			if (prot.getEvidence() == ProteinEvidence.CONCLUSIVE)
 				for (ExtendedIdentifiedPeptide pept : prot.getPeptides())
 					if (pept.getRelation() != PeptideRelation.UNIQUE)
@@ -114,11 +110,10 @@ public class PAnalyzerOLD {
 
 		// Locate non-meaningful peptides (second round)
 		boolean shared;
-		for (ExtendedIdentifiedPeptide pept : mPepts.values()) {
+		for (ExtendedIdentifiedPeptide pept : mPepts.valueCollection()) {
 			if (pept.getRelation() != PeptideRelation.DISCRIMINATING)
 				continue;
-			for (ExtendedIdentifiedPeptide pept2 : pept.getProteins().get(0)
-					.getPeptides()) {
+			for (ExtendedIdentifiedPeptide pept2 : pept.getProteins().get(0).getPeptides()) {
 				if (pept2.getRelation() == PeptideRelation.NONDISCRIMINATING)
 					continue;
 				if (pept2.getProteins().size() <= pept.getProteins().size())
@@ -138,7 +133,7 @@ public class PAnalyzerOLD {
 	private void classifyProteins() {
 		boolean group;
 
-		for (ExtendedIdentifiedProtein prot : mProts.values()) {
+		for (ExtendedIdentifiedProtein prot : mProts.valueCollection()) {
 			if (prot.getEvidence() == ProteinEvidence.CONCLUSIVE)
 				continue;
 			List<ExtendedIdentifiedPeptide> peptides = prot.getPeptides();
@@ -152,15 +147,14 @@ public class PAnalyzerOLD {
 					group = true;
 					break;
 				}
-			prot.setEvidence(group ? ProteinEvidence.AMBIGUOUSGROUP
-					: ProteinEvidence.NONCONCLUSIVE);
+			prot.setEvidence(group ? ProteinEvidence.AMBIGUOUSGROUP : ProteinEvidence.NONCONCLUSIVE);
 		}
 	}
 
 	private void createGroups() {
 		ProteinGroup group;
 
-		for (ExtendedIdentifiedProtein prot : mProts.values()) {
+		for (ExtendedIdentifiedProtein prot : mProts.valueCollection()) {
 			if (prot.getGroup() == null) {
 				group = new ProteinGroup(prot.getEvidence());
 				if (!group.contains(prot)) {// added by Salva (6Dec2012)
@@ -175,8 +169,7 @@ public class PAnalyzerOLD {
 				if (pept.getRelation() != PeptideRelation.DISCRIMINATING)
 					continue;
 				for (ExtendedIdentifiedProtein subp : pept.getProteins()) {
-					if (subp.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP
-							|| subp.getGroup() != null)
+					if (subp.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP || subp.getGroup() != null)
 						continue;
 					prot.getGroup().add(subp);
 					subp.setGroup(prot.getGroup());
@@ -218,8 +211,7 @@ public class PAnalyzerOLD {
 
 	public void fullGroupDump(PrintStream stream) {
 		for (ProteinGroup proteinGroup : this.mGroups) {
-			stream.println(proteinGroup + " "
-					+ proteinGroup.getBestPeptideByScore().getSequence() + " "
+			stream.println(proteinGroup + " " + proteinGroup.getBestPeptideByScore().getSequence() + " "
 					+ proteinGroup.getBestPeptideScore());
 		}
 	}

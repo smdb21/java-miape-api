@@ -1,9 +1,7 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -15,6 +13,8 @@ import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 public class ScoreFilter implements Filter {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -78,7 +78,7 @@ public class ScoreFilter implements Filter {
 		if (appliedToPeptides) {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
-			Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides);
+			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides);
 			return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides,
 					currentIdSet.getCvManager());
 
@@ -120,11 +120,11 @@ public class ScoreFilter implements Filter {
 		throw new UnsupportedOperationException("The filter has not a valid comparator");
 	}
 
-	private Set<Integer> filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides) {
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides) {
 		log.info("Filtering " + identifiedPeptides.size() + " peptides by " + this.scoreName + " " + operator + " "
 				+ threshold);
 
-		Set<Integer> ret = new HashSet<Integer>();
+		TIntHashSet ret = new TIntHashSet();
 		for (ExtendedIdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 
 			try {

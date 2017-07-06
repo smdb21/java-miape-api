@@ -1,20 +1,22 @@
 package org.proteored.miapeapi.experiment.model.datamanager;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 public class StaticPeptideStorage {
-	private final static Map<String, Map<Integer, ExtendedIdentifiedPeptide>> staticPeptidesByMIAPEID = new HashMap<String, Map<Integer, ExtendedIdentifiedPeptide>>();
+	private final static Map<String, TIntObjectHashMap<ExtendedIdentifiedPeptide>> staticPeptidesByMIAPEID = new THashMap<String, TIntObjectHashMap<ExtendedIdentifiedPeptide>>();
 
 	public static synchronized void addPeptide(MiapeMSIDocument miapeMSI, ExtendedIdentifiedPeptide peptide) {
 		if (!staticPeptidesByMIAPEID.containsKey(miapeMSI.getName())) {
-			Map<Integer, ExtendedIdentifiedPeptide> peptideMap = new HashMap<Integer, ExtendedIdentifiedPeptide>();
+			TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = new TIntObjectHashMap<ExtendedIdentifiedPeptide>();
 			staticPeptidesByMIAPEID.put(miapeMSI.getName(), peptideMap);
 		}
-		final Map<Integer, ExtendedIdentifiedPeptide> peptideMap = staticPeptidesByMIAPEID.get(miapeMSI.getName());
+		final TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = staticPeptidesByMIAPEID.get(miapeMSI.getName());
 		peptideMap.put(peptide.getId(), peptide);
 	}
 

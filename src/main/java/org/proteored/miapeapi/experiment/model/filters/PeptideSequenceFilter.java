@@ -2,7 +2,6 @@ package org.proteored.miapeapi.experiment.model.filters;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,10 +12,13 @@ import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
 
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 public class PeptideSequenceFilter implements Filter, Filters<String> {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	private final HashSet<String> sequences = new HashSet<String>();
+	private final Set<String> sequences = new THashSet<String>();
 	private final List<String> sortedSequences = new ArrayList<String>();
 	private final boolean distinguisModificatedPeptides;
 	private final Software software;
@@ -41,15 +43,15 @@ public class PeptideSequenceFilter implements Filter, Filters<String> {
 	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
-		Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
 		return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides, currentIdSet.getCvManager());
 	}
 
-	private Set<Integer> filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
 
 		log.info("Filtering by peptide " + this.sequences.size() + " sequences: " + this);
-		Set<Integer> ret = new HashSet<Integer>();
+		TIntHashSet ret = new TIntHashSet();
 		if (identifiedPeptides != null && !identifiedPeptides.isEmpty())
 			for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 				if (peptide != null) {

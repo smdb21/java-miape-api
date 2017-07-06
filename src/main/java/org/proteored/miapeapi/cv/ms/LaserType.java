@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.cv.ms;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.proteored.miapeapi.cv.Accession;
@@ -35,12 +34,11 @@ public class LaserType extends ControlVocabularySet {
 
 	}
 
-	public static String getLaser(Map<String, CvParamType> cvParams,
-			ControlVocabularyManager cvManager) {
+	public static String getLaser(Map<String, CvParamType> cvParams, ControlVocabularyManager cvManager) {
 		// log.info("getLaser = " + cvParams);
 		for (String accession : cvParams.keySet()) {
 			try {
-				HashMap<String, ControlVocabularyTerm> accesionParents = cvManager
+				Map<String, ControlVocabularyTerm> accesionParents = cvManager
 						.getAccesionParents(new Accession(accession));
 				// if there is a cvParamType that is children of LASER_ACCESION
 				if (accesionParents.containsKey(LaserType.LASER_ACCESION)) {

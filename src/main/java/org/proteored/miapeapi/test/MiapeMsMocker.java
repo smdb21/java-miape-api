@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,15 +28,17 @@ import org.proteored.miapeapi.interfaces.ms.ResultingData;
 import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.spring.SpringHandler;
 
+import gnu.trove.set.hash.THashSet;
+
 public class MiapeMsMocker {
-	public static final ControlVocabularyManager cvManager = SpringHandler
-			.getInstance("spring-test.xml").getCVManager();
+	public static final ControlVocabularyManager cvManager = SpringHandler.getInstance("spring-test.xml")
+			.getCVManager();
 	public static final String PEAK_LIST_GENERATION_MASS_TOLERANCE_UNIT = "peakListGenerationMassToleranceUnit";
 	public static final String COLLISION_CELL_PRESSURE = "CollisionCellPressure";
-	public static final String COLLISION_CELL_PRESSURE_UNIT = PressureUnit
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
-	public static final String COLLISION_CELL_ACTIVATION_TYPE = DissociationMethod
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
+	public static final String COLLISION_CELL_PRESSURE_UNIT = PressureUnit.getInstance(cvManager).getFirstCVTerm()
+			.getPreferredName();
+	public static final String COLLISION_CELL_ACTIVATION_TYPE = DissociationMethod.getInstance(cvManager)
+			.getFirstCVTerm().getPreferredName();
 	public static final String PEAK_LIST_GENERATION_GENERAL_PARAMETERS = "peakListGenerationGeneralParameters";
 	public static final String MALDI_WAVE_LENGTH = "MaldiWaveLength";
 	public static final String PEAK_LIST_GENERATION_SCAN_PRODUCTION_TYPE = "peakListGenerationScanProductionType";
@@ -59,8 +60,7 @@ public class MiapeMsMocker {
 	public static final String FULL_SPECTRUM_URL = "FullSpectrumUrl";
 
 	public static final String SPECTRUM_DESCRIPTION_MS_LEVEL = "MS_LEVEL";
-	public static final String ION_MODE = IonMode.getInstance(cvManager)
-			.getFirstCVTerm().getPreferredName();
+	public static final String ION_MODE = IonMode.getInstance(cvManager).getFirstCVTerm().getPreferredName();
 	public static final String SPECTRUM_DESCRIPTION_NAME = "SpectrumDescriptionName";
 	public static final String SPECTRA_DESCRIPTION_RAW_FILE_URL = "SpectraDescriptionRawFileUrl";
 	public static final String SPECTRA_DESCRIPTION_RAW_FILE_DESCRIPTION = "SpectraDescriptionRawFileDescription";
@@ -71,8 +71,7 @@ public class MiapeMsMocker {
 	public static final String ESI_NAME = "EsiName";
 	public static final String TRAP_FINAL_MASS_SPECTOMETRY = "trapFinalMassSpectometry";
 	public static final String ANALYZER_NAME = "TrapName";
-	public static final String IONOPTICNAME = IonOpticsType
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
+	public static final String IONOPTICNAME = IonOpticsType.getInstance(cvManager).getFirstCVTerm().getPreferredName();
 	public static final String COLLISION_CELL_URL = "CollisionCellUrl";
 	public static final String COLLISION_CELL_GAS = "CollisionCellGas";
 	public static final String COLLISION_CELL_NAME = "CollisionCellName";
@@ -100,8 +99,7 @@ public class MiapeMsMocker {
 
 	private static final Set<DataAnalysis> PEAK_LIST_GENERATIONS = mockPeakListGenerations();
 	private static final Equipment ESI_SPRAYER1 = MiapeMocker.mockEquipment(21);
-	private static final Equipment ESI_INTERFACE1 = MiapeMocker
-			.mockEquipment(11);
+	private static final Equipment ESI_INTERFACE1 = MiapeMocker.mockEquipment(11);
 	private static final List<Maldi> MALDIS = mockMaldis();
 	/*
 	 * private static final Set<Quantitation> QUANTITATIONS =
@@ -150,14 +148,11 @@ public class MiapeMsMocker {
 
 		/* Mockito.when(miape.getQuantitations()).thenReturn(QUANTITATIONS); */
 		Mockito.when(miape.getSpectrometers()).thenReturn(SPECTROMETERS);
-		Mockito.when(miape.getInstrumentConfigurations()).thenReturn(
-				INSTRUMENT_CONFIGURATIONS);
-		Mockito.when(miape.getAcquisitions()).thenReturn(
-				CONTROL_ANALYSIS_SOFTWARES);
+		Mockito.when(miape.getInstrumentConfigurations()).thenReturn(INSTRUMENT_CONFIGURATIONS);
+		Mockito.when(miape.getAcquisitions()).thenReturn(CONTROL_ANALYSIS_SOFTWARES);
 		Mockito.when(miape.getResultingDatas()).thenReturn(RESULTING_DATA);
 		Mockito.when(miape.getDataAnalysis()).thenReturn(PEAK_LIST_GENERATIONS);
-		Mockito.when(miape.getAdditionalInformations()).thenReturn(
-				ADDITIONAL_INFORMATIONS);
+		Mockito.when(miape.getAdditionalInformations()).thenReturn(ADDITIONAL_INFORMATIONS);
 		return miape;
 	}
 
@@ -168,11 +163,9 @@ public class MiapeMsMocker {
 	}
 
 	private static InstrumentConfiguration mockInstrumentConfiguration() {
-		InstrumentConfiguration ic = Mockito
-				.mock(InstrumentConfiguration.class);
+		InstrumentConfiguration ic = Mockito.mock(InstrumentConfiguration.class);
 		Mockito.when(ic.getAnalyzers()).thenReturn(ANALYZERS);
-		Mockito.when(ic.getActivationDissociations()).thenReturn(
-				COLLISION_CELLS);
+		Mockito.when(ic.getActivationDissociations()).thenReturn(COLLISION_CELLS);
 		Mockito.when(ic.getEsis()).thenReturn(ESIS);
 		// Mockito.when(ic.getIonOptics()).thenReturn(IONOPTICS);
 		Mockito.when(ic.getMaldis()).thenReturn(MALDIS);
@@ -195,23 +188,23 @@ public class MiapeMsMocker {
 	}
 
 	private static Set<Spectrometer> mockSpectrometers() {
-		Set<Spectrometer> result = new HashSet<Spectrometer>();
+		Set<Spectrometer> result = new THashSet<Spectrometer>();
 		result.add(MiapeMocker.mockSpectrometer(0));
 		return result;
 	}
 
 	/*
 	 * private static Set<Quantitation> mockQuantitations() { Set<Quantitation>
-	 * result = new HashSet<Quantitation>(); result.add(mockQuantitation(0));
+	 * result = new THashSet<Quantitation>(); result.add(mockQuantitation(0));
 	 * return result; } private static Quantitation mockQuantitation(int i) {
 	 * Quantitation quantitation = Mockito.mock(Quantitation.class);
 	 * Mockito.when(quantitation.getName()).thenReturn(QUANTITATION_NAME + i);
 	 * Mockito.when(quantitation.getApproach()).thenReturn(QUANTITATION_APPROACH
 	 * + i);
 	 * Mockito.when(quantitation.getDataUrl()).thenReturn(QUANTITATION_DATA_URL
-	 * + i);
-	 * Mockito.when(quantitation.getFileType()).thenReturn(QUANTITATION_FILE_TYPE
-	 * + i); Mockito.when(quantitation.getNormalization()).thenReturn(
+	 * + i); Mockito.when(quantitation.getFileType()).thenReturn(
+	 * QUANTITATION_FILE_TYPE + i);
+	 * Mockito.when(quantitation.getNormalization()).thenReturn(
 	 * QUANTITATION_NORMALIZATION + i);
 	 * Mockito.when(quantitation.getProtocol()).thenReturn(QUANTITATION_PROTOCOL
 	 * + i); Mockito.when(quantitation.getSampleNumber()).thenReturn(
@@ -233,72 +226,51 @@ public class MiapeMsMocker {
 		Mockito.when(maldi.getExtraction()).thenReturn(MALDI_EXTRACTION);
 		Mockito.when(maldi.getLaser()).thenReturn(MALDI_LASER + i);
 		Mockito.when(maldi.getMatrix()).thenReturn(MALDI_MATRIX + i);
-		Mockito.when(maldi.getLaserParameters()).thenReturn(
-				MALDI_PARAMETERS + i);
+		Mockito.when(maldi.getLaserParameters()).thenReturn(MALDI_PARAMETERS + i);
 		Mockito.when(maldi.getPlateType()).thenReturn(MALDI_PLATE_TYPE + i);
-		Mockito.when(maldi.getDissociation())
-				.thenReturn(MALDI_DISSOCIATION + i);
-		Mockito.when(maldi.getLaserWaveLength()).thenReturn(
-				MALDI_WAVE_LENGTH + i);
-		Mockito.when(maldi.getDissociationSummary()).thenReturn(
-				MALDI_DISSOCIATION_SUMMARY + i);
+		Mockito.when(maldi.getDissociation()).thenReturn(MALDI_DISSOCIATION + i);
+		Mockito.when(maldi.getLaserWaveLength()).thenReturn(MALDI_WAVE_LENGTH + i);
+		Mockito.when(maldi.getDissociationSummary()).thenReturn(MALDI_DISSOCIATION_SUMMARY + i);
 
 		return maldi;
 	}
 
 	private static Set<ActivationDissociation> mockCollisionCells() {
-		Set<ActivationDissociation> result = new HashSet<ActivationDissociation>();
+		Set<ActivationDissociation> result = new THashSet<ActivationDissociation>();
 		result.add(mockCollisionCell(0));
 		return result;
 	}
 
 	private static ActivationDissociation mockCollisionCell(int i) {
-		ActivationDissociation collisionCell = Mockito
-				.mock(ActivationDissociation.class);
-		Mockito.when(collisionCell.getName()).thenReturn(
-				COLLISION_CELL_NAME + i);
-		Mockito.when(collisionCell.getGasType()).thenReturn(
-				COLLISION_CELL_GAS + i);
-		Mockito.when(collisionCell.getGasPressure()).thenReturn(
-				COLLISION_CELL_PRESSURE + i);
-		Mockito.when(collisionCell.getPressureUnit()).thenReturn(
-				COLLISION_CELL_PRESSURE_UNIT + i);
-		Mockito.when(collisionCell.getActivationType()).thenReturn(
-				COLLISION_CELL_ACTIVATION_TYPE + i);
+		ActivationDissociation collisionCell = Mockito.mock(ActivationDissociation.class);
+		Mockito.when(collisionCell.getName()).thenReturn(COLLISION_CELL_NAME + i);
+		Mockito.when(collisionCell.getGasType()).thenReturn(COLLISION_CELL_GAS + i);
+		Mockito.when(collisionCell.getGasPressure()).thenReturn(COLLISION_CELL_PRESSURE + i);
+		Mockito.when(collisionCell.getPressureUnit()).thenReturn(COLLISION_CELL_PRESSURE_UNIT + i);
+		Mockito.when(collisionCell.getActivationType()).thenReturn(COLLISION_CELL_ACTIVATION_TYPE + i);
 
 		return collisionCell;
 	}
 
 	private static Set<Acquisition> mockControlAnalysisSoftwares() {
-		Set<Acquisition> result = new HashSet<Acquisition>();
+		Set<Acquisition> result = new THashSet<Acquisition>();
 		result.add(mockControlAnalysisSoftware(0));
 		return result;
 	}
 
 	private static Acquisition mockControlAnalysisSoftware(int i) {
 		Acquisition software = Mockito.mock(Acquisition.class);
-		Mockito.when(software.getName()).thenReturn(
-				MiapeMocker.SOFTWARE_NAME + i);
-		Mockito.when(software.getCatalogNumber()).thenReturn(
-				MiapeMocker.SOFTWARE_CATALOG_NUMBER + i);
-		Mockito.when(software.getComments()).thenReturn(
-				MiapeMocker.SOFTWARE_COMMENTS + i);
-		Mockito.when(software.getCustomizations()).thenReturn(
-				MiapeMocker.SOFTWARE_CUSTOMIZATIONS + i);
-		Mockito.when(software.getDescription()).thenReturn(
-				MiapeMocker.SOFTWARE_DESCRIPTION + i);
-		Mockito.when(software.getManufacturer()).thenReturn(
-				MiapeMocker.SOFTWARE_MANUFACTURER + i);
-		Mockito.when(software.getModel()).thenReturn(
-				MiapeMocker.SOFTWARE_MODEL + i);
-		Mockito.when(software.getParameterFile()).thenReturn(
-				MiapeMocker.SOFTWARE_PARAMETER_FILE + i);
-		Mockito.when(software.getParameters()).thenReturn(
-				MiapeMocker.SOFTWARE_PARAMETERS + i);
-		Mockito.when(software.getURI())
-				.thenReturn(MiapeMocker.SOFTWARE_URI + i);
-		Mockito.when(software.getVersion()).thenReturn(
-				MiapeMocker.SOFTWARE_VERSION + i);
+		Mockito.when(software.getName()).thenReturn(MiapeMocker.SOFTWARE_NAME + i);
+		Mockito.when(software.getCatalogNumber()).thenReturn(MiapeMocker.SOFTWARE_CATALOG_NUMBER + i);
+		Mockito.when(software.getComments()).thenReturn(MiapeMocker.SOFTWARE_COMMENTS + i);
+		Mockito.when(software.getCustomizations()).thenReturn(MiapeMocker.SOFTWARE_CUSTOMIZATIONS + i);
+		Mockito.when(software.getDescription()).thenReturn(MiapeMocker.SOFTWARE_DESCRIPTION + i);
+		Mockito.when(software.getManufacturer()).thenReturn(MiapeMocker.SOFTWARE_MANUFACTURER + i);
+		Mockito.when(software.getModel()).thenReturn(MiapeMocker.SOFTWARE_MODEL + i);
+		Mockito.when(software.getParameterFile()).thenReturn(MiapeMocker.SOFTWARE_PARAMETER_FILE + i);
+		Mockito.when(software.getParameters()).thenReturn(MiapeMocker.SOFTWARE_PARAMETERS + i);
+		Mockito.when(software.getURI()).thenReturn(MiapeMocker.SOFTWARE_URI + i);
+		Mockito.when(software.getVersion()).thenReturn(MiapeMocker.SOFTWARE_VERSION + i);
 
 		return software;
 	}
@@ -317,7 +289,7 @@ public class MiapeMsMocker {
 	}
 
 	// private static Set<IonOptic> mockIonOptics() {
-	// Set<IonOptic> result = new HashSet<IonOptic>();
+	// Set<IonOptic> result = new THashSet<IonOptic>();
 	// result.add(mockIonOptic(0));
 	// return result;
 	// }
@@ -337,8 +309,7 @@ public class MiapeMsMocker {
 	private static Other_IonSource mockOther_IonSource(int i) {
 		Other_IonSource ionSource = Mockito.mock(Other_IonSource.class);
 		Mockito.when(ionSource.getName()).thenReturn(ION_SOURCE_NAME + i);
-		Mockito.when(ionSource.getParameters()).thenReturn(
-				ION_SOURCE_PARAMETERS + i);
+		Mockito.when(ionSource.getParameters()).thenReturn(ION_SOURCE_PARAMETERS + i);
 		return ionSource;
 	}
 
@@ -358,9 +329,8 @@ public class MiapeMsMocker {
 		Answer<Set<Equipment>> interfaces = new Answer<Set<Equipment>>() {
 			@SuppressWarnings("serial")
 			@Override
-			public Set<Equipment> answer(InvocationOnMock invocation)
-					throws Throwable {
-				return new HashSet<Equipment>() {
+			public Set<Equipment> answer(InvocationOnMock invocation) throws Throwable {
+				return new THashSet<Equipment>() {
 					{
 						add(ESI_INTERFACE1);
 					}
@@ -371,9 +341,8 @@ public class MiapeMsMocker {
 		Answer<Set<Equipment>> sprayers = new Answer<Set<Equipment>>() {
 			@SuppressWarnings("serial")
 			@Override
-			public Set<Equipment> answer(InvocationOnMock invocation)
-					throws Throwable {
-				return new HashSet<Equipment>() {
+			public Set<Equipment> answer(InvocationOnMock invocation) throws Throwable {
+				return new THashSet<Equipment>() {
 					{
 						add(ESI_SPRAYER1);
 					}
@@ -388,33 +357,24 @@ public class MiapeMsMocker {
 	}
 
 	private static Set<DataAnalysis> mockPeakListGenerations() {
-		Set<DataAnalysis> result = new HashSet<DataAnalysis>();
+		Set<DataAnalysis> result = new THashSet<DataAnalysis>();
 		result.add(mockDataAnalysis(0));
 		return result;
 	}
 
 	private static DataAnalysis mockDataAnalysis(int i) {
 		DataAnalysis peakListGeneration = Mockito.mock(DataAnalysis.class);
-		Mockito.when(peakListGeneration.getName()).thenReturn(
-				PEAK_LIST_GENERATION_NAME + i);
-		Mockito.when(peakListGeneration.getCatalogNumber()).thenReturn(
-				PLG_CATALOGNUMBER + i);
-		Mockito.when(peakListGeneration.getComments()).thenReturn(
-				PLG_COMMENTS + i);
-		Mockito.when(peakListGeneration.getCustomizations()).thenReturn(
-				PLG_CUSTOMIZATIONS + i);
-		Mockito.when(peakListGeneration.getDescription()).thenReturn(
-				PLG_DESCRIPTION + i);
-		Mockito.when(peakListGeneration.getManufacturer()).thenReturn(
-				PLG_MANUFACTURER + i);
+		Mockito.when(peakListGeneration.getName()).thenReturn(PEAK_LIST_GENERATION_NAME + i);
+		Mockito.when(peakListGeneration.getCatalogNumber()).thenReturn(PLG_CATALOGNUMBER + i);
+		Mockito.when(peakListGeneration.getComments()).thenReturn(PLG_COMMENTS + i);
+		Mockito.when(peakListGeneration.getCustomizations()).thenReturn(PLG_CUSTOMIZATIONS + i);
+		Mockito.when(peakListGeneration.getDescription()).thenReturn(PLG_DESCRIPTION + i);
+		Mockito.when(peakListGeneration.getManufacturer()).thenReturn(PLG_MANUFACTURER + i);
 		Mockito.when(peakListGeneration.getModel()).thenReturn(PLG_MODEL + i);
-		Mockito.when(peakListGeneration.getParameters()).thenReturn(
-				PLG_PARAMETERS + i);
-		Mockito.when(peakListGeneration.getParametersLocation()).thenReturn(
-				PLG_PARAMETERS_URL + i);
+		Mockito.when(peakListGeneration.getParameters()).thenReturn(PLG_PARAMETERS + i);
+		Mockito.when(peakListGeneration.getParametersLocation()).thenReturn(PLG_PARAMETERS_URL + i);
 		Mockito.when(peakListGeneration.getURI()).thenReturn(PLG_URI + i);
-		Mockito.when(peakListGeneration.getVersion()).thenReturn(
-				PLG_VERSION + i);
+		Mockito.when(peakListGeneration.getVersion()).thenReturn(PLG_VERSION + i);
 
 		return peakListGeneration;
 	}

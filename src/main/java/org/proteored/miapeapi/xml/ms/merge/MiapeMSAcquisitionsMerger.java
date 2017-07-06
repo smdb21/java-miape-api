@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.ms.merge;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +9,8 @@ import org.proteored.miapeapi.factories.ms.MiapeMSDocumentFactory;
 import org.proteored.miapeapi.interfaces.ms.Acquisition;
 import org.proteored.miapeapi.xml.merge.MergerUtil;
 import org.proteored.miapeapi.xml.merge.MiapeMerger;
+
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> {
 	private static MiapeMSAcquisitionsMerger instance;
@@ -21,8 +22,7 @@ public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> 
 	}
 
 	@Override
-	public Set<Acquisition> merge(Set<Acquisition> miapeDataOriginal,
-			Set<Acquisition> miapeDataMetadata) {
+	public Set<Acquisition> merge(Set<Acquisition> miapeDataOriginal, Set<Acquisition> miapeDataMetadata) {
 		if (miapeDataMetadata == null)
 			return miapeDataOriginal;
 		if (miapeDataOriginal == null)
@@ -36,7 +36,7 @@ public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> 
 		for (Acquisition activationDissociation : miapeDataOriginal) {
 			miapeDataOriginalList.add(activationDissociation);
 		}
-		Set<Acquisition> ret = new HashSet<Acquisition>();
+		Set<Acquisition> ret = new THashSet<Acquisition>();
 		int maxIndex = Math.max(miapeDataOriginalList.size(), miapeDataMetadataList.size());
 		for (int i = 0; i < maxIndex; i++) {
 			Acquisition acquisitionOriginal = null;
@@ -48,39 +48,32 @@ public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> 
 
 			Object object;
 			String name = null;
-			object = MergerUtil
-					.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getName");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getName");
 			if (object != null)
 				name = (String) object;
 
 			String parameters = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getParameters");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getParameters");
 			if (object != null)
 				parameters = (String) object;
 			String catalogNumber = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getCatalogNumber");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getCatalogNumber");
 			if (object != null)
 				catalogNumber = (String) object;
 			String comments = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getComments");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getComments");
 			if (object != null)
 				comments = (String) object;
 			String description = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getDescription");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getDescription");
 			if (object != null)
 				description = (String) object;
 			String manufacturer = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getManufacturer");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getManufacturer");
 			if (object != null)
 				manufacturer = (String) object;
 			String model = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getModel");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getModel");
 			if (object != null)
 				model = (String) object;
 			String uri = null;
@@ -88,13 +81,11 @@ public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> 
 			if (object != null)
 				uri = (String) object;
 			String customizations = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getCustomizations");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getCustomizations");
 			if (object != null)
 				customizations = (String) object;
 			String version = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getVersion");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getVersion");
 			if (object != null)
 				version = (String) object;
 
@@ -103,25 +94,21 @@ public class MiapeMSAcquisitionsMerger implements MiapeMerger<Set<Acquisition>> 
 			if (object != null)
 				id = (Integer) object;
 			String parametersFile = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getParameterFile");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getParameterFile");
 			if (object != null)
 				parametersFile = (String) object;
 			String targetList = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getTargetList");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getTargetList");
 			if (object != null)
 				targetList = (String) object;
 			String transitionListFile = null;
-			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata,
-					"getTransitionListFile");
+			object = MergerUtil.getNonNullValue(acquisitionOriginal, acquisitionMetadata, "getTransitionListFile");
 			if (object != null)
 				transitionListFile = (String) object;
 			final AcquisitionBuilder builder = (AcquisitionBuilder) MiapeMSDocumentFactory
-					.createAcquisitionBuilder(name).parameterFile(parametersFile)
-					.targetList(targetList).transitionListFile(transitionListFile).id(id)
-					.customizations(customizations).parameters(parameters).version(version)
-					.catalogNumber(catalogNumber).comments(comments).description(description)
+					.createAcquisitionBuilder(name).parameterFile(parametersFile).targetList(targetList)
+					.transitionListFile(transitionListFile).id(id).customizations(customizations).parameters(parameters)
+					.version(version).catalogNumber(catalogNumber).comments(comments).description(description)
 					.manufacturer(manufacturer).model(model).uri(uri);
 			ret.add(builder.build());
 		}

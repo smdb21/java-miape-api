@@ -1,9 +1,7 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -12,6 +10,8 @@ import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 public class OccurrenceFilter implements Filter {
 	private final int minOccurrence;
@@ -42,12 +42,10 @@ public class OccurrenceFilter implements Filter {
 			over = "times";
 			at = "at";
 		}
-		return "Just include " + level + " present " + at + " " + minOccurrence
-				+ " " + over;
+		return "Just include " + level + " present " + at + " " + minOccurrence + " " + over;
 	}
 
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	/**
 	 * 
@@ -59,9 +57,8 @@ public class OccurrenceFilter implements Filter {
 	 *            which the item appears, and if false the minOccurrence is the
 	 *            number of times that the item appears over the replicates
 	 */
-	public OccurrenceFilter(int minOccurrence, IdentificationItemEnum item,
-			boolean distinguisModificatedPeptides, boolean minNumReplicates,
-			Software software) {
+	public OccurrenceFilter(int minOccurrence, IdentificationItemEnum item, boolean distinguisModificatedPeptides,
+			boolean minNumReplicates, Software software) {
 		this.minOccurrence = minOccurrence;
 		if (IdentificationItemEnum.PEPTIDE.equals(item))
 			this.appliedToPeptides = true;
@@ -105,20 +102,16 @@ public class OccurrenceFilter implements Filter {
 		return this.appliedToPeptides;
 	}
 
-	private Set<Integer> filterPeptides(
-			List<ExtendedIdentifiedPeptide> identifiedPeptides,
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
-		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet
-				.getNextLevelIdentificationSetList();
+		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
 
 		if (byReplicates)
-			log.info("filtering " + identifiedPeptides.size()
-					+ " peptides by Occurrence " + minOccurrence
+			log.info("filtering " + identifiedPeptides.size() + " peptides by Occurrence " + minOccurrence
 					+ " replicates");
 		else
-			log.info("filtering " + identifiedPeptides.size()
-					+ " peptides by Occurrence " + minOccurrence + " times");
-		Set<Integer> ret = new HashSet<Integer>();
+			log.info("filtering " + identifiedPeptides.size() + " peptides by Occurrence " + minOccurrence + " times");
+		TIntHashSet ret = new TIntHashSet();
 		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 			int replicates = 0;
 			if (nextLevelIdentificationSetList == null) {
@@ -128,9 +121,8 @@ public class OccurrenceFilter implements Filter {
 					log.info("This peptide has passed already the threshold");
 			} else {
 				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
-					final int peptideOccurrence = idSet
-							.getPeptideOccurrenceNumber(peptide.getSequence(),
-									this.distinguishModificatedPeptides);
+					final int peptideOccurrence = idSet.getPeptideOccurrenceNumber(peptide.getSequence(),
+							this.distinguishModificatedPeptides);
 					if (peptideOccurrence > 0) {
 						if (byReplicates)
 							replicates = replicates + 1;
@@ -146,40 +138,33 @@ public class OccurrenceFilter implements Filter {
 				}
 			}
 		}
-		log.info("Resulting " + ret.size() + " peptides after filtering "
-				+ identifiedPeptides.size() + " peptides");
+		log.info("Resulting " + ret.size() + " peptides after filtering " + identifiedPeptides.size() + " peptides");
 		return ret;
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups,
-			IdentificationSet currentIdSet) {
-		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet
-				.getNextLevelIdentificationSetList();
+	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
+		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
 		if (appliedToPeptides) {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
-			Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides,
-					currentIdSet);
-			return DataManager.filterProteinGroupsByPeptides(proteinGroups,
-					filteredPeptides, currentIdSet.getCvManager());
+			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+			return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides,
+					currentIdSet.getCvManager());
 		} else {
 			if (nextLevelIdentificationSetList == null)
 				return proteinGroups;
 			if (byReplicates)
-				log.info("filtering " + proteinGroups.size()
-						+ " protein groups by Occurrence " + minOccurrence
+				log.info("filtering " + proteinGroups.size() + " protein groups by Occurrence " + minOccurrence
 						+ " replicates");
 			else
-				log.info("filtering " + proteinGroups.size()
-						+ " protein groups by Occurrence " + minOccurrence
+				log.info("filtering " + proteinGroups.size() + " protein groups by Occurrence " + minOccurrence
 						+ " times");
 			List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 			for (ProteinGroup proteinGroup : proteinGroups) {
 				int replicates = 0;
 				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
-					final int proteinGroupOccurrence = idSet
-							.getProteinGroupOccurrenceNumber(proteinGroup);
+					final int proteinGroupOccurrence = idSet.getProteinGroupOccurrenceNumber(proteinGroup);
 					if (proteinGroupOccurrence > 0) {
 						if (byReplicates)
 							replicates = replicates + 1;
@@ -193,10 +178,8 @@ public class OccurrenceFilter implements Filter {
 				// log.info("This protein has not the enough occurrence");
 			}
 			log.info("Running PAnalyzer before to return the groups in the occurrence filter");
-			ret = DataManager.filterProteinGroupsByPeptides(ret, null,
-					currentIdSet.getCvManager());
-			log.info("Resulting " + ret.size()
-					+ " protein groups after filtering " + proteinGroups.size()
+			ret = DataManager.filterProteinGroupsByPeptides(ret, null, currentIdSet.getCvManager());
+			log.info("Resulting " + ret.size() + " protein groups after filtering " + proteinGroups.size()
 					+ " protein groups");
 			return ret;
 		}
@@ -214,8 +197,7 @@ public class OccurrenceFilter implements Filter {
 	 * @param inclusionProteinList
 	 * @return
 	 */
-	public List<ProteinGroup> filterProteins(
-			List<ProteinGroup> identifiedProteinGroups,
+	public List<ProteinGroup> filterProteins(List<ProteinGroup> identifiedProteinGroups,
 			List<ProteinGroup> inclusionProteinGroupList) {
 
 		if (inclusionProteinGroupList == null)
@@ -223,22 +205,22 @@ public class OccurrenceFilter implements Filter {
 
 		if (!appliedToProteins) {
 			// throw new
-			// UnsupportedOperationException("This filter cannot filter proteins");
+			// UnsupportedOperationException("This filter cannot filter
+			// proteins");
 			log.info("This filter cannot filter peptides");
 			return identifiedProteinGroups;
 
 		}
 
-		log.info("filtering " + identifiedProteinGroups.size()
-				+ " protein groups by Occurrence of the experiment.");
+		log.info("filtering " + identifiedProteinGroups.size() + " protein groups by Occurrence of the experiment.");
 
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 		for (ProteinGroup proteinGroup : identifiedProteinGroups) {
 			if (inclusionProteinGroupList.contains(proteinGroup))
 				ret.add(proteinGroup);
 		}
-		log.info("Resulting " + ret.size() + " protein groups after filtering "
-				+ identifiedProteinGroups.size() + " protein groups");
+		log.info("Resulting " + ret.size() + " protein groups after filtering " + identifiedProteinGroups.size()
+				+ " protein groups");
 		return ret;
 	}
 

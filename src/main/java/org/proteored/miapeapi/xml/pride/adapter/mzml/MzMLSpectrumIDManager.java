@@ -1,8 +1,8 @@
 package org.proteored.miapeapi.xml.pride.adapter.mzml;
 
-import java.util.HashMap;
-
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
+
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Class that contains the relationships between an spectrum identifier and the
@@ -13,12 +13,11 @@ import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
  */
 public class MzMLSpectrumIDManager {
 
-	private final HashMap<String, Integer> identifiersMapping = new HashMap<String, Integer>();
+	private final TObjectIntHashMap<String> identifiersMapping = new TObjectIntHashMap<String>();
 
 	/**
 	 * Note that the spectrumRef should contain the offset if more than one mzML
-	 * files
-	 * are readed
+	 * files are readed
 	 * 
 	 * @param spectrumIdentifier
 	 * @param spectrumRef
@@ -27,8 +26,8 @@ public class MzMLSpectrumIDManager {
 		if (!identifiersMapping.containsKey(spectrumIdentifier)) {
 			identifiersMapping.put(spectrumIdentifier, spectrumRef);
 		} else {
-			throw new IllegalMiapeArgumentException("The spectrum ID: '" + spectrumIdentifier
-					+ "' has already been included in the mapping!");
+			throw new IllegalMiapeArgumentException(
+					"The spectrum ID: '" + spectrumIdentifier + "' has already been included in the mapping!");
 		}
 	}
 

@@ -5,10 +5,9 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
@@ -50,17 +49,19 @@ import de.proteinms.xtandemparser.xtandem.Protein;
 import de.proteinms.xtandemparser.xtandem.ProteinMap;
 import de.proteinms.xtandemparser.xtandem.Spectrum;
 import de.proteinms.xtandemparser.xtandem.XTandemFile;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private final PersistenceManager dbManager;
 	private final ControlVocabularyManager cvManager;
-	private final Set<InputParameter> inputParameters = new HashSet<InputParameter>();
-	private final Set<InputDataSet> inputDataSets = new HashSet<InputDataSet>();
-	private final Set<Validation> validations = new HashSet<Validation>();
-	private final Set<Software> softwares = new HashSet<Software>();
-	private final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+	private final Set<InputParameter> inputParameters = new THashSet<InputParameter>();
+	private final Set<InputDataSet> inputDataSets = new THashSet<InputDataSet>();
+	private final Set<Validation> validations = new THashSet<Validation>();
+	private final Set<Software> softwares = new THashSet<Software>();
+	private final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
 	private String fileLocation;
 	private final String xtandemXMLFileName;
 	private final User owner;
@@ -74,8 +75,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private String url = null;
 
 	private int referencedMS;
-	private HashMap<String, List<IdentifiedPeptide>> peptidesByProteinIDHash;
-	private HashMap<String, IdentifiedProtein> proteinHash;
+	private Map<String, List<IdentifiedPeptide>> peptidesByProteinIDHash;
+	private Map<String, IdentifiedProtein> proteinHash;
 
 	public MiapeMsiDocumentImpl(XTandemFile xfile, ControlVocabularyManager cvManager, String xtandemXMLFileName,
 			String projectName) {
@@ -174,8 +175,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		createPeptideAndProteinHashMaps(xfile);
 
 		// protein data sets
-		proteinSets.add(new IdentifiedProteinSetImpl(inputDataSets, inputParameter, fileLocation, proteinHash.values(),
-				cvManager));
+		proteinSets
+				.add(new IdentifiedProteinSetImpl(inputDataSets, inputParameter, fileLocation, proteinHash.values()));
 
 	}
 
@@ -374,18 +375,18 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private void createPeptideAndProteinHashMaps(XTandemFile xfile) {
-		peptidesByProteinIDHash = new HashMap<String, List<IdentifiedPeptide>>();
+		peptidesByProteinIDHash = new THashMap<String, List<IdentifiedPeptide>>();
 		PeptideMap peptideMap = xfile.getPeptideMap();
 
 		ModificationMap modificationsMap = xfile.getModificationMap();
-		final HashMap<String, String> rawModMap = xfile.getXTandemParser().getRawModMap();
+		final Map<String, String> rawModMap = xfile.getXTandemParser().getRawModMap();
 		InputData inputData = getInputData();
 		ArrayList<Spectrum> spectraList = xfile.getSpectraList();
 		log.info("Iterating over " + spectraList.size() + " spectra...");
 
 		for (Spectrum spectrum : spectraList) {
 
-			HashMap<String, IdentifiedPeptide> peptidesByGroup = new HashMap<String, IdentifiedPeptide>();
+			Map<String, IdentifiedPeptide> peptidesByGroup = new THashMap<String, IdentifiedPeptide>();
 			final int spectrumNumber = spectrum.getSpectrumNumber();
 			final String spectrumRef = xfile.getSupportData(spectrumNumber).getFragIonSpectrumDescription();
 			// ArrayList<Peptide> xTandemPeptides =
@@ -393,7 +394,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			// spectrumNumber, index);
 			// ArrayList<Peptide> xTandemPeptides = peptideMap
 			// .getAllPeptides(spectrumNumber);
-			Set<String> numGroups = new HashSet<String>();
+			Set<String> numGroups = new THashSet<String>();
 			for (int numPeptide = 1; numPeptide <= peptideMap.getNumberOfPeptides(spectrumNumber); numPeptide++) {
 				// for (Peptide xTandemPeptide : xTandemPeptides) {
 				Peptide xTandemPeptide = peptideMap.getPeptideByIndex(spectrumNumber, numPeptide);
@@ -434,7 +435,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		log.info("Iterating over proteins...");
 
 		// protein hash
-		proteinHash = new HashMap<String, IdentifiedProtein>();
+		proteinHash = new THashMap<String, IdentifiedProtein>();
 		Iterator<String> proteinIDIterator = proteinMap.getProteinIDIterator();
 		while (proteinIDIterator.hasNext()) {
 			String proteinID = proteinIDIterator.next();

@@ -1,8 +1,8 @@
 package org.proteored.miapeapi.xml.mzml.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularySet;
@@ -38,8 +38,7 @@ public class MzMLControlVocabularyXmlFactory {
 					// Search in CVParams
 					for (CVParam cvParam : mzMLParamGroup.getCvParam()) {
 						for (ControlVocabularyTerm controlVocabularyField : cvTermSet) {
-							if (controlVocabularyField.getTermAccession().equals(
-									cvParam.getAccession())) {
+							if (controlVocabularyField.getTermAccession().equals(cvParam.getAccession())) {
 								cvList.add(cvParam);
 							}
 						}
@@ -47,15 +46,13 @@ public class MzMLControlVocabularyXmlFactory {
 					// Search in CVParams of the referenceable ParamGroup
 					if (mzMLParamGroup.getReferenceableParamGroupRef() != null
 							&& mzMLParamGroup.getReferenceableParamGroupRef().size() > 0) {
-						for (ReferenceableParamGroupRef ref : mzMLParamGroup
-								.getReferenceableParamGroupRef()) {
+						for (ReferenceableParamGroupRef ref : mzMLParamGroup.getReferenceableParamGroupRef()) {
 							ReferenceableParamGroup refParamGroup = MzMLControlVocabularyXmlFactory
 									.searchParamGroupInReferenceableParamGroupList(ref.getRef(),
 											referenceableParamGroupList);
 							for (CVParam cvParam : refParamGroup.getCvParam()) {
 								for (ControlVocabularyTerm controlVocabularyField : cvTermSet) {
-									if (controlVocabularyField.getTermAccession().equals(
-											cvParam.getAccession())) {
+									if (controlVocabularyField.getTermAccession().equals(cvParam.getAccession())) {
 										cvList.add(cvParam);
 									}
 								}
@@ -92,11 +89,9 @@ public class MzMLControlVocabularyXmlFactory {
 			// Search in CVParams of the referenceable ParamGroup
 			if (mzMLParamGroup.getReferenceableParamGroupRef() != null
 					&& mzMLParamGroup.getReferenceableParamGroupRef().size() > 0) {
-				for (ReferenceableParamGroupRef ref : mzMLParamGroup
-						.getReferenceableParamGroupRef()) {
+				for (ReferenceableParamGroupRef ref : mzMLParamGroup.getReferenceableParamGroupRef()) {
 					ReferenceableParamGroup refParamGroup = MzMLControlVocabularyXmlFactory
-							.searchParamGroupInReferenceableParamGroupList(ref.getRef(),
-									referenceableParamGroupList);
+							.searchParamGroupInReferenceableParamGroupList(ref.getRef(), referenceableParamGroupList);
 					for (CVParam cvParam : refParamGroup.getCvParam()) {
 						if (cvParam != null && accession.equals(cvParam.getAccession())) {
 							return cvParam;
@@ -151,8 +146,7 @@ public class MzMLControlVocabularyXmlFactory {
 			// Search in CVParams of the referenceable ParamGroup
 			if (mzMLParamGroup.getReferenceableParamGroupRef() != null
 					&& mzMLParamGroup.getReferenceableParamGroupRef().size() > 0) {
-				for (ReferenceableParamGroupRef paramRef : mzMLParamGroup
-						.getReferenceableParamGroupRef()) {
+				for (ReferenceableParamGroupRef paramRef : mzMLParamGroup.getReferenceableParamGroupRef()) {
 					ReferenceableParamGroup refParamGroup = searchParamGroupInReferenceableParamGroupList(
 							paramRef.getRef(), referenceableParamGroupList);
 					for (CVParam cvParam : refParamGroup.getCvParam()) {
@@ -185,12 +179,11 @@ public class MzMLControlVocabularyXmlFactory {
 	 * @return the value of the CV
 	 */
 	public static String getValueFromParamGroupByName(ParamGroup paramGroup,
-			ReferenceableParamGroupList referenceableParamGroupList, String[] textList,
-			String matchMode) {
+			ReferenceableParamGroupList referenceableParamGroupList, String[] textList, String matchMode) {
 		for (String text : textList) {
 
-			Object cvOrUserParam = MzMLControlVocabularyXmlFactory.getCvFromParamGroupByName(
-					paramGroup, referenceableParamGroupList, text, matchMode);
+			Object cvOrUserParam = MzMLControlVocabularyXmlFactory.getCvFromParamGroupByName(paramGroup,
+					referenceableParamGroupList, text, matchMode);
 			if (cvOrUserParam != null) {
 				if (cvOrUserParam instanceof CVParam)
 					return ((CVParam) cvOrUserParam).getValue();
@@ -215,11 +208,10 @@ public class MzMLControlVocabularyXmlFactory {
 	 * @return the value of the CV
 	 */
 	public static String getFullCVFromParamGroupByName(ParamGroup paramGroup,
-			ReferenceableParamGroupList referenceableParamGroupList, String[] textList,
-			String matchMode) {
+			ReferenceableParamGroupList referenceableParamGroupList, String[] textList, String matchMode) {
 		for (String text : textList) {
-			Object cvOrUserParam = MzMLControlVocabularyXmlFactory.getCvFromParamGroupByName(
-					paramGroup, referenceableParamGroupList, text, matchMode);
+			Object cvOrUserParam = MzMLControlVocabularyXmlFactory.getCvFromParamGroupByName(paramGroup,
+					referenceableParamGroupList, text, matchMode);
 			if (cvOrUserParam != null) {
 				if (cvOrUserParam instanceof CVParam)
 					return getFullCVParam((CVParam) cvOrUserParam);
@@ -270,8 +262,8 @@ public class MzMLControlVocabularyXmlFactory {
 	 */
 	public static String getValueFromParamGroupByAccession(ParamGroup paramGroup,
 			ReferenceableParamGroupList referenceableParamGroupList, Accession accession) {
-		CVParam cv = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup,
-				referenceableParamGroupList, accession);
+		CVParam cv = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup, referenceableParamGroupList,
+				accession);
 		if (cv != null)
 			if (!"".equals(cv.getValue()))
 				return cv.getValue();
@@ -288,8 +280,8 @@ public class MzMLControlVocabularyXmlFactory {
 	 */
 	public static String getFullCVFromParamGroupByAccession(ParamGroup paramGroup,
 			ReferenceableParamGroupList referenceableParamGroupList, Accession accession) {
-		CVParam cv = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup,
-				referenceableParamGroupList, accession);
+		CVParam cv = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup, referenceableParamGroupList,
+				accession);
 		if (cv != null)
 			return getFullCVParam(cv);
 		return null;
@@ -392,8 +384,8 @@ public class MzMLControlVocabularyXmlFactory {
 	 *            the dictionary
 	 * @return the string separated by return carriages
 	 */
-	public static String parseAllParams(ParamGroup paramGroup,
-			ReferenceableParamGroupList referenceableParamGroupList, HashMap<String, String> dicc) {
+	public static String parseAllParams(ParamGroup paramGroup, ReferenceableParamGroupList referenceableParamGroupList,
+			Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 
 		String parseAllCvParams = parseAllCvParams(paramGroup.getCvParam(), dicc);
@@ -437,8 +429,7 @@ public class MzMLControlVocabularyXmlFactory {
 		if (ref == null || "".equals(ref) || referenceableParamGroupList == null
 				|| referenceableParamGroupList.getReferenceableParamGroup().size() <= 0)
 			return null;
-		for (ReferenceableParamGroup refParamGroup : referenceableParamGroupList
-				.getReferenceableParamGroup()) {
+		for (ReferenceableParamGroup refParamGroup : referenceableParamGroupList.getReferenceableParamGroup()) {
 			if (refParamGroup.getId().equals(ref)) {
 				return refParamGroup;
 			}
@@ -446,7 +437,7 @@ public class MzMLControlVocabularyXmlFactory {
 		return null;
 	}
 
-	public static String parseAllUserParams(List<UserParam> userParams, HashMap<String, String> dicc) {
+	public static String parseAllUserParams(List<UserParam> userParams, Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 		String temp = null;
 		boolean include;
@@ -475,7 +466,7 @@ public class MzMLControlVocabularyXmlFactory {
 		return null;
 	}
 
-	public static String parseAllCvParams(List<CVParam> cvParams, HashMap<String, String> dicc) {
+	public static String parseAllCvParams(List<CVParam> cvParams, Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 		String temp = null;
 		boolean include;
@@ -540,8 +531,7 @@ public class MzMLControlVocabularyXmlFactory {
 			}
 			for (ReferenceableParamGroupRef paramRef : paramGroup1.getReferenceableParamGroupRef()) {
 				ReferenceableParamGroup refParamGroup = MzMLControlVocabularyXmlFactory
-						.searchParamGroupInReferenceableParamGroupList(paramRef.getRef(),
-								referenceableParamGroupList);
+						.searchParamGroupInReferenceableParamGroupList(paramRef.getRef(), referenceableParamGroupList);
 				if (refParamGroup != null && refParamGroup.getCvParam() != null) {
 					for (CVParam cvParam : refParamGroup.getCvParam()) {
 						if (isNotInTheList(cvParam.getAccession(), commonParamGroup.getCvParam()))
@@ -560,8 +550,7 @@ public class MzMLControlVocabularyXmlFactory {
 			}
 			for (ReferenceableParamGroupRef paramRef : paramGroup2.getReferenceableParamGroupRef()) {
 				ReferenceableParamGroup refParamGroup = MzMLControlVocabularyXmlFactory
-						.searchParamGroupInReferenceableParamGroupList(paramRef.getRef(),
-								referenceableParamGroupList);
+						.searchParamGroupInReferenceableParamGroupList(paramRef.getRef(), referenceableParamGroupList);
 				if (refParamGroup != null && refParamGroup.getCvParam() != null) {
 					for (CVParam cvParam : refParamGroup.getCvParam()) {
 						if (isNotInTheList(cvParam.getAccession(), commonParamGroup.getCvParam()))

@@ -1,11 +1,12 @@
 package org.proteored.miapeapi.factories.ms;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.proteored.miapeapi.cv.ms.EsiName;
 import org.proteored.miapeapi.interfaces.Equipment;
 import org.proteored.miapeapi.interfaces.ms.Esi;
+
+import gnu.trove.set.hash.THashSet;
 
 public class EsiBuilder {
 
@@ -41,7 +42,7 @@ public class EsiBuilder {
 
 	public EsiBuilder interfaceEquipment(Equipment value) {
 		if (this.interfaces == null)
-			this.interfaces = new HashSet<Equipment>();
+			this.interfaces = new THashSet<Equipment>();
 		this.interfaces.add(value);
 		return this;
 	}
@@ -53,7 +54,7 @@ public class EsiBuilder {
 
 	public EsiBuilder sprayer(Equipment value) {
 		if (this.sprayers == null)
-			this.sprayers = new HashSet<Equipment>();
+			this.sprayers = new THashSet<Equipment>();
 		this.sprayers.add(value);
 		return this;
 	}

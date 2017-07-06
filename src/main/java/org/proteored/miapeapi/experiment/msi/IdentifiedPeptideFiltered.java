@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.experiment.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +11,9 @@ import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.InputData;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 
@@ -26,7 +28,7 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 	private final String sequence;
 	private final int id;
 	private final String retentionTimeInSeconds;
-	private final Set<Integer> filteredProteinIds = new HashSet<Integer>();
+	private final TIntHashSet filteredProteinIds = new TIntHashSet();
 
 	public IdentifiedPeptideFiltered(ExtendedIdentifiedPeptide peptide) {
 		this.charge = peptide.getCharge();
@@ -35,7 +37,7 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 		this.massDesviation = peptide.getMassDesviation();
 		Set<PeptideModification> modifications2 = peptide.getModifications();
 		if (modifications2 != null) {
-			this.modifications = new HashSet<PeptideModification>();
+			this.modifications = new THashSet<PeptideModification>();
 			this.modifications.addAll(modifications2);
 		} else {
 			this.modifications = null;
@@ -43,7 +45,7 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 		this.rank = peptide.getRank();
 		this.retentionTimeInSeconds = peptide.getRetentionTimeInSeconds();
 		if (peptide.getScores() != null) {
-			this.scores = new HashSet<PeptideScore>();
+			this.scores = new THashSet<PeptideScore>();
 			this.scores.addAll(peptide.getScores());
 		} else {
 			this.scores = null;
@@ -58,7 +60,7 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 		}
 	}
 
-	public Set<Integer> getFilteredProteinIds() {
+	public TIntHashSet getFilteredProteinIds() {
 		return filteredProteinIds;
 	}
 

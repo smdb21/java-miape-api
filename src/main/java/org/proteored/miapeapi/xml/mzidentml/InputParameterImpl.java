@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.xml.mzidentml;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,6 +23,8 @@ import org.proteored.miapeapi.xml.mzidentml.util.MzidentmlControlVocabularyXmlFa
 import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.set.hash.THashSet;
+
 public class InputParameterImpl implements InputParameter {
 	private final PSIPIAnalysisSearchSpectrumIdentificationProtocolType protocol;
 	private final PSIPIAnalysisProcessProteinDetectionProtocolType proteinDetectionProtocol;
@@ -33,12 +34,10 @@ public class InputParameterImpl implements InputParameter {
 	private final Long numSeqSearched;
 	private final ControlVocabularyManager cvManager;
 
-	public InputParameterImpl(
-			PSIPIAnalysisSearchSpectrumIdentificationProtocolType spectProtocol,
+	public InputParameterImpl(PSIPIAnalysisSearchSpectrumIdentificationProtocolType spectProtocol,
 			PSIPIAnalysisProcessProteinDetectionProtocolType proteinDetectionProtocol,
-			List<PSIPIAnalysisSearchSearchDatabaseType> databaseListXML,
-			Software msiSoftware, Integer identifier, Long numSeqSearched,
-			ControlVocabularyManager cvManager) {
+			List<PSIPIAnalysisSearchSearchDatabaseType> databaseListXML, Software msiSoftware, Integer identifier,
+			Long numSeqSearched, ControlVocabularyManager cvManager) {
 		this.protocol = spectProtocol;
 		this.searchDatabaseList = databaseListXML;
 		this.msiSoftware = msiSoftware;
@@ -52,8 +51,8 @@ public class InputParameterImpl implements InputParameter {
 	public String getAaModif() {
 		if (protocol.getModificationParams() != null
 				&& protocol.getModificationParams().getSearchModification() != null) {
-			List<PSIPIAnalysisSearchSearchModificationType> modifications = protocol
-					.getModificationParams().getSearchModification();
+			List<PSIPIAnalysisSearchSearchModificationType> modifications = protocol.getModificationParams()
+					.getSearchModification();
 			StringBuilder sb = new StringBuilder();
 			// fix mode if false --> Variable true --> Fixed
 			// Add CV
@@ -62,8 +61,7 @@ public class InputParameterImpl implements InputParameter {
 				if (!sb.equals(""))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 				final String modificationName = MzidentmlControlVocabularyXmlFactory
-						.readEntireParam(modification.getModParam()
-								.getCvParam());
+						.readEntireParam(modification.getModParam().getCvParam());
 				if (modificationName != null && !modificationName.equals(""))
 					sb.append(modificationName + MiapeXmlUtil.TERM_SEPARATOR);
 
@@ -83,12 +81,10 @@ public class InputParameterImpl implements InputParameter {
 				if (modification.getModParam().getResidues().size() > 0) {
 					sb.append(Utils.RESIDUES + "=");
 					int count = 0;
-					for (String residue : modification.getModParam()
-							.getResidues()) {
+					for (String residue : modification.getModParam().getResidues()) {
 						sb.append(residue);
 						count++;
-						if (count < modification.getModParam().getResidues()
-								.size()) {
+						if (count < modification.getModParam().getResidues().size()) {
 							sb.append(", ");
 						}
 					}
@@ -96,8 +92,7 @@ public class InputParameterImpl implements InputParameter {
 				}
 				if (modification.getSpecificityRules() != null) {
 					sb.append(MzidentmlControlVocabularyXmlFactory
-							.readEntireCVParamList(modification
-									.getSpecificityRules().getCvParam(), true));
+							.readEntireCVParamList(modification.getSpecificityRules().getCvParam(), true));
 				}
 			}
 			return Utils.checkReturnedString(sb);
@@ -108,10 +103,8 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getAdditionalCleavages() {
 		StringBuilder sb = new StringBuilder();
-		if (protocol.getEnzymes() != null
-				&& protocol.getEnzymes().getEnzyme() != null) {
-			for (PSIPIAnalysisSearchEnzymeType enzyme : protocol.getEnzymes()
-					.getEnzyme()) {
+		if (protocol.getEnzymes() != null && protocol.getEnzymes().getEnzyme() != null) {
+			for (PSIPIAnalysisSearchEnzymeType enzyme : protocol.getEnzymes().getEnzyme()) {
 				// disabled on 28-Mat-2013: is already captured in
 				// getMissedCleavages
 				// if (enzyme.getMissedCleavages() != null) {
@@ -120,21 +113,16 @@ public class InputParameterImpl implements InputParameter {
 				// + MiapeXmlUtil.TERM_SEPARATOR);
 				// }
 				if (enzyme.isSemiSpecific() != null) {
-					sb.append(Utils.SEMISPECIFIC + "= true"
-							+ MiapeXmlUtil.TERM_SEPARATOR);
+					sb.append(Utils.SEMISPECIFIC + "= true" + MiapeXmlUtil.TERM_SEPARATOR);
 				}
 				if (enzyme.getNTermGain() != null) {
-					sb.append(Utils.NTERM_GAIN + "=" + enzyme.getNTermGain()
-							+ MiapeXmlUtil.TERM_SEPARATOR);
+					sb.append(Utils.NTERM_GAIN + "=" + enzyme.getNTermGain() + MiapeXmlUtil.TERM_SEPARATOR);
 				}
 				if (enzyme.getCTermGain() != null) {
-					sb.append(Utils.CTERM_GAIN + "=" + enzyme.getNTermGain()
-							+ MiapeXmlUtil.TERM_SEPARATOR);
+					sb.append(Utils.CTERM_GAIN + "=" + enzyme.getNTermGain() + MiapeXmlUtil.TERM_SEPARATOR);
 				}
 				if (enzyme.getMinDistance() != null) {
-					sb.append(Utils.MIN_DISTANCE + "="
-							+ enzyme.getMinDistance()
-							+ MiapeXmlUtil.TERM_SEPARATOR);
+					sb.append(Utils.MIN_DISTANCE + "=" + enzyme.getMinDistance() + MiapeXmlUtil.TERM_SEPARATOR);
 				}
 			}
 		}
@@ -145,11 +133,10 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public Set<AdditionalParameter> getAdditionalParameters() {
 		// from Additional Search Params
-		Set<AdditionalParameter> addParameter = new HashSet<AdditionalParameter>();
+		Set<AdditionalParameter> addParameter = new THashSet<AdditionalParameter>();
 		if (protocol.getAdditionalSearchParams() != null
 				&& protocol.getAdditionalSearchParams().getParamGroup() != null) {
-			List<FuGECommonOntologyParamType> parameters = protocol
-					.getAdditionalSearchParams().getParamGroup();
+			List<FuGECommonOntologyParamType> parameters = protocol.getAdditionalSearchParams().getParamGroup();
 			for (FuGECommonOntologyParamType param : parameters) {
 				if (param != null) {
 					StringBuilder wkName = new StringBuilder();
@@ -163,16 +150,13 @@ public class InputParameterImpl implements InputParameter {
 					if (param.getUnitName() != null) {
 						wkValue.append(" " + param.getUnitName());
 					}
-					addParameter.add(new AdditionalParameterImpl(wkName
-							.toString(), wkValue.toString()));
+					addParameter.add(new AdditionalParameterImpl(wkName.toString(), wkValue.toString()));
 				}
 			}
 		}
-		if (this.proteinDetectionProtocol != null
-				&& proteinDetectionProtocol.getAnalysisParams() != null
+		if (this.proteinDetectionProtocol != null && proteinDetectionProtocol.getAnalysisParams() != null
 				&& proteinDetectionProtocol.getAnalysisParams().getParamGroup() != null) {
-			List<FuGECommonOntologyParamType> parameters = proteinDetectionProtocol
-					.getAnalysisParams().getParamGroup();
+			List<FuGECommonOntologyParamType> parameters = proteinDetectionProtocol.getAnalysisParams().getParamGroup();
 			for (FuGECommonOntologyParamType param : parameters) {
 				if (param != null) {
 					StringBuilder wkName = new StringBuilder();
@@ -186,8 +170,7 @@ public class InputParameterImpl implements InputParameter {
 					if (param.getUnitName() != null) {
 						wkValue.append(" " + param.getUnitName());
 					}
-					addParameter.add(new AdditionalParameterImpl(wkName
-							.toString(), wkValue.toString()));
+					addParameter.add(new AdditionalParameterImpl(wkName.toString(), wkValue.toString()));
 				}
 			}
 		}
@@ -200,16 +183,13 @@ public class InputParameterImpl implements InputParameter {
 	public String getCleavageName() {
 		StringBuilder sb = new StringBuilder();
 
-		if (protocol.getEnzymes() != null
-				&& protocol.getEnzymes().getEnzyme() != null) {
-			List<PSIPIAnalysisSearchEnzymeType> enzymes = protocol.getEnzymes()
-					.getEnzyme();
+		if (protocol.getEnzymes() != null && protocol.getEnzymes().getEnzyme() != null) {
+			List<PSIPIAnalysisSearchEnzymeType> enzymes = protocol.getEnzymes().getEnzyme();
 
 			int counter = 1;
 			for (PSIPIAnalysisSearchEnzymeType enzyme : enzymes) {
 				if (enzyme.getEnzymeName() != null)
-					sb.append(MzidentmlControlVocabularyXmlFactory
-							.readEntireParamList(enzyme.getEnzymeName()));
+					sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParamList(enzyme.getEnzymeName()));
 				if (counter < enzymes.size()) {
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 					counter++;
@@ -225,10 +205,8 @@ public class InputParameterImpl implements InputParameter {
 	public String getCleavageRules() {
 		StringBuilder sb = new StringBuilder();
 		int counter = 1;
-		if (protocol.getEnzymes() != null
-				&& protocol.getEnzymes().getEnzyme() != null) {
-			for (PSIPIAnalysisSearchEnzymeType enzyme : protocol.getEnzymes()
-					.getEnzyme()) {
+		if (protocol.getEnzymes() != null && protocol.getEnzymes().getEnzyme() != null) {
+			for (PSIPIAnalysisSearchEnzymeType enzyme : protocol.getEnzymes().getEnzyme()) {
 				if (enzyme.getSiteRegexp() != null) {
 					sb.append(Utils.SITEREGEXP + "=");
 					sb.append(enzyme.getSiteRegexp());
@@ -247,7 +225,7 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public Set<Database> getDatabases() {
 		if (this.searchDatabaseList != null) {
-			Set<Database> databaseSet = new HashSet<Database>();
+			Set<Database> databaseSet = new THashSet<Database>();
 			for (PSIPIAnalysisSearchSearchDatabaseType databaseXML : searchDatabaseList) {
 				databaseSet.add(new DatabaseImpl(databaseXML));
 			}
@@ -259,8 +237,8 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getFragmentMassTolerance() {
 		if (protocol.getFragmentTolerance() != null) {
-			return MzidentmlControlVocabularyXmlFactory.readEntireCVParamList(
-					protocol.getFragmentTolerance().getCvParam(), false);
+			return MzidentmlControlVocabularyXmlFactory
+					.readEntireCVParamList(protocol.getFragmentTolerance().getCvParam(), false);
 		}
 		return null;
 	}
@@ -269,8 +247,7 @@ public class InputParameterImpl implements InputParameter {
 	public String getFragmentMassToleranceUnit() {
 		if (protocol.getFragmentTolerance() != null) {
 			return MzidentmlControlVocabularyXmlFactory
-					.readFirstUnitCVParamList(protocol.getFragmentTolerance()
-							.getCvParam());
+					.readFirstUnitCVParamList(protocol.getFragmentTolerance().getCvParam());
 		}
 		return null;
 	}
@@ -286,19 +263,16 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getMinScore() {
 		if (protocol.getThreshold() != null) {
-			return MzidentmlControlVocabularyXmlFactory
-					.readEntireParamList(protocol.getThreshold());
+			return MzidentmlControlVocabularyXmlFactory.readEntireParamList(protocol.getThreshold());
 		}
 		return null;
 	}
 
 	@Override
 	public String getMisscleavages() {
-		if (protocol.getEnzymes() != null
-				&& protocol.getEnzymes().getEnzyme() != null) {
+		if (protocol.getEnzymes() != null && protocol.getEnzymes().getEnzyme() != null) {
 			if (protocol.getEnzymes().getEnzyme().get(0).getMissedCleavages() != null) {
-				return protocol.getEnzymes().getEnzyme().get(0)
-						.getMissedCleavages().toString();
+				return protocol.getEnzymes().getEnzyme().get(0).getMissedCleavages().toString();
 			}
 		}
 		return null;
@@ -320,21 +294,13 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getPmfMassTolerance() {
-		if (protocol.getSearchType() != null
-				&& protocol.getSearchType().getCvParam() != null) {
-			if (SearchType
-					.getPMFSearchTerm(cvManager)
-					.getTermAccession()
-					.equals(protocol.getSearchType().getCvParam()
-							.getAccession())
-					|| SearchType
-							.getCombinedPMFMSMSSearchTerm(cvManager)
-							.getTermAccession()
-							.equals(protocol.getSearchType().getCvParam()
-									.getAccession())) {
+		if (protocol.getSearchType() != null && protocol.getSearchType().getCvParam() != null) {
+			if (SearchType.getPMFSearchTerm(cvManager).getTermAccession()
+					.equals(protocol.getSearchType().getCvParam().getAccession())
+					|| SearchType.getCombinedPMFMSMSSearchTerm(cvManager).getTermAccession()
+							.equals(protocol.getSearchType().getCvParam().getAccession())) {
 				return MzidentmlControlVocabularyXmlFactory
-						.readEntireCVParamList(protocol.getParentTolerance()
-								.getCvParam(), false);
+						.readEntireCVParamList(protocol.getParentTolerance().getCvParam(), false);
 			}
 		}
 		return null;
@@ -342,21 +308,13 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getPmfMassToleranceUnit() {
-		if (protocol.getSearchType() != null
-				&& protocol.getSearchType().getCvParam() != null) {
-			if (SearchType
-					.getPMFSearchTerm(cvManager)
-					.getTermAccession()
-					.equals(protocol.getSearchType().getCvParam()
-							.getAccession())
-					|| SearchType
-							.getCombinedPMFMSMSSearchTerm(cvManager)
-							.getTermAccession()
-							.equals(protocol.getSearchType().getCvParam()
-									.getAccession())) {
+		if (protocol.getSearchType() != null && protocol.getSearchType().getCvParam() != null) {
+			if (SearchType.getPMFSearchTerm(cvManager).getTermAccession()
+					.equals(protocol.getSearchType().getCvParam().getAccession())
+					|| SearchType.getCombinedPMFMSMSSearchTerm(cvManager).getTermAccession()
+							.equals(protocol.getSearchType().getCvParam().getAccession())) {
 				return MzidentmlControlVocabularyXmlFactory
-						.readFirstUnitCVParamList(protocol.getParentTolerance()
-								.getCvParam());
+						.readFirstUnitCVParamList(protocol.getParentTolerance().getCvParam());
 			}
 		}
 		return null;
@@ -365,8 +323,8 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getPrecursorMassTolerance() {
 		if (protocol.getParentTolerance() != null) {
-			return MzidentmlControlVocabularyXmlFactory.readEntireCVParamList(
-					protocol.getParentTolerance().getCvParam(), false);
+			return MzidentmlControlVocabularyXmlFactory
+					.readEntireCVParamList(protocol.getParentTolerance().getCvParam(), false);
 		}
 		return null;
 	}
@@ -375,8 +333,7 @@ public class InputParameterImpl implements InputParameter {
 	public String getPrecursorMassToleranceUnit() {
 		if (protocol.getParentTolerance() != null) {
 			return MzidentmlControlVocabularyXmlFactory
-					.readFirstUnitCVParamList(protocol.getParentTolerance()
-							.getCvParam());
+					.readFirstUnitCVParamList(protocol.getParentTolerance().getCvParam());
 		}
 		return null;
 	}
@@ -385,29 +342,21 @@ public class InputParameterImpl implements InputParameter {
 	public String getScoringAlgorithm() {
 
 		if (this.protocol.getAdditionalSearchParams() != null) {
-			for (FuGECommonOntologyParamType paramType : this.protocol
-					.getAdditionalSearchParams().getParamGroup()) {
+			for (FuGECommonOntologyParamType paramType : this.protocol.getAdditionalSearchParams().getParamGroup()) {
 				// take <userParam name="Mascot Instrument Name"
 				// value="MALDI-TOF-TOF"/>
 				if (paramType instanceof FuGECommonOntologyUserParamType) {
-					if (paramType
-							.getName()
-							.equals(MzidentmlControlVocabularyXmlFactory.MASCOT_INSTRUMENT_NAME)) {
-						return MzidentmlControlVocabularyXmlFactory
-								.readEntireParam(paramType);
+					if (paramType.getName().equals(MzidentmlControlVocabularyXmlFactory.MASCOT_INSTRUMENT_NAME)) {
+						return MzidentmlControlVocabularyXmlFactory.readEntireParam(paramType);
 					}
 				}
 				// take ("MS:1001376", "Phenyx:Scoring Model")
 				if (paramType instanceof FuGECommonOntologyCvParamType) {
-					if (((FuGECommonOntologyCvParamType) paramType)
-							.getAccession()
-							.equals(AdditionalParameterName
-									.getInstance(cvManager)
-									.getCVTermByAccession(
-											AdditionalParameterName.PHENYX_SCORING_MODEL)
+					if (((FuGECommonOntologyCvParamType) paramType).getAccession()
+							.equals(AdditionalParameterName.getInstance(cvManager)
+									.getCVTermByAccession(AdditionalParameterName.PHENYX_SCORING_MODEL)
 									.getTermAccession())) {
-						return MzidentmlControlVocabularyXmlFactory
-								.readEntireParam(paramType);
+						return MzidentmlControlVocabularyXmlFactory.readEntireParam(paramType);
 					}
 				}
 			}
@@ -418,8 +367,7 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public String getSearchType() {
 		if (protocol.getSearchType() != null)
-			return MzidentmlControlVocabularyXmlFactory
-					.readEntireParam(protocol.getSearchType());
+			return MzidentmlControlVocabularyXmlFactory.readEntireParam(protocol.getSearchType());
 		return null;
 	}
 
@@ -437,21 +385,18 @@ public class InputParameterImpl implements InputParameter {
 		for (FilterType filterType : filters) {
 			if (filterType.getFilterType() != null) {
 				sb.append(Utils.FILTER_TYPE + "=");
-				sb.append(MzidentmlControlVocabularyXmlFactory
-						.readEntireParam(filterType.getFilterType()));
+				sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(filterType.getFilterType()));
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 			}
 
 			if (filterType.getExclude() != null) {
 				sb.append(Utils.EXCLUDE + "=");
-				sb.append(MzidentmlControlVocabularyXmlFactory
-						.readEntireParamList(filterType.getExclude()));
+				sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParamList(filterType.getExclude()));
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 			}
 			if (filterType.getInclude() != null) {
 				sb.append(Utils.INCLUDE + "=");
-				sb.append(MzidentmlControlVocabularyXmlFactory
-						.readEntireParamList(filterType.getInclude()));
+				sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParamList(filterType.getInclude()));
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 			}
 		}

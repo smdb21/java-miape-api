@@ -2,10 +2,9 @@ package org.proteored.miapeapi.experiment.model.datamanager;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,19 +40,24 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.spring.SpringHandler;
 
-import edu.scripps.yates.cores.SystemCoreManager;
-import edu.scripps.yates.pi.ParIterator;
-import edu.scripps.yates.pi.ParIteratorFactory;
-import edu.scripps.yates.pi.ParIterator.Schedule;
-import edu.scripps.yates.pi.reductions.Reducible;
-import edu.scripps.yates.pi.reductions.Reduction;
+import edu.scripps.yates.utilities.cores.SystemCoreManager;
+import edu.scripps.yates.utilities.pi.ParIterator;
+import edu.scripps.yates.utilities.pi.ParIteratorFactory;
+import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
+import edu.scripps.yates.utilities.pi.reductions.Reducible;
+import edu.scripps.yates.utilities.pi.reductions.Reduction;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public abstract class DataManager {
 	// Peptides less than this length, will be discarded
 	public final static int DEFAULT_MIN_PEPTIDE_LENGTH = 7;
 
-	// private final static HashMap<Integer, ExtendedIdentifiedProtein>
-	// staticProteins = new HashMap<Integer, ExtendedIdentifiedProtein>();
+	// private final static TIntObjectHashMap< ExtendedIdentifiedProtein>
+	// staticProteins = new TIntObjectHashMap< ExtendedIdentifiedProtein>();
 	private final ControlVocabularyManager cvManager;
 	protected final IdentificationSet idSet;
 
@@ -71,7 +75,7 @@ public abstract class DataManager {
 
 	// Protein occurrence, indicates how many times a protein group has been
 	// identified over the replicates
-	protected HashMap<String, ProteinGroupOccurrence> proteinGroupOccurrenceList = new HashMap<String, ProteinGroupOccurrence>();
+	protected Map<String, ProteinGroupOccurrence> proteinGroupOccurrenceList = new THashMap<String, ProteinGroupOccurrence>();
 
 	// Indicate if the proteins has already been filtered or not
 	protected boolean isDataReady = false;
@@ -87,7 +91,7 @@ public abstract class DataManager {
 	// Non filtered peptides, List of peptides sorted by peptides score
 	// Peptide occurrence, indicates how many times a peptide has been
 	// identified over replicates
-	protected HashMap<String, PeptideOccurrence> peptideOccurrenceList = new HashMap<String, PeptideOccurrence>();
+	protected Map<String, PeptideOccurrence> peptideOccurrenceList = new THashMap<String, PeptideOccurrence>();
 	// Indicates if two peptides with the same modification are considered equal
 	// even if they have
 	// different modifications
@@ -108,7 +112,7 @@ public abstract class DataManager {
 
 	private List<ProteinGroup> inclusionList = null;
 
-	private final Set<String> differentSearchedDatabases = new HashSet<String>();
+	private final Set<String> differentSearchedDatabases = new THashSet<String>();
 
 	private Float proteinFDR;
 	private Float peptideFDR;
@@ -254,11 +258,11 @@ public abstract class DataManager {
 		}
 		log.info("Linking " + nonFilteredIdentifiedProteins.size() + " proteins with "
 				+ nonFilteredIdentifiedPeptides.size() + " peptides");
-		HashMap<Integer, ExtendedIdentifiedPeptide> peptideMap = new HashMap<Integer, ExtendedIdentifiedPeptide>();
+		TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = new TIntObjectHashMap<ExtendedIdentifiedPeptide>();
 		for (ExtendedIdentifiedPeptide peptide : nonFilteredIdentifiedPeptides) {
 			peptideMap.put(peptide.getId(), peptide);
 		}
-		HashMap<Integer, ExtendedIdentifiedProtein> proteinMap = new HashMap<Integer, ExtendedIdentifiedProtein>();
+		TIntObjectHashMap<ExtendedIdentifiedProtein> proteinMap = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
 		for (ExtendedIdentifiedProtein prot : nonFilteredIdentifiedProteins) {
 			proteinMap.put(prot.getId(), prot);
 		}
@@ -350,7 +354,7 @@ public abstract class DataManager {
 		int peptideWithoutProteins = 0;
 		// reset collections
 		resetIdentificationSet();
-		Set<Integer> peptidesIds = new HashSet<Integer>();
+		TIntHashSet peptidesIds = new TIntHashSet();
 		// process the MIAPE
 		if (miapeMSIs != null) {
 			for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
@@ -373,7 +377,7 @@ public abstract class DataManager {
 					Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSIDocument.getIdentifiedProteinSets();
 					if (identifiedProteinSets != null) {
 						for (IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
-							HashMap<String, IdentifiedProtein> identifiedProteins2 = identifiedProteinSet
+							Map<String, IdentifiedProtein> identifiedProteins2 = identifiedProteinSet
 									.getIdentifiedProteins();
 							if (identifiedProteins2 != null) {
 								log.info(identifiedProteins2.size() + " proteins in MIAPE MSI "
@@ -513,8 +517,8 @@ public abstract class DataManager {
 	 */
 	private void collectDataFromReplicates() {
 		log.info("Collecting data from replicates at experiment level");
-		// Set<Integer> proteinIDList = new HashSet<Integer>();
-		// Set<Integer> peptideIDList = new HashSet<Integer>();
+		// TIntHashSet proteinIDList = new TIntHashSet();
+		// TIntHashSet peptideIDList = new TIntHashSet();
 
 		for (DataManager dataManager : dataManagers) {
 
@@ -1141,7 +1145,7 @@ public abstract class DataManager {
 	 *
 	 * @return
 	 */
-	public HashMap<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
+	public Map<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
 		// log.info("Getting protein occurrence list from " +
 		// this.idSet.getName());
 
@@ -1177,7 +1181,7 @@ public abstract class DataManager {
 	}
 
 	public ProteinGroupOccurrence getProteinGroupOccurrence(ProteinGroup proteinGroup) {
-		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
+		final Map<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
 		if (proteinOcurrenceList.containsKey(proteinGroup.getKey()))
 			return proteinOcurrenceList.get(proteinGroup.getKey());
 		return null;
@@ -1185,7 +1189,7 @@ public abstract class DataManager {
 	}
 
 	public ProteinGroupOccurrence getProteinGroupOccurrenceByProteinGroupKey(String proteinGroupKey) {
-		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
+		final Map<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
 		if (proteinOcurrenceList.containsKey(proteinGroupKey))
 			return proteinOcurrenceList.get(proteinGroupKey);
 		return null;
@@ -1193,7 +1197,7 @@ public abstract class DataManager {
 	}
 
 	public ProteinGroupOccurrence getProteinGroupOccurrence(String proteinACC) {
-		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
+		final Map<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
 		for (ProteinGroupOccurrence proteinGroupOccurrence : proteinOcurrenceList.values()) {
 			if (proteinGroupOccurrence.getAccessions().contains(proteinACC)) {
 				return proteinGroupOccurrence;
@@ -1203,7 +1207,7 @@ public abstract class DataManager {
 	}
 
 	public int getProteinGroupOccurrenceNumber(String proteinACC) {
-		final HashMap<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
+		final Map<String, ProteinGroupOccurrence> proteinOcurrenceList = getProteinGroupOccurrenceList();
 		for (ProteinGroupOccurrence proteinGroupOccurrence : proteinOcurrenceList.values()) {
 			if (proteinGroupOccurrence.getAccessions().contains(proteinACC)) {
 				return proteinGroupOccurrence.getItemList().size();
@@ -1224,7 +1228,7 @@ public abstract class DataManager {
 	private List<ExtendedIdentifiedPeptide> getNextLevelIdentifiedPeptides() {
 		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
 		try {
-			Set<Integer> peptideIDs = new HashSet<Integer>();
+			TIntHashSet peptideIDs = new TIntHashSet();
 			final List<IdentificationSet> nextLevelIdentificationSetList = idSet.getNextLevelIdentificationSetList();
 			for (IdentificationSet identificationSet : nextLevelIdentificationSetList) {
 				List<ExtendedIdentifiedPeptide> peptides = null;
@@ -1253,7 +1257,7 @@ public abstract class DataManager {
 	 *
 	 * @return
 	 */
-	public HashMap<String, PeptideOccurrence> getPeptideOcurrenceList(boolean distinguishModPep) {
+	public Map<String, PeptideOccurrence> getPeptideOcurrenceList(boolean distinguishModPep) {
 
 		// recalculate de occurrence list if the boolean distinguishModPep
 		// changes
@@ -1278,10 +1282,9 @@ public abstract class DataManager {
 		return peptideOccurrenceList;
 	}
 
-	public HashMap<String, PeptideOccurrence> getPeptideChargeOcurrenceList(boolean distinguishModPep) {
-		final HashMap<String, PeptideOccurrence> peptideChargeOcurrenceList = getPeptideOcurrenceList(
-				distinguishModPep);
-		HashMap<String, PeptideOccurrence> ret = new HashMap<String, PeptideOccurrence>();
+	public Map<String, PeptideOccurrence> getPeptideChargeOcurrenceList(boolean distinguishModPep) {
+		final Map<String, PeptideOccurrence> peptideChargeOcurrenceList = getPeptideOcurrenceList(distinguishModPep);
+		Map<String, PeptideOccurrence> ret = new THashMap<String, PeptideOccurrence>();
 		for (PeptideOccurrence peptideOccurrence : peptideChargeOcurrenceList.values()) {
 			final List<ExtendedIdentifiedPeptide> itemList = peptideOccurrence.getItemList();
 			for (ExtendedIdentifiedPeptide peptide : itemList) {
@@ -1301,9 +1304,9 @@ public abstract class DataManager {
 		return ret;
 	}
 
-	public static HashMap<String, PeptideOccurrence> createPeptideOccurrenceList(
-			List<ExtendedIdentifiedPeptide> peptides, boolean distinguishModPep) {
-		HashMap<String, PeptideOccurrence> ret = new HashMap<String, PeptideOccurrence>();
+	public static Map<String, PeptideOccurrence> createPeptideOccurrenceList(List<ExtendedIdentifiedPeptide> peptides,
+			boolean distinguishModPep) {
+		Map<String, PeptideOccurrence> ret = new THashMap<String, PeptideOccurrence>();
 
 		for (ExtendedIdentifiedPeptide extPeptide : peptides) {
 			if (extPeptide != null) {
@@ -1322,7 +1325,7 @@ public abstract class DataManager {
 		return ret;
 	}
 
-	public static HashMap<String, PeptideOccurrence> createPeptideOccurrenceListInParallel(
+	public static Map<String, PeptideOccurrence> createPeptideOccurrenceListInParallel(
 			List<ExtendedIdentifiedPeptide> peptides, final boolean distinguishModPep) {
 
 		int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
@@ -1330,7 +1333,7 @@ public abstract class DataManager {
 				+ " using " + threadCount + " threads");
 		ParIterator<ExtendedIdentifiedPeptide> iterator = ParIteratorFactory.createParIterator(peptides, threadCount,
 				Schedule.GUIDED);
-		Reducible<HashMap<String, PeptideOccurrence>> reduciblePeptideMap = new Reducible<HashMap<String, PeptideOccurrence>>();
+		Reducible<Map<String, PeptideOccurrence>> reduciblePeptideMap = new Reducible<Map<String, PeptideOccurrence>>();
 
 		List<PeptideOcurrenceParallelCreator> runners = new ArrayList<PeptideOcurrenceParallelCreator>();
 		for (int numCore = 0; numCore < threadCount; numCore++) {
@@ -1353,11 +1356,11 @@ public abstract class DataManager {
 		}
 
 		// Reductors
-		Reduction<HashMap<String, PeptideOccurrence>> peptideListReduction = new Reduction<HashMap<String, PeptideOccurrence>>() {
+		Reduction<Map<String, PeptideOccurrence>> peptideListReduction = new Reduction<Map<String, PeptideOccurrence>>() {
 			@Override
-			public HashMap<String, PeptideOccurrence> reduce(HashMap<String, PeptideOccurrence> first,
-					HashMap<String, PeptideOccurrence> second) {
-				HashMap<String, PeptideOccurrence> peptideOccurrences = new HashMap<String, PeptideOccurrence>();
+			public Map<String, PeptideOccurrence> reduce(Map<String, PeptideOccurrence> first,
+					Map<String, PeptideOccurrence> second) {
+				Map<String, PeptideOccurrence> peptideOccurrences = new THashMap<String, PeptideOccurrence>();
 				for (String key : first.keySet()) {
 					if (peptideOccurrences.containsKey(key)) {
 						final PeptideOccurrence peptideOccurrenceFirst = first.get(key);
@@ -1386,7 +1389,7 @@ public abstract class DataManager {
 			}
 		};
 
-		final HashMap<String, PeptideOccurrence> mergedPeptideOccurrences = reduciblePeptideMap
+		final Map<String, PeptideOccurrence> mergedPeptideOccurrences = reduciblePeptideMap
 				.reduce(peptideListReduction);
 		log.debug(mergedPeptideOccurrences.size() + " peptides occurrences from " + peptides.size() + " peptides");
 
@@ -1394,9 +1397,8 @@ public abstract class DataManager {
 
 	}
 
-	public static HashMap<String, ProteinOccurrence> createProteinOccurrenceList(
-			List<ExtendedIdentifiedProtein> proteins) {
-		HashMap<String, ProteinOccurrence> ret = new HashMap<String, ProteinOccurrence>();
+	public static Map<String, ProteinOccurrence> createProteinOccurrenceList(List<ExtendedIdentifiedProtein> proteins) {
+		Map<String, ProteinOccurrence> ret = new THashMap<String, ProteinOccurrence>();
 
 		for (ExtendedIdentifiedProtein protein : proteins) {
 			if (protein != null) {
@@ -1415,7 +1417,7 @@ public abstract class DataManager {
 		return ret;
 	}
 
-	public static HashMap<String, ProteinGroupOccurrence> createProteinGroupOccurrenceList(
+	public static Map<String, ProteinGroupOccurrence> createProteinGroupOccurrenceList(
 			List<ProteinGroup> proteinGroups) {
 		// return
 		// createProteinGroupOccurrenceListWithRelaxedComparison(proteinGroups);
@@ -1435,10 +1437,10 @@ public abstract class DataManager {
 	 * @param proteinGroups
 	 * @return
 	 */
-	public static HashMap<String, ProteinGroupOccurrence> createProteinGroupOccurrenceListWithStrictComparison(
+	public static Map<String, ProteinGroupOccurrence> createProteinGroupOccurrenceListWithStrictComparison(
 			List<ProteinGroup> proteinGroups) {
 		log.debug("Creating protein group occurrences from " + proteinGroups.size() + " protein groups");
-		HashMap<String, ProteinGroupOccurrence> differentProteinGroups = new HashMap<String, ProteinGroupOccurrence>();
+		Map<String, ProteinGroupOccurrence> differentProteinGroups = new THashMap<String, ProteinGroupOccurrence>();
 
 		for (ProteinGroup proteinGroup : proteinGroups) {
 			if (differentProteinGroups.containsKey(proteinGroup.getKey())) {
@@ -1461,14 +1463,14 @@ public abstract class DataManager {
 		return differentProteinGroups;
 	}
 
-	public static HashMap<String, ProteinGroupOccurrence> createProteinGroupOccurrenceListWithStrictComparisonInParallel(
+	public static Map<String, ProteinGroupOccurrence> createProteinGroupOccurrenceListWithStrictComparisonInParallel(
 			List<ProteinGroup> proteinGroups) {
 		int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
 		log.debug("Creating protein group occurrences from " + proteinGroups.size() + " protein groups using "
 				+ threadCount + " threads");
 		ParIterator<ProteinGroup> iterator = ParIteratorFactory.createParIterator(proteinGroups, threadCount,
 				Schedule.GUIDED);
-		Reducible<HashMap<String, ProteinGroupOccurrence>> reducibleProteinGroupMap = new Reducible<HashMap<String, ProteinGroupOccurrence>>();
+		Reducible<Map<String, ProteinGroupOccurrence>> reducibleProteinGroupMap = new Reducible<Map<String, ProteinGroupOccurrence>>();
 
 		List<ProteinGroupOcurrenceParallelCreator> runners = new ArrayList<ProteinGroupOcurrenceParallelCreator>();
 		for (int numCore = 0; numCore < threadCount; numCore++) {
@@ -1491,11 +1493,11 @@ public abstract class DataManager {
 			throw new IllegalArgumentException(iterator.getAllExceptions()[0].getException());
 		}
 		// Reductors
-		Reduction<HashMap<String, ProteinGroupOccurrence>> proteinGroupListReduction = new Reduction<HashMap<String, ProteinGroupOccurrence>>() {
+		Reduction<Map<String, ProteinGroupOccurrence>> proteinGroupListReduction = new Reduction<Map<String, ProteinGroupOccurrence>>() {
 			@Override
-			public HashMap<String, ProteinGroupOccurrence> reduce(HashMap<String, ProteinGroupOccurrence> first,
-					HashMap<String, ProteinGroupOccurrence> second) {
-				HashMap<String, ProteinGroupOccurrence> proteinGroupOccurrences = new HashMap<String, ProteinGroupOccurrence>();
+			public Map<String, ProteinGroupOccurrence> reduce(Map<String, ProteinGroupOccurrence> first,
+					Map<String, ProteinGroupOccurrence> second) {
+				Map<String, ProteinGroupOccurrence> proteinGroupOccurrences = new THashMap<String, ProteinGroupOccurrence>();
 				for (String key : first.keySet()) {
 					final ProteinGroupOccurrence proteinGroupOccurrenceFirst = first.get(key);
 					if (proteinGroupOccurrences.containsKey(key)) {
@@ -1523,7 +1525,7 @@ public abstract class DataManager {
 			}
 		};
 
-		final HashMap<String, ProteinGroupOccurrence> mergedPeptideOccurrences = reducibleProteinGroupMap
+		final Map<String, ProteinGroupOccurrence> mergedPeptideOccurrences = reducibleProteinGroupMap
 				.reduce(proteinGroupListReduction);
 		log.debug(mergedPeptideOccurrences.size() + " protein group occurrences from " + proteinGroups.size()
 				+ " protein groups");
@@ -1547,8 +1549,8 @@ public abstract class DataManager {
 	// + proteinGroups.size() + " protein groups");
 	//
 	// // protein acc: proteingocc
-	// HashMap<String, ProteinGroupOccurrence>
-	// proteinToProteinGroupOccurrenceMapping = new HashMap<String,
+	// Map<String, ProteinGroupOccurrence>
+	// proteinToProteinGroupOccurrenceMapping = new TMap<String,
 	// ProteinGroupOccurrence>();
 	//
 	// for (ProteinGroup proteinGroup : proteinGroups) {
@@ -1668,12 +1670,12 @@ public abstract class DataManager {
 	}
 
 	public PeptideOccurrence getPeptideOccurrence(String sequence, boolean distModPep) {
-		final HashMap<String, PeptideOccurrence> peptideOcurrenceList = getPeptideOcurrenceList(distModPep);
+		final Map<String, PeptideOccurrence> peptideOcurrenceList = getPeptideOcurrenceList(distModPep);
 		return peptideOcurrenceList.get(sequence);
 	}
 
 	public PeptideOccurrence getPeptideChargeOccurrence(String sequencePlusChargeKey, boolean distModPep) {
-		final HashMap<String, PeptideOccurrence> peptideChargeOcurrenceList = getPeptideChargeOcurrenceList(distModPep);
+		final Map<String, PeptideOccurrence> peptideChargeOcurrenceList = getPeptideChargeOcurrenceList(distModPep);
 		return peptideChargeOcurrenceList.get(sequencePlusChargeKey);
 	}
 
@@ -1770,10 +1772,10 @@ public abstract class DataManager {
 		return count;
 	}
 
-	public HashMap<Integer, Integer> getModificationOccurrenceDistribution(String modif) {
+	public TIntIntHashMap getModificationOccurrenceDistribution(String modif) {
 
-		HashMap<Integer, Integer> ret = new HashMap<Integer, Integer>();
-		final HashMap<String, PeptideOccurrence> peptideOccurrences = getPeptideOcurrenceList(true);
+		TIntIntHashMap ret = new TIntIntHashMap();
+		final Map<String, PeptideOccurrence> peptideOccurrences = getPeptideOcurrenceList(true);
 		for (PeptideOccurrence peptideOccurrence : peptideOccurrences.values()) {
 			final Set<PeptideModification> peptideModifications = peptideOccurrence.getFirstOccurrence()
 					.getModifications();
@@ -1821,9 +1823,9 @@ public abstract class DataManager {
 		return count;
 	}
 
-	public HashMap<Integer, Integer> getMissedCleavagesOccurrenceDistribution() {
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
 
-		HashMap<Integer, Integer> ret = new HashMap<Integer, Integer>();
+		TIntIntHashMap ret = new TIntIntHashMap();
 		final List<ExtendedIdentifiedPeptide> peptides = getIdentifiedPeptides();
 		for (ExtendedIdentifiedPeptide peptide : peptides) {
 			int missedCleavages = peptide.getNumMissedcleavages();
@@ -1886,7 +1888,7 @@ public abstract class DataManager {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getProteinGroupTP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		List<ProteinGroup> positiveProteinGroups = getIdentifiedProteinGroups();
 		int TP = 0;
 		for (ProteinGroup proteinGroup : positiveProteinGroups) {
@@ -1902,7 +1904,7 @@ public abstract class DataManager {
 		return TP;
 	}
 
-	public int getProteinGroupFN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		List<ProteinGroup> allProteinGroups = getNonFilteredIdentifiedProteinGroups();
 		List<ProteinGroup> positiveProteinGroups = getIdentifiedProteinGroups();
 
@@ -1934,7 +1936,7 @@ public abstract class DataManager {
 		return FN;
 	}
 
-	public int getProteinGroupTN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		List<ProteinGroup> allProteinGroups = getNonFilteredIdentifiedProteinGroups();
 		List<ProteinGroup> positiveProteinGroups = getIdentifiedProteinGroups();
 
@@ -1969,7 +1971,7 @@ public abstract class DataManager {
 		return TN;
 	}
 
-	public int getProteinGroupFP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		List<ProteinGroup> positiveProteinGroups = getIdentifiedProteinGroups();
 		int FP = 0;
 		for (ProteinGroup proteinGroup : positiveProteinGroups) {
@@ -1988,7 +1990,7 @@ public abstract class DataManager {
 		return FP;
 	}
 
-	public int getPeptideTP(HashSet<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
+	public int getPeptideTP(Set<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
 		List<ExtendedIdentifiedPeptide> positivePeptides = getIdentifiedPeptides();
 		int TP = 0;
 		for (ExtendedIdentifiedPeptide identifiedPeptide : positivePeptides) {
@@ -2002,7 +2004,7 @@ public abstract class DataManager {
 		return TP;
 	}
 
-	public int getPeptideFN(HashSet<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
+	public int getPeptideFN(Set<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
 		List<ExtendedIdentifiedPeptide> allPeptides = getNonFilteredIdentifiedPeptides();
 		List<ExtendedIdentifiedPeptide> positivePeptides = getIdentifiedPeptides();
 
@@ -2038,7 +2040,7 @@ public abstract class DataManager {
 		return FN;
 	}
 
-	public int getPeptideTN(HashSet<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
+	public int getPeptideTN(Set<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
 		List<ExtendedIdentifiedPeptide> allPeptides = getNonFilteredIdentifiedPeptides();
 		List<ExtendedIdentifiedPeptide> positivePeptides = getIdentifiedPeptides();
 
@@ -2070,7 +2072,7 @@ public abstract class DataManager {
 		return TN;
 	}
 
-	public int getPeptideFP(HashSet<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
+	public int getPeptideFP(Set<String> truePositivePeptideSequences, boolean distinguishModificatedPeptides) {
 		List<ExtendedIdentifiedPeptide> positivePeptides = getIdentifiedPeptides();
 		int FP = 0;
 		for (ExtendedIdentifiedPeptide identifiedPeptide : positivePeptides) {
@@ -2287,7 +2289,7 @@ public abstract class DataManager {
 		}
 		if (numDifferentPeptideDecoys != null)
 			return numDifferentPeptideDecoys;
-		final HashMap<String, PeptideOccurrence> peptideOccurrences = getPeptideOcurrenceList(
+		final Map<String, PeptideOccurrence> peptideOccurrences = getPeptideOcurrenceList(
 				distinguishModificatedPeptides);
 		int numDecoys = 0;
 		for (PeptideOccurrence peptideOccurrence : peptideOccurrences.values()) {
@@ -2300,7 +2302,7 @@ public abstract class DataManager {
 
 	public static List<ExtendedIdentifiedPeptide> getPeptidesFromProteinGroups(List<ProteinGroup> proteinGroups) {
 		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
-		Set<Integer> peptideIds = new HashSet<Integer>();
+		TIntHashSet peptideIds = new TIntHashSet();
 		int minPeptideLength2 = getMinPeptideLength();
 
 		if (proteinGroups != null) {
@@ -2377,7 +2379,7 @@ public abstract class DataManager {
 				public List<ExtendedIdentifiedPeptide> reduce(List<ExtendedIdentifiedPeptide> first,
 						List<ExtendedIdentifiedPeptide> second) {
 					List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
-					Set<Integer> peptideIds = new HashSet<Integer>();
+					TIntHashSet peptideIds = new TIntHashSet();
 					for (ExtendedIdentifiedPeptide peptide : first) {
 						if (!peptideIds.contains(peptide.getId())) {
 							peptideIds.add(peptide.getId());
@@ -2404,7 +2406,7 @@ public abstract class DataManager {
 
 	private List<ExtendedIdentifiedProtein> getProteinsFromProteinGroups(List<ProteinGroup> proteinGroups) {
 		List<ExtendedIdentifiedProtein> ret = new ArrayList<ExtendedIdentifiedProtein>();
-		Set<Integer> proteinIds = new HashSet<Integer>();
+		TIntHashSet proteinIds = new TIntHashSet();
 		if (proteinGroups != null) {
 			// log.info("Getting proteins from " + proteinGroups.size()
 			// + " protein groups");
@@ -2436,7 +2438,7 @@ public abstract class DataManager {
 	 * @return
 	 */
 	public static List<ProteinGroup> filterProteinGroupsByPeptides(List<ProteinGroup> proteinGroups,
-			Set<Integer> filteredPeptideIDs, ControlVocabularyManager cvManager) {
+			TIntHashSet filteredPeptideIDs, ControlVocabularyManager cvManager) {
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 		if (filteredPeptideIDs == null) {
 
@@ -2491,8 +2493,8 @@ public abstract class DataManager {
 	}
 
 	public int getNumDifferentPeptidesPlusCharge(boolean distiguishModificatedPeptides) {
-		HashMap<String, PeptideOccurrence> numDifPeptides = getPeptideOcurrenceList(distiguishModificatedPeptides);
-		Set<String> peptidePlusCharge = new HashSet<String>();
+		Map<String, PeptideOccurrence> numDifPeptides = getPeptideOcurrenceList(distiguishModificatedPeptides);
+		Set<String> peptidePlusCharge = new THashSet<String>();
 		for (PeptideOccurrence peptideOccurrence : numDifPeptides.values()) {
 			final List<ExtendedIdentifiedPeptide> itemList = peptideOccurrence.getItemList();
 			for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : itemList) {

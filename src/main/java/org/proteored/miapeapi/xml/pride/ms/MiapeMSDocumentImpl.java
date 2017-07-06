@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.pride.ms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,32 +38,26 @@ import org.proteored.miapeapi.xml.pride.util.Parameter;
 import org.proteored.miapeapi.xml.pride.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
-public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
-		MiapeMSDocument {
+import gnu.trove.set.hash.THashSet;
+
+public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements MiapeMSDocument {
 	protected final XmlMiapeFactory<MiapeMSDocument> xmlFactory;
 	private final List<InstrumentConfiguration> instrumentConfigurations = new ArrayList<InstrumentConfiguration>();;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	public MiapeMSDocumentImpl(ExperimentType experiment, User user,
-			String prideXMLFileName, String projectName,
-			ControlVocabularyManager cvManager)
-			throws IllegalMiapeArgumentException {
+	public MiapeMSDocumentImpl(ExperimentType experiment, User user, String prideXMLFileName, String projectName,
+			ControlVocabularyManager cvManager) throws IllegalMiapeArgumentException {
 		super(experiment, cvManager, user, prideXMLFileName, projectName);
-		instrumentConfigurations.add(new InstrumentConfigurationImpl(
-				instrumentManager));
+		instrumentConfigurations.add(new InstrumentConfigurationImpl(instrumentManager));
 		xmlFactory = MiapeMSXmlFactory.getFactory();
 
 	}
 
-	public MiapeMSDocumentImpl(ExperimentType experiment,
-			PersistenceManager dbManager, ControlVocabularyManager cvManager,
-			String user, String password, String prideXMLFileName,
-			String projectName) throws MiapeDatabaseException,
-			MiapeSecurityException, IllegalMiapeArgumentException {
-		super(experiment, dbManager, cvManager, user, password,
-				prideXMLFileName, projectName);
-		instrumentConfigurations.add(new InstrumentConfigurationImpl(
-				instrumentManager));
+	public MiapeMSDocumentImpl(ExperimentType experiment, PersistenceManager dbManager,
+			ControlVocabularyManager cvManager, String user, String password, String prideXMLFileName,
+			String projectName) throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
+		super(experiment, dbManager, cvManager, user, password, prideXMLFileName, projectName);
+		instrumentConfigurations.add(new InstrumentConfigurationImpl(instrumentManager));
 		xmlFactory = MiapeMSXmlFactory.getFactory();
 
 	}
@@ -76,24 +69,19 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 	@Override
 	public Set<Acquisition> getAcquisitions() {
 		log.info("getAcquisitions");
-		Set<Acquisition> acquisitions = new HashSet<Acquisition>();
-		if (experiment.getMzData() != null
-				&& experiment.getMzData().getDescription() != null
+		Set<Acquisition> acquisitions = new THashSet<Acquisition>();
+		if (experiment.getMzData() != null && experiment.getMzData().getDescription() != null
 				&& experiment.getMzData().getDescription().getDataProcessing() != null
-				&& experiment.getMzData().getDescription().getDataProcessing()
-						.getSoftware() != null) {
+				&& experiment.getMzData().getDescription().getDataProcessing().getSoftware() != null) {
 			Integer softwareID = MiapeXmlUtil.SoftwareCounter.increaseCounter();
 			AnalyzerList analyzers = null;
-			if (experiment.getMzData() != null
-					&& experiment.getMzData().getDescription() != null
+			if (experiment.getMzData() != null && experiment.getMzData().getDescription() != null
 					&& experiment.getMzData().getDescription().getInstrument() != null
-					&& experiment.getMzData().getDescription().getInstrument()
-							.getAnalyzerList() != null)
-				analyzers = experiment.getMzData().getDescription()
-						.getInstrument().getAnalyzerList();
-			acquisitions.add(new AcquisitionImpl(experiment.getMzData()
-					.getDescription().getDataProcessing().getSoftware(),
-					analyzers, softwareID, cvManager));
+					&& experiment.getMzData().getDescription().getInstrument().getAnalyzerList() != null)
+				analyzers = experiment.getMzData().getDescription().getInstrument().getAnalyzerList();
+			acquisitions
+					.add(new AcquisitionImpl(experiment.getMzData().getDescription().getDataProcessing().getSoftware(),
+							analyzers, softwareID, cvManager));
 		}
 		return acquisitions;
 	}
@@ -101,14 +89,12 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 	@Override
 	public Set<DataAnalysis> getDataAnalysis() {
 		log.info("get dataanalysis");
-		if (experiment.getMzData() != null
-				&& experiment.getMzData().getDescription() != null
+		if (experiment.getMzData() != null && experiment.getMzData().getDescription() != null
 				&& experiment.getMzData().getDescription().getDataProcessing() != null
-				&& experiment.getMzData().getDescription().getDataProcessing()
-						.getProcessingMethod() != null) {
-			Set<DataAnalysis> dataAnalysis = new DataAnalysisManager(experiment
-					.getMzData().getDescription().getDataProcessing()
-					.getProcessingMethod(), cvManager).getDataAnalysis();
+				&& experiment.getMzData().getDescription().getDataProcessing().getProcessingMethod() != null) {
+			Set<DataAnalysis> dataAnalysis = new DataAnalysisManager(
+					experiment.getMzData().getDescription().getDataProcessing().getProcessingMethod(), cvManager)
+							.getDataAnalysis();
 			if (dataAnalysis != null)
 				return dataAnalysis;
 		}
@@ -123,11 +109,9 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 	@Override
 	public List<ResultingData> getResultingDatas() {
 		log.info("get resulting datas");
-		if (experiment != null && experiment.getMzData() != null
-				&& experiment.getMzData().getDescription() != null
+		if (experiment != null && experiment.getMzData() != null && experiment.getMzData().getDescription() != null
 				&& experiment.getMzData().getDescription().getAdmin() != null) {
-			final SourceFileType sourceFile = experiment.getMzData()
-					.getDescription().getAdmin().getSourceFile();
+			final SourceFileType sourceFile = experiment.getMzData().getDescription().getAdmin().getSourceFile();
 			if (sourceFile != null) {
 				List<ResultingData> resultingDatas = new ArrayList<ResultingData>();
 
@@ -142,7 +126,7 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 	@Override
 	public Set<Spectrometer> getSpectrometers() {
 		log.info("get spectrometers");
-		Set<Spectrometer> resultSet = new HashSet<Spectrometer>();
+		Set<Spectrometer> resultSet = new THashSet<Spectrometer>();
 		if (instrumentManager.getSpectrometer() != null) {
 			resultSet.add(instrumentManager.getSpectrometer());
 		}
@@ -152,25 +136,19 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 	@Override
 	public int store() throws MiapeDatabaseException, MiapeSecurityException {
 		log.info("store miape ms");
-		if (dbManager != null
-				&& dbManager.getMiapeMSPersistenceManager() != null) {
+		if (dbManager != null && dbManager.getMiapeMSPersistenceManager() != null) {
 			return dbManager.getMiapeMSPersistenceManager().store(this);
 		}
-		throw new MiapeDatabaseException(
-				"The persistance method is not defined.");
+		throw new MiapeDatabaseException("The persistance method is not defined.");
 	}
 
 	@Override
-	public void delete(String user, String password)
-			throws MiapeDatabaseException, MiapeSecurityException {
+	public void delete(String user, String password) throws MiapeDatabaseException, MiapeSecurityException {
 		log.info("delete miape ms");
-		if (dbManager != null
-				&& dbManager.getMiapeMSPersistenceManager() != null) {
-			dbManager.getMiapeMSPersistenceManager().deleteById(getId(), user,
-					password);
+		if (dbManager != null && dbManager.getMiapeMSPersistenceManager() != null) {
+			dbManager.getMiapeMSPersistenceManager().deleteById(getId(), user, password);
 		}
-		throw new MiapeDatabaseException(
-				"The persistance method is not defined.");
+		throw new MiapeDatabaseException("The persistance method is not defined.");
 	}
 
 	@Override
@@ -190,67 +168,50 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 		if (experiment.getProtocol() != null) {
 
 			if (experiment.getProtocol().getProtocolName() != null) {
-				setOfAdditionalInformations.add(new AdditionalInformationImpl(
-						"Protocol name", experiment.getProtocol()
-								.getProtocolName()));
+				setOfAdditionalInformations.add(
+						new AdditionalInformationImpl("Protocol name", experiment.getProtocol().getProtocolName()));
 			}
 
 			if (experiment.getProtocol().getProtocolSteps() != null) {
-				for (ParamType paramType : experiment.getProtocol()
-						.getProtocolSteps().getStepDescription()) {
-					List<Parameter> listParameter = Utils.createListParameter(
-							paramType.getCvParamOrUserParam(), null);
+				for (ParamType paramType : experiment.getProtocol().getProtocolSteps().getStepDescription()) {
+					List<Parameter> listParameter = Utils.createListParameter(paramType.getCvParamOrUserParam(), null);
 					if (listParameter != null)
 						for (Parameter param : listParameter) {
 							setOfAdditionalInformations
-									.add(new AdditionalInformationImpl(param
-											.getName(), param.getValue()));
+									.add(new AdditionalInformationImpl(param.getName(), param.getValue()));
 						}
 				}
 			}
 			if (experiment.getTitle() != null)
-				setOfAdditionalInformations.add(new AdditionalInformationImpl(
-						"PRIDE title", experiment.getTitle()));
+				setOfAdditionalInformations.add(new AdditionalInformationImpl("PRIDE title", experiment.getTitle()));
 			if (experiment.getShortLabel() != null)
-				setOfAdditionalInformations.add(new AdditionalInformationImpl(
-						"PRIDE short label", experiment.getShortLabel()));
+				setOfAdditionalInformations
+						.add(new AdditionalInformationImpl("PRIDE short label", experiment.getShortLabel()));
 
-			if (experiment.getMzData() != null
-					&& experiment.getMzData().getDescription() != null
+			if (experiment.getMzData() != null && experiment.getMzData().getDescription() != null
 					&& experiment.getMzData().getDescription().getAdmin() != null
 					&& experiment.getMzData().getDescription().getAdmin() != null) {
 				// sample name
-				String sampleName = experiment.getMzData().getDescription()
-						.getAdmin().getSampleName();
+				String sampleName = experiment.getMzData().getDescription().getAdmin().getSampleName();
 				if (sampleName != null) {
-					final String sampleBatchCVName = cvManager
-							.getControlVocabularyName(
-									SampleInformation.SAMPLE_BATCH_ACC,
-									SampleInformation.getInstance(cvManager));
+					final String sampleBatchCVName = cvManager.getControlVocabularyName(
+							SampleInformation.SAMPLE_BATCH_ACC, SampleInformation.getInstance(cvManager));
 					CvParamType cvParam = new CvParamType();
-					cvParam.setAccession(SampleInformation.SAMPLE_BATCH_ACC
-							.toString());
+					cvParam.setAccession(SampleInformation.SAMPLE_BATCH_ACC.toString());
 					cvParam.setName(sampleBatchCVName);
 					cvParam.setValue(sampleName);
-					setOfAdditionalInformations
-							.add(new AdditionalInformationImpl(cvParam));
+					setOfAdditionalInformations.add(new AdditionalInformationImpl(cvParam));
 				}
 				// sample description
-				final DescriptionType sampleDescription = experiment
-						.getMzData().getDescription().getAdmin()
+				final DescriptionType sampleDescription = experiment.getMzData().getDescription().getAdmin()
 						.getSampleDescription();
-				if (sampleDescription != null
-						&& sampleDescription.getCvParamOrUserParam() != null) {
-					for (Object cvOrUserParam : sampleDescription
-							.getCvParamOrUserParam()) {
+				if (sampleDescription != null && sampleDescription.getCvParamOrUserParam() != null) {
+					for (Object cvOrUserParam : sampleDescription.getCvParamOrUserParam()) {
 						if (cvOrUserParam instanceof CvParamType)
-							setOfAdditionalInformations
-									.add(new AdditionalInformationImpl(
-											(CvParamType) cvOrUserParam));
+							setOfAdditionalInformations.add(new AdditionalInformationImpl((CvParamType) cvOrUserParam));
 						if (cvOrUserParam instanceof UserParamType)
 							setOfAdditionalInformations
-									.add(new AdditionalInformationImpl(
-											(UserParamType) cvOrUserParam));
+									.add(new AdditionalInformationImpl((UserParamType) cvOrUserParam));
 					}
 
 				}
@@ -272,17 +233,14 @@ public class MiapeMSDocumentImpl extends AbstractDocumentFromPride implements
 		log.info("get name");
 		// Try to obtain the name of the CV=PRIDE:0000097 -> project
 		if (experiment.getAdditional() != null) {
-			for (Object cvOrUserParam : experiment.getAdditional()
-					.getCvParamOrUserParam()) {
+			for (Object cvOrUserParam : experiment.getAdditional().getCvParamOrUserParam()) {
 				if (cvOrUserParam instanceof CvParamType) {
-					final Accession cvAcc = cvManager.getControlVocabularyId(
-							((CvParamType) cvOrUserParam).getName(),
+					final Accession cvAcc = cvManager.getControlVocabularyId(((CvParamType) cvOrUserParam).getName(),
 							PrideProject.getInstance(cvManager));
 					if (cvAcc != null)
 						return ((CvParamType) cvOrUserParam).getValue();
 				} else if (cvOrUserParam instanceof UserParamType) {
-					final Accession cvAcc = cvManager.getControlVocabularyId(
-							((UserParamType) cvOrUserParam).getName(),
+					final Accession cvAcc = cvManager.getControlVocabularyId(((UserParamType) cvOrUserParam).getName(),
 							PrideProject.getInstance(cvManager));
 					if (cvAcc != null)
 						return ((UserParamType) cvOrUserParam).getValue();

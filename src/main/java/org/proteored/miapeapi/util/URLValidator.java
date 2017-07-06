@@ -10,7 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.net.PrintCommandListener;
@@ -18,11 +17,12 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
+import gnu.trove.map.hash.THashMap;
 import sun.net.www.protocol.ftp.FtpURLConnection;
 
 public class URLValidator {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
-	private static Map<String, Boolean> validatedURLs = new HashMap<String, Boolean>();
+	private static Map<String, Boolean> validatedURLs = new THashMap<String, Boolean>();
 
 	/**
 	 * This function validates the URL. If the url is a file ("file://") and the
@@ -131,8 +131,7 @@ public class URLValidator {
 			ftp.setConnectTimeout(5000);
 			ftp.setDefaultTimeout(5000);
 			ftp.setDataTimeout(5000);
-			ftp.addProtocolCommandListener(new PrintCommandListener(
-					new PrintWriter(System.out)));
+			ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 			log.info("Getting connection");
 			ftp.connect(url.getHost());
 			log.info("Connection received");

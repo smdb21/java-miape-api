@@ -3,12 +3,13 @@ package org.proteored.miapeapi.cv;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.core.io.ClassPathResource;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 import psidev.psi.tools.ontology_manager.OntologyManager;
 import psidev.psi.tools.ontology_manager.impl.local.OntologyLoaderException;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyAccess;
@@ -19,8 +20,7 @@ public class OboControlVocabularyConnector {
 	private static OboControlVocabularyConnector instance;
 	private static OntologyManager om;
 	private static boolean omAvailable = true;
-	private static org.apache.log4j.Logger log = org.apache.log4j.Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private static boolean error;
 	public final static String CONFIG_FILE = "ontologies.xml";
 	public final static String LOCAL_CONFIG_FILE = "ontologies_local.xml";
@@ -31,8 +31,7 @@ public class OboControlVocabularyConnector {
 		loadOntologyManager(configFile);
 	}
 
-	public static OboControlVocabularyConnector getInstance(
-			boolean overrideInstance) {
+	public static OboControlVocabularyConnector getInstance(boolean overrideInstance) {
 		if (instance == null || overrideInstance)
 			instance = new OboControlVocabularyConnector(null);
 		return instance;
@@ -44,15 +43,13 @@ public class OboControlVocabularyConnector {
 		return instance;
 	}
 
-	public static OboControlVocabularyConnector getInstanceForLocalOBOFiles(
-			boolean overrideInstance) {
+	public static OboControlVocabularyConnector getInstanceForLocalOBOFiles(boolean overrideInstance) {
 		if (instance == null || overrideInstance)
 			instance = new OboControlVocabularyConnector(LOCAL_CONFIG_FILE);
 		return instance;
 	}
 
-	public static OboControlVocabularyConnector getInstanceForLocalTestOBOFiles(
-			boolean overrideInstance) {
+	public static OboControlVocabularyConnector getInstanceForLocalTestOBOFiles(boolean overrideInstance) {
 		if (instance == null || overrideInstance)
 			instance = new OboControlVocabularyConnector(LOCAL_TEST_CONFIG_FILE);
 		return instance;
@@ -64,8 +61,7 @@ public class OboControlVocabularyConnector {
 		return instance;
 	}
 
-	public static OboControlVocabularyConnector getInstanceForOLSWebservice(
-			boolean overrideInstance) {
+	public static OboControlVocabularyConnector getInstanceForOLSWebservice(boolean overrideInstance) {
 		if (instance == null || overrideInstance)
 			instance = new OboControlVocabularyConnector(OLS_CONFIG_FILE);
 		return instance;
@@ -114,14 +110,12 @@ public class OboControlVocabularyConnector {
 				omAvailable = true;
 				log.info("ontologies loaded from " + configFile);
 				long time2 = System.currentTimeMillis();
-				log.info("Ontologies loaded in " + (time2 - time1) / 1000
-						+ " seconds");
+				log.info("Ontologies loaded in " + (time2 - time1) / 1000 + " seconds");
 				return om;
 
 				// if fails retrieving remote ontologies, get local ontologies
 			} catch (OntologyLoaderException e) {
-				log.info("Error loading ontologies from " + configFile + ": "
-						+ e.getMessage());
+				log.info("Error loading ontologies from " + configFile + ": " + e.getMessage());
 				configFile = LOCAL_CONFIG_FILE;
 				omAvailable = false;
 				log.info("Loading ontologies from " + configFile);
@@ -161,14 +155,12 @@ public class OboControlVocabularyConnector {
 		return null;
 	}
 
-	private static InputStream getConfigFile(String configFile)
-			throws IOException {
+	private static InputStream getConfigFile(String configFile) throws IOException {
 		// Check the environment variable SERVER_TEST
 		Map<String, String> env = System.getenv();
 		ClassPathResource file = null;
 		// if true, take local ontologies
-		if (env.get("SERVER_TEST") != null
-				&& env.get("SERVER_TEST").equals("true")) {
+		if (env.get("SERVER_TEST") != null && env.get("SERVER_TEST").equals("true")) {
 			// file = new ClassPathResource("ontologies_local.xml");
 			// file = new ClassPathResource("ontologies.xml");
 			// if false, take remote ontologies
@@ -183,12 +175,10 @@ public class OboControlVocabularyConnector {
 
 		if (om != null) {
 			for (String ontologyID : om.getOntologyIDs()) {
-				final OntologyAccess ontologyAccess = om
-						.getOntologyAccess(ontologyID);
+				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 
 				if (ontologyAccess != null) {
-					final OntologyTermI term = ontologyAccess
-							.getTermForAccession(accession.toString());
+					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
 					if (term != null)
 						return term;
 				}
@@ -202,14 +192,11 @@ public class OboControlVocabularyConnector {
 
 		if (om != null) {
 			for (String ontologyID : om.getOntologyIDs()) {
-				final OntologyAccess ontologyAccess = om
-						.getOntologyAccess(ontologyID);
+				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
-					final OntologyTermI term = ontologyAccess
-							.getTermForAccession(accession.toString());
+					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
 					if (term != null) {
-						final Set<OntologyTermI> terms = ontologyAccess
-								.getAllChildren(term);
+						final Set<OntologyTermI> terms = ontologyAccess.getAllChildren(term);
 						if (terms != null && terms.size() > 0)
 							return terms;
 					}
@@ -221,14 +208,12 @@ public class OboControlVocabularyConnector {
 
 	public Set<OntologyTermI> getTermParents(Accession accession) {
 		if (om != null) {
-			Set<OntologyTermI> ret = new HashSet<OntologyTermI>();
+			Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
 
 			for (String ontologyID : om.getOntologyIDs()) {
-				final OntologyAccess ontologyAccess = om
-						.getOntologyAccess(ontologyID);
+				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
-					final OntologyTermI term = ontologyAccess
-							.getTermForAccession(accession.toString());
+					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
 					if (term != null) {
 						ret.addAll(ontologyAccess.getAllParents(term));
 					}
@@ -241,14 +226,12 @@ public class OboControlVocabularyConnector {
 
 	public Set<OntologyTermI> getDirectTermParents(Accession accession) {
 		if (om != null) {
-			Set<OntologyTermI> ret = new HashSet<OntologyTermI>();
+			Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
 
 			for (String ontologyID : om.getOntologyIDs()) {
-				final OntologyAccess ontologyAccess = om
-						.getOntologyAccess(ontologyID);
+				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
-					final OntologyTermI term = ontologyAccess
-							.getTermForAccession(accession.toString());
+					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
 					if (term != null) {
 						ret.addAll(ontologyAccess.getDirectParents(term));
 					}
@@ -273,10 +256,10 @@ public class OboControlVocabularyConnector {
 	 * @param accession
 	 * @return
 	 */
-	public HashMap<String, OntologyTermI> getAccesionParents(Accession accession) {
+	public Map<String, OntologyTermI> getAccesionParents(Accession accession) {
 		final Set<OntologyTermI> termParents = getTermParents(accession);
 		if (termParents != null) {
-			HashMap<String, OntologyTermI> ret = new HashMap<String, OntologyTermI>();
+			Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
 			for (OntologyTermI ontologyTermI : termParents) {
 				ret.put(ontologyTermI.getTermAccession(), ontologyTermI);
 			}
@@ -285,10 +268,10 @@ public class OboControlVocabularyConnector {
 		return null;
 	}
 
-	public HashMap<String, OntologyTermI> getChildren(Accession accession) {
+	public Map<String, OntologyTermI> getChildren(Accession accession) {
 		final Set<OntologyTermI> allChildren = getAllChildren(accession);
 		if (allChildren != null) {
-			HashMap<String, OntologyTermI> ret = new HashMap<String, OntologyTermI>();
+			Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
 			for (OntologyTermI ontologyTermI : allChildren) {
 				ret.put(ontologyTermI.getTermAccession(), ontologyTermI);
 			}

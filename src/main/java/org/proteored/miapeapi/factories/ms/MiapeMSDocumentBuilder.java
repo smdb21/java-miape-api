@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.factories.ms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +18,8 @@ import org.proteored.miapeapi.interfaces.ms.ResultingData;
 import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.interfaces.xml.XmlManager;
+
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeMSDocumentBuilder extends AbstractMiapeDocumentBuilder {
 
@@ -42,8 +43,8 @@ public class MiapeMSDocumentBuilder extends AbstractMiapeDocumentBuilder {
 		super(project, documentName, owner, db);
 	}
 
-	MiapeMSDocumentBuilder(Project project, String documentName, User owner, PersistenceManager db,
-			XmlManager xml, ControlVocabularyManager cvUtil) {
+	MiapeMSDocumentBuilder(Project project, String documentName, User owner, PersistenceManager db, XmlManager xml,
+			ControlVocabularyManager cvUtil) {
 		super(project, documentName, owner, db, xml, cvUtil);
 
 	}
@@ -87,7 +88,7 @@ public class MiapeMSDocumentBuilder extends AbstractMiapeDocumentBuilder {
 
 	public MiapeMSDocumentBuilder spectrometer(Spectrometer value) {
 		if (spectrometers == null)
-			spectrometers = new HashSet<Spectrometer>();
+			spectrometers = new THashSet<Spectrometer>();
 		spectrometers.add(value);
 		return this;
 	}

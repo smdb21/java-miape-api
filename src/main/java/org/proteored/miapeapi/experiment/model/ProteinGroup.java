@@ -3,9 +3,7 @@ package org.proteored.miapeapi.experiment.model;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
@@ -20,6 +18,7 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -258,7 +257,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	public List<ExtendedIdentifiedPeptide> getPeptides() {
 		// if (this.peptides == null || this.peptides.isEmpty()) {
 		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
-		Set<Integer> peptideIds = new HashSet<Integer>();
+		TIntHashSet peptideIds = new TIntHashSet();
 		for (ExtendedIdentifiedProtein protein : this) {
 			final List<ExtendedIdentifiedPeptide> pepts = protein.getPeptides();
 			if (pepts != null)
@@ -336,7 +335,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	public List<MiapeMSIDocument> getMiapeMSIs() {
 		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		Set<Integer> identifiers = new HashSet<Integer>();
+		TIntHashSet identifiers = new TIntHashSet();
 		for (ExtendedIdentifiedProtein protein : this) {
 			final MiapeMSIDocument miapeMSI = protein.getMiapeMSI();
 			if (miapeMSI != null && !identifiers.contains(miapeMSI.getId())) {

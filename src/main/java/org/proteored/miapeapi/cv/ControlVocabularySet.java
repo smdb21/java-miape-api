@@ -1,11 +1,12 @@
 package org.proteored.miapeapi.cv;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import gnu.trove.map.hash.THashMap;
 import psidev.psi.tools.ontology_manager.impl.OntologyTermImpl;
 
 /**
@@ -33,8 +34,8 @@ public class ControlVocabularySet {
 		this.cachedPossibleValues = cachedPossibleValues;
 	}
 
-	private final HashMap<String, ControlVocabularyTerm> termCacheByAccession = new HashMap<String, ControlVocabularyTerm>();
-	private final HashMap<String, ControlVocabularyTerm> termCacheByName = new HashMap<String, ControlVocabularyTerm>();
+	private final Map<String, ControlVocabularyTerm> termCacheByAccession = new THashMap<String, ControlVocabularyTerm>();
+	private final Map<String, ControlVocabularyTerm> termCacheByName = new THashMap<String, ControlVocabularyTerm>();
 
 	private ControlVocabularyManager cvManager = null;
 

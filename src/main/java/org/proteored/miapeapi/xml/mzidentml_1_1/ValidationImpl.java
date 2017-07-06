@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import org.proteored.miapeapi.interfaces.msi.Validation;
 import org.proteored.miapeapi.xml.mzidentml_1_1.util.MzidentmlControlVocabularyXmlFactory;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractContact;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractParam;
 import uk.ac.ebi.jmzidml.model.mzidml.AnalysisSoftware;
@@ -40,10 +40,8 @@ public class ValidationImpl implements Validation {
 	 * 
 	 * @param cvManager2
 	 */
-	public ValidationImpl(List<Object> list,
-			List<AnalysisSoftware> analysisSoftware,
-			String spectrumIdentificationSoftwareID2,
-			ControlVocabularyManager cvManager2) {
+	public ValidationImpl(List<Object> list, List<AnalysisSoftware> analysisSoftware,
+			String spectrumIdentificationSoftwareID2, ControlVocabularyManager cvManager2) {
 		this.list = list;
 		this.analysisSoftwareList = analysisSoftware;
 		this.analysisSoftware = null;
@@ -51,8 +49,7 @@ public class ValidationImpl implements Validation {
 		this.spectrumIdentificationSoftwareID = spectrumIdentificationSoftwareID2;
 	}
 
-	public ValidationImpl(AnalysisSoftware analysisSoftware,
-			ControlVocabularyManager cvManager2) {
+	public ValidationImpl(AnalysisSoftware analysisSoftware, ControlVocabularyManager cvManager2) {
 		this.list = null;
 		this.analysisSoftwareList = null;
 		this.analysisSoftware = analysisSoftware;
@@ -97,8 +94,7 @@ public class ValidationImpl implements Validation {
 		} else if (this.analysisSoftware != null) {
 			if (this.analysisSoftware.getSoftwareName() != null) {
 				String paramText = MzidentmlControlVocabularyXmlFactory
-						.readEntireParam(this.analysisSoftware
-								.getSoftwareName());
+						.readEntireParam(this.analysisSoftware.getSoftwareName());
 				return paramText;
 			}
 			if (this.analysisSoftware.getName() != null)
@@ -128,7 +124,7 @@ public class ValidationImpl implements Validation {
 
 	@Override
 	public Set<Software> getPostProcessingSoftwares() {
-		Set<Software> validationSoftwares = new HashSet<Software>();
+		Set<Software> validationSoftwares = new THashSet<Software>();
 
 		if (list != null) {
 			ParamList paramList = new ParamList();
@@ -142,25 +138,20 @@ public class ValidationImpl implements Validation {
 					softwareXML = getSoftware(softwareRef);
 					final ParamList analysisParams = pdp.getAnalysisParams();
 					if (analysisParams != null)
-						paramList.getParamGroup().addAll(
-								analysisParams.getParamGroup());
+						paramList.getParamGroup().addAll(analysisParams.getParamGroup());
 					final ParamList threshold2 = pdp.getThreshold();
 					if (threshold2 != null)
-						paramList.getParamGroup().addAll(
-								threshold2.getParamGroup());
+						paramList.getParamGroup().addAll(threshold2.getParamGroup());
 				} else if (object instanceof SpectrumIdentificationProtocol) {
 					SpectrumIdentificationProtocol sip = (SpectrumIdentificationProtocol) object;
 					softwareRef = sip.getAnalysisSoftwareRef();
 					softwareXML = getSoftware(softwareRef);
-					final ParamList additionalSearchParams = sip
-							.getAdditionalSearchParams();
+					final ParamList additionalSearchParams = sip.getAdditionalSearchParams();
 					if (additionalSearchParams != null)
-						paramList.getParamGroup().addAll(
-								additionalSearchParams.getParamGroup());
+						paramList.getParamGroup().addAll(additionalSearchParams.getParamGroup());
 					final ParamList threshold2 = sip.getThreshold();
 					if (threshold2 != null)
-						paramList.getParamGroup().addAll(
-								threshold2.getParamGroup());
+						paramList.getParamGroup().addAll(threshold2.getParamGroup());
 				}
 			}
 
@@ -171,12 +162,10 @@ public class ValidationImpl implements Validation {
 				if (softwareXML != null) {
 					AbstractContact abstractContact = null;
 					if (softwareXML.getContactRole() != null)
-						abstractContact = softwareXML.getContactRole()
-								.getContact();
+						abstractContact = softwareXML.getContactRole().getContact();
 
-					validationSoftwares.add(new ValidationSoftwareImpl(
-							softwareXML, abstractContact, paramList, threshold,
-							cvManager));
+					validationSoftwares.add(
+							new ValidationSoftwareImpl(softwareXML, abstractContact, paramList, threshold, cvManager));
 
 				}
 			}
@@ -184,11 +173,9 @@ public class ValidationImpl implements Validation {
 		} else if (this.analysisSoftware != null) {
 			AbstractContact abstractContact = null;
 			if (this.analysisSoftware.getContactRole() != null)
-				abstractContact = this.analysisSoftware.getContactRole()
-						.getContact();
-			validationSoftwares.add(new ValidationSoftwareImpl(
-					this.analysisSoftware, abstractContact, null, null,
-					cvManager));
+				abstractContact = this.analysisSoftware.getContactRole().getContact();
+			validationSoftwares
+					.add(new ValidationSoftwareImpl(this.analysisSoftware, abstractContact, null, null, cvManager));
 		}
 
 		if (!validationSoftwares.isEmpty())
@@ -202,8 +189,7 @@ public class ValidationImpl implements Validation {
 				if (analysisSoftware.getId().equals(softwareRef))
 					return analysisSoftware;
 			}
-		} else if (this.analysisSoftware != null
-				&& this.analysisSoftware.getId().equals(softwareRef))
+		} else if (this.analysisSoftware != null && this.analysisSoftware.getId().equals(softwareRef))
 			return this.analysisSoftware;
 		return null;
 	}
@@ -212,25 +198,19 @@ public class ValidationImpl implements Validation {
 	public String getGlobalThresholds() {
 		// take params from Threshold element
 		StringBuilder sb = new StringBuilder();
-		MzidentmlControlVocabularyXmlFactory cvUtil = new MzidentmlControlVocabularyXmlFactory(
-				null, cvManager);
+		MzidentmlControlVocabularyXmlFactory cvUtil = new MzidentmlControlVocabularyXmlFactory(null, cvManager);
 		if (this.list != null) {
 			for (Object object : list) {
 				if (object instanceof ProteinDetectionProtocol) {
 					ProteinDetectionProtocol proteinDetectionProtocol = (ProteinDetectionProtocol) object;
-					if (proteinDetectionProtocol != null
-							&& proteinDetectionProtocol.getThreshold() != null) {
-						for (AbstractParam param : proteinDetectionProtocol
-								.getThreshold().getParamGroup()) {
+					if (proteinDetectionProtocol != null && proteinDetectionProtocol.getThreshold() != null) {
+						for (AbstractParam param : proteinDetectionProtocol.getThreshold().getParamGroup()) {
 							if (param instanceof CvParam) {
-								if (cvUtil.isCV(
-										new Accession(((CvParam) param)
-												.getAccession()), ThresholdName
-												.getInstance(cvManager))) {
+								if (cvUtil.isCV(new Accession(((CvParam) param).getAccession()),
+										ThresholdName.getInstance(cvManager))) {
 									if (!"".equals(sb.toString()))
 										sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-									sb.append(MzidentmlControlVocabularyXmlFactory
-											.readEntireParam(param));
+									sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(param));
 								}
 							}
 						}
@@ -238,17 +218,13 @@ public class ValidationImpl implements Validation {
 				} else if (object instanceof SpectrumIdentificationProtocol) {
 					SpectrumIdentificationProtocol spectrumIdentificationProtocol = (SpectrumIdentificationProtocol) object;
 					if (spectrumIdentificationProtocol.getThreshold() != null) {
-						for (AbstractParam param : spectrumIdentificationProtocol
-								.getThreshold().getParamGroup()) {
+						for (AbstractParam param : spectrumIdentificationProtocol.getThreshold().getParamGroup()) {
 							if (param instanceof CvParam) {
-								if (cvUtil.isCV(
-										new Accession(((CvParam) param)
-												.getAccession()), ThresholdName
-												.getInstance(cvManager))) {
+								if (cvUtil.isCV(new Accession(((CvParam) param).getAccession()),
+										ThresholdName.getInstance(cvManager))) {
 									if (!"".equals(sb.toString()))
 										sb.append(MiapeXmlUtil.TERM_SEPARATOR);
-									sb.append(MzidentmlControlVocabularyXmlFactory
-											.readEntireParam(param));
+									sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(param));
 								}
 							}
 						}

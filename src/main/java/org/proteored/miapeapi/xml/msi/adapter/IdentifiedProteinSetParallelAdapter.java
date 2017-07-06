@@ -2,8 +2,8 @@ package org.proteored.miapeapi.xml.msi.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.Adapter;
@@ -19,17 +19,16 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.InnerIteratorSync;
 import org.proteored.miapeapi.xml.util.parallel.InnerLock;
 
-import edu.scripps.yates.cores.SystemCoreManager;
+import edu.scripps.yates.utilities.cores.SystemCoreManager;
 import uk.ac.ebi.jmzml.model.mzml.Spectrum;
 
-public class IdentifiedProteinSetParallelAdapter implements
-		Adapter<MSIIdentifiedProteinSet> {
+public class IdentifiedProteinSetParallelAdapter implements Adapter<MSIIdentifiedProteinSet> {
 	private final IdentifiedProteinSet proteinSet;
 	private final ObjectFactory factory;
 	private final MSIControlVocabularyXmlFactory cvFactory;
 
-	public IdentifiedProteinSetParallelAdapter(IdentifiedProteinSet proteinSet,
-			ObjectFactory factory, MSIControlVocabularyXmlFactory cvFactory) {
+	public IdentifiedProteinSetParallelAdapter(IdentifiedProteinSet proteinSet, ObjectFactory factory,
+			MSIControlVocabularyXmlFactory cvFactory) {
 		this.cvFactory = cvFactory;
 		this.factory = factory;
 		this.proteinSet = proteinSet;
@@ -37,48 +36,40 @@ public class IdentifiedProteinSetParallelAdapter implements
 
 	@Override
 	public MSIIdentifiedProteinSet adapt() {
-		MSIIdentifiedProteinSet proteinSetXML = factory
-				.createMSIIdentifiedProteinSet();
+		MSIIdentifiedProteinSet proteinSetXML = factory.createMSIIdentifiedProteinSet();
 		proteinSetXML.setName(proteinSet.getName());
 		proteinSetXML.setFileURL(proteinSet.getFileLocation());
 
 		Set<InputDataSet> inputDataSets = proteinSet.getInputDataSets();
 		if (inputDataSets != null) {
-			InputDataSetReferences inputDataSetRefs = factory
-					.createInputDataSetReferences();
+			InputDataSetReferences inputDataSetRefs = factory.createInputDataSetReferences();
 			for (InputDataSet inputDataSet : inputDataSets) {
-				inputDataSetRefs.getInputDataSetRef().add(
-						MiapeXmlUtil.IdentifierPrefixes.INPUTDATASET
-								.getPrefix() + inputDataSet.getId());
+				inputDataSetRefs.getInputDataSetRef()
+						.add(MiapeXmlUtil.IdentifierPrefixes.INPUTDATASET.getPrefix() + inputDataSet.getId());
 			}
 			proteinSetXML.setInputDataSetReferences(inputDataSetRefs);
 		}
 		InputParameter inputParameter = proteinSet.getInputParameter();
 		if (inputParameter != null) {
 			proteinSetXML
-					.setParametersRef(MiapeXmlUtil.IdentifierPrefixes.PARAMETERS
-							.getPrefix() + inputParameter.getId());
+					.setParametersRef(MiapeXmlUtil.IdentifierPrefixes.PARAMETERS.getPrefix() + inputParameter.getId());
 		}
 
-		HashMap<String, IdentifiedProtein> identifiedProteins = proteinSet
-				.getIdentifiedProteins();
+		Map<String, IdentifiedProtein> identifiedProteins = proteinSet.getIdentifiedProteins();
 
 		if (identifiedProteins != null) {
 			int total = identifiedProteins.size();
 			long t1 = System.currentTimeMillis();
-			final Iterator<IdentifiedProtein> iterator = identifiedProteins
-					.values().iterator();
+			final Iterator<IdentifiedProtein> iterator = identifiedProteins.values().iterator();
 			// Create lock.
 			InnerLock lock = new InnerLock();
-			InnerIteratorSync<Spectrum> iteratorSync = new InnerIteratorSync(
-					iterator);
+			InnerIteratorSync<Spectrum> iteratorSync = new InnerIteratorSync(iterator);
 			Collection<InnerProteinAdapter> runners = new ArrayList<InnerProteinAdapter>();
 			int processorCount = SystemCoreManager.getAvailableNumSystemCores();
 
 			for (int i = 0; i < processorCount; i++) {
 				// take current DB session
-				InnerProteinAdapter runner = new InnerProteinAdapter(
-						iteratorSync, lock, i, factory, cvFactory,
+				InnerProteinAdapter runner = new InnerProteinAdapter(iteratorSync, lock, i, factory, cvFactory,
 						proteinSetXML);
 				runners.add(runner);
 				new Thread(runner).start();

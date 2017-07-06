@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.experiment.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +9,9 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class IdentifiedProteinFiltered implements IdentifiedProtein {
 
@@ -26,7 +28,7 @@ public class IdentifiedProteinFiltered implements IdentifiedProtein {
 	private final String description;
 	private final String accession;
 	private final int id;
-	private final Set<Integer> filteredPeptideIds = new HashSet<Integer>();
+	private final TIntHashSet filteredPeptideIds = new TIntHashSet();
 
 	public IdentifiedProteinFiltered(ExtendedIdentifiedProtein protein) {
 		this.id = protein.getId();
@@ -41,7 +43,7 @@ public class IdentifiedProteinFiltered implements IdentifiedProtein {
 		this.validationStatus = protein.getValidationStatus();
 		this.validationType = protein.getValidationType();
 		if (protein.getScores() != null) {
-			this.scores = new HashSet<ProteinScore>();
+			this.scores = new THashSet<ProteinScore>();
 			this.scores.addAll(protein.getScores());
 		} else {
 			this.scores = null;
@@ -54,7 +56,7 @@ public class IdentifiedProteinFiltered implements IdentifiedProtein {
 		}
 	}
 
-	public Set<Integer> getFilteredPeptideIds() {
+	public TIntHashSet getFilteredPeptideIds() {
 		return filteredPeptideIds;
 	}
 

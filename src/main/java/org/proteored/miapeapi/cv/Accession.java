@@ -1,8 +1,10 @@
 package org.proteored.miapeapi.cv;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import gnu.trove.map.hash.THashMap;
 
 public class Accession {
 
@@ -84,7 +86,7 @@ public class Accession {
 	 * @return the synonymus
 	 */
 	private String getValidCVRef(String cvRef) {
-		HashMap<String, String> synonyms = createSynonymDicctionary();
+		Map<String, String> synonyms = createSynonymDicctionary();
 		if (synonyms.containsKey(cvRef)) {
 			return synonyms.get(cvRef);
 		}
@@ -96,8 +98,8 @@ public class Accession {
 	 * 
 	 * @return
 	 */
-	private HashMap<String, String> createSynonymDicctionary() {
-		HashMap<String, String> synonym = new HashMap<String, String>();
+	private Map<String, String> createSynonymDicctionary() {
+		Map<String, String> synonym = new THashMap<String, String>();
 
 		// Sinonimos de "MS"
 		// List<String> lista = new ArrayList<String>();

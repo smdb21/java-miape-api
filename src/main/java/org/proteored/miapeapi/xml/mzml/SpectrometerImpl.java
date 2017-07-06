@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -14,6 +14,7 @@ import org.proteored.miapeapi.interfaces.MatchMode;
 import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.InstrumentConfiguration;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
@@ -32,8 +33,8 @@ public class SpectrometerImpl implements Spectrometer {
 	private String parameters = null;
 	private String comments = null;
 
-	private final String[] SPECTROMETER_NAME_TEXT_LIST = { "spectrometer", "spectrometer name",
-			"name", "InstrumentDescription" }; // use EXACT
+	private final String[] SPECTROMETER_NAME_TEXT_LIST = { "spectrometer", "spectrometer name", "name",
+			"InstrumentDescription" }; // use EXACT
 	private final String[] SPECTROMETER_VERSION_TEXT_LIST = { "version" };
 	private final String[] SPECTROMETER_MANUFACTURER_TEXT_LIST = { "manufacturer", "vendor" };
 	private final String[] SPECTROMETER_MODEL_TEXT_LIST = { "model" };
@@ -45,24 +46,22 @@ public class SpectrometerImpl implements Spectrometer {
 	private static final Accession INSTRUMENT_SERIAL_NUMBER_CV = new Accession("MS:1000529");
 
 	public SpectrometerImpl(List<InstrumentConfiguration> instrumentConfigurationList,
-			ReferenceableParamGroupList referenceableParamGroupList,
-			ControlVocabularyManager cvManager) {
-		HashMap<String, String> dicc = new HashMap<String, String>();
+			ReferenceableParamGroupList referenceableParamGroupList, ControlVocabularyManager cvManager) {
+		Map<String, String> dicc = new THashMap<String, String>();
 
 		// Create a paramGroup
 		ParamGroup paramGroup = null;
 		ParamGroup paramGroupTMP;
 		for (InstrumentConfiguration instrumentConfiguration : instrumentConfigurationList) {
-			paramGroupTMP = MzMLControlVocabularyXmlFactory.createParamGroup(
-					instrumentConfiguration.getCvParam(), instrumentConfiguration.getUserParam(),
-					instrumentConfiguration.getReferenceableParamGroupRef());
-			paramGroup = MzMLControlVocabularyXmlFactory.mergeParamGroups(paramGroup,
-					paramGroupTMP, referenceableParamGroupList);
+			paramGroupTMP = MzMLControlVocabularyXmlFactory.createParamGroup(instrumentConfiguration.getCvParam(),
+					instrumentConfiguration.getUserParam(), instrumentConfiguration.getReferenceableParamGroupRef());
+			paramGroup = MzMLControlVocabularyXmlFactory.mergeParamGroups(paramGroup, paramGroupTMP,
+					referenceableParamGroupList);
 		}
 
 		// name
-		this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup,
-				referenceableParamGroupList, SpectrometerName.getInstance(cvManager));
+		this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup, referenceableParamGroupList,
+				SpectrometerName.getInstance(cvManager));
 		if (this.name == null)
 			this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
 					referenceableParamGroupList, SPECTROMETER_NAME_TEXT_LIST, MatchMode.EXACT);
@@ -72,28 +71,26 @@ public class SpectrometerImpl implements Spectrometer {
 			dicc.put(name, name);
 
 		// customizations
-		final CVParam customizationCVTerm = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(
-				paramGroup, referenceableParamGroupList, AcquisitionParameters.CUSTOMIZATION_CV);
+		final CVParam customizationCVTerm = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup,
+				referenceableParamGroupList, AcquisitionParameters.CUSTOMIZATION_CV);
 		if (customizationCVTerm != null)
 			this.customizations = customizationCVTerm.getValue();
 		else
-			this.customizations = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-					paramGroup, referenceableParamGroupList, SPECTROMETER_CUSTOMIZATIONS_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.customizations = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
+					referenceableParamGroupList, SPECTROMETER_CUSTOMIZATIONS_TEXT_LIST, MatchMode.ANYWHERE);
 		dicc.put(customizations, customizations);
 
 		// manufacturer
 		this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup,
 				referenceableParamGroupList, InstrumentVendor.getInstance(cvManager));
 		if (this.manufacturer == null)
-			this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-					paramGroup, referenceableParamGroupList, SPECTROMETER_MANUFACTURER_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(paramGroup,
+					referenceableParamGroupList, SPECTROMETER_MANUFACTURER_TEXT_LIST, MatchMode.ANYWHERE);
 		dicc.put(manufacturer, manufacturer);
 
 		// model
-		final String valueFromParamGroup = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(
-				paramGroup, referenceableParamGroupList, InstrumentModel.getInstance(cvManager));
+		final String valueFromParamGroup = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup,
+				referenceableParamGroupList, InstrumentModel.getInstance(cvManager));
 
 		this.model = valueFromParamGroup;
 		if (this.model == null)
@@ -115,9 +112,8 @@ public class SpectrometerImpl implements Spectrometer {
 		// dicc.put(description, description);
 
 		// catalog number
-		this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-				paramGroup, referenceableParamGroupList, SPECTROMETER_CATALOG_TEXT_LIST,
-				MatchMode.ANYWHERE);
+		this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(paramGroup,
+				referenceableParamGroupList, SPECTROMETER_CATALOG_TEXT_LIST, MatchMode.ANYWHERE);
 		dicc.put(catalogNumber, catalogNumber);
 
 		// uri
@@ -126,12 +122,11 @@ public class SpectrometerImpl implements Spectrometer {
 		dicc.put(uri, uri);
 
 		// version
-		this.version = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(
-				paramGroup, referenceableParamGroupList, INSTRUMENT_SERIAL_NUMBER_CV);
+		this.version = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(paramGroup,
+				referenceableParamGroupList, INSTRUMENT_SERIAL_NUMBER_CV);
 		if (this.version == null)
-			this.version = MzMLControlVocabularyXmlFactory
-					.getValueFromParamGroupByName(paramGroup, referenceableParamGroupList,
-							SPECTROMETER_VERSION_TEXT_LIST, MatchMode.ANYWHERE);
+			this.version = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
+					referenceableParamGroupList, SPECTROMETER_VERSION_TEXT_LIST, MatchMode.ANYWHERE);
 		dicc.put(version, version);
 
 		// parameters
@@ -146,8 +141,7 @@ public class SpectrometerImpl implements Spectrometer {
 		if (ionOpticsName != null)
 			dicc.put(ionOpticsName, ionOpticsName);
 
-		this.comments = MzMLControlVocabularyXmlFactory.parseAllParams(paramGroup,
-				referenceableParamGroupList, dicc);
+		this.comments = MzMLControlVocabularyXmlFactory.parseAllParams(paramGroup, referenceableParamGroupList, dicc);
 	}
 
 	@Override

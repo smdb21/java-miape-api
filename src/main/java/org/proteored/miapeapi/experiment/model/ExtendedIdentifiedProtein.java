@@ -89,7 +89,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	// private void processProtein() {
 	// final List<IdentifiedPeptide> identifiedPeptides =
 	// protein.getIdentifiedPeptides();
-	// Set<Integer> peptideIDs = new HashSet<Integer>();
+	// TIntHashSet peptideIDs = new TIntHashSet();
 	// if (identifiedPeptides != null) {
 	// peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 	// for (IdentifiedPeptide peptide : identifiedPeptides) {

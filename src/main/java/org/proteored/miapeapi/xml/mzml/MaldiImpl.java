@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.Accession;
@@ -16,6 +16,7 @@ import org.proteored.miapeapi.interfaces.MatchMode;
 import org.proteored.miapeapi.interfaces.ms.Maldi;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
 import uk.ac.ebi.jmzml.model.mzml.ReferenceableParamGroup;
@@ -35,88 +36,68 @@ public class MaldiImpl implements Maldi {
 	private String plateType = null;
 	private final String[] PLATE_TYPE_TEXT_LIST = { "plate" };
 	private String matrixComposition = null;
-	private final String[] MATRIX_TEXT_LIST = { "matrixComposition",
-			"composition" };
+	private final String[] MATRIX_TEXT_LIST = { "matrixComposition", "composition" };
 	private final Accession MATRIX_SOLUTION_CV = new Accession("MS:1000834");
-	private final Accession MATRIX_SOLUTION_CONCENTRATION_CV = new Accession(
-			"MS:1000835");
+	private final Accession MATRIX_SOLUTION_CONCENTRATION_CV = new Accession("MS:1000835");
 	private String dissociation = null;
-	private final String[] DISSOCIATION_TEXT_LIST = {
-			"laser-induced decomposition", "in-source dissociation" };
+	private final String[] DISSOCIATION_TEXT_LIST = { "laser-induced decomposition", "in-source dissociation" };
 	private final String[] DISSOCIATION_SUMMARY_TEXT_LIST = { "reduction" };
 	private String dissociationSummary = null;
-	private static final Accession POST_SOURCE_DECAY_CV = new Accession(
-			"MS:1000135");
+	private static final Accession POST_SOURCE_DECAY_CV = new Accession("MS:1000135");
 	private static final String[] EXTRACTION_DELAY_SUMMARY_TEXT_LIST = { "delay" };
 	private final String[] NAME_TEXT_LIST = { "name" };
 	private String extraction = null;
 	private final ControlVocabularyManager cvManager;
 
-	public MaldiImpl(SourceComponent sourceComponent,
-			ReferenceableParamGroupList referenceableParamGroupList,
+	public MaldiImpl(SourceComponent sourceComponent, ReferenceableParamGroupList referenceableParamGroupList,
 			ControlVocabularyManager cvManager) {
 		log.info("Constructor of maldi");
 		this.cvManager = cvManager;
-		HashMap<String, String> dicc = new HashMap<String, String>();
+		Map<String, String> dicc = new THashMap<String, String>();
 		if (sourceComponent != null) {
 			// Create a paramGroup
-			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory
-					.createParamGroup(sourceComponent.getCvParam(),
-							sourceComponent.getUserParam(),
-							sourceComponent.getReferenceableParamGroupRef());
+			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory.createParamGroup(sourceComponent.getCvParam(),
+					sourceComponent.getUserParam(), sourceComponent.getReferenceableParamGroupRef());
 
-			if (this.isMaldiFromParamGroup(paramGroup,
-					referenceableParamGroupList)) {
+			if (this.isMaldiFromParamGroup(paramGroup, referenceableParamGroupList)) {
 				// search the name
-				this.name = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroup(paramGroup,
-								referenceableParamGroupList,
-								IonSourceName.getInstance(cvManager));
+				this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup,
+						referenceableParamGroupList, IonSourceName.getInstance(cvManager));
 				if (name == null)
-					this.name = MzMLControlVocabularyXmlFactory
-							.getValueFromParamGroupByName(paramGroup,
-									referenceableParamGroupList,
-									NAME_TEXT_LIST, MatchMode.ANYWHERE);
+					this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
+							referenceableParamGroupList, NAME_TEXT_LIST, MatchMode.ANYWHERE);
 				if (name == null)
 					this.name = "MALDI source";
 				else
 					dicc.put(name, name);
 
 				// laser type
-				this.laserType = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroup(paramGroup,
-								referenceableParamGroupList,
-								LaserType.getInstance(cvManager));
+				this.laserType = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(paramGroup,
+						referenceableParamGroupList, LaserType.getInstance(cvManager));
 				dicc.put(laserType, laserType);
 
 				// wavelength
-				this.wavelength = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroupByAccession(paramGroup,
-								referenceableParamGroupList, WAVELENGTH_CV);
+				this.wavelength = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(paramGroup,
+						referenceableParamGroupList, WAVELENGTH_CV);
 				dicc.put(wavelength, wavelength);
 
 				// plate type
 				// Add parsing when new CV is available
-				this.plateType = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroupByName(paramGroup,
-								referenceableParamGroupList,
-								PLATE_TYPE_TEXT_LIST, MatchMode.ANYWHERE);
+				this.plateType = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
+						referenceableParamGroupList, PLATE_TYPE_TEXT_LIST, MatchMode.ANYWHERE);
 				dicc.put(plateType, plateType);
 
 				// matrixComposition composition
 				// firstly, search by CVs
 				StringBuilder sb = new StringBuilder();
-				String temp = MzMLControlVocabularyXmlFactory
-						.getFullCVFromParamGroupByAccession(paramGroup,
-								referenceableParamGroupList, MATRIX_SOLUTION_CV);
+				String temp = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByAccession(paramGroup,
+						referenceableParamGroupList, MATRIX_SOLUTION_CV);
 				if (temp != null) {
 					sb.append(temp);
 					dicc.put(temp, temp);
 				}
-				temp = MzMLControlVocabularyXmlFactory
-						.getFullCVFromParamGroupByAccession(paramGroup,
-								referenceableParamGroupList,
-								MATRIX_SOLUTION_CONCENTRATION_CV);
+				temp = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByAccession(paramGroup,
+						referenceableParamGroupList, MATRIX_SOLUTION_CONCENTRATION_CV);
 				if (temp != null) {
 					if (!"".equals(sb.toString()))
 						sb.append("\n");
@@ -124,10 +105,8 @@ public class MaldiImpl implements Maldi {
 					dicc.put(temp, temp);
 				}
 				// then, by text
-				temp = MzMLControlVocabularyXmlFactory
-						.getValueFromParamGroupByName(paramGroup,
-								referenceableParamGroupList, MATRIX_TEXT_LIST,
-								MatchMode.ANYWHERE);
+				temp = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(paramGroup,
+						referenceableParamGroupList, MATRIX_TEXT_LIST, MatchMode.ANYWHERE);
 				if (temp != null) {
 					if (!"".equals(sb.toString()))
 						sb.append("\n");
@@ -140,35 +119,26 @@ public class MaldiImpl implements Maldi {
 
 				// Maldi Dissociation
 				sb = new StringBuilder();
-				List<CVParam> maldiDissociationMethod = MzMLControlVocabularyXmlFactory
-						.getCvsFromParamGroup(paramGroup,
-								referenceableParamGroupList,
-								MaldiDissociationMethod.getInstance(cvManager));
-				if (maldiDissociationMethod != null
-						&& !maldiDissociationMethod.isEmpty()) {
+				List<CVParam> maldiDissociationMethod = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(paramGroup,
+						referenceableParamGroupList, MaldiDissociationMethod.getInstance(cvManager));
+				if (maldiDissociationMethod != null && !maldiDissociationMethod.isEmpty()) {
 					CVParam cvParam = maldiDissociationMethod.get(0);
 					this.dissociation = cvParam.getName();
-					if (cvParam.getValue() != null
-							&& !"".equals(cvParam.getValue()))
+					if (cvParam.getValue() != null && !"".equals(cvParam.getValue()))
 						this.dissociationSummary = cvParam.getValue();
 				}
 				if (this.dissociation == null) {
-					String dissociationMethod = MzMLControlVocabularyXmlFactory
-							.getFullCVsFromParamGroup(paramGroup,
-									referenceableParamGroupList,
-									MaldiDissociationMethod
-											.getInstance(cvManager));
+					String dissociationMethod = MzMLControlVocabularyXmlFactory.getFullCVsFromParamGroup(paramGroup,
+							referenceableParamGroupList, MaldiDissociationMethod.getInstance(cvManager));
 					if (dissociationMethod != null) {
 						sb.append(dissociationMethod);
 						dicc.put(dissociationMethod, dissociationMethod);
 					}
 
 					if ("".equals(sb.toString())) {
-						final String dissociationText = MzMLControlVocabularyXmlFactory
-								.getFullCVFromParamGroupByName(paramGroup,
-										referenceableParamGroupList,
-										this.DISSOCIATION_TEXT_LIST,
-										MatchMode.ANYWHERE);
+						final String dissociationText = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
+								paramGroup, referenceableParamGroupList, this.DISSOCIATION_TEXT_LIST,
+								MatchMode.ANYWHERE);
 						if (dissociationText != null) {
 							sb.append(dissociationText);
 							dicc.put(dissociationText, dissociationText);
@@ -180,42 +150,30 @@ public class MaldiImpl implements Maldi {
 				// end dissociation
 
 				// Dissociation summary
-				this.dissociationSummary = MzMLControlVocabularyXmlFactory
-						.getFullCVFromParamGroupByName(paramGroup,
-								referenceableParamGroupList,
-								DISSOCIATION_SUMMARY_TEXT_LIST,
-								MatchMode.ANYWHERE);
+				this.dissociationSummary = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(paramGroup,
+						referenceableParamGroupList, DISSOCIATION_SUMMARY_TEXT_LIST, MatchMode.ANYWHERE);
 
 				// delayed extraction
-				final CVParam delayedExtractionCV = MzMLControlVocabularyXmlFactory
-						.getCvFromParamGroup(paramGroup,
-								referenceableParamGroupList,
-								IonOpticsType.DELAYED_CV);
+				final CVParam delayedExtractionCV = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(paramGroup,
+						referenceableParamGroupList, IonOpticsType.DELAYED_CV);
 				if (delayedExtractionCV != null) {
-					this.extraction = MzMLControlVocabularyXmlFactory
-							.getFullCVParam(delayedExtractionCV);
+					this.extraction = MzMLControlVocabularyXmlFactory.getFullCVParam(delayedExtractionCV);
 				}
 				if (this.extraction == null)
-					this.extraction = MzMLControlVocabularyXmlFactory
-							.getFullCVFromParamGroupByName(paramGroup,
-									referenceableParamGroupList,
-									EXTRACTION_DELAY_SUMMARY_TEXT_LIST,
-									MatchMode.ANYWHERE);
+					this.extraction = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(paramGroup,
+							referenceableParamGroupList, EXTRACTION_DELAY_SUMMARY_TEXT_LIST, MatchMode.ANYWHERE);
 				dicc.put(extraction, extraction);
 				// end delayed extraction
 
 				// laser parameters
 				sb = new StringBuilder();
-				final List<CVParam> laserAttributeCVs = MzMLControlVocabularyXmlFactory
-						.getCvsFromParamGroup(sourceComponent,
-								referenceableParamGroupList,
-								LaserAttribute.getInstance(cvManager));
+				final List<CVParam> laserAttributeCVs = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(
+						sourceComponent, referenceableParamGroupList, LaserAttribute.getInstance(cvManager));
 				if (laserAttributeCVs != null) {
 					for (CVParam cvParam : laserAttributeCVs) {
 						if (!"".equals(sb.toString()))
 							sb.append("\n");
-						sb.append(MzMLControlVocabularyXmlFactory
-								.getFullCVParam(cvParam));
+						sb.append(MzMLControlVocabularyXmlFactory.getFullCVParam(cvParam));
 					}
 				}
 				if (!"".equals(sb.toString()))
@@ -230,21 +188,17 @@ public class MaldiImpl implements Maldi {
 		}
 	}
 
-	private String parseAllParams(ParamGroup paramGroup,
-			HashMap<String, String> dicc) {
+	private String parseAllParams(ParamGroup paramGroup, Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(parseAllCvParams(paramGroup.getCvParam(), dicc));
 		sb.append(parseAllUserParams(paramGroup.getUserParam(), dicc));
 
-		for (ReferenceableParamGroupRef paramRef : paramGroup
-				.getReferenceableParamGroupRef()) {
+		for (ReferenceableParamGroupRef paramRef : paramGroup.getReferenceableParamGroupRef()) {
 			if (paramRef.getReferenceableParamGroup().getCvParam() != null)
-				sb.append(parseAllCvParams(paramRef
-						.getReferenceableParamGroup().getCvParam(), dicc));
+				sb.append(parseAllCvParams(paramRef.getReferenceableParamGroup().getCvParam(), dicc));
 			if (paramRef.getReferenceableParamGroup().getUserParam() != null)
-				sb.append(parseAllUserParams(paramRef
-						.getReferenceableParamGroup().getUserParam(), dicc));
+				sb.append(parseAllUserParams(paramRef.getReferenceableParamGroup().getUserParam(), dicc));
 		}
 		if (sb.toString() != null && !"".equals(sb.toString())) {
 			return sb.toString();
@@ -252,8 +206,7 @@ public class MaldiImpl implements Maldi {
 		return null;
 	}
 
-	private String parseAllUserParams(List<UserParam> userParams,
-			HashMap<String, String> dicc) {
+	private String parseAllUserParams(List<UserParam> userParams, Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 		String temp = null;
 		boolean include;
@@ -272,15 +225,13 @@ public class MaldiImpl implements Maldi {
 			if (include) {
 				if (!sb.toString().equals(""))
 					sb.append("\n");
-				sb.append(MzMLControlVocabularyXmlFactory
-						.getFullUserParam(userParam));
+				sb.append(MzMLControlVocabularyXmlFactory.getFullUserParam(userParam));
 			}
 		}
 		return sb.toString();
 	}
 
-	private String parseAllCvParams(List<CVParam> cvParams,
-			HashMap<String, String> dicc) {
+	private String parseAllCvParams(List<CVParam> cvParams, Map<String, String> dicc) {
 		StringBuilder sb = new StringBuilder();
 		String temp = null;
 		boolean include;
@@ -299,8 +250,7 @@ public class MaldiImpl implements Maldi {
 			if (include) {
 				if (!sb.toString().equals(""))
 					sb.append("\n");
-				sb.append(MzMLControlVocabularyXmlFactory
-						.getFullCVParam(cvParam));
+				sb.append(MzMLControlVocabularyXmlFactory.getFullCVParam(cvParam));
 			}
 		}
 		return sb.toString();
@@ -361,11 +311,9 @@ public class MaldiImpl implements Maldi {
 				return true;
 			if (this.isMaldiFromUserParams(paramGroup.getUserParam()))
 				return true;
-			for (ReferenceableParamGroupRef refParam : paramGroup
-					.getReferenceableParamGroupRef()) {
+			for (ReferenceableParamGroupRef refParam : paramGroup.getReferenceableParamGroupRef()) {
 				ReferenceableParamGroup refParamGroup = MzMLControlVocabularyXmlFactory
-						.searchParamGroupInReferenceableParamGroupList(
-								refParam.getRef(), referenceableParamGroupList);
+						.searchParamGroupInReferenceableParamGroupList(refParam.getRef(), referenceableParamGroupList);
 				if (this.isMaldiFromCVParams(refParamGroup.getCvParam()))
 					return true;
 				if (this.isMaldiFromUserParams(refParamGroup.getUserParam()))
@@ -378,19 +326,14 @@ public class MaldiImpl implements Maldi {
 
 	private boolean isMaldiFromCVParams(List<CVParam> listParam) {
 		for (CVParam cvParam : listParam) {
-			if (IonSourceName.IONIZATION_TYPE_ACC
-					.equals(cvParam.getAccession())) {
+			if (IonSourceName.IONIZATION_TYPE_ACC.equals(cvParam.getAccession())) {
 
-				if (IonSourceName.isMaldiFromDescription(cvParam.getValue(),
-						cvManager))
+				if (IonSourceName.isMaldiFromDescription(cvParam.getValue(), cvManager))
 					return true;
 			} else {
-				final ControlVocabularyTerm cvTerm = IonSourceName.getInstance(
-						cvManager).getCVTermByAccession(
-						new Accession(cvParam.getAccession()));
-				if (cvTerm != null
-						&& IonSourceName.isMaldiFromAccession(cvTerm
-								.getTermAccession()))
+				final ControlVocabularyTerm cvTerm = IonSourceName.getInstance(cvManager)
+						.getCVTermByAccession(new Accession(cvParam.getAccession()));
+				if (cvTerm != null && IonSourceName.isMaldiFromAccession(cvTerm.getTermAccession()))
 					return true;
 			}
 		}
@@ -399,8 +342,7 @@ public class MaldiImpl implements Maldi {
 
 	private boolean isMaldiFromUserParams(List<UserParam> listParam) {
 		for (UserParam userParam : listParam) {
-			if (IonSourceName.isMaldiFromDescription(userParam.getValue(),
-					cvManager))
+			if (IonSourceName.isMaldiFromDescription(userParam.getValue(), cvManager))
 				return true;
 		}
 		return false;

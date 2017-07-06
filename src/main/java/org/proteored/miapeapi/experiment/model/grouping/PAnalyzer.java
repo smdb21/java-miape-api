@@ -3,10 +3,9 @@ package org.proteored.miapeapi.experiment.model.grouping;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -25,6 +24,9 @@ import org.proteored.miapeapi.xml.msi.MIAPEMSIXmlFile;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
 import edu.scripps.yates.utilities.dates.DatesUtil;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import junit.framework.Assert;
 
 /**
@@ -34,8 +36,8 @@ import junit.framework.Assert;
 public class PAnalyzer {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	private final HashMap<String, InferenceProtein> mProts;
-	private final HashMap<String, InferencePeptide> mPepts;
+	private final Map<String, InferenceProtein> mProts;
+	private final Map<String, InferencePeptide> mPepts;
 	private final List<ProteinGroupInference> mGroups;
 	private PanalyzerStats mStats;
 	private final boolean separateNonConclusiveProteins;
@@ -60,8 +62,8 @@ public class PAnalyzer {
 	 *            separated
 	 */
 	public PAnalyzer(boolean separateNonConclusiveProteins, boolean ignoreProteinId) {
-		mProts = new HashMap<String, InferenceProtein>();
-		mPepts = new HashMap<String, InferencePeptide>();
+		mProts = new THashMap<String, InferenceProtein>();
+		mPepts = new THashMap<String, InferencePeptide>();
 		mGroups = new ArrayList<ProteinGroupInference>();
 		this.ignoreProteinId = ignoreProteinId;
 		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
@@ -166,7 +168,7 @@ public class PAnalyzer {
 	private void createInferenceMaps(Collection<ExtendedIdentifiedProtein> proteins) {
 		InferenceProtein iProt = null;
 		InferencePeptide iPept = null;
-		Set<Integer> proteinIds = new HashSet<Integer>();
+		TIntHashSet proteinIds = new TIntHashSet();
 
 		for (ExtendedIdentifiedProtein prot : proteins) {
 			if (ignoreProteinId || !proteinIds.contains(prot.getId())) {
@@ -346,7 +348,7 @@ public class PAnalyzer {
 	//
 	// }
 	private void markIndistinguishable() {
-		Set<InferencePeptide> discriminating = new HashSet<InferencePeptide>();
+		Set<InferencePeptide> discriminating = new THashSet<InferencePeptide>();
 		boolean indistinguishable;
 		for (ProteinGroupInference group : mGroups) {
 			if (group.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP || group.size() < 2)

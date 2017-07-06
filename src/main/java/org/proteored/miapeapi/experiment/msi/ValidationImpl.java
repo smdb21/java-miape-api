@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.experiment.msi;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,6 +9,8 @@ import org.proteored.miapeapi.experiment.model.filters.Filter;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.PostProcessingMethod;
 import org.proteored.miapeapi.interfaces.msi.Validation;
+
+import gnu.trove.set.hash.THashSet;
 
 public class ValidationImpl implements Validation {
 	private static final Object NEW_LINE = System.getProperty("line.separator");;
@@ -42,7 +43,7 @@ public class ValidationImpl implements Validation {
 
 	@Override
 	public Set<Software> getPostProcessingSoftwares() {
-		Set<Software> softwares = new HashSet<Software>();
+		Set<Software> softwares = new THashSet<Software>();
 		final Software software = this.filters.get(0).getSoftware();
 		if (software != null) {
 			softwares.add(software);

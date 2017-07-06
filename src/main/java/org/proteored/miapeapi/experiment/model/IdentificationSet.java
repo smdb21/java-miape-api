@@ -1,8 +1,7 @@
 package org.proteored.miapeapi.experiment.model;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -14,6 +13,8 @@ import org.proteored.miapeapi.interfaces.ms.ResultingData;
 import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
+
+import gnu.trove.map.hash.TIntIntHashMap;
 
 public interface IdentificationSet<T> {
 
@@ -95,7 +96,7 @@ public interface IdentificationSet<T> {
 	 *
 	 * @return
 	 */
-	public HashMap<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList();
+	public Map<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList();
 
 	/**
 	 * Gets the {@link ProteinGroupOccurrence} of a protein group
@@ -124,7 +125,7 @@ public interface IdentificationSet<T> {
 	 *
 	 * @return
 	 */
-	public HashMap<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep);
+	public Map<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep);
 
 	/**
 	 * Gets the number of times that a certain sequence appears over the next
@@ -258,7 +259,7 @@ public interface IdentificationSet<T> {
 	 * @return hashmap <number of modifications in the peptide, number of
 	 *         peptides with that number of modifications>
 	 */
-	public HashMap<Integer, Integer> getModificationOccurrenceDistribution(String modif);
+	public TIntIntHashMap getModificationOccurrenceDistribution(String modif);
 
 	/**
 	 *
@@ -266,7 +267,7 @@ public interface IdentificationSet<T> {
 	 * @return hashmap <number of missedclavage sites in the peptide, number of
 	 *         peptides with that number of missedcleavages>
 	 */
-	public HashMap<Integer, Integer> getMissedCleavagesOccurrenceDistribution();
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution();
 
 	/**
 	 * Gets the {@link DataManager} of this {@link IdentificationSet}
@@ -289,7 +290,7 @@ public interface IdentificationSet<T> {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getProteinGroupTP(HashSet<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
+	public int getProteinGroupTP(Set<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
 
 	/**
 	 * Gets the number of False Negatives
@@ -297,7 +298,7 @@ public interface IdentificationSet<T> {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getProteinGroupFN(HashSet<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
+	public int getProteinGroupFN(Set<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
 
 	/**
 	 * Gets the number of True Negatives
@@ -305,7 +306,7 @@ public interface IdentificationSet<T> {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getProteinGroupTN(HashSet<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
+	public int getProteinGroupTN(Set<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
 
 	/**
 	 * Gets the number of False Positives
@@ -313,7 +314,7 @@ public interface IdentificationSet<T> {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getProteinGroupFP(HashSet<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
+	public int getProteinGroupFP(Set<String> positiveProteinAccessions, boolean countNonConclusiveProteins);
 
 	/**
 	 * Gets the number of True Positives
@@ -321,7 +322,7 @@ public interface IdentificationSet<T> {
 	 * @param positiveProteinAccessions
 	 * @return
 	 */
-	public int getPeptideTP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
+	public int getPeptideTP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
 
 	/**
 	 * Gets the number of False Negatives
@@ -329,7 +330,7 @@ public interface IdentificationSet<T> {
 	 * @param positivePeptideSequences
 	 * @return
 	 */
-	public int getPeptideFN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
+	public int getPeptideFN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
 
 	/**
 	 * Gets the number of True Negatives
@@ -337,7 +338,7 @@ public interface IdentificationSet<T> {
 	 * @param positivePeptideSequences
 	 * @return
 	 */
-	public int getPeptideTN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
+	public int getPeptideTN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
 
 	/**
 	 * Gets the number of False Positives
@@ -345,7 +346,7 @@ public interface IdentificationSet<T> {
 	 * @param positivePeptideSequences
 	 * @return
 	 */
-	public int getPeptideFP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
+	public int getPeptideFP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides);
 
 	/**
 	 * Gets the number of different peptides that contains at least one AA
@@ -518,7 +519,7 @@ public interface IdentificationSet<T> {
 	 *
 	 * @return
 	 */
-	public HashMap<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep);
+	public Map<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep);
 
 	public PeptideOccurrence getPeptideChargeOccurrence(String sequencePlusChargeKey, boolean b);
 

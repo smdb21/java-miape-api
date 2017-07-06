@@ -5,9 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -38,6 +37,8 @@ import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
 import edu.scripps.yates.dtaselectparser.DTASelectParser;
 import edu.scripps.yates.dtaselectparser.util.DTASelectProtein;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -96,10 +97,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		// clear map
 		IdentifiedPeptideImplFromDTASelect.map.clear();
 
-		final HashMap<String, DTASelectProtein> dtaSelectProteins = parser.getDTASelectProteins();
-		HashMap<String, IdentifiedProtein> proteins = new HashMap<String, IdentifiedProtein>();
+		final Map<String, DTASelectProtein> dtaSelectProteins = parser.getDTASelectProteins();
+		Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
 		List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
-		Set<String> psmIDs = new HashSet<String>();
+		Set<String> psmIDs = new THashSet<String>();
 		for (String acc : dtaSelectProteins.keySet()) {
 			final DTASelectProtein dtaSelectProtein = dtaSelectProteins.get(acc);
 			IdentifiedProtein protein = new IdentifiedProteinImplFromDTASelectProtein(dtaSelectProtein, cvManager);
@@ -122,7 +123,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		MiapeMSIDocumentBuilder builder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project, idSetName,
 				owner);
 		builder.identifiedPeptides(peptides);
-		Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+		Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
 		IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory.createIdentifiedProteinSetBuilder("Protein set")
 				.identifiedProteins(proteins).build();
 		proteinSets.add(proteinSet);

@@ -1,10 +1,10 @@
 package org.proteored.miapeapi.xml.pride.adapter;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.xml.msi.adapter.InnerIteratorSync2;
 import org.proteored.miapeapi.xml.util.parallel.InnerLock;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 public class SpectraFilter<T> implements Runnable {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -13,10 +13,9 @@ public class SpectraFilter<T> implements Runnable {
 	private InnerLock lock = null;
 	private final int count = 0;
 	private int iNumber = -1;
-	private final Set<Integer> spectrumRefs;
+	private final TIntHashSet spectrumRefs;
 
-	public SpectraFilter(InnerIteratorSync2<T> aIterator, InnerLock aLock, int aNumber,
-			Set<Integer> spectrumRefs) {
+	public SpectraFilter(InnerIteratorSync2<T> aIterator, InnerLock aLock, int aNumber, TIntHashSet spectrumRefs) {
 		iter = aIterator;
 		lock = aLock;
 		iNumber = aNumber;

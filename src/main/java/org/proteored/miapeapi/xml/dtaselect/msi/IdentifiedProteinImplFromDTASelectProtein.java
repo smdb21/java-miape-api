@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.dtaselect.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -15,11 +14,12 @@ import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.dtaselectparser.util.DTASelectProtein;
 import edu.scripps.yates.utilities.fasta.FastaParser;
 import edu.scripps.yates.utilities.util.Pair;
+import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProtein {
 	private final DTASelectProtein dtaSelectProtein;
 	private final int id;
-	private HashSet<ProteinScore> proteinScores;
+	private Set<ProteinScore> proteinScores;
 	private List<IdentifiedPeptide> peptides;
 	private final ControlVocabularyManager cvManager;
 
@@ -62,7 +62,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	@Override
 	public Set<ProteinScore> getScores() {
 		if (proteinScores == null) {
-			proteinScores = new HashSet<ProteinScore>();
+			proteinScores = new THashSet<ProteinScore>();
 			if (dtaSelectProtein.getEmpai() != null) {
 				ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl("emPAI value",
 						dtaSelectProtein.getEmpai());
@@ -95,7 +95,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	@Override
 	public String getPeptideNumber() {
 		final List<IdentifiedPeptide> identifiedPeptides = getIdentifiedPeptides();
-		Set<String> seqs = new HashSet<String>();
+		Set<String> seqs = new THashSet<String>();
 		if (identifiedPeptides != null) {
 			for (IdentifiedPeptide pep : identifiedPeptides) {
 				seqs.add(pep.getSequence());

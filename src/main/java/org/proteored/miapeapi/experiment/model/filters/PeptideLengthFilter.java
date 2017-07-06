@@ -1,8 +1,6 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -11,13 +9,14 @@ import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 public class PeptideLengthFilter implements Filter {
 	private int minLenth = 0;
 	private int maxLenth = Integer.MAX_VALUE;
 	private final Software software;
 
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	public static final String NOT_MODIFIED = "NOT MODIFIED";
 
@@ -41,8 +40,7 @@ public class PeptideLengthFilter implements Filter {
 	public boolean equals(Object obj) {
 		if (obj instanceof PeptideLengthFilter) {
 			PeptideLengthFilter filter = (PeptideLengthFilter) obj;
-			if (this.minLenth == filter.minLenth
-					&& this.maxLenth == filter.maxLenth)
+			if (this.minLenth == filter.minLenth && this.maxLenth == filter.maxLenth)
 				return true;
 
 			return false;
@@ -50,20 +48,17 @@ public class PeptideLengthFilter implements Filter {
 			return super.equals(obj);
 	}
 
-	private Set<Integer> filterPeptides(
-			List<ExtendedIdentifiedPeptide> identifiedPeptides,
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
 
-		log.info("Filtering " + identifiedPeptides.size()
-				+ " peptides by peptide length: " + this);
-		Set<Integer> ret = new HashSet<Integer>();
+		log.info("Filtering " + identifiedPeptides.size() + " peptides by peptide length: " + this);
+		TIntHashSet ret = new TIntHashSet();
 		if (identifiedPeptides != null && !identifiedPeptides.isEmpty())
 			for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 				if (peptide != null) {
 					String sequence = peptide.getSequence();
 					if (sequence != null) {
-						if (sequence.length() >= minLenth
-								&& sequence.length() <= this.maxLenth) {
+						if (sequence.length() >= minLenth && sequence.length() <= this.maxLenth) {
 							if (!ret.contains(peptide.getId()))
 								ret.add(peptide.getId());
 							else
@@ -73,29 +68,24 @@ public class PeptideLengthFilter implements Filter {
 				}
 
 			}
-		log.info("Filtered " + ret.size() + " out of "
-				+ identifiedPeptides.size() + " peptides");
+		log.info("Filtered " + ret.size() + " out of " + identifiedPeptides.size() + " peptides");
 		return ret;
 	}
 
 	@Override
 	public String toString() {
 		if (maxLenth < Integer.MAX_VALUE)
-			return "Peptide length between " + minLenth + " < length < "
-					+ maxLenth;
+			return "Peptide length between " + minLenth + " < length < " + maxLenth;
 		else
 			return "Peptide length > " + minLenth;
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups,
-			IdentificationSet currentIdSet) {
+	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
-		Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides,
-				currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(proteinGroups,
-				filteredPeptides, currentIdSet.getCvManager());
+		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+		return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides, currentIdSet.getCvManager());
 	}
 
 	@Override

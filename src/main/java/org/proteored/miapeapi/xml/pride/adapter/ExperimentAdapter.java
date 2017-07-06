@@ -1,8 +1,8 @@
 package org.proteored.miapeapi.xml.pride.adapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -26,23 +26,19 @@ public class ExperimentAdapter implements Adapter<ExperimentType> {
 	private final boolean addPeakList;
 	private final boolean gelBasedExperiment;
 
-	public ExperimentAdapter(ObjectFactory factory,
-			ControlVocabularyManager cvManager, MiapeMSDocument miapeMS,
+	public ExperimentAdapter(ObjectFactory factory, ControlVocabularyManager cvManager, MiapeMSDocument miapeMS,
 			MiapeMSIDocument miapeMSI, boolean addPeakList) {
 		this(factory, cvManager, miapeMS, miapeMSI, addPeakList, false);
 
 	}
 
-	public ExperimentAdapter(ObjectFactory factory,
-			ControlVocabularyManager cvManager, MiapeMSDocument miapeMS,
-			MiapeMSIDocument miapeMSI, boolean addPeakList,
-			boolean gelBasedExperiment) {
+	public ExperimentAdapter(ObjectFactory factory, ControlVocabularyManager cvManager, MiapeMSDocument miapeMS,
+			MiapeMSIDocument miapeMSI, boolean addPeakList, boolean gelBasedExperiment) {
 		this.factory = factory;
 		this.cvManager = cvManager;
 		this.miapeMS = miapeMS;
 		this.miapeMSI = miapeMSI;
-		this.prideCvUtil = new PrideControlVocabularyXmlFactory(factory,
-				cvManager);
+		this.prideCvUtil = new PrideControlVocabularyXmlFactory(factory, cvManager);
 		this.addPeakList = addPeakList;
 		this.gelBasedExperiment = gelBasedExperiment;
 	}
@@ -53,43 +49,36 @@ public class ExperimentAdapter implements Adapter<ExperimentType> {
 
 		log.info("adding MIAPE data: titles and contacts");
 
-		xmlExperiment.setProtocol(new ProtocolAdapter(factory, cvManager,
-				miapeMS, miapeMSI).adapt());
+		xmlExperiment.setProtocol(new ProtocolAdapter(factory, cvManager, miapeMS, miapeMSI).adapt());
 		List<MiapeMSDocument> miapeList = new ArrayList<MiapeMSDocument>();
 		miapeList.add(miapeMS);
 
 		// if the software used to identify proteins, is the Proteome
 		// discoverer, the order in which the mgf should be readed in RT order.
 
-		xmlExperiment.setMzData(new MzDataAdapter(factory, cvManager,
-				miapeList, addPeakList).adapt());
+		xmlExperiment.setMzData(new MzDataAdapter(factory, cvManager, miapeList, addPeakList).adapt());
 
 		addGelFreeIdentifications(xmlExperiment);
 
 		// Additional
-		xmlExperiment.setAdditional(new AdditionalAdapter(factory, cvManager,
-				miapeMS, miapeMSI, xmlExperiment, this.gelBasedExperiment)
-				.adapt());
+		xmlExperiment.setAdditional(
+				new AdditionalAdapter(factory, cvManager, miapeMS, miapeMSI, xmlExperiment, this.gelBasedExperiment)
+						.adapt());
 		return xmlExperiment;
 	}
 
 	private void addGelFreeIdentifications(ExperimentType xmlExperiment) {
 		if (miapeMSI != null) {
-			final Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSI
-					.getIdentifiedProteinSets();
+			final Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSI.getIdentifiedProteinSets();
 			if (identifiedProteinSets != null) {
 				for (IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
-					final HashMap<String, IdentifiedProtein> identifiedProteins = identifiedProteinSet
+					final Map<String, IdentifiedProtein> identifiedProteins = identifiedProteinSet
 							.getIdentifiedProteins();
-					if (identifiedProteins != null
-							&& identifiedProteins.size() > 0) {
+					if (identifiedProteins != null && identifiedProteins.size() > 0) {
 						for (String proteinAcc : identifiedProteins.keySet()) {
-							IdentifiedProtein protein = identifiedProteins
-									.get(proteinAcc);
-							xmlExperiment.getGelFreeIdentification().add(
-									new GelFreeIdentificationAdapter(factory,
-											cvManager, protein, miapeMSI,
-											this.addPeakList).adapt());
+							IdentifiedProtein protein = identifiedProteins.get(proteinAcc);
+							xmlExperiment.getGelFreeIdentification().add(new GelFreeIdentificationAdapter(factory,
+									cvManager, protein, miapeMSI, this.addPeakList).adapt());
 						}
 					}
 				}

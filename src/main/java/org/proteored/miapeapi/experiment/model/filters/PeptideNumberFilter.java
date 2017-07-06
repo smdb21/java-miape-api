@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -9,6 +8,8 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.interfaces.Software;
+
+import gnu.trove.set.hash.THashSet;
 
 public class PeptideNumberFilter implements Filter {
 	private final int minNumPeptides;
@@ -54,7 +55,7 @@ public class PeptideNumberFilter implements Filter {
 		if (!distinguishSequence2) {
 			return peptides.size();
 		} else {
-			Set<String> seqs = new HashSet<String>();
+			Set<String> seqs = new THashSet<String>();
 			for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
 				seqs.add(extendedIdentifiedPeptide.getSequence());
 			}

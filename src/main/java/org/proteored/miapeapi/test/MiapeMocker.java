@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.test;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.mockito.Mockito;
@@ -36,17 +35,16 @@ import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.interfaces.msi.PostProcessingMethod;
 import org.proteored.miapeapi.spring.SpringHandler;
 
+import gnu.trove.set.hash.THashSet;
+
 public class MiapeMocker {
-	public static final ControlVocabularyManager cvManager = SpringHandler
-			.getInstance().getCVManager();
-	public static final String NEW_CONTACT_EMAIL = "ContactEmail"
-			+ System.currentTimeMillis();
-	public static final String NEW_PROJECT_NAME = "NEW_PROJECT_NAME"
-			+ System.currentTimeMillis();
-	public static final String CONTACT_POSITION_MS = ContactPositionMS
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
-	public static final String CONTACT_POSITION_GE = ContactPositionGE
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
+	public static final ControlVocabularyManager cvManager = SpringHandler.getInstance().getCVManager();
+	public static final String NEW_CONTACT_EMAIL = "ContactEmail" + System.currentTimeMillis();
+	public static final String NEW_PROJECT_NAME = "NEW_PROJECT_NAME" + System.currentTimeMillis();
+	public static final String CONTACT_POSITION_MS = ContactPositionMS.getInstance(cvManager).getFirstCVTerm()
+			.getPreferredName();
+	public static final String CONTACT_POSITION_GE = ContactPositionGE.getInstance(cvManager).getFirstCVTerm()
+			.getPreferredName();
 	public static final String CONTACT_TELEPHONE = "ContactTelephone";
 	public static final String CONTACT_NAME = "ContactName";
 	public static final String CONTACT_LOCALTY = "ContactLocalty";
@@ -97,8 +95,7 @@ public class MiapeMocker {
 	public static final String USERNAME = "testUser";
 	public static final String PASSWORD = "test";
 
-	public static final String NEW_USER_USER = "testUser"
-			+ System.currentTimeMillis();
+	public static final String NEW_USER_USER = "testUser" + System.currentTimeMillis();
 	public static final String TELEPHONE_NUMBER = "TelephoneNumber";
 	public static final String USER_STATUS = "1";
 	public static final String NODE_NAME = "NodeName";
@@ -159,8 +156,8 @@ public class MiapeMocker {
 	public static final String CONCENTRATION_UNIT = "ConcentrationUnit";
 	public static final String CONCENTRATION = "Concentration";
 	public static final String SUBSTANCE_NAME = "SubstanceName";
-	public static final String COMPONENT_NAME = BufferComponentName
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
+	public static final String COMPONENT_NAME = BufferComponentName.getInstance(cvManager).getFirstCVTerm()
+			.getPreferredName();
 
 	public static final String BUFFER_TYPE = "BufferType";
 	public static final String BUFFER_DESCRIPTION = "BufferDescription";
@@ -176,8 +173,8 @@ public class MiapeMocker {
 	public static final String DIMENSION_X = "DimensionX";
 	public static final String DIMENSION_UNIT = "DimensionUnit";
 	public static final String BIT_DEPTH = "BitDepth";
-	public static final String IMAGE_ACQUISITION_SOFTWARE_NAME = ImageAcquisitionSoftwareName
-			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
+	public static final String IMAGE_ACQUISITION_SOFTWARE_NAME = ImageAcquisitionSoftwareName.getInstance(cvManager)
+			.getFirstCVTerm().getPreferredName();
 	public static final String IMAGE_ANALYSIS_SOFTWARE_NAME = org.proteored.miapeapi.cv.gi.ImageAnalysisSoftwareName
 			.getInstance(cvManager).getFirstCVTerm().getPreferredName();
 	public static final String CUSTOMIZATIONS = "Customizations";
@@ -281,25 +278,19 @@ public class MiapeMocker {
 	}
 
 	public static PostProcessingMethod mockValidationAlgorithm(int i) {
-		PostProcessingMethod algorithm = Mockito
-				.mock(PostProcessingMethod.class);
+		PostProcessingMethod algorithm = Mockito.mock(PostProcessingMethod.class);
 		addAlgorithm(i, algorithm);
 		return algorithm;
 	}
 
 	private static void addAlgorithm(int i, Algorithm algorithm) {
 		Mockito.when(algorithm.getName()).thenReturn(ALGORITHM_NAME + i);
-		Mockito.when(algorithm.getCatalogNumber()).thenReturn(
-				ALGORITHM_C_ATALOG_NUMBER + i);
-		Mockito.when(algorithm.getComments())
-				.thenReturn(ALGORITHM_COMMENTS + i);
-		Mockito.when(algorithm.getDescription()).thenReturn(
-				ALGORITHM_DESCRIPTION + i);
-		Mockito.when(algorithm.getManufacturer()).thenReturn(
-				ALGORITHM_MANUFACTURER + i);
+		Mockito.when(algorithm.getCatalogNumber()).thenReturn(ALGORITHM_C_ATALOG_NUMBER + i);
+		Mockito.when(algorithm.getComments()).thenReturn(ALGORITHM_COMMENTS + i);
+		Mockito.when(algorithm.getDescription()).thenReturn(ALGORITHM_DESCRIPTION + i);
+		Mockito.when(algorithm.getManufacturer()).thenReturn(ALGORITHM_MANUFACTURER + i);
 		Mockito.when(algorithm.getModel()).thenReturn(ALGORITHM_MODEL + i);
-		Mockito.when(algorithm.getParameters()).thenReturn(
-				ALGORITHM_PARAMETERS + i);
+		Mockito.when(algorithm.getParameters()).thenReturn(ALGORITHM_PARAMETERS + i);
 		Mockito.when(algorithm.getURI()).thenReturn(ALGORITHM_URI + i);
 		Mockito.when(algorithm.getVersion()).thenReturn(ALGORITHM_VERSION + i);
 	}
@@ -312,20 +303,16 @@ public class MiapeMocker {
 	}
 
 	public static ImageAnalysisSoftware mockImageAnalysisSoftware(int i) {
-		ImageAnalysisSoftware software = Mockito
-				.mock(ImageAnalysisSoftware.class);
-		Mockito.when(software.getName()).thenReturn(
-				IMAGE_ANALYSIS_SOFTWARE_NAME);
+		ImageAnalysisSoftware software = Mockito.mock(ImageAnalysisSoftware.class);
+		Mockito.when(software.getName()).thenReturn(IMAGE_ANALYSIS_SOFTWARE_NAME);
 		addSoftware(i, software);
 
 		return software;
 	}
 
 	public static ImageAcquisitionSoftware mockImageAcquisitionSoftware(int i) {
-		ImageAcquisitionSoftware software = Mockito
-				.mock(ImageAcquisitionSoftware.class);
-		Mockito.when(software.getName()).thenReturn(
-				IMAGE_ACQUISITION_SOFTWARE_NAME);
+		ImageAcquisitionSoftware software = Mockito.mock(ImageAcquisitionSoftware.class);
+		Mockito.when(software.getName()).thenReturn(IMAGE_ACQUISITION_SOFTWARE_NAME);
 		addSoftware(i, software);
 
 		return software;
@@ -333,18 +320,13 @@ public class MiapeMocker {
 
 	private static void addSoftware(int i, Software software) {
 		Mockito.when(software.getName()).thenReturn(SOFTWARE_NAME + i);
-		Mockito.when(software.getCatalogNumber()).thenReturn(
-				SOFTWARE_CATALOG_NUMBER + i);
+		Mockito.when(software.getCatalogNumber()).thenReturn(SOFTWARE_CATALOG_NUMBER + i);
 		Mockito.when(software.getComments()).thenReturn(SOFTWARE_COMMENTS + i);
-		Mockito.when(software.getCustomizations()).thenReturn(
-				SOFTWARE_CUSTOMIZATIONS + i);
-		Mockito.when(software.getDescription()).thenReturn(
-				SOFTWARE_DESCRIPTION + i);
-		Mockito.when(software.getManufacturer()).thenReturn(
-				SOFTWARE_MANUFACTURER + i);
+		Mockito.when(software.getCustomizations()).thenReturn(SOFTWARE_CUSTOMIZATIONS + i);
+		Mockito.when(software.getDescription()).thenReturn(SOFTWARE_DESCRIPTION + i);
+		Mockito.when(software.getManufacturer()).thenReturn(SOFTWARE_MANUFACTURER + i);
 		Mockito.when(software.getModel()).thenReturn(SOFTWARE_MODEL + i);
-		Mockito.when(software.getParameters()).thenReturn(
-				SOFTWARE_PARAMETERS + i);
+		Mockito.when(software.getParameters()).thenReturn(SOFTWARE_PARAMETERS + i);
 		Mockito.when(software.getURI()).thenReturn(SOFTWARE_URI + i);
 		Mockito.when(software.getVersion()).thenReturn(SOFTWARE_VERSION + i);
 	}
@@ -357,8 +339,7 @@ public class MiapeMocker {
 
 	public static Spectrometer mockSpectrometer(int i) {
 		Spectrometer spectrometer = Mockito.mock(Spectrometer.class);
-		Mockito.when(spectrometer.getCustomizations()).thenReturn(
-				CUSTOMIZATIONS + i);
+		Mockito.when(spectrometer.getCustomizations()).thenReturn(CUSTOMIZATIONS + i);
 		Mockito.when(spectrometer.getName()).thenReturn(EQUIPMENT_NAME + i);
 		addEquipmentData(i, spectrometer);
 		return spectrometer;
@@ -366,30 +347,25 @@ public class MiapeMocker {
 
 	public static void addEquipmentData(int i, Equipment equipment) {
 		Mockito.when(equipment.getName()).thenReturn(EQUIPMENT_NAME + i);
-		Mockito.when(equipment.getCatalogNumber()).thenReturn(
-				EQUIPMENT_CATALOG_NUMBER + i);
-		Mockito.when(equipment.getComments())
-				.thenReturn(EQUIPMENT_COMMENTS + i);
-		Mockito.when(equipment.getDescription()).thenReturn(
-				EQUIPMENT_DESCRIPTION + i);
-		Mockito.when(equipment.getManufacturer()).thenReturn(
-				EQUIPMENT_MANUFACTURER + i);
+		Mockito.when(equipment.getCatalogNumber()).thenReturn(EQUIPMENT_CATALOG_NUMBER + i);
+		Mockito.when(equipment.getComments()).thenReturn(EQUIPMENT_COMMENTS + i);
+		Mockito.when(equipment.getDescription()).thenReturn(EQUIPMENT_DESCRIPTION + i);
+		Mockito.when(equipment.getManufacturer()).thenReturn(EQUIPMENT_MANUFACTURER + i);
 		Mockito.when(equipment.getModel()).thenReturn(EQUIPMENT_MODEL + i);
-		Mockito.when(equipment.getParameters()).thenReturn(
-				EQUIPMENT_PARAMETERS + i);
+		Mockito.when(equipment.getParameters()).thenReturn(EQUIPMENT_PARAMETERS + i);
 		Mockito.when(equipment.getUri()).thenReturn(EQUIPMENT_URI + i);
 		Mockito.when(equipment.getVersion()).thenReturn(EQUIPMENT_VERSION + i);
 	}
 
 	public static Set<Substance> mockSubstances(int i) {
-		Set<Substance> substances = new HashSet<Substance>();
+		Set<Substance> substances = new THashSet<Substance>();
 		Substance substance = MiapeMocker.mockSubstance(i);
 		substances.add(substance);
 		return substances;
 	}
 
 	public static Set<Agent> mockAdditionalMatrixSubstances(int i) {
-		Set<Agent> substances = new HashSet<Agent>();
+		Set<Agent> substances = new THashSet<Agent>();
 		Agent substance = MiapeMocker.mockAgent(i);
 		substances.add(substance);
 		return substances;
@@ -398,10 +374,8 @@ public class MiapeMocker {
 	public static Agent mockAgent(int i) {
 		Agent substance = Mockito.mock(Agent.class);
 		Mockito.when(substance.getName()).thenReturn(SUBSTANCE_NAME + i);
-		Mockito.when(substance.getConcentration())
-				.thenReturn(CONCENTRATION + i);
-		Mockito.when(substance.getConcentrationUnit()).thenReturn(
-				CONCENTRATION_UNIT + i);
+		Mockito.when(substance.getConcentration()).thenReturn(CONCENTRATION + i);
+		Mockito.when(substance.getConcentrationUnit()).thenReturn(CONCENTRATION_UNIT + i);
 		Mockito.when(substance.getDescription()).thenReturn(DESCRIPTION + i);
 		Mockito.when(substance.getMass()).thenReturn(MASS + i);
 		Mockito.when(substance.getMassUnit()).thenReturn(MASS_UNIT + i);
@@ -414,10 +388,8 @@ public class MiapeMocker {
 	public static Substance mockSubstance(int i) {
 		Substance substance = Mockito.mock(Substance.class);
 		Mockito.when(substance.getName()).thenReturn(SUBSTANCE_NAME + i);
-		Mockito.when(substance.getConcentration())
-				.thenReturn(CONCENTRATION + i);
-		Mockito.when(substance.getConcentrationUnit()).thenReturn(
-				CONCENTRATION_UNIT + i);
+		Mockito.when(substance.getConcentration()).thenReturn(CONCENTRATION + i);
+		Mockito.when(substance.getConcentrationUnit()).thenReturn(CONCENTRATION_UNIT + i);
 		Mockito.when(substance.getDescription()).thenReturn(DESCRIPTION + i);
 		Mockito.when(substance.getMass()).thenReturn(MASS + i);
 		Mockito.when(substance.getMassUnit()).thenReturn(MASS_UNIT + i);
@@ -430,10 +402,8 @@ public class MiapeMocker {
 	public static BufferComponent mockBufferComponent(int i) {
 		BufferComponent substance = Mockito.mock(BufferComponent.class);
 		Mockito.when(substance.getName()).thenReturn(COMPONENT_NAME);
-		Mockito.when(substance.getConcentration())
-				.thenReturn(CONCENTRATION + i);
-		Mockito.when(substance.getConcentrationUnit()).thenReturn(
-				CONCENTRATION_UNIT + i);
+		Mockito.when(substance.getConcentration()).thenReturn(CONCENTRATION + i);
+		Mockito.when(substance.getConcentrationUnit()).thenReturn(CONCENTRATION_UNIT + i);
 		Mockito.when(substance.getDescription()).thenReturn(DESCRIPTION + i);
 		Mockito.when(substance.getMass()).thenReturn(MASS + i);
 		Mockito.when(substance.getMassUnit()).thenReturn(MASS_UNIT + i);
@@ -447,8 +417,7 @@ public class MiapeMocker {
 		DirectDetectionAgent agent = Mockito.mock(DirectDetectionAgent.class);
 		Mockito.when(agent.getName()).thenReturn(SUBSTANCE_NAME + i);
 		Mockito.when(agent.getConcentration()).thenReturn(CONCENTRATION + i);
-		Mockito.when(agent.getConcentrationUnit()).thenReturn(
-				CONCENTRATION_UNIT + i);
+		Mockito.when(agent.getConcentrationUnit()).thenReturn(CONCENTRATION_UNIT + i);
 		Mockito.when(agent.getDescription()).thenReturn(DESCRIPTION + i);
 		Mockito.when(agent.getMass()).thenReturn(MASS + i);
 		Mockito.when(agent.getMassUnit()).thenReturn(MASS_UNIT + i);
@@ -459,12 +428,10 @@ public class MiapeMocker {
 	}
 
 	public static IndirectDetectionAgent mockIndirectDetectionAgent(int i) {
-		IndirectDetectionAgent agent = Mockito
-				.mock(IndirectDetectionAgent.class);
+		IndirectDetectionAgent agent = Mockito.mock(IndirectDetectionAgent.class);
 		Mockito.when(agent.getName()).thenReturn(SUBSTANCE_NAME + i);
 		Mockito.when(agent.getConcentration()).thenReturn(CONCENTRATION + i);
-		Mockito.when(agent.getConcentrationUnit()).thenReturn(
-				CONCENTRATION_UNIT + i);
+		Mockito.when(agent.getConcentrationUnit()).thenReturn(CONCENTRATION_UNIT + i);
 		Mockito.when(agent.getDescription()).thenReturn(DESCRIPTION + i);
 		Mockito.when(agent.getMass()).thenReturn(MASS + i);
 		Mockito.when(agent.getMassUnit()).thenReturn(MASS_UNIT + i);
@@ -475,7 +442,7 @@ public class MiapeMocker {
 	}
 
 	public static Set<Buffer> mockBuffers(int i) {
-		Set<Buffer> buffers = new HashSet<Buffer>();
+		Set<Buffer> buffers = new THashSet<Buffer>();
 		buffers.add(mockBuffer(i));
 		return buffers;
 	}
@@ -483,10 +450,9 @@ public class MiapeMocker {
 	public static Buffer mockBuffer(int i) {
 		Buffer buffer = Mockito.mock(Buffer.class);
 		Mockito.when(buffer.getName()).thenReturn(BUFFER_NAME + i);
-		Mockito.when(buffer.getDescription())
-				.thenReturn(BUFFER_DESCRIPTION + i);
+		Mockito.when(buffer.getDescription()).thenReturn(BUFFER_DESCRIPTION + i);
 		Mockito.when(buffer.getType()).thenReturn(BUFFER_TYPE + i);
-		Set<BufferComponent> substances = new HashSet<BufferComponent>();
+		Set<BufferComponent> substances = new THashSet<BufferComponent>();
 		substances.add(mockBufferComponent(88));
 		Mockito.when(buffer.getComponents()).thenReturn(substances);
 
@@ -508,92 +474,62 @@ public class MiapeMocker {
 
 	public static MSContact mockMSContact() {
 		MSContact contact = Mockito.mock(MSContact.class);
-		Mockito.when(contact.getAddress()).thenReturn(
-				MiapeMocker.CONTACT_ADDRESS);
-		Mockito.when(contact.getCountry()).thenReturn(
-				MiapeMocker.CONTACT_COUNTRY);
+		Mockito.when(contact.getAddress()).thenReturn(MiapeMocker.CONTACT_ADDRESS);
+		Mockito.when(contact.getCountry()).thenReturn(MiapeMocker.CONTACT_COUNTRY);
 		Mockito.when(contact.getCP()).thenReturn(MiapeMocker.CONTACT_CP);
-		Mockito.when(contact.getDepartment()).thenReturn(
-				MiapeMocker.CONTACT_DEPARTMENT);
-		Mockito.when(contact.getEmail()).thenReturn(
-				MiapeMocker.CONTACT_EMAIL_MS);
+		Mockito.when(contact.getDepartment()).thenReturn(MiapeMocker.CONTACT_DEPARTMENT);
+		Mockito.when(contact.getEmail()).thenReturn(MiapeMocker.CONTACT_EMAIL_MS);
 		Mockito.when(contact.getFax()).thenReturn(MiapeMocker.CONTACT_FAX);
 		// Mockito.when(contact.getInstitution()).thenReturn(MiapeMocker.CONTACT_INSTITUTION);
-		Mockito.when(contact.getLastName()).thenReturn(
-				MiapeMocker.CONTACT_LAST_N_AME);
-		Mockito.when(contact.getLocality()).thenReturn(
-				MiapeMocker.CONTACT_LOCALTY);
+		Mockito.when(contact.getLastName()).thenReturn(MiapeMocker.CONTACT_LAST_N_AME);
+		Mockito.when(contact.getLocality()).thenReturn(MiapeMocker.CONTACT_LOCALTY);
 		Mockito.when(contact.getName()).thenReturn(MiapeMocker.CONTACT_NAME);
-		Mockito.when(contact.getTelephone()).thenReturn(
-				MiapeMocker.CONTACT_TELEPHONE);
-		Mockito.when(contact.getPosition()).thenReturn(
-				MiapeMocker.CONTACT_POSITION_MS);
+		Mockito.when(contact.getTelephone()).thenReturn(MiapeMocker.CONTACT_TELEPHONE);
+		Mockito.when(contact.getPosition()).thenReturn(MiapeMocker.CONTACT_POSITION_MS);
 		return contact;
 	}
 
 	public static GEContact mockGEContact() {
 		GEContact contact = Mockito.mock(GEContact.class);
-		Mockito.when(contact.getAddress()).thenReturn(
-				MiapeMocker.CONTACT_ADDRESS);
-		Mockito.when(contact.getCountry()).thenReturn(
-				MiapeMocker.CONTACT_COUNTRY);
+		Mockito.when(contact.getAddress()).thenReturn(MiapeMocker.CONTACT_ADDRESS);
+		Mockito.when(contact.getCountry()).thenReturn(MiapeMocker.CONTACT_COUNTRY);
 		Mockito.when(contact.getCP()).thenReturn(MiapeMocker.CONTACT_CP);
-		Mockito.when(contact.getDepartment()).thenReturn(
-				MiapeMocker.CONTACT_DEPARTMENT);
-		Mockito.when(contact.getEmail()).thenReturn(
-				MiapeMocker.CONTACT_EMAIL_GE);
+		Mockito.when(contact.getDepartment()).thenReturn(MiapeMocker.CONTACT_DEPARTMENT);
+		Mockito.when(contact.getEmail()).thenReturn(MiapeMocker.CONTACT_EMAIL_GE);
 		Mockito.when(contact.getFax()).thenReturn(MiapeMocker.CONTACT_FAX);
-		Mockito.when(contact.getInstitution()).thenReturn(
-				MiapeMocker.CONTACT_INSTITUTION);
-		Mockito.when(contact.getLastName()).thenReturn(
-				MiapeMocker.CONTACT_LAST_N_AME);
-		Mockito.when(contact.getLocality()).thenReturn(
-				MiapeMocker.CONTACT_LOCALTY);
+		Mockito.when(contact.getInstitution()).thenReturn(MiapeMocker.CONTACT_INSTITUTION);
+		Mockito.when(contact.getLastName()).thenReturn(MiapeMocker.CONTACT_LAST_N_AME);
+		Mockito.when(contact.getLocality()).thenReturn(MiapeMocker.CONTACT_LOCALTY);
 		Mockito.when(contact.getName()).thenReturn(MiapeMocker.CONTACT_NAME);
-		Mockito.when(contact.getTelephone()).thenReturn(
-				MiapeMocker.CONTACT_TELEPHONE);
-		Mockito.when(contact.getPosition()).thenReturn(
-				MiapeMocker.CONTACT_POSITION_GE);
+		Mockito.when(contact.getTelephone()).thenReturn(MiapeMocker.CONTACT_TELEPHONE);
+		Mockito.when(contact.getPosition()).thenReturn(MiapeMocker.CONTACT_POSITION_GE);
 
 		return contact;
 	}
 
 	public static GIAdditionalInformation mockGIAdditionalInformation(int i) {
-		GIAdditionalInformation hibAdditionalInformation = Mockito
-				.mock(GIAdditionalInformation.class);
-		Mockito.when(hibAdditionalInformation.getName()).thenReturn(
-				MiapeGiMocker.ADDINFO_NAME + i);
-		Mockito.when(hibAdditionalInformation.getValue()).thenReturn(
-				MiapeGiMocker.ADDINFO_VALUE + i);
+		GIAdditionalInformation hibAdditionalInformation = Mockito.mock(GIAdditionalInformation.class);
+		Mockito.when(hibAdditionalInformation.getName()).thenReturn(MiapeGiMocker.ADDINFO_NAME + i);
+		Mockito.when(hibAdditionalInformation.getValue()).thenReturn(MiapeGiMocker.ADDINFO_VALUE + i);
 		return hibAdditionalInformation;
 	}
 
 	public static MSAdditionalInformation mockMSAdditionalInformation(int i) {
-		MSAdditionalInformation hibAdditionalInformation = Mockito
-				.mock(MSAdditionalInformation.class);
-		Mockito.when(hibAdditionalInformation.getName()).thenReturn(
-				MiapeMsMocker.ADDINFO_NAME + i);
-		Mockito.when(hibAdditionalInformation.getValue()).thenReturn(
-				MiapeMsMocker.ADDINFO_VALUE + i);
+		MSAdditionalInformation hibAdditionalInformation = Mockito.mock(MSAdditionalInformation.class);
+		Mockito.when(hibAdditionalInformation.getName()).thenReturn(MiapeMsMocker.ADDINFO_NAME + i);
+		Mockito.when(hibAdditionalInformation.getValue()).thenReturn(MiapeMsMocker.ADDINFO_VALUE + i);
 		return hibAdditionalInformation;
 	}
 
 	public static ResultingData mockResultingData(int i) {
 		ResultingData resultingData = Mockito.mock(ResultingData.class);
-		Mockito.when(resultingData.getName()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_NAME);
-		Mockito.when(resultingData.getAdditionalUri()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_ADDURI);
-		Mockito.when(resultingData.getDataFileType()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_RAWFILETYPE);
-		Mockito.when(resultingData.getDataFileUri()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_RAWFILEURI);
-		Mockito.when(resultingData.getSRMDescriptor()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_SRM_DESCRIPTOR);
-		Mockito.when(resultingData.getSRMType()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_SRM_TYPE);
-		Mockito.when(resultingData.getSRMUri()).thenReturn(
-				MiapeMsMocker.RESULTING_DATA_SRM_URI);
+		Mockito.when(resultingData.getName()).thenReturn(MiapeMsMocker.RESULTING_DATA_NAME);
+		Mockito.when(resultingData.getAdditionalUri()).thenReturn(MiapeMsMocker.RESULTING_DATA_ADDURI);
+		Mockito.when(resultingData.getDataFileType()).thenReturn(MiapeMsMocker.RESULTING_DATA_RAWFILETYPE);
+		Mockito.when(resultingData.getDataFileUri()).thenReturn(MiapeMsMocker.RESULTING_DATA_RAWFILEURI);
+		Mockito.when(resultingData.getSRMDescriptor()).thenReturn(MiapeMsMocker.RESULTING_DATA_SRM_DESCRIPTOR);
+		Mockito.when(resultingData.getSRMType()).thenReturn(MiapeMsMocker.RESULTING_DATA_SRM_TYPE);
+		Mockito.when(resultingData.getSRMUri()).thenReturn(MiapeMsMocker.RESULTING_DATA_SRM_URI);
 
 		// Mockito.when(resultingData.getSpectrumDescriptions()).thenReturn(MiapeMsMocker.SPECTRUM_DESCRIPTIONS);
 

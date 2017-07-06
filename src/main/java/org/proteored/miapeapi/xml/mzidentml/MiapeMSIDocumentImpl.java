@@ -5,8 +5,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -81,12 +79,14 @@ import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
-import edu.scripps.yates.cores.SystemCoreManager;
-import edu.scripps.yates.pi.ParIterator;
-import edu.scripps.yates.pi.ParIteratorFactory;
-import edu.scripps.yates.pi.ParIterator.Schedule;
-import edu.scripps.yates.pi.reductions.Reducible;
-import edu.scripps.yates.pi.reductions.Reduction;
+import edu.scripps.yates.utilities.cores.SystemCoreManager;
+import edu.scripps.yates.utilities.pi.ParIterator;
+import edu.scripps.yates.utilities.pi.ParIteratorFactory;
+import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
+import edu.scripps.yates.utilities.pi.reductions.Reducible;
+import edu.scripps.yates.utilities.pi.reductions.Reduction;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private int msDocumentID;
@@ -105,17 +105,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private final List<FuGECommonAuditContactType> mzIdentContactList;
 	private final List<PSIPIAnalysisSearchSpectrumIdentificationType> spectrumIdentifications;
 
-	private final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
-	private final Set<InputParameter> inputParameters = new HashSet<InputParameter>();
-	private final Set<Software> msiSoftwares = new HashSet<Software>();
-	private final Set<InputDataSet> inputDataSets = new HashSet<InputDataSet>();
-	private final Set<Validation> validations = new HashSet<Validation>();
+	private final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
+	private final Set<InputParameter> inputParameters = new THashSet<InputParameter>();
+	private final Set<Software> msiSoftwares = new THashSet<Software>();
+	private final Set<InputDataSet> inputDataSets = new THashSet<InputDataSet>();
+	private final Set<Validation> validations = new THashSet<Validation>();
 	private final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
 	public String url;
 	private String generatedFileURI;
 	private final String mzIdentMLFileName;
 	// Map<ProteinACC, Protein>
-	private final Map<String, IdentifiedProtein> proteinHash = new HashMap<String, IdentifiedProtein>();
+	private final Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 
 	public MiapeMSIDocumentImpl(PSIPIMainMzIdentMLType mzIdentML, ControlVocabularyManager cvManager,
 			String mzIdentMLFileName, String projectName, boolean processInParallel) {
@@ -162,13 +162,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 * @param mzIdentMLUnmarshaller
 	 */
 	private void processMzIdentMLInParallel() {
-		Map<String, InputDataSet> inputDataSetMap = new HashMap<String, InputDataSet>();
+		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 
 		String spectrumIdentificationSoftwareID = "";
 		// Main loop over SpectrumIdentifications elements
 		for (PSIPIAnalysisSearchSpectrumIdentificationType spectrumIdent : mzIdentML.getAnalysisCollection()
 				.getSpectrumIdentification()) {
-			Map<String, IdentifiedProtein> proteinHash = new HashMap<String, IdentifiedProtein>();
+			Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 
 			log.info("Processing SI: " + spectrumIdent.getId());
 			PSIPIAnalysisSearchSpectrumIdentificationProtocolType spectrumIdentProtocol = getSpectrumIdentificationProtocol(
@@ -230,7 +230,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			log.info("Processing " + spectrumIdentificationResult.size() + " SpectrumIdentificationResults using "
 					+ threadCount + " cores");
 			Reducible<List<IdentifiedPeptide>> reduciblePeptides = new Reducible<List<IdentifiedPeptide>>();
-			Map<String, InputData> inputDataHash = new HashMap<String, InputData>();
+			Map<String, InputData> inputDataHash = new THashMap<String, InputData>();
 			MapSync<String, InputData> syncInputDataHash = new MapSync<String, InputData>(inputDataHash);
 			Reducible<Map<String, IdentifiedProtein>> reducibleProteinHash = new Reducible<Map<String, IdentifiedProtein>>();
 
@@ -270,7 +270,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				@Override
 				public Map<String, IdentifiedProtein> reduce(Map<String, IdentifiedProtein> first,
 						Map<String, IdentifiedProtein> second) {
-					Map<String, IdentifiedProtein> map = new HashMap<String, IdentifiedProtein>();
+					Map<String, IdentifiedProtein> map = new THashMap<String, IdentifiedProtein>();
 
 					List<Map<String, IdentifiedProtein>> listofmaps = new ArrayList<Map<String, IdentifiedProtein>>();
 					listofmaps.add(first);
@@ -343,7 +343,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 		// for the protein detection protocol and the peptide identification
 		// detection protocol
-		HashMap<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(
+		Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(
 				mzIdentML.getAnalysisProtocolCollection());
 		if (protocolsBySoftware != null) {
 			for (List<Object> list : protocolsBySoftware.values()) {
@@ -385,7 +385,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 */
 	private void processMzIdentML() {
 		String spectrumIdentificationSoftwareID = "";
-		Map<String, InputDataSet> inputDataSetMap = new HashMap<String, InputDataSet>();
+		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 		// Main loop over SpectrumIdentifications elements
 		for (PSIPIAnalysisSearchSpectrumIdentificationType spectrumIdent : mzIdentML.getAnalysisCollection()
 				.getSpectrumIdentification()) {
@@ -440,7 +440,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			proteinSets.add(proteinSet);
 
 			// Map<spectraDataXML.ID, InputData
-			Map<String, InputData> inputDataHash = new HashMap<String, InputData>();
+			Map<String, InputData> inputDataHash = new THashMap<String, InputData>();
 
 			List<PSIPIAnalysisSearchSpectrumIdentificationResultType> spectrumIdentificationResult = spectIdentListXML
 					.getSpectrumIdentificationResult();
@@ -475,7 +475,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 				// log.info(spectIdentResultXML.getSpectrumIdentificationItem().size()
 				// + " SpectrumIdentificationItems");
-				Set<PeptideScore> scoresFromFirstPeptide = new HashSet<PeptideScore>();
+				Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
 
 				List<PSIPIAnalysisSearchSpectrumIdentificationItemType> spectrumIdentificationItems = spectIdentResultXML
 						.getSpectrumIdentificationItem();
@@ -565,7 +565,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 		// for the protein detection protocol and the peptide identification
 		// detection protocol
-		HashMap<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(
+		Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(
 				mzIdentML.getAnalysisProtocolCollection());
 		if (protocolsBySoftware != null) {
 			for (List<Object> list : protocolsBySoftware.values()) {
@@ -635,9 +635,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		return null;
 	}
 
-	private HashMap<String, List<Object>> getProtocolsBySoftware(
+	private Map<String, List<Object>> getProtocolsBySoftware(
 			AnalysisProtocolCollectionType analysisProtocolCollection) {
-		HashMap<String, List<Object>> ret = new HashMap<String, List<Object>>();
+		Map<String, List<Object>> ret = new THashMap<String, List<Object>>();
 		if (analysisProtocolCollection != null) {
 			final List<PSIPIAnalysisSearchSpectrumIdentificationProtocolType> spectrumIdentificationProtocol = analysisProtocolCollection
 					.getSpectrumIdentificationProtocol();
@@ -671,7 +671,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Set<String> getProtocolsBySoftwareIDs(AnalysisProtocolCollectionType analysisProtocolCollection2) {
-		HashSet<String> ret = new HashSet<String>();
+		Set<String> ret = new THashSet<String>();
 		if (analysisProtocolCollection2 != null) {
 			final List<PSIPIAnalysisSearchSpectrumIdentificationProtocolType> spectrumIdentificationProtocol = analysisProtocolCollection2
 					.getSpectrumIdentificationProtocol();
@@ -987,13 +987,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		 * Map<String, PSIPIPolypeptidePeptideType> mapPeptides =
 		 * initMapPeptides(mzIdentML.getSequenceCollection().getPeptide());
 		 * Map<String, PSIPIAnalysisSearchSpectrumIdentificationItemType>
-		 * mapEvidenceSpectrum = new HashMap<String,
+		 * mapEvidenceSpectrum = new THashMap<String,
 		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>(); Map<String,
 		 * PSIPIAnalysisSearchDBSequenceType> mapEvidenceProtein = new
 		 * HashMap<String, PSIPIAnalysisSearchDBSequenceType>();
 		 * Map<PSIPIPolypeptidePeptideType,
 		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>
-		 * mapPeptidesSpectrum = new HashMap<PSIPIPolypeptidePeptideType,
+		 * mapPeptidesSpectrum = new THashMap<PSIPIPolypeptidePeptideType,
 		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>();
 		 * initPepEvidenceMap(mapPeptides, mapEvidenceSpectrum,
 		 * mapPeptidesSpectrum, mapEvidenceProtein, mapProteins); if
@@ -1169,7 +1169,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Set<MSIAdditionalInformation> getAdditionalInformations() {
-		Set<MSIAdditionalInformation> addInfos = new HashSet<MSIAdditionalInformation>();
+		Set<MSIAdditionalInformation> addInfos = new THashSet<MSIAdditionalInformation>();
 
 		// Capture information about the samples
 		if (mzIdentML.getAnalysisSampleCollection() != null) {

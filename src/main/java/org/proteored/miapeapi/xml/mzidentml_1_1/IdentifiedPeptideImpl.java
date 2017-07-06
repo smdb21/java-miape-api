@@ -2,7 +2,6 @@ package org.proteored.miapeapi.xml.mzidentml_1_1;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +24,7 @@ import org.proteored.miapeapi.xml.mzidentml_1_1.util.MzidentmlControlVocabularyX
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractParam;
 import uk.ac.ebi.jmzidml.model.mzidml.CvParam;
 import uk.ac.ebi.jmzidml.model.mzidml.DBSequence;
@@ -178,7 +178,7 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 
 	public static Set<PeptideScore> getScoresFromThisPeptide(SpectrumIdentificationItem spectrumItemXML,
 			Peptide peptideXML, ControlVocabularyManager cvManager) {
-		Set<PeptideScore> peptideScores = new HashSet<PeptideScore>();
+		Set<PeptideScore> peptideScores = new THashSet<PeptideScore>();
 
 		// Scores in the SpectrumIdentificationItem
 		List<AbstractParam> params = spectrumItemXML.getParamGroup();
@@ -217,7 +217,7 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 
 		}
 		if (peptideXML != null) {
-			Set<PeptideModification> modifications = new HashSet<PeptideModification>();
+			Set<PeptideModification> modifications = new THashSet<PeptideModification>();
 			// Modifications
 			List<Modification> xmlModifications = peptideXML.getModification();
 			if (xmlModifications != null) {

@@ -1,6 +1,6 @@
 package org.proteored.miapeapi.factories.msi;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
@@ -13,7 +13,7 @@ public class IdentifiedProteinSetImpl implements IdentifiedProteinSet {
 	private final String name;
 	private final InputParameter inputParameter;
 	private final Set<InputDataSet> inputDataSets;
-	private final HashMap<String, IdentifiedProtein> identifiedProteins;
+	private final Map<String, IdentifiedProtein> identifiedProteins;
 	private final String fileLocation;
 
 	public IdentifiedProteinSetImpl(IdentifiedProteinSetBuilder builder) {
@@ -30,7 +30,7 @@ public class IdentifiedProteinSetImpl implements IdentifiedProteinSet {
 	}
 
 	@Override
-	public HashMap<String, IdentifiedProtein> getIdentifiedProteins() {
+	public Map<String, IdentifiedProtein> getIdentifiedProteins() {
 		return identifiedProteins;
 	}
 

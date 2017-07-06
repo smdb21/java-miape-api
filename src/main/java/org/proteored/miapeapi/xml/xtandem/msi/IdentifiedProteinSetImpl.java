@@ -1,36 +1,33 @@
 package org.proteored.miapeapi.xml.xtandem.msi;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.proteored.miapeapi.cv.ControlVocabularyManager;
-import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProteinSet;
 import org.proteored.miapeapi.interfaces.msi.InputDataSet;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
+
+import gnu.trove.map.hash.THashMap;
 
 public class IdentifiedProteinSetImpl implements IdentifiedProteinSet {
 
 	private final Set<InputDataSet> inputDataSets;
 	private final InputParameter inputParameter;
 	private final String fileLocation;
-	private final HashMap<String, IdentifiedProtein> identifiedProteinList;
-	private HashMap<String, IdentifiedPeptide> peptideSet;
-	private final ControlVocabularyManager cvManager;
+	private final Map<String, IdentifiedProtein> identifiedProteinList;
+	// private Map<String, IdentifiedPeptide> peptideSet;
+	// private final ControlVocabularyManager cvManager;
 
-	public IdentifiedProteinSetImpl(Set<InputDataSet> inputDataSets, InputParameter inputParameter,
-			String fileLocation, Collection<IdentifiedProtein> proteinCollection,
-			ControlVocabularyManager cvManager) {
+	public IdentifiedProteinSetImpl(Set<InputDataSet> inputDataSets, InputParameter inputParameter, String fileLocation,
+			Collection<IdentifiedProtein> proteinCollection) {
 
 		this.inputDataSets = inputDataSets;
 		this.inputParameter = inputParameter;
 		this.fileLocation = fileLocation;
 
-		this.cvManager = cvManager;
-
-		this.identifiedProteinList = new HashMap<String, IdentifiedProtein>();
+		this.identifiedProteinList = new THashMap<String, IdentifiedProtein>();
 		for (IdentifiedProtein identifiedProtein : proteinCollection) {
 			this.identifiedProteinList.put(identifiedProtein.getAccession(), identifiedProtein);
 		}
@@ -69,7 +66,7 @@ public class IdentifiedProteinSetImpl implements IdentifiedProteinSet {
 	}
 
 	@Override
-	public HashMap<String, IdentifiedProtein> getIdentifiedProteins() {
+	public Map<String, IdentifiedProtein> getIdentifiedProteins() {
 		if (!identifiedProteinList.isEmpty())
 			return identifiedProteinList;
 		return null;

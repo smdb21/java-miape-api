@@ -3,9 +3,8 @@ package org.proteored.miapeapi.experiment.model;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -21,6 +20,10 @@ import org.proteored.miapeapi.interfaces.ms.Spectrometer;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.spring.SpringHandler;
+
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class ExperimentList implements IdentificationSet<Experiment> {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -145,9 +148,9 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	 * @return
 	 */
 	@Override
-	public HashMap<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep) {
+	public Map<String, PeptideOccurrence> getPeptideOccurrenceList(boolean distinguishModPep) {
 		log.info("Getting peptide occurrence list from experiment list:" + getName());
-		final HashMap<String, PeptideOccurrence> peptideOcurrenceList = dataManager
+		final Map<String, PeptideOccurrence> peptideOcurrenceList = dataManager
 				.getPeptideOcurrenceList(distinguishModPep);
 		log.info("returning " + peptideOcurrenceList.size() + " different peptides from experiment list: " + getName());
 		return peptideOcurrenceList;
@@ -202,7 +205,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public HashMap<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
+	public Map<String, ProteinGroupOccurrence> getProteinGroupOccurrenceList() {
 		return dataManager.getProteinGroupOccurrenceList();
 	}
 
@@ -331,7 +334,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public HashMap<Integer, Integer> getModificationOccurrenceDistribution(String modifs) {
+	public TIntIntHashMap getModificationOccurrenceDistribution(String modifs) {
 		return dataManager.getModificationOccurrenceDistribution(modifs);
 	}
 
@@ -341,22 +344,22 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public int getProteinGroupTP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupTP(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupFN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupFN(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupTN(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupTN(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupTN(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
 	@Override
-	public int getProteinGroupFP(HashSet<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
+	public int getProteinGroupFP(Set<String> truePositiveProteinACCs, boolean countNonConclusiveProteins) {
 		return dataManager.getProteinGroupFP(truePositiveProteinACCs, countNonConclusiveProteins);
 	}
 
@@ -415,7 +418,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public HashMap<Integer, Integer> getMissedCleavagesOccurrenceDistribution() {
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
 		return dataManager.getMissedCleavagesOccurrenceDistribution();
 	}
 
@@ -527,7 +530,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 
 	public boolean validFDRCalculation() {
 		if (experiments != null) {
-			HashMap<String, List<String>> scoreNames = new HashMap<String, List<String>>();
+			Map<String, List<String>> scoreNames = new THashMap<String, List<String>>();
 			for (Experiment idSet : experiments) {
 
 				Experiment exp = idSet;
@@ -605,22 +608,22 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public int getPeptideTP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideTP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideTP(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideFN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideFN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideFN(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideTN(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideTN(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideTN(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
 	@Override
-	public int getPeptideFP(HashSet<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
+	public int getPeptideFP(Set<String> positivePeptideSequences, boolean distinguisModificatedPeptides) {
 		return dataManager.getPeptideFP(positivePeptideSequences, distinguisModificatedPeptides);
 	}
 
@@ -669,11 +672,11 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return ret;
 	}
 
-	public HashMap<Replicate, List<ResultingData>> getPeakListResultingDataMapByReplicate() {
-		HashMap<Replicate, List<ResultingData>> ret = new HashMap<Replicate, List<ResultingData>>();
+	public Map<Replicate, List<ResultingData>> getPeakListResultingDataMapByReplicate() {
+		Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
 		if (getExperiments() != null) {
 			for (Experiment exp : getExperiments()) {
-				HashMap<Replicate, List<ResultingData>> resultingDataMap = exp.getPeakListResultingDataMap();
+				Map<Replicate, List<ResultingData>> resultingDataMap = exp.getPeakListResultingDataMap();
 				if (resultingDataMap != null && !resultingDataMap.isEmpty()) {
 					for (Replicate replicateKey : resultingDataMap.keySet()) {
 						if (ret.containsKey(replicateKey)) {
@@ -690,11 +693,11 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return null;
 	}
 
-	public HashMap<Replicate, List<ResultingData>> getRawFileResultingDataMapByReplicate() {
-		HashMap<Replicate, List<ResultingData>> ret = new HashMap<Replicate, List<ResultingData>>();
+	public Map<Replicate, List<ResultingData>> getRawFileResultingDataMapByReplicate() {
+		Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
 		if (getExperiments() != null) {
 			for (Experiment exp : getExperiments()) {
-				HashMap<Replicate, List<ResultingData>> resultingDataMap = exp.getRawFileResultingDataMap();
+				Map<Replicate, List<ResultingData>> resultingDataMap = exp.getRawFileResultingDataMap();
 				if (resultingDataMap != null && !resultingDataMap.isEmpty()) {
 					for (Replicate replicateKey : resultingDataMap.keySet()) {
 						if (ret.containsKey(replicateKey)) {
@@ -711,11 +714,11 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return null;
 	}
 
-	public HashMap<Experiment, List<ResultingData>> getPeakListResultingDataMapByExperiment() {
-		HashMap<Experiment, List<ResultingData>> ret = new HashMap<Experiment, List<ResultingData>>();
+	public Map<Experiment, List<ResultingData>> getPeakListResultingDataMapByExperiment() {
+		Map<Experiment, List<ResultingData>> ret = new THashMap<Experiment, List<ResultingData>>();
 		if (getExperiments() != null) {
 			for (Experiment exp : getExperiments()) {
-				HashMap<Replicate, List<ResultingData>> resultingDataMap = exp.getPeakListResultingDataMap();
+				Map<Replicate, List<ResultingData>> resultingDataMap = exp.getPeakListResultingDataMap();
 				if (resultingDataMap != null && !resultingDataMap.isEmpty()) {
 					for (List<ResultingData> resultingDatas : resultingDataMap.values()) {
 						ret.put(exp, resultingDatas);
@@ -728,11 +731,11 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return null;
 	}
 
-	public HashMap<Experiment, List<ResultingData>> getRawFileResultingDataMapByExperiment() {
-		HashMap<Experiment, List<ResultingData>> ret = new HashMap<Experiment, List<ResultingData>>();
+	public Map<Experiment, List<ResultingData>> getRawFileResultingDataMapByExperiment() {
+		Map<Experiment, List<ResultingData>> ret = new THashMap<Experiment, List<ResultingData>>();
 		if (getExperiments() != null) {
 			for (Experiment exp : getExperiments()) {
-				HashMap<Replicate, List<ResultingData>> resultingDataMap = exp.getRawFileResultingDataMap();
+				Map<Replicate, List<ResultingData>> resultingDataMap = exp.getRawFileResultingDataMap();
 				if (resultingDataMap != null && !resultingDataMap.isEmpty()) {
 					for (List<ResultingData> resultingDatas : resultingDataMap.values()) {
 						ret.put(exp, resultingDatas);
@@ -745,8 +748,8 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 		return null;
 	}
 
-	public HashMap<Replicate, List<String>> getMSIGeneratedFilesByReplicate() {
-		HashMap<Replicate, List<String>> ret = new HashMap<Replicate, List<String>>();
+	public Map<Replicate, List<String>> getMSIGeneratedFilesByReplicate() {
+		Map<Replicate, List<String>> ret = new THashMap<Replicate, List<String>>();
 		if (getExperiments() != null) {
 			for (Experiment exp : getExperiments()) {
 				for (Replicate rep : exp.getReplicates()) {
@@ -788,7 +791,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	@Override
 	public Set<Spectrometer> getSpectrometers() {
 		final List<Experiment> experiments = getExperiments();
-		Set<Spectrometer> spectrometers = new HashSet<Spectrometer>();
+		Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
 		for (Experiment exp : experiments) {
 			spectrometers.addAll(exp.getSpectrometers());
 		}
@@ -798,7 +801,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	@Override
 	public Set<InputParameter> getInputParameters() {
 		final List<Experiment> experiments = getExperiments();
-		Set<InputParameter> inputParameters = new HashSet<InputParameter>();
+		Set<InputParameter> inputParameters = new THashSet<InputParameter>();
 		for (Experiment exp : experiments) {
 			inputParameters.addAll(exp.getInputParameters());
 		}
@@ -811,7 +814,7 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public HashMap<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep) {
+	public Map<String, PeptideOccurrence> getPeptideChargeOccurrenceList(boolean distinguishModPep) {
 		return dataManager.getPeptideChargeOcurrenceList(distinguishModPep);
 	}
 

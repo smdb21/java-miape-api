@@ -4,8 +4,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -26,10 +26,11 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.Atom;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
 public class ExtendedIdentifiedPeptide extends IdentificationItem implements IdentifiedPeptide {
-	private static HashMap<String, List<String>> sequenceConversion = new HashMap<String, List<String>>();
+	private static Map<String, List<String>> sequenceConversion = new THashMap<String, List<String>>();
 
 	private final IdentifiedPeptide peptide;
 	private final String modificationString;
@@ -177,7 +178,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		numMissedClieavages = numMiss;
 
 		// if (this.peptide.getIdentifiedProteins() != null) {
-		// Set<Integer> proteinIDs = new HashSet<Integer>();
+		// TIntHashSet proteinIDs = new TIntHashSet();
 		// proteins = new ArrayList<ExtendedIdentifiedProtein>();
 		// for (IdentifiedProtein protein :
 		// this.peptide.getIdentifiedProteins()) {

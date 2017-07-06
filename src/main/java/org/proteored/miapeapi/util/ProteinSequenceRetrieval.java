@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +29,7 @@ import edu.scripps.yates.annotations.uniprot.UniprotEntryUtil;
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
 import edu.scripps.yates.annotations.uniprot.xml.Entry;
 import edu.scripps.yates.utilities.fasta.FastaParser;
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DatabaseInfo;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfConnException;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfException;
@@ -41,7 +41,7 @@ public class ProteinSequenceRetrieval {
 	private static final WSDBFetchServerProxy ws = new WSDBFetchServerProxy();
 	private static DatabaseInfo[] databases;
 	private static String[] proteinDBs = { "uniprotkb", "ipi" };
-	private static HashMap<String, String> sequenceMap = new HashMap<String, String>();
+	private static Map<String, String> sequenceMap = new THashMap<String, String>();
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private static JAXBContext jc;
@@ -62,7 +62,7 @@ public class ProteinSequenceRetrieval {
 
 		List<String> proteinAccs = new ArrayList<String>();
 		proteinAccs.add(proteinAcc);
-		HashMap<String, String> proteinSequence = getProteinSequence(proteinAccs, retrieveFromInternetIfNotCached, upr);
+		Map<String, String> proteinSequence = getProteinSequence(proteinAccs, retrieveFromInternetIfNotCached, upr);
 		return proteinSequence.get(proteinAcc);
 
 	}
@@ -73,9 +73,9 @@ public class ProteinSequenceRetrieval {
 
 	}
 
-	public static HashMap<String, String> getProteinSequence(List<String> proteinAccs,
+	public static Map<String, String> getProteinSequence(List<String> proteinAccs,
 			boolean retrieveFromInternetIfNotCached, UniprotProteinLocalRetriever upr) {
-		HashMap<String, String> ret = new HashMap<String, String>();
+		Map<String, String> ret = new THashMap<String, String>();
 
 		try {
 			List<String> uniprotAccs = new ArrayList<String>();
@@ -143,7 +143,7 @@ public class ProteinSequenceRetrieval {
 						+ csvNcbiAccs;
 				// String seqXML = URLDownloader.downloadURL(new URL(
 				// URLParamEncoder.encode(urlText)));
-				HashMap<String, String> seqs = parseSeqXMLFromNCBI(urlText);
+				Map<String, String> seqs = parseSeqXMLFromNCBI(urlText);
 				for (String proteinAcc : seqs.keySet()) {
 					String seq = seqs.get(proteinAcc);
 					sequenceMap.put(proteinAcc, seq);
@@ -161,8 +161,8 @@ public class ProteinSequenceRetrieval {
 		return ret;
 	}
 
-	private static HashMap<String, String> parseSeqXMLFromNCBI(String seqXML) {
-		HashMap<String, String> ret = new HashMap<String, String>();
+	private static Map<String, String> parseSeqXMLFromNCBI(String seqXML) {
+		Map<String, String> ret = new THashMap<String, String>();
 
 		try {
 

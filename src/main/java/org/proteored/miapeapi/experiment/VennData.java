@@ -3,18 +3,20 @@ package org.proteored.miapeapi.experiment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public abstract class VennData<T> {
 	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private static int count = 0;
-	private final HashMap<T, Object> hash1 = new HashMap<T, Object>();
-	private final HashMap<T, Object> hash2 = new HashMap<T, Object>();
-	private final HashMap<T, Object> hash3 = new HashMap<T, Object>();
+	private final Map<T, Object> hash1 = new THashMap<T, Object>();
+	private final Map<T, Object> hash2 = new THashMap<T, Object>();
+	private final Map<T, Object> hash3 = new THashMap<T, Object>();
 
 	private List<T> keys1 = new ArrayList<T>();
 	private List<T> keys2 = new ArrayList<T>();
@@ -67,8 +69,7 @@ public abstract class VennData<T> {
 		this.collectionProcessed = true;
 	}
 
-	private final void processCollections(Collection<Object> referenceCollection, List<T> keys1,
-			HashMap<T, Object> hash1) {
+	private final void processCollections(Collection<Object> referenceCollection, List<T> keys1, Map<T, Object> hash1) {
 
 		int uniques = 0; // number of unique objects in reference collection
 
@@ -256,7 +257,7 @@ public abstract class VennData<T> {
 	private Set<Object> getObjectsByKeys(Collection<T> keys) {
 		processCollections();
 
-		Set<Object> ret = new HashSet<Object>();
+		Set<Object> ret = new THashSet<Object>();
 
 		for (T key : keys) {
 			if (this.hash1.containsKey(key)) {
@@ -359,7 +360,7 @@ public abstract class VennData<T> {
 
 		// Since the HashSet doesn't allow to add repeated elements, add all to
 		// the set
-		Set<T> ret = new HashSet<T>();
+		Set<T> ret = new THashSet<T>();
 		if (list1 != null) {
 			ret.addAll(list1);
 		}
@@ -409,7 +410,7 @@ public abstract class VennData<T> {
 	 */
 	public Collection<Object> getMaxCollection() {
 		processCollections();
-		HashSet<Object> ret = new HashSet<Object>();
+		Set<Object> ret = new THashSet<Object>();
 		ret.addAll(hash1.values());
 		if (hash2.size() > hash1.size()) {
 			ret.clear();

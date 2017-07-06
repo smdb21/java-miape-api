@@ -1,9 +1,8 @@
 package org.proteored.miapeapi.test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.mockito.Mockito;
@@ -34,12 +33,14 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.interfaces.msi.Validation;
 import org.proteored.miapeapi.spring.SpringHandler;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 public class MiapeMSIMocker {
-	public static final ControlVocabularyManager cvManager = SpringHandler.getInstance()
-			.getCVManager();
+	public static final ControlVocabularyManager cvManager = SpringHandler.getInstance().getCVManager();
 	public static final String SCORE_VALUE = "34";
-	public static final String RAWFILETYPE = MSFileType.getInstance(cvManager).getPossibleValues()
-			.get(0).getPreferredName();
+	public static final String RAWFILETYPE = MSFileType.getInstance(cvManager).getPossibleValues().get(0)
+			.getPreferredName();
 	public static final String PARAMETER_VALUE = "ParameterValue";
 	public static final String PARAMETER_NAME = "ParameterName";
 	public static final String CLEAVAGE_NAME = "CleavageName";
@@ -50,8 +51,8 @@ public class MiapeMSIMocker {
 	public static final String FRAGMENT_MASS_TOLERANCE = "FragmentMassTolerance";
 	private static Set<InputParameter> INPUT_PARAMETERS;
 	private static final Algorithm SCORING_ALGORITHM = MiapeMocker.mockAlgorithm(0);
-	public final static String PEPTIDE_MODIFICATION_NAME = PeptideModificationName
-			.getInstance(cvManager).getPossibleValues().get(0).getPreferredName();
+	public final static String PEPTIDE_MODIFICATION_NAME = PeptideModificationName.getInstance(cvManager)
+			.getPossibleValues().get(0).getPreferredName();
 	public static final Double AVG_DELTA = 18.0;
 	public static final Double MONO_DELTA = 18.1;
 	public static final int MODIFICATION_POSITION = 4;
@@ -71,7 +72,7 @@ public class MiapeMSIMocker {
 	public static Set<InputDataSet> INPUT_DATA_SETS = mockInputDataSets();
 
 	private static final List<IdentifiedPeptide> IDENTIFIED_PEPTIDES = mockIdentifiedPeptides();
-	public static final HashMap<String, IdentifiedProtein> IDENTIFIED_PROTEINS = mockProteins();
+	public static final Map<String, IdentifiedProtein> IDENTIFIED_PROTEINS = mockProteins();
 	public static final Set<IdentifiedProteinSet> IDENTIFIED_PROTEIN_SETS = mockProteinSets();
 
 	public static final String VALIDATION_RESULTS = "ValidationResults";
@@ -132,8 +133,7 @@ public class MiapeMSIMocker {
 	private static final Set<MSIAdditionalInformation> ADDITIONAL_INFORMATIONS = MockMSIAdditionalInformations();
 	public static final String ADDINFONAME = "ADDINFONAME";
 	public static final String ADDINFOVALUE = "ADDINFOVALUE";
-	public static final String SEARCHTYPE = SearchType.getInstance(cvManager).getFirstCVTerm()
-			.getPreferredName();
+	public static final String SEARCHTYPE = SearchType.getInstance(cvManager).getFirstCVTerm().getPreferredName();
 	public static final String PROTEIN_SET_LOCATION = "http://locationofproteinset.com";
 	public static final String INPUT_DATA_SET_NAME = "INPUT_DATA_SET_NAME";
 	public static final String GLOBAL_THRESHOLDS = "Glocal threshold <0";
@@ -151,8 +151,7 @@ public class MiapeMSIMocker {
 		MSContact contact = MiapeMocker.mockMSContact();
 		Mockito.when(document.getContact()).thenReturn(contact);
 
-		Mockito.when(document.getGeneratedFilesDescription()).thenReturn(
-				GENERATED_FILES_DESCRIPTION);
+		Mockito.when(document.getGeneratedFilesDescription()).thenReturn(GENERATED_FILES_DESCRIPTION);
 		Mockito.when(document.getGeneratedFilesURI()).thenReturn(GENERATED_FILES_URL);
 
 		Mockito.when(document.getIdentifiedProteinSets()).thenReturn(IDENTIFIED_PROTEIN_SETS);
@@ -182,13 +181,13 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<ProteinScore> mockMSIProteinScores() {
-		Set<ProteinScore> result = new HashSet<ProteinScore>();
+		Set<ProteinScore> result = new THashSet<ProteinScore>();
 		result.add(mockProteinScore());
 		return result;
 	}
 
 	private static Set<PeptideScore> mockMSIPeptideScores() {
-		Set<PeptideScore> result = new HashSet<PeptideScore>();
+		Set<PeptideScore> result = new THashSet<PeptideScore>();
 		result.add(mockPeptideScore());
 		return result;
 	}
@@ -196,8 +195,7 @@ public class MiapeMSIMocker {
 	private static ProteinScore mockProteinScore() {
 		ProteinScore result = Mockito.mock(ProteinScore.class);
 
-		Mockito.when(result.getName()).thenReturn(
-				Score.getInstance(cvManager).getFirstCVTerm().getPreferredName());
+		Mockito.when(result.getName()).thenReturn(Score.getInstance(cvManager).getFirstCVTerm().getPreferredName());
 
 		Mockito.when(result.getValue()).thenReturn(SCORE_VALUE);
 		return result;
@@ -206,14 +204,13 @@ public class MiapeMSIMocker {
 	private static PeptideScore mockPeptideScore() {
 		PeptideScore result = Mockito.mock(PeptideScore.class);
 
-		Mockito.when(result.getName()).thenReturn(
-				Score.getInstance(cvManager).getFirstCVTerm().getPreferredName());
+		Mockito.when(result.getName()).thenReturn(Score.getInstance(cvManager).getFirstCVTerm().getPreferredName());
 		Mockito.when(result.getValue()).thenReturn("34");
 		return result;
 	}
 
 	private static Set<PeptideModification> MockMSIPeptideModifications() {
-		Set<PeptideModification> result = new HashSet<PeptideModification>();
+		Set<PeptideModification> result = new THashSet<PeptideModification>();
 		result.add(mockPeptideModification());
 		return result;
 	}
@@ -232,7 +229,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<InputDataSet> mockInputDataSets() {
-		Set<InputDataSet> result = new HashSet<InputDataSet>();
+		Set<InputDataSet> result = new THashSet<InputDataSet>();
 
 		result.add(mockInputDataSet());
 		return result;
@@ -246,7 +243,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<IdentifiedProteinSet> mockProteinSets() {
-		Set<IdentifiedProteinSet> result = new HashSet<IdentifiedProteinSet>();
+		Set<IdentifiedProteinSet> result = new THashSet<IdentifiedProteinSet>();
 		result.add(mockIdentifiedProteinSet());
 		return result;
 	}
@@ -255,7 +252,7 @@ public class MiapeMSIMocker {
 		IdentifiedProteinSet proteinSet = Mockito.mock(IdentifiedProteinSet.class);
 		Mockito.when(proteinSet.getFileLocation()).thenReturn(PROTEIN_SET_LOCATION);
 		Mockito.when(proteinSet.getName()).thenReturn(PROTEIN_SET_NAME);
-		HashMap<String, IdentifiedProtein> identifiedProteinList = IDENTIFIED_PROTEINS;
+		Map<String, IdentifiedProtein> identifiedProteinList = IDENTIFIED_PROTEINS;
 		Mockito.when(proteinSet.getIdentifiedProteins()).thenReturn(identifiedProteinList);
 		Mockito.when(proteinSet.getInputParameter()).thenReturn(INPUT_PARAMETER);
 		Mockito.when(proteinSet.getInputDataSets()).thenReturn(INPUT_DATA_SETS);
@@ -264,7 +261,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<MSIAdditionalInformation> MockMSIAdditionalInformations() {
-		Set<MSIAdditionalInformation> result = new HashSet<MSIAdditionalInformation>();
+		Set<MSIAdditionalInformation> result = new THashSet<MSIAdditionalInformation>();
 		result.add(mockAdditionalInformation(0));
 		return result;
 	}
@@ -277,7 +274,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<Validation> mockValidations() {
-		Set<Validation> result = new HashSet<Validation>();
+		Set<Validation> result = new THashSet<Validation>();
 		result.add(mockValidation(0));
 		return result;
 	}
@@ -297,25 +294,25 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<Software> mockValidationSoftwares() {
-		Set<Software> result = new HashSet<Software>();
+		Set<Software> result = new THashSet<Software>();
 		result.add(MiapeMocker.mockSoftware(0));
 		return result;
 	}
 
 	private static Set<PostProcessingMethod> mockValidationMethods() {
-		Set<PostProcessingMethod> result = new HashSet<PostProcessingMethod>();
+		Set<PostProcessingMethod> result = new THashSet<PostProcessingMethod>();
 		result.add(MiapeMocker.mockValidationAlgorithm(2));
 		return result;
 	}
 
 	private static Set<Software> mockMsiSoftwares() {
-		Set<Software> result = new HashSet<Software>();
+		Set<Software> result = new THashSet<Software>();
 		result.add(MiapeMocker.mockSoftware(1));
 		return result;
 	}
 
 	private static Set<InputParameter> mockInputParameters() {
-		Set<InputParameter> result = new HashSet<InputParameter>();
+		Set<InputParameter> result = new THashSet<InputParameter>();
 		result.add(INPUT_PARAMETER);
 		return result;
 	}
@@ -323,24 +320,19 @@ public class MiapeMSIMocker {
 	private static InputParameter mockInputParameter(int i) {
 		mockedInputParameter = Mockito.mock(InputParameter.class);
 		Mockito.when(mockedInputParameter.getAaModif()).thenReturn(AA_MODIF + i);
-		Mockito.when(mockedInputParameter.getAdditionalCleavages()).thenReturn(
-				ADDITIONAL_CLEAVAGES + i);
+		Mockito.when(mockedInputParameter.getAdditionalCleavages()).thenReturn(ADDITIONAL_CLEAVAGES + i);
 
 		Mockito.when(mockedInputParameter.getCleavageRules()).thenReturn(CLEAVAGE_RULES + i);
 		Set<Database> databases = mockDatabases();
 		Mockito.when(mockedInputParameter.getDatabases()).thenReturn(databases);
-		Mockito.when(mockedInputParameter.getPrecursorMassTolerance()).thenReturn(
-				MASS_TOLERANCE_MS + i);
+		Mockito.when(mockedInputParameter.getPrecursorMassTolerance()).thenReturn(MASS_TOLERANCE_MS + i);
 		Mockito.when(mockedInputParameter.getPmfMassTolerance()).thenReturn(MASS_TOLERANCE_PMF + i);
-		Mockito.when(mockedInputParameter.getFragmentMassTolerance()).thenReturn(
-				FRAGMENT_MASS_TOLERANCE + i);
+		Mockito.when(mockedInputParameter.getFragmentMassTolerance()).thenReturn(FRAGMENT_MASS_TOLERANCE + i);
 
-		Mockito.when(mockedInputParameter.getPrecursorMassToleranceUnit()).thenReturn(
-				PRECURSOR_MASS_TOLERANCE_UNIT + i);
-		Mockito.when(mockedInputParameter.getPmfMassToleranceUnit()).thenReturn(
-				MASS_TOLERANCE_PMF_UNIT + i);
-		Mockito.when(mockedInputParameter.getFragmentMassToleranceUnit()).thenReturn(
-				FRAGMENT_MASS_TOLERANCE_UNIT + i);
+		Mockito.when(mockedInputParameter.getPrecursorMassToleranceUnit())
+				.thenReturn(PRECURSOR_MASS_TOLERANCE_UNIT + i);
+		Mockito.when(mockedInputParameter.getPmfMassToleranceUnit()).thenReturn(MASS_TOLERANCE_PMF_UNIT + i);
+		Mockito.when(mockedInputParameter.getFragmentMassToleranceUnit()).thenReturn(FRAGMENT_MASS_TOLERANCE_UNIT + i);
 
 		Mockito.when(mockedInputParameter.getMinScore()).thenReturn(MIN_SCORE + i);
 		Mockito.when(mockedInputParameter.getMisscleavages()).thenReturn(MISSCLEAVAGES + i);
@@ -356,7 +348,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<AdditionalParameter> mockParameters() {
-		Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
+		Set<AdditionalParameter> additionalParameters = new THashSet<AdditionalParameter>();
 		AdditionalParameter addParameter = Mockito.mock(AdditionalParameter.class);
 		Mockito.when(addParameter.getName()).thenReturn(PARAMETER_NAME);
 		Mockito.when(addParameter.getValue()).thenReturn(PARAMETER_VALUE);
@@ -365,13 +357,13 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<Algorithm> mockScoringAlgorithms() {
-		Set<Algorithm> result = new HashSet<Algorithm>();
+		Set<Algorithm> result = new THashSet<Algorithm>();
 		result.add(SCORING_ALGORITHM);
 		return result;
 	}
 
 	private static Set<Database> mockDatabases() {
-		Set<Database> result = new HashSet<Database>();
+		Set<Database> result = new THashSet<Database>();
 		Database db = mockDatabase(0);
 		result.add(db);
 		return result;
@@ -381,8 +373,8 @@ public class MiapeMSIMocker {
 		Database result = Mockito.mock(Database.class);
 		Mockito.when(result.getDate()).thenReturn(DATE);
 		Mockito.when(result.getDescription()).thenReturn(DATABASE_DESCRIPTION + i);
-		Mockito.when(result.getName()).thenReturn(
-				DatabaseName.getInstance(cvManager).getPossibleValues().get(0).getPreferredName());
+		Mockito.when(result.getName())
+				.thenReturn(DatabaseName.getInstance(cvManager).getPossibleValues().get(0).getPreferredName());
 		Mockito.when(result.getNumVersion()).thenReturn(DATABASE_VERSION + i);
 		Mockito.when(result.getSequenceNumber()).thenReturn(SEQUENCE_NUMBER + i);
 		Mockito.when(result.getUri()).thenReturn(DATABASE_URI + i);
@@ -390,7 +382,7 @@ public class MiapeMSIMocker {
 	}
 
 	private static Set<InputData> mockInputDatas() {
-		Set<InputData> result = new HashSet<InputData>();
+		Set<InputData> result = new THashSet<InputData>();
 		result.add(mockInputData(0));
 		return result;
 	}
@@ -406,8 +398,8 @@ public class MiapeMSIMocker {
 		return result;
 	}
 
-	private static HashMap<String, IdentifiedProtein> mockProteins() {
-		HashMap<String, IdentifiedProtein> result = new HashMap<String, IdentifiedProtein>();
+	private static Map<String, IdentifiedProtein> mockProteins() {
+		Map<String, IdentifiedProtein> result = new THashMap<String, IdentifiedProtein>();
 		IDENTIFIED_PROTEIN = mockIdentifiedProtein(0);
 		result.put(IDENTIFIED_PROTEIN.getAccession(), IDENTIFIED_PROTEIN);
 		return result;

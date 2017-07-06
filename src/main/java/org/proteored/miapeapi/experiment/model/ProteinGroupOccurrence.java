@@ -2,7 +2,6 @@ package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,6 +26,8 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class ProteinGroupOccurrence
 		implements Occurrence<ProteinGroup>, ProteinContainer, PeptideContainer, ProteinGroupContainer {
@@ -329,7 +330,7 @@ public class ProteinGroupOccurrence
 	@Override
 	public List<ExtendedIdentifiedPeptide> getPeptides() {
 		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
-		Set<Integer> peptideIds = new HashSet<Integer>();
+		TIntHashSet peptideIds = new TIntHashSet();
 		if (proteinGroups != null) {
 			for (ProteinGroup proteinGroup : proteinGroups) {
 				final List<ExtendedIdentifiedPeptide> peptides = proteinGroup.getPeptides();
@@ -472,7 +473,7 @@ public class ProteinGroupOccurrence
 	 */
 	@Override
 	public Set<String> getScoreNames() {
-		Set<String> ret = new HashSet<String>();
+		Set<String> ret = new THashSet<String>();
 		if (proteinGroups != null) {
 			for (ProteinGroup proteinGroup : proteinGroups) {
 				List<String> scoreNames = proteinGroup.getProteinScoreNames();

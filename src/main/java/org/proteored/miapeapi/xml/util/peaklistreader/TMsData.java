@@ -11,10 +11,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * 
@@ -41,7 +43,7 @@ public class TMsData {
 	// Elementos globales....
 	private final String Inputfilename;
 	// El conjunto de spectros .... Aunque también puede ser una tabla hash
-	private final HashMap<Integer, TSpectrum> pffSpectra;
+	private final TIntObjectHashMap<TSpectrum> pffSpectra;
 
 	// Constantes .....
 	private final String BEGINIONS = "BEGIN IONS";
@@ -60,12 +62,11 @@ public class TMsData {
 	private final boolean Sorted = false;
 	private int maxSpectrumIndex = -1;
 
-	public TMsData(final String inputfile,
-			HashMap<String, Integer> mgfTitlesMaps) {
+	public TMsData(final String inputfile, TObjectIntHashMap<String> mgfTitlesMaps) {
 		log.info("Reading MGF from :" + inputfile);
 
 		Inputfilename = inputfile;
-		pffSpectra = new HashMap<Integer, TSpectrum>();
+		pffSpectra = new TIntObjectHashMap<TSpectrum>();
 		readMGFFile(inputfile, mgfTitlesMaps);
 
 		// for (int i = 0; i < PFFSpectra.size(); i++) {
@@ -78,8 +79,7 @@ public class TMsData {
 				// Metemos el spectrum Reference
 				setSpectrumReference(i, String.valueOf(i + 1));
 				System.out.println("Nuevo orden: " + String.valueOf(i + 1));
-				System.out.println("Spectrum Reference: "
-						+ getSpectrumReference(i));
+				System.out.println("Spectrum Reference: " + getSpectrumReference(i));
 				System.out.println(getQueryNumber(i));
 				System.out.println(getPepMoverZ(i));
 				System.out.println(getPepMass(i));
@@ -106,7 +106,7 @@ public class TMsData {
 		return Inputfilename;
 	}
 
-	public HashMap<Integer, TSpectrum> getSpectra() {
+	public TIntObjectHashMap<TSpectrum> getSpectra() {
 		return pffSpectra;
 	}
 
@@ -116,8 +116,7 @@ public class TMsData {
 
 	// ReadFile
 
-	public void readMGFFile(String _inputfile,
-			HashMap<String, Integer> mgfTitlesMaps)
+	public void readMGFFile(String _inputfile, TObjectIntHashMap mgfTitlesMaps)
 	// Método para leer los ficheros de datos.
 	// tanto para PMF como para PFF
 	{
@@ -135,8 +134,7 @@ public class TMsData {
 		int precursorCharge = -1;
 		try {
 			URL url = new URL(_inputfile);
-			BufferedReader inStream = new BufferedReader(new InputStreamReader(
-					url.openStream()));
+			BufferedReader inStream = new BufferedReader(new InputStreamReader(url.openStream()));
 			precursorMasses = new ArrayList<Double>();
 			massesLocal = new ArrayList<Double>();
 			intensities = new ArrayList<Double>();
@@ -180,12 +178,10 @@ public class TMsData {
 								// "massesLocal" array with the reference to
 								// precursor to -1. It will be updated at the
 								// end
-								TSpectrum mySpectrum = createSpectrum(
-										queryNumber, -1, peakListId,
-										precursorMass, charge, rt);
+								TSpectrum mySpectrum = createSpectrum(queryNumber, -1, peakListId, precursorMass,
+										charge, rt);
 
-								mySpectrum.fillMassValues(massesLocal,
-										intensities);
+								mySpectrum.fillMassValues(massesLocal, intensities);
 								mySpectrum.setMsLevel(2);
 								pffSpectra.put(queryNumber, mySpectrum);
 								// empty array "massesLocal"
@@ -208,8 +204,7 @@ public class TMsData {
 								rt = parseRT(inLine);
 							// en otro caso será una pareja de elemenos
 							else {
-								if (inLine.contains(ARRAYS_SEP)
-										|| inLine.contains(ARRAYS_TAB)) {
+								if (inLine.contains(ARRAYS_SEP) || inLine.contains(ARRAYS_TAB)) {
 									String separator = null;
 									if (inLine.contains(ARRAYS_SEP))
 										separator = ARRAYS_SEP;
@@ -230,9 +225,9 @@ public class TMsData {
 								}
 							}
 
-						}// else de contenido
-					}// else begin ions
-				}// Parseo de la línea.....
+						} // else de contenido
+					} // else begin ions
+				} // Parseo de la línea.....
 			}
 
 			while (true);
@@ -248,34 +243,35 @@ public class TMsData {
 				// precursorQueryNumber, starting by the maximum queryNumber
 				// captured
 				List<Integer> queryNumbers = new ArrayList<Integer>();
-				queryNumbers.addAll(pffSpectra.keySet());
+				for (int key : pffSpectra.keys()) {
+					queryNumbers.add(key);
+				}
 				Collections.sort(queryNumbers);
 				queryNumber = queryNumbers.get(queryNumbers.size() - 1);
 				while (pffSpectra.containsKey(queryNumber)) {
-					log.info("Searching a valid precursor queryNumber: "
-							+ queryNumber);
+					log.info("Searching a valid precursor queryNumber: " + queryNumber);
 					queryNumber--;
 				}
 				int precursorQueryNumber = queryNumber;
-				TSpectrum precursorSpectrum = createSpectrum(
-						precursorQueryNumber, -1, peakListId, null,
+				TSpectrum precursorSpectrum = createSpectrum(precursorQueryNumber, -1, peakListId, null,
 						precursorCharge, rt);
 				precursorSpectrum.fillMassValues(precursorMasses, null);
 				precursorSpectrum.setMsLevel(1);
 				log.info("MS1 spectrum created with index=" + queryNumber);
 				// iterate all MS2 spectra to asign the precursor spectrum to
 				// precursorQueryNumber
-				for (TSpectrum spectrum : pffSpectra.values()) {
+				for (TSpectrum spectrum : pffSpectra.valueCollection()) {
 					spectrum.setPrecursorQueryNumber(precursorQueryNumber);
 				}
 				pffSpectra.put(precursorQueryNumber, precursorSpectrum);
 			}
 
-		} catch (IOException ex) {
+		} catch (
+
+		IOException ex) {
 			ex.printStackTrace();
 		}
-		log.info(pffSpectra.size() + " spectra readed from '" + _inputfile
-				+ "'");
+		log.info(pffSpectra.size() + " spectra readed from '" + _inputfile + "'");
 	}
 
 	// Métodos de parseo.....
@@ -287,8 +283,7 @@ public class TMsData {
 			nexttabPos = _line.indexOf(ARRAYS_SEP);
 		else if (_line.indexOf(ARRAYS_TAB) > 0)
 			nexttabPos = _line.indexOf(ARRAYS_TAB);
-		_ret = _line.substring(_line.indexOf(PEPMASS) + PEPMASS.length(),
-				nexttabPos);
+		_ret = _line.substring(_line.indexOf(PEPMASS) + PEPMASS.length(), nexttabPos);
 		try {
 
 			return Double.valueOf(_ret);
@@ -330,8 +325,7 @@ public class TMsData {
 		String _ret = null;
 		int index = -1;
 		if ((index = _line.indexOf("+")) > 0)
-			_ret = _line.substring(_line.indexOf(CHARGE) + CHARGE.length(),
-					index);
+			_ret = _line.substring(_line.indexOf(CHARGE) + CHARGE.length(), index);
 		else if ((index = _line.indexOf("-")) > 0)
 			_ret = _line.substring(_line.indexOf(CHARGE), index);
 
@@ -351,18 +345,15 @@ public class TMsData {
 			if (split.length == 2)
 				return split[1];
 		}
-		_ret = _line.substring(_line.indexOf(TITLE) + TITLE.length(),
-				_line.length());
+		_ret = _line.substring(_line.indexOf(TITLE) + TITLE.length(), _line.length());
 		return (_ret);
 	}
 
-	private TSpectrum createSpectrum(int queryNumber, int precursorQueryNumber,
-			String _peak_list_id, Double precursor_mass, Integer _charge,
-			Double rt) {
+	private TSpectrum createSpectrum(int queryNumber, int precursorQueryNumber, String _peak_list_id,
+			Double precursor_mass, Integer _charge, Double rt) {
 
 		try {
-			TSpectrum mySpectrum = new TSpectrum(queryNumber,
-					precursorQueryNumber, _peak_list_id, precursor_mass, rt);
+			TSpectrum mySpectrum = new TSpectrum(queryNumber, precursorQueryNumber, _peak_list_id, precursor_mass, rt);
 
 			mySpectrum.setPeptideCharge(_charge);
 			return mySpectrum;
@@ -403,20 +394,17 @@ public class TMsData {
 
 	public String getIntensityPFFSpectrum(int _pos) {
 		String _ret = "";
-		_ret = pffSpectra.get(_pos).getPeakList()
-				.getMzData(TBase64PeakList.INTENSITY);
+		_ret = pffSpectra.get(_pos).getPeakList().getMzData(TBase64PeakList.INTENSITY);
 		return (_ret);
 	}
 
 	// métodos para el array de bytes.
 	public byte[] getMzByteArrayPFFSpectrum(int _pos) {
-		return pffSpectra.get(_pos).getPeakList()
-				.getByteMzData(TBase64PeakList.MZ);
+		return pffSpectra.get(_pos).getPeakList().getByteMzData(TBase64PeakList.MZ);
 	}
 
 	public byte[] getIntensityByteArrayPFFSpectrum(int _pos) {
-		return pffSpectra.get(_pos).getPeakList()
-				.getByteMzData(TBase64PeakList.INTENSITY);
+		return pffSpectra.get(_pos).getPeakList().getByteMzData(TBase64PeakList.INTENSITY);
 	}
 
 	public Double getPepMass(int _pos) {

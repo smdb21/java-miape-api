@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.mzidentml;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +25,8 @@ import org.proteored.miapeapi.xml.mzidentml.util.MzidentmlControlVocabularyXmlFa
 import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.set.hash.THashSet;
+
 public class IdentifiedProteinImpl implements IdentifiedProtein {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private static final Accession CV_SEQUENCE_COVERAGE = new Accession("MS:1001093");
@@ -41,8 +42,8 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	private final MzidentmlControlVocabularyXmlFactory cvFactory;
 
 	public IdentifiedProteinImpl(PSIPIAnalysisSearchDBSequenceType dbSequenceXML,
-			PSIPIAnalysisProcessProteinDetectionHypothesisType proteinHypotesisXML,
-			Integer proteinID, ControlVocabularyManager cvUtil) {
+			PSIPIAnalysisProcessProteinDetectionHypothesisType proteinHypotesisXML, Integer proteinID,
+			ControlVocabularyManager cvUtil) {
 		this.dbSequenceXML = dbSequenceXML;
 		this.proteinHypotesisXML = proteinHypotesisXML;
 		if (proteinHypotesisXML != null)
@@ -61,8 +62,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 			if (proteinHypotesisXML.getParamGroup() != null) {
 				for (FuGECommonOntologyParamType param : proteinHypotesisXML.getParamGroup()) {
 					if (param instanceof FuGECommonOntologyCvParamType) {
-						if (cvFactory.isCV(param.getName(),
-								ValidationType.getInstance(cvFactory.getCvManager()))) {
+						if (cvFactory.isCV(param.getName(), ValidationType.getInstance(cvFactory.getCvManager()))) {
 							validationType = param.getName();
 							validationValue = param.getValue();
 						}
@@ -110,10 +110,10 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 							&& !CV_PEPTIDE_NUMBER.equals(cvID)
 							&& !psiProteinDescriptionTerm.getTermAccession().equals(cvID)
 							&& !CV_SEQUENCE_COVERAGE.equals(cvID)
-							&& !MatchedPeaks.NUMBER_OF_UNMATCHED_PEAKS.getTermAccession().equals(
-									cvID)
+							&& !MatchedPeaks.NUMBER_OF_UNMATCHED_PEAKS.getTermAccession().equals(cvID)
 							&& !cvFactory.isCV(proteinHypotesisParams.get(cvID).getName(),
-									Score.getInstance(cvFactory.getCvManager())) &&
+									Score.getInstance(cvFactory.getCvManager()))
+							&&
 							// !OntologyManager.getInstance().isSonOf(cvID,
 							// CV_SEARCH_ENGINE_SCORE) &&
 							!cvFactory.isCV(proteinHypotesisParams.get(cvID).getName(),
@@ -121,8 +121,8 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 					// !OntologyManager.getInstance().isSonOf(cvID,
 					// CV_QUALITY_ESTIMATION))
 					{
-						sb.append(MzidentmlControlVocabularyXmlFactory
-								.readEntireParam(proteinHypotesisParams.get(cvID)));
+						sb.append(
+								MzidentmlControlVocabularyXmlFactory.readEntireParam(proteinHypotesisParams.get(cvID)));
 						sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 					}
 				}
@@ -130,12 +130,11 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 		for (String cvID : dbSequenceParams.keySet()) {
 			if (dbSequenceParams.containsKey(cvID)) {
 				if (!MatchedPeaks.NUMBER_OF_MATCHED_PEAKS.getTermAccession().equals(cvID)
-						&& !CV_PEPTIDE_NUMBER.equals(cvID)
-						&& !psiProteinDescriptionTerm.getTermAccession().equals(cvID)
+						&& !CV_PEPTIDE_NUMBER.equals(cvID) && !psiProteinDescriptionTerm.getTermAccession().equals(cvID)
 						&& !CV_SEQUENCE_COVERAGE.equals(cvID)
-						&& !MatchedPeaks.NUMBER_OF_UNMATCHED_PEAKS.getTermAccession().equals(cvID)
-						&& !cvFactory.isCV(dbSequenceParams.get(cvID).getName(),
-								Score.getInstance(cvFactory.getCvManager())) &&
+						&& !MatchedPeaks.NUMBER_OF_UNMATCHED_PEAKS.getTermAccession().equals(cvID) && !cvFactory
+								.isCV(dbSequenceParams.get(cvID).getName(), Score.getInstance(cvFactory.getCvManager()))
+						&&
 						// !OntologyManager.getInstance().isSonOf(cvID,
 						// CV_SEARCH_ENGINE_SCORE) &&
 						!cvFactory.isCV(dbSequenceParams.get(cvID).getName(),
@@ -143,8 +142,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 				// !OntologyManager.getInstance().isSonOf(cvID,
 				// CV_QUALITY_ESTIMATION))
 				{
-					sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(dbSequenceParams
-							.get(cvID)));
+					sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(dbSequenceParams.get(cvID)));
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 				}
 			}
@@ -156,16 +154,14 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	public String getCoverage() {
 		if (proteinHypotesisParams != null)
 			if (proteinHypotesisParams.containsKey(CV_SEQUENCE_COVERAGE.toString())) {
-				String coverage = proteinHypotesisParams.get(CV_SEQUENCE_COVERAGE.toString())
-						.getValue();
+				String coverage = proteinHypotesisParams.get(CV_SEQUENCE_COVERAGE.toString()).getValue();
 				return coverage;
 			} else {
 				log.info("Calculating protein coverage");
 				// / calculate coverage from the supporting peptides
 				final String proteinSequence = dbSequenceXML.getSeq();
 				final List<IdentifiedPeptide> supportingPeptides = this.getIdentifiedPeptides();
-				Double coverage = MiapeXmlUtil.calculateProteinCoverage2(proteinSequence,
-						supportingPeptides);
+				Double coverage = MiapeXmlUtil.calculateProteinCoverage2(proteinSequence, supportingPeptides);
 				if (coverage != null) {
 					log.info("Coverage = " + coverage);
 					return coverage.toString();
@@ -180,11 +176,9 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	public String getDescription() {
 		if (dbSequenceXML == null)
 			return null;
-		if (dbSequenceParams.containsKey(ProteinDescription.PSI_PROTEIN_DESCRIPTION
-				.getTermAccession().toString())) {
-			String description = dbSequenceParams.get(
-					ProteinDescription.PSI_PROTEIN_DESCRIPTION.getTermAccession().toString())
-					.getValue();
+		if (dbSequenceParams.containsKey(ProteinDescription.PSI_PROTEIN_DESCRIPTION.getTermAccession().toString())) {
+			String description = dbSequenceParams
+					.get(ProteinDescription.PSI_PROTEIN_DESCRIPTION.getTermAccession().toString()).getValue();
 			return description;
 		}
 		return dbSequenceXML.getName();
@@ -203,10 +197,9 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	@Override
 	public String getPeaksMatchedNumber() {
 		if (proteinHypotesisParams != null)
-			if (proteinHypotesisParams.containsKey(MatchedPeaks.NUMBER_OF_MATCHED_PEAKS
-					.getTermAccession().toString())) {
-				return proteinHypotesisParams.get(
-						MatchedPeaks.NUMBER_OF_MATCHED_PEAKS.getTermAccession().toString())
+			if (proteinHypotesisParams
+					.containsKey(MatchedPeaks.NUMBER_OF_MATCHED_PEAKS.getTermAccession().toString())) {
+				return proteinHypotesisParams.get(MatchedPeaks.NUMBER_OF_MATCHED_PEAKS.getTermAccession().toString())
 						.getName();
 			}
 		return null;
@@ -216,8 +209,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	public String getPeptideNumber() {
 		if (proteinHypotesisParams != null)
 			if (proteinHypotesisParams.containsKey(CV_PEPTIDE_NUMBER.toString())) {
-				String peptideNumber = proteinHypotesisParams.get(CV_PEPTIDE_NUMBER.toString())
-						.getValue();
+				String peptideNumber = proteinHypotesisParams.get(CV_PEPTIDE_NUMBER.toString()).getValue();
 				return peptideNumber;
 			}
 
@@ -229,7 +221,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 		if (proteinHypotesisXML == null)
 			return null;
 
-		Set<ProteinScore> proteinScores = new HashSet<ProteinScore>();
+		Set<ProteinScore> proteinScores = new THashSet<ProteinScore>();
 		// OntologyManager ontologyManager = OntologyManager.getInstance();
 		List<FuGECommonOntologyParamType> params = proteinHypotesisXML.getParamGroup();
 		for (FuGECommonOntologyParamType param : params) {
@@ -237,8 +229,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 				FuGECommonOntologyCvParamType cvParam = (FuGECommonOntologyCvParamType) param;
 				// if the param is an score, store it in the set
 				final ControlVocabularyTerm cvTerm = cvFactory.getCvManager().getCVTermByAccession(
-						new Accession(cvParam.getAccession()),
-						Score.getInstance(cvFactory.getCvManager()));
+						new Accession(cvParam.getAccession()), Score.getInstance(cvFactory.getCvManager()));
 				if (cvTerm != null)
 					proteinScores.add(new ProteinScoreImpl(cvTerm, cvParam.getValue()));
 			} else if (param instanceof FuGECommonOntologyUserParamType) {

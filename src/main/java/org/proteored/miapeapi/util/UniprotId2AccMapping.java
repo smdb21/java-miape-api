@@ -5,14 +5,15 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.Map;
+
+import gnu.trove.map.hash.THashMap;
 
 public class UniprotId2AccMapping {
-	private static org.apache.log4j.Logger log = org.apache.log4j.Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private static UniprotId2AccMapping instance;
-	private static HashMap<String, String> uniprotIDACCMap = new HashMap<String, String>();
-	private static HashMap<String, String> uniprotACCIDMap = new HashMap<String, String>();
+	private static Map<String, String> uniprotIDACCMap = new THashMap<String, String>();
+	private static Map<String, String> uniprotACCIDMap = new THashMap<String, String>();
 	public static final String mappingFileName = "Uniprot_ID_AC_Mapping.csv";
 
 	/**
@@ -24,8 +25,7 @@ public class UniprotId2AccMapping {
 	 * @return
 	 * @throws IOException
 	 */
-	public static UniprotId2AccMapping getInstance(String mappingFileName)
-			throws IOException {
+	public static UniprotId2AccMapping getInstance(String mappingFileName) throws IOException {
 		if (instance == null) {
 			instance = new UniprotId2AccMapping(mappingFileName);
 		}

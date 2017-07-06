@@ -2,9 +2,8 @@ package org.proteored.miapeapi.experiment.msi;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -34,13 +33,18 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 public class MiapeMSIFiltered implements MiapeMSIDocument {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private final MiapeMSIDocument miapeMSI;
 	private final IdentificationSet idSet;
 	private final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
-	private final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+	private final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
 
 	private final MiapeMSIXmlFactory xmlFactory;
 
@@ -60,27 +64,27 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		if (idSet != null) {
 			log.info("Filtering MIAPE MSI " + miapeMSI.getId() + ": " + miapeMSI.getName() + " by idSet:  "
 					+ idSet.getName());
-			Set<Integer> miapeProteinIds = getMiapeProteinIds(miapeMSI);
-			Set<Integer> miapePeptideIds = getMiapePeptideIds(miapeMSI);
+			TIntHashSet miapeProteinIds = getMiapeProteinIds(miapeMSI);
+			TIntHashSet miapePeptideIds = getMiapePeptideIds(miapeMSI);
 
 			final List<ProteinGroup> validProteinGroups = idSet.getIdentifiedProteinGroups();
-			HashMap<Integer, ExtendedIdentifiedProtein> validProteinMap = new HashMap<Integer, ExtendedIdentifiedProtein>();
+			TIntObjectHashMap<ExtendedIdentifiedProtein> validProteinMap = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
 			for (ProteinGroup validProteinGroup : validProteinGroups) {
 				for (ExtendedIdentifiedProtein validProtein : validProteinGroup) {
 					validProteinMap.put(validProtein.getId(), validProtein);
 				}
 			}
 			final List<ExtendedIdentifiedPeptide> validPeptides = idSet.getIdentifiedPeptides();
-			HashMap<Integer, ExtendedIdentifiedPeptide> validPeptideMap = new HashMap<Integer, ExtendedIdentifiedPeptide>();
+			TIntObjectHashMap<ExtendedIdentifiedPeptide> validPeptideMap = new TIntObjectHashMap<ExtendedIdentifiedPeptide>();
 			for (ExtendedIdentifiedPeptide validPeptide : validPeptides) {
 				validPeptideMap.put(validPeptide.getId(), validPeptide);
 
 			}
 
-			HashMap<String, IdentifiedProtein> resultingFilteredProteins = new HashMap<String, IdentifiedProtein>();
+			Map<String, IdentifiedProtein> resultingFilteredProteins = new THashMap<String, IdentifiedProtein>();
 			int total = validProteinGroups.size();
 			log.info("Filtering " + total + " protein groups");
-			for (Integer proteinId : miapeProteinIds) {
+			for (int proteinId : miapeProteinIds._set) {
 				if (validProteinMap.containsKey(proteinId)) {
 					ExtendedIdentifiedProtein validProtein = validProteinMap.get(proteinId);
 					List<ExtendedIdentifiedPeptide> peptides2 = validProtein.getPeptides();
@@ -98,7 +102,7 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			}
 			total = validPeptides.size();
 			log.info("Filtering " + total + " peptides");
-			for (Integer peptideId : miapePeptideIds) {
+			for (int peptideId : miapePeptideIds._set) {
 				if (validPeptideMap.containsKey(peptideId)) {
 					ExtendedIdentifiedPeptide validPeptide = validPeptideMap.get(peptideId);
 					List<ExtendedIdentifiedProtein> proteins = validPeptide.getProteins();
@@ -143,18 +147,18 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 
 	}
 
-	private void linkProteinsAndPeptides(HashMap<String, IdentifiedProtein> identifiedProteins,
+	private void linkProteinsAndPeptides(Map<String, IdentifiedProtein> identifiedProteins,
 			List<IdentifiedPeptide> identifiedPeptides) {
 		if (!identifiedProteins.isEmpty() && !identifiedPeptides.isEmpty()) {
 			log.info("Linking " + identifiedProteins.size() + " proteins with " + identifiedPeptides.size()
 					+ " peptides");
 			// Create PEPTIDE MAP
-			HashMap<Integer, IdentifiedPeptide> peptideMap = new HashMap<Integer, IdentifiedPeptide>();
+			TIntObjectHashMap<IdentifiedPeptide> peptideMap = new TIntObjectHashMap<IdentifiedPeptide>();
 			for (IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 				peptideMap.put(identifiedPeptide.getId(), identifiedPeptide);
 			}
 			// Create PROTEIN MAP
-			HashMap<Integer, IdentifiedProtein> proteinMap = new HashMap<Integer, IdentifiedProtein>();
+			TIntObjectHashMap<IdentifiedProtein> proteinMap = new TIntObjectHashMap<IdentifiedProtein>();
 			for (IdentifiedProtein identifiedProtein : identifiedProteins.values()) {
 				proteinMap.put(identifiedProtein.getId(), identifiedProtein);
 			}
@@ -162,9 +166,9 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			// ITERATE OVER PROTEINS
 			for (IdentifiedProtein identifiedProtein : identifiedProteins.values()) {
 				IdentifiedProteinFiltered filteredProtein = (IdentifiedProteinFiltered) identifiedProtein;
-				Set<Integer> peptidesFromProteinIds = filteredProtein.getFilteredPeptideIds();
+				TIntHashSet peptidesFromProteinIds = filteredProtein.getFilteredPeptideIds();
 				if (peptidesFromProteinIds != null) {
-					for (Integer identifiedPeptideID : peptidesFromProteinIds) {
+					for (int identifiedPeptideID : peptidesFromProteinIds._set) {
 						if (peptideMap.containsKey(identifiedPeptideID)) {
 							IdentifiedPeptideFiltered peptideInMap = (IdentifiedPeptideFiltered) peptideMap
 									.get(identifiedPeptideID);
@@ -182,9 +186,9 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			// ITERATE OVER PEPTIDES
 			for (IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 				IdentifiedPeptideFiltered filteredPeptide = (IdentifiedPeptideFiltered) identifiedPeptide;
-				Set<Integer> proteinsFromPeptideIds = filteredPeptide.getFilteredProteinIds();
+				TIntHashSet proteinsFromPeptideIds = filteredPeptide.getFilteredProteinIds();
 				if (proteinsFromPeptideIds != null) {
-					for (Integer identifiedProteinID : proteinsFromPeptideIds) {
+					for (int identifiedProteinID : proteinsFromPeptideIds._set) {
 						if (proteinMap.containsKey(identifiedProteinID)) {
 							IdentifiedProteinFiltered proteinInMap = (IdentifiedProteinFiltered) proteinMap
 									.get(identifiedProteinID);
@@ -203,13 +207,13 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		log.info("End linking proteins and peptides");
 	}
 
-	private Set<Integer> getMiapeProteinIds(MiapeMSIDocument miapeMSI2) {
-		Set<Integer> ret = new HashSet<Integer>();
+	private TIntHashSet getMiapeProteinIds(MiapeMSIDocument miapeMSI2) {
+		TIntHashSet ret = new TIntHashSet();
 		if (miapeMSI2 != null) {
 			Set<IdentifiedProteinSet> proteinSets = miapeMSI2.getIdentifiedProteinSets();
 			if (proteinSets != null) {
 				for (IdentifiedProteinSet proteinset : proteinSets) {
-					HashMap<String, IdentifiedProtein> identifiedProteins = proteinset.getIdentifiedProteins();
+					Map<String, IdentifiedProtein> identifiedProteins = proteinset.getIdentifiedProteins();
 					if (identifiedProteins != null) {
 						for (IdentifiedProtein protein : identifiedProteins.values()) {
 							ret.add(protein.getId());
@@ -222,8 +226,8 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		return ret;
 	}
 
-	private Set<Integer> getMiapePeptideIds(MiapeMSIDocument miapeMSI2) {
-		Set<Integer> ret = new HashSet<Integer>();
+	private TIntHashSet getMiapePeptideIds(MiapeMSIDocument miapeMSI2) {
+		TIntHashSet ret = new TIntHashSet();
 		if (miapeMSI2 != null) {
 			List<IdentifiedPeptide> identifiedPeptides = miapeMSI2.getIdentifiedPeptides();
 			if (identifiedPeptides != null) {
@@ -244,7 +248,7 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 	// // filter peptides
 	// final List<ExtendedIdentifiedPeptide> identifiedPeptides = this.idSet
 	// .getIdentifiedPeptides();
-	// HashMap<String, IdentifiedProtein> proteins = new HashMap<String,
+	// HashMap<String, IdentifiedProtein> proteins = new THashMap<String,
 	// IdentifiedProtein>();
 	// for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide :
 	// identifiedPeptides) {
@@ -292,8 +296,8 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 	//
 	// }
 
-	private HashSet<Integer> getPeptideIdentifiers(IdentificationSet idSet2) {
-		HashSet<Integer> ret = new HashSet<Integer>();
+	private TIntHashSet getPeptideIdentifiers(IdentificationSet idSet2) {
+		TIntHashSet ret = new TIntHashSet();
 		List<ExtendedIdentifiedPeptide> peptides = idSet2.getIdentifiedPeptides();
 		for (ExtendedIdentifiedPeptide peptide : peptides) {
 			ret.add(peptide.getId());
@@ -301,8 +305,8 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		return ret;
 	}
 
-	private HashSet<Integer> getProteinIdentifiers(IdentificationSet idSet2) {
-		HashSet<Integer> ret = new HashSet<Integer>();
+	private TIntHashSet getProteinIdentifiers(IdentificationSet idSet2) {
+		TIntHashSet ret = new TIntHashSet();
 		List<ProteinGroup> proteinGroups = idSet2.getIdentifiedProteinGroups();
 		for (ProteinGroup proteinGroup : proteinGroups) {
 			for (ExtendedIdentifiedProtein protein : proteinGroup) {

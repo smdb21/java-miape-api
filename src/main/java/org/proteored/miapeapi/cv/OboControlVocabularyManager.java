@@ -1,10 +1,11 @@
 package org.proteored.miapeapi.cv;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import gnu.trove.map.hash.THashMap;
 import psidev.psi.tools.ontology_manager.interfaces.OntologyTermI;
 
 /**
@@ -33,14 +34,11 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 
 	protected OboControlVocabularyManager(int mode, boolean overrideInstance) {
 		if (mode == LOCAL_OBO)
-			cvOboManager = OboControlVocabularyConnector
-					.getInstanceForLocalOBOFiles(overrideInstance);
+			cvOboManager = OboControlVocabularyConnector.getInstanceForLocalOBOFiles(overrideInstance);
 		else if (mode == OLS_OBO)
-			cvOboManager = OboControlVocabularyConnector
-					.getInstanceForOLSWebservice(overrideInstance);
+			cvOboManager = OboControlVocabularyConnector.getInstanceForOLSWebservice(overrideInstance);
 		else if (mode == LOCAL_OBO_TEST)
-			cvOboManager = OboControlVocabularyConnector
-					.getInstanceForLocalTestOBOFiles(overrideInstance);
+			cvOboManager = OboControlVocabularyConnector.getInstanceForLocalTestOBOFiles(overrideInstance);
 		else
 			cvOboManager = OboControlVocabularyConnector.getInstance(overrideInstance);
 	}
@@ -115,7 +113,7 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 		if (cvSet.getCachedPossibleValues() != null)
 			return cvSet.getCachedPossibleValues();
 
-		HashMap<String, String> dicc = new HashMap<String, String>();
+		Map<String, String> dicc = new THashMap<String, String>();
 
 		List<Accession> parentAccessions = cvSet.getParentAccessions();
 		if (parentAccessions != null)
@@ -124,8 +122,8 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 				if (allChildren != null)
 					for (OntologyTermI ontologyTermI : allChildren) {
 						if (!dicc.containsKey(ontologyTermI.getTermAccession().toLowerCase())) {
-							dicc.put(ontologyTermI.getTermAccession().toLowerCase(), ontologyTermI
-									.getTermAccession().toLowerCase());
+							dicc.put(ontologyTermI.getTermAccession().toLowerCase(),
+									ontologyTermI.getTermAccession().toLowerCase());
 							ret.add(new ControlVocabularyTermImpl(ontologyTermI));
 						}
 					}
@@ -143,8 +141,7 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 			for (Accession accession : explicitAccessions) {
 				final OntologyTermI term = cvOboManager.getTermForAccession(accession);
 				if (term != null && !dicc.containsKey(term.getTermAccession().toLowerCase())) {
-					dicc.put(term.getTermAccession().toLowerCase(), term.getTermAccession()
-							.toLowerCase());
+					dicc.put(term.getTermAccession().toLowerCase(), term.getTermAccession().toLowerCase());
 					ret.add(new ControlVocabularyTermImpl(term));
 				}
 			}
@@ -154,8 +151,7 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 	}
 
 	@Override
-	public ControlVocabularyTerm getCVTermByAccession(Accession accession,
-			ControlVocabularySet cvSet) {
+	public ControlVocabularyTerm getCVTermByAccession(Accession accession, ControlVocabularySet cvSet) {
 		if (accession == null)
 			return null;
 		if (cvSet == null)
@@ -176,22 +172,20 @@ public class OboControlVocabularyManager implements ControlVocabularyManager {
 	}
 
 	@Override
-	public HashMap<String, ControlVocabularyTerm> getAccesionParents(Accession accession)
+	public Map<String, ControlVocabularyTerm> getAccesionParents(Accession accession)
 			throws UnsupportedOperationException {
 		if (accession == null)
 			return null;
-		HashMap<String, OntologyTermI> accesionParents = cvOboManager.getAccesionParents(accession);
-		HashMap<String, ControlVocabularyTerm> ret = new HashMap<String, ControlVocabularyTerm>();
+		Map<String, OntologyTermI> accesionParents = cvOboManager.getAccesionParents(accession);
+		Map<String, ControlVocabularyTerm> ret = new THashMap<String, ControlVocabularyTerm>();
 		for (String accession_string : accesionParents.keySet()) {
-			ret.put(accession_string,
-					new ControlVocabularyTermImpl(accesionParents.get(accession_string)));
+			ret.put(accession_string, new ControlVocabularyTermImpl(accesionParents.get(accession_string)));
 		}
 		return ret;
 	}
 
 	@Override
-	public boolean isSonOf(Accession accession, Accession potentialParent)
-			throws UnsupportedOperationException {
+	public boolean isSonOf(Accession accession, Accession potentialParent) throws UnsupportedOperationException {
 		if (accession == null || potentialParent == null)
 			return false;
 		return cvOboManager.isSonOf(accession, potentialParent);

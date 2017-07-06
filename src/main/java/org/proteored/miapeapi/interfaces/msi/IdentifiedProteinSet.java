@@ -1,6 +1,6 @@
 package org.proteored.miapeapi.interfaces.msi;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,7 +31,7 @@ public interface IdentifiedProteinSet {
 	 * 
 	 * @return the list of proteins
 	 */
-	public HashMap<String, IdentifiedProtein> getIdentifiedProteins();
+	public Map<String, IdentifiedProtein> getIdentifiedProteins();
 
 	/**
 	 * Gets the input parameters that were used to obtain this protein set

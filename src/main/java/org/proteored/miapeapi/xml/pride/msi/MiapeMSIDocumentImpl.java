@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.pride.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,12 +37,14 @@ import org.proteored.miapeapi.xml.pride.util.Parameter;
 import org.proteored.miapeapi.xml.pride.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.set.hash.THashSet;
+
 public class MiapeMSIDocumentImpl extends AbstractDocumentFromPride implements MiapeMSIDocument {
 	// private final XmlMiapeFactory<MiapeMSIDocument> xmlFactory;
 	private int msDocumentID;
-	private final Set<InputDataSet> inputDataSets = new HashSet<InputDataSet>();
-	private final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
-	private final Set<InputParameter> inputParameters = new HashSet<InputParameter>();
+	private final Set<InputDataSet> inputDataSets = new THashSet<InputDataSet>();
+	private final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
+	private final Set<InputParameter> inputParameters = new THashSet<InputParameter>();
 	private Set<Software> MSISoftwares;
 
 	public MiapeMSIDocumentImpl(ExperimentType experiment, User user, String prideXMLFileName, String projectName,
@@ -80,8 +81,8 @@ public class MiapeMSIDocumentImpl extends AbstractDocumentFromPride implements M
 	}
 
 	private Set<Software> getMSISoftwares(ExperimentType experiment) {
-		Set<Software> result = new HashSet<Software>();
-		Set<String> softwares = new HashSet<String>();
+		Set<Software> result = new THashSet<Software>();
+		Set<String> softwares = new THashSet<String>();
 		for (Object object : experiment.getGelFreeIdentification()) {
 			GelFreeIdentificationType identification = (GelFreeIdentificationType) object;
 			if (identification.getSearchEngine() != null
@@ -163,7 +164,7 @@ public class MiapeMSIDocumentImpl extends AbstractDocumentFromPride implements M
 
 	@Override
 	public Set<MSIAdditionalInformation> getAdditionalInformations() {
-		Set<MSIAdditionalInformation> setOfAdditionalInformations = new HashSet<MSIAdditionalInformation>();
+		Set<MSIAdditionalInformation> setOfAdditionalInformations = new THashSet<MSIAdditionalInformation>();
 
 		if (experiment.getProtocol() != null) {
 

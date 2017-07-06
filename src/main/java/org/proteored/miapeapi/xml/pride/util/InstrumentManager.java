@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.pride.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,8 @@ import org.proteored.miapeapi.xml.pride.ms.MaldiImpl;
 import org.proteored.miapeapi.xml.pride.ms.SpectrometerImpl;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.map.hash.THashMap;
+
 public class InstrumentManager {
 
 	private final List<Maldi> maldis = new ArrayList<Maldi>();
@@ -28,8 +29,7 @@ public class InstrumentManager {
 	private final Map<String, CvParamType> sourceCVParams;
 	private final ControlVocabularyManager cvManager;
 
-	public InstrumentManager(InstrumentDescriptionType instrument,
-			ControlVocabularyManager cvManager) {
+	public InstrumentManager(InstrumentDescriptionType instrument, ControlVocabularyManager cvManager) {
 		this.sourceCVParams = initSourceParams(instrument);
 		this.cvManager = cvManager;
 		createInstrument(instrument);
@@ -62,8 +62,7 @@ public class InstrumentManager {
 	}
 
 	private void createAnalyzers(InstrumentDescriptionType instrument) {
-		if (instrument.getAnalyzerList() != null
-				&& instrument.getAnalyzerList().getAnalyzer() != null) {
+		if (instrument.getAnalyzerList() != null && instrument.getAnalyzerList().getAnalyzer() != null) {
 			for (ParamType analizerPRIDE : instrument.getAnalyzerList().getAnalyzer()) {
 				analyzers.add(new AnalyzerImpl(analizerPRIDE, cvManager));
 			}
@@ -71,7 +70,7 @@ public class InstrumentManager {
 	}
 
 	private Map<String, CvParamType> initSourceParams(InstrumentDescriptionType instrument) {
-		Map<String, CvParamType> result = new HashMap<String, CvParamType>();
+		Map<String, CvParamType> result = new THashMap<String, CvParamType>();
 		ParamType source = instrument.getSource();
 
 		if (source != null && source.getCvParamOrUserParam() != null) {

@@ -2,7 +2,6 @@ package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,9 +17,10 @@ import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
-public class ProteinOccurrence implements
-		Occurrence<ExtendedIdentifiedProtein>, ProteinContainer,
-		PeptideContainer {
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
+public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>, ProteinContainer, PeptideContainer {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	private final List<ExtendedIdentifiedProtein> proteinList = new ArrayList<ExtendedIdentifiedProtein>();
@@ -94,8 +94,7 @@ public class ProteinOccurrence implements
 	@Override
 	public ExtendedIdentifiedPeptide getBestPeptide(String scoreName) {
 
-		final List<ExtendedIdentifiedPeptide> peptides = this
-				.getPeptides(scoreName);
+		final List<ExtendedIdentifiedPeptide> peptides = this.getPeptides(scoreName);
 		if (peptides != null && !peptides.isEmpty()) {
 			SorterUtil.sortPeptidesByPeptideScore(peptides, scoreName, false);
 			return peptides.get(0);
@@ -105,8 +104,7 @@ public class ProteinOccurrence implements
 
 	@Override
 	public Float getBestPeptideScore() {
-		final ExtendedIdentifiedPeptide bestPeptideByPeptideScore = this
-				.getBestPeptide();
+		final ExtendedIdentifiedPeptide bestPeptideByPeptideScore = this.getBestPeptide();
 		if (bestPeptideByPeptideScore != null)
 			return bestPeptideByPeptideScore.getScore();
 		return null;
@@ -114,8 +112,7 @@ public class ProteinOccurrence implements
 
 	@Override
 	public Float getBestPeptideScore(String scoreName) {
-		final ExtendedIdentifiedPeptide bestPeptideByPeptideScore = this
-				.getBestPeptide(scoreName);
+		final ExtendedIdentifiedPeptide bestPeptideByPeptideScore = this.getBestPeptide(scoreName);
 		if (bestPeptideByPeptideScore != null)
 			return bestPeptideByPeptideScore.getScore(scoreName);
 		return null;
@@ -130,8 +127,7 @@ public class ProteinOccurrence implements
 	 */
 	@Override
 	public Float getBestProteinScore() {
-		final ExtendedIdentifiedProtein bestProteinByProteinScore = this
-				.getBestProtein();
+		final ExtendedIdentifiedProtein bestProteinByProteinScore = this.getBestProtein();
 		if (bestProteinByProteinScore != null)
 			return bestProteinByProteinScore.getScore();
 		return null;
@@ -139,8 +135,7 @@ public class ProteinOccurrence implements
 
 	@Override
 	public Float getBestProteinScore(String scoreName) {
-		final ExtendedIdentifiedProtein bestProteinByProteinScore = this
-				.getBestProtein(scoreName);
+		final ExtendedIdentifiedProtein bestProteinByProteinScore = this.getBestProtein(scoreName);
 		if (bestProteinByProteinScore != null)
 			return bestProteinByProteinScore.getScore(scoreName);
 		return null;
@@ -226,18 +221,15 @@ public class ProteinOccurrence implements
 
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 			if (proteinList != null) {
-				HashSet<Integer> peptideIds = new HashSet<Integer>();
+				TIntHashSet peptideIds = new TIntHashSet();
 				for (ExtendedIdentifiedProtein protein : proteinList) {
 
-					final List<ExtendedIdentifiedPeptide> peptides = protein
-							.getPeptides();
+					final List<ExtendedIdentifiedPeptide> peptides = protein.getPeptides();
 					if (peptides != null) {
 						for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
-							if (!peptideIds.contains(extendedIdentifiedPeptide
-									.getId())) {
+							if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
 								this.peptides.add(extendedIdentifiedPeptide);
-								peptideIds.add(extendedIdentifiedPeptide
-										.getId());
+								peptideIds.add(extendedIdentifiedPeptide.getId());
 							}
 						}
 					}
@@ -250,8 +242,7 @@ public class ProteinOccurrence implements
 
 	public List<ExtendedIdentifiedPeptide> getPeptides(String scoreName) {
 
-		if (peptideListByScoreNames == null
-				|| peptideListByScoreNames.isEmpty()) {
+		if (peptideListByScoreNames == null || peptideListByScoreNames.isEmpty()) {
 			List<ExtendedIdentifiedPeptide> peptides = getPeptides();
 			for (ExtendedIdentifiedPeptide peptide : peptides) {
 				if (peptide.getScore(scoreName) != null) {
@@ -314,8 +305,7 @@ public class ProteinOccurrence implements
 		List<Database> ret = new ArrayList<Database>();
 		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
 		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<InputParameter> inputParameters = miapeMSIDocument
-					.getInputParameters();
+			Set<InputParameter> inputParameters = miapeMSIDocument.getInputParameters();
 			if (inputParameters != null) {
 				for (InputParameter inputParameter : inputParameters) {
 					Set<Database> databases = inputParameter.getDatabases();
@@ -323,17 +313,12 @@ public class ProteinOccurrence implements
 						for (Database database : databases) {
 							boolean found = false;
 							for (Database selectedDatabase : ret) {
-								String selectedDatabaseName = selectedDatabase
-										.getName();
+								String selectedDatabaseName = selectedDatabase.getName();
 								if (selectedDatabase != null)
-									if (selectedDatabaseName.equals(database
-											.getName())) {
-										String selectedDatabaseVersion = selectedDatabase
-												.getNumVersion();
+									if (selectedDatabaseName.equals(database.getName())) {
+										String selectedDatabaseVersion = selectedDatabase.getNumVersion();
 										if (selectedDatabaseVersion != null) {
-											if (selectedDatabaseVersion
-													.equals(database
-															.getNumVersion()))
+											if (selectedDatabaseVersion.equals(database.getNumVersion()))
 												found = true;
 										} else if (selectedDatabaseVersion == null
 												&& database.getNumVersion() == null) {
@@ -366,18 +351,14 @@ public class ProteinOccurrence implements
 				for (Software software : softwares) {
 					boolean found = false;
 					for (Software selectedSoftware : ret) {
-						String selectedDatabaseName = selectedSoftware
-								.getName();
+						String selectedDatabaseName = selectedSoftware.getName();
 						if (selectedSoftware != null)
 							if (selectedDatabaseName.equals(software.getName())) {
-								String selectedSoftwareVersion = selectedSoftware
-										.getVersion();
+								String selectedSoftwareVersion = selectedSoftware.getVersion();
 								if (selectedSoftwareVersion != null) {
-									if (selectedSoftwareVersion.equals(software
-											.getVersion()))
+									if (selectedSoftwareVersion.equals(software.getVersion()))
 										found = true;
-								} else if (selectedSoftwareVersion == null
-										&& software.getVersion() == null) {
+								} else if (selectedSoftwareVersion == null && software.getVersion() == null) {
 									found = true;
 								}
 							}
@@ -397,7 +378,7 @@ public class ProteinOccurrence implements
 	 */
 	@Override
 	public Set<String> getScoreNames() {
-		Set<String> ret = new HashSet<String>();
+		Set<String> ret = new THashSet<String>();
 		if (proteinList != null) {
 			for (ExtendedIdentifiedProtein protein : proteinList) {
 				List<String> scoreNames = protein.getScoreNames();

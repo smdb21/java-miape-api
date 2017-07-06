@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.xml.xtandem.msi;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -16,14 +16,12 @@ public class PeptideModificationImpl2 implements PeptideModification {
 	private PeptideModificationImpl modificationImpl;
 	private final InputParams iInputParams;
 
-	public PeptideModificationImpl2(String modKey,
-			HashMap<String, String> rawModMap, Integer domainStart,
+	public PeptideModificationImpl2(String modKey, Map<String, String> rawModMap, Integer domainStart,
 			InputParams iInputParams, ControlVocabularyManager cvManager) {
 		this.iInputParams = iInputParams;
 		// Get the specific parameters for the modification
 		String rawModString = rawModMap.get("name" + modKey);
-		double modMass = Double.parseDouble(rawModMap.get("modified" + modKey)
-				.toString());
+		double modMass = Double.parseDouble(rawModMap.get("modified" + modKey).toString());
 		String modLocation = rawModMap.get("at" + modKey).toString();
 		String aminoAcidSubstituted = null;
 
@@ -35,20 +33,16 @@ public class PeptideModificationImpl2 implements PeptideModification {
 		if (isFixedModificationInput(modMass)) {
 
 			// Create an instance of a fixed modification.
-			FixedModification fixedMod = new FixedModification(rawModString,
-					modMass, modLocation, 0, aminoAcidSubstituted != null,
-					aminoAcidSubstituted);
-			modificationImpl = new PeptideModificationImpl(fixedMod,
-					domainStart, cvManager);
+			FixedModification fixedMod = new FixedModification(rawModString, modMass, modLocation, 0,
+					aminoAcidSubstituted != null, aminoAcidSubstituted);
+			modificationImpl = new PeptideModificationImpl(fixedMod, domainStart, cvManager);
 
 		} else if (isVariableModificationInput(modMass)) {
 
 			// The rest will be assumed to be variable modifications.
-			VariableModification varMod = new VariableModification(
-					rawModString, modMass, modLocation, 0,
+			VariableModification varMod = new VariableModification(rawModString, modMass, modLocation, 0,
 					aminoAcidSubstituted != null, aminoAcidSubstituted);
-			modificationImpl = new PeptideModificationImpl(varMod, domainStart,
-					cvManager);
+			modificationImpl = new PeptideModificationImpl(varMod, domainStart, cvManager);
 
 		} else {
 
@@ -56,11 +50,9 @@ public class PeptideModificationImpl2 implements PeptideModification {
 			// in the residue, modification mass [1-n]
 
 			// The rest will be assumed to be variable modifications.
-			VariableModification varMod = new VariableModification(
-					rawModString, modMass, modLocation, 0,
+			VariableModification varMod = new VariableModification(rawModString, modMass, modLocation, 0,
 					aminoAcidSubstituted != null, aminoAcidSubstituted);
-			modificationImpl = new PeptideModificationImpl(varMod, domainStart,
-					cvManager);
+			modificationImpl = new PeptideModificationImpl(varMod, domainStart, cvManager);
 
 		}
 
@@ -121,8 +113,7 @@ public class PeptideModificationImpl2 implements PeptideModification {
 
 		if (modificationMasses != null) {
 
-			StringTokenizer tokenizer = new StringTokenizer(modificationMasses,
-					",");
+			StringTokenizer tokenizer = new StringTokenizer(modificationMasses, ",");
 
 			while (tokenizer.hasMoreTokens()) {
 				String[] tokens = tokenizer.nextToken().split("@");
@@ -155,8 +146,7 @@ public class PeptideModificationImpl2 implements PeptideModification {
 
 		if (modificationMasses != null) {
 
-			StringTokenizer tokenizer = new StringTokenizer(modificationMasses,
-					",");
+			StringTokenizer tokenizer = new StringTokenizer(modificationMasses, ",");
 			while (tokenizer.hasMoreTokens()) {
 				String[] tokens = tokenizer.nextToken().split("@");
 				BigDecimal inputMass = new BigDecimal(new Double(tokens[0]));
@@ -169,8 +159,7 @@ public class PeptideModificationImpl2 implements PeptideModification {
 
 		if (refineModificationMasses != null) {
 
-			StringTokenizer tokenizer2 = new StringTokenizer(
-					refineModificationMasses, ",");
+			StringTokenizer tokenizer2 = new StringTokenizer(refineModificationMasses, ",");
 
 			while (tokenizer2.hasMoreTokens()) {
 				String[] tokens = tokenizer2.nextToken().split("@");

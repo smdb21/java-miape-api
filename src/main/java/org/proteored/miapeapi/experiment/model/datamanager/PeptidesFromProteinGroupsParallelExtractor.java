@@ -1,15 +1,14 @@
 package org.proteored.miapeapi.experiment.model.datamanager;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 
-import edu.scripps.yates.pi.ParIterator;
-import edu.scripps.yates.pi.reductions.Reducible;
+import edu.scripps.yates.utilities.pi.ParIterator;
+import edu.scripps.yates.utilities.pi.reductions.Reducible;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class PeptidesFromProteinGroupsParallelExtractor extends Thread {
 
@@ -17,10 +16,8 @@ public class PeptidesFromProteinGroupsParallelExtractor extends Thread {
 	private final Reducible<List<ExtendedIdentifiedPeptide>> reduciblePeptides;
 	private final int minPeptideLength;
 
-	public PeptidesFromProteinGroupsParallelExtractor(
-			ParIterator<ProteinGroup> iterator,
-			Reducible<List<ExtendedIdentifiedPeptide>> reduciblePeptides,
-			int minPeptideLength) {
+	public PeptidesFromProteinGroupsParallelExtractor(ParIterator<ProteinGroup> iterator,
+			Reducible<List<ExtendedIdentifiedPeptide>> reduciblePeptides, int minPeptideLength) {
 		this.iterator = iterator;
 		this.reduciblePeptides = reduciblePeptides;
 		this.minPeptideLength = minPeptideLength;
@@ -29,24 +26,20 @@ public class PeptidesFromProteinGroupsParallelExtractor extends Thread {
 	@Override
 	public void run() {
 		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
-		Set<Integer> peptideIds = new HashSet<Integer>();
+		TIntHashSet peptideIds = new TIntHashSet();
 		reduciblePeptides.set(ret);
 
 		while (iterator.hasNext()) {
 			try {
 				ProteinGroup proteinGroup = iterator.next();
-				final List<ExtendedIdentifiedPeptide> peptidesFromProteins = proteinGroup
-						.getPeptides();
-				if (peptidesFromProteins != null
-						&& !peptidesFromProteins.isEmpty()) {
+				final List<ExtendedIdentifiedPeptide> peptidesFromProteins = proteinGroup.getPeptides();
+				if (peptidesFromProteins != null && !peptidesFromProteins.isEmpty()) {
 					for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptidesFromProteins) {
 						// Do not take the same peptide several times ->
 						// This happens when a peptide is shared by several
 						// proteins
-						if (!peptideIds.contains(extendedIdentifiedPeptide
-								.getId())) {
-							if (minPeptideLength > extendedIdentifiedPeptide
-									.getSequence().length())
+						if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
+							if (minPeptideLength > extendedIdentifiedPeptide.getSequence().length())
 								continue;
 							ret.add(extendedIdentifiedPeptide);
 							peptideIds.add(extendedIdentifiedPeptide.getId());

@@ -8,13 +8,14 @@
 package org.proteored.miapeapi.xml.mzml.lightParser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.ReferenceableParamGroupRef;
 import uk.ac.ebi.jmzml.model.mzml.UserParam;
@@ -25,7 +26,7 @@ import uk.ac.ebi.jmzml.model.mzml.UserParam;
 public class TXMLAttributeList extends TXMLNode {
 	private List<String> attribute_labels;
 	private List<String> attribute_data;
-	private final HashMap<String, String> attributes = new HashMap<String, String>();
+	private final Map<String, String> attributes = new THashMap<String, String>();
 	private boolean vectorcreated;
 	private boolean usestarttag;
 
@@ -56,7 +57,7 @@ public class TXMLAttributeList extends TXMLNode {
 		return attribute_labels;
 	}
 
-	public HashMap<String, String> getAttributes() {
+	public Map<String, String> getAttributes() {
 		return attributes;
 	}
 

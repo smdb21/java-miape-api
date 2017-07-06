@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.xtandem.msi;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,18 +14,19 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import de.proteinms.xtandemparser.xtandem.ModificationMap;
 import de.proteinms.xtandemparser.xtandem.Peptide;
 import de.proteinms.xtandemparser.xtandem.Protein;
+import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedProteinImpl implements IdentifiedProtein {
 	private final Protein xmlProtein;
-	private final Set<ProteinScore> proteinScores = new HashSet<ProteinScore>();
+	private final Set<ProteinScore> proteinScores = new THashSet<ProteinScore>();
 	private final Integer identifier;
 	private List<Peptide> peptideList;
 	private final ModificationMap modificationsMap;
 	private final ControlVocabularyManager cvManager;
 	private List<IdentifiedPeptide> peptides;
 
-	public IdentifiedProteinImpl(Protein xTandemProtein, Integer identifier,
-			ModificationMap modificationsMap, ControlVocabularyManager cvManager) {
+	public IdentifiedProteinImpl(Protein xTandemProtein, Integer identifier, ModificationMap modificationsMap,
+			ControlVocabularyManager cvManager) {
 		xmlProtein = xTandemProtein;
 		this.identifier = identifier;
 		// this.peptideList = list;
@@ -37,8 +37,7 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 
 	private void processScores() {
 		if (xmlProtein != null) {
-			final ControlVocabularyTerm xTandemExpectValueTerm = Score
-					.getXTandemExpectValueTerm(cvManager);
+			final ControlVocabularyTerm xTandemExpectValueTerm = Score.getXTandemExpectValueTerm(cvManager);
 			String name = "XTandem e-value";
 			if (xTandemExpectValueTerm != null) {
 				name = xTandemExpectValueTerm.getPreferredName();

@@ -1,9 +1,8 @@
 package org.proteored.miapeapi.xml.xtandem.msi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -22,6 +21,7 @@ import de.proteinms.xtandemparser.xtandem.InputParams;
 import de.proteinms.xtandemparser.xtandem.ModificationMap;
 import de.proteinms.xtandemparser.xtandem.Peptide;
 import de.proteinms.xtandemparser.xtandem.Spectrum;
+import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 	private final Domain domain;
@@ -32,19 +32,16 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 	private final String spectrumRef;
 	private final InputData inputData;
 	private final Spectrum spectrum;
-	private final HashMap<String, String> rawModMap;
+	private final Map<String, String> rawModMap;
 	private final Peptide xTandemPeptide;
 	private final InputParams inputParams;
 	private final int rank;
 
 	// private final ProteinMap proteinMap;
 
-	public IdentifiedPeptideImpl(Domain domain, Peptide xTandemPeptide,
-			ModificationMap modificationsMap,
-			HashMap<String, String> rawModMap, InputParams inputParams,
-			Integer identifier, InputData inputData,
-			ControlVocabularyManager cvManager, Spectrum spectrum, int rank,
-			String spectrumRef) {
+	public IdentifiedPeptideImpl(Domain domain, Peptide xTandemPeptide, ModificationMap modificationsMap,
+			Map<String, String> rawModMap, InputParams inputParams, Integer identifier, InputData inputData,
+			ControlVocabularyManager cvManager, Spectrum spectrum, int rank, String spectrumRef) {
 		this.domain = domain;
 		this.modificationsMap = modificationsMap;
 		this.cvManager = cvManager;
@@ -65,25 +62,21 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 
 	@Override
 	public Set<PeptideScore> getScores() {
-		Set<PeptideScore> peptideScores = new HashSet<PeptideScore>();
+		Set<PeptideScore> peptideScores = new THashSet<PeptideScore>();
 
 		try {
 			String name;
 
 			name = "X!Tandem:hyperscore";
-			final ControlVocabularyTerm xTandemHyperScoreTerm = Score
-					.getXTandemHyperScoreTerm(cvManager);
+			final ControlVocabularyTerm xTandemHyperScoreTerm = Score.getXTandemHyperScoreTerm(cvManager);
 			if (xTandemHyperScoreTerm != null)
 				name = xTandemHyperScoreTerm.getPreferredName();
-			peptideScores.add(new PeptideScoreImpl(name, domain
-					.getDomainHyperScore()));
+			peptideScores.add(new PeptideScoreImpl(name, domain.getDomainHyperScore()));
 			name = "X!Tandem:expect";
-			final ControlVocabularyTerm xTandemExpectedValueTerm = Score
-					.getXTandemExpectValueTerm(cvManager);
+			final ControlVocabularyTerm xTandemExpectedValueTerm = Score.getXTandemExpectValueTerm(cvManager);
 			if (xTandemExpectedValueTerm != null)
 				name = xTandemExpectedValueTerm.getPreferredName();
-			peptideScores.add(new PeptideScoreImpl(name, domain
-					.getDomainExpect()));
+			peptideScores.add(new PeptideScoreImpl(name, domain.getDomainExpect()));
 
 			// not appears in the xtandem output documentation
 			// peptideScores.add(new PeptideScoreImpl("X!Tandem:nextscore",
@@ -100,29 +93,25 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 	public Set<PeptideModification> getModifications() {
 		if (modificationsMap != null) {
 
-			Set<PeptideModification> peptideModifications = new HashSet<PeptideModification>();
-			ArrayList<Modification> allFixedModifications = modificationsMap
-					.getAllFixedModifications();
+			Set<PeptideModification> peptideModifications = new THashSet<PeptideModification>();
+			ArrayList<Modification> allFixedModifications = modificationsMap.getAllFixedModifications();
 			int start = domain.getDomainStart();
 			int end = domain.getDomainEnd();
 
 			int m_counter = 1;
-			String modKey = getModKey(xTandemPeptide.getSpectrumNumber(),
-					xTandemPeptide.getPeptideID(), domain.getDomainKey(),
-					m_counter);
+			String modKey = getModKey(xTandemPeptide.getSpectrumNumber(), xTandemPeptide.getPeptideID(),
+					domain.getDomainKey(), m_counter);
 
 			while (rawModMap.get("name" + modKey) != null) {
 
-				final PeptideModificationImpl2 peptideModification = new PeptideModificationImpl2(
-						modKey, rawModMap, domain.getDomainStart(),
-						inputParams, cvManager);
+				final PeptideModificationImpl2 peptideModification = new PeptideModificationImpl2(modKey, rawModMap,
+						domain.getDomainStart(), inputParams, cvManager);
 
 				peptideModifications.add(peptideModification);
 
 				m_counter++;
-				modKey = getModKey(xTandemPeptide.getSpectrumNumber(),
-						xTandemPeptide.getPeptideID(), domain.getDomainKey(),
-						m_counter);
+				modKey = getModKey(xTandemPeptide.getSpectrumNumber(), xTandemPeptide.getPeptideID(),
+						domain.getDomainKey(), m_counter);
 			}
 			// for (Modification modification : allFixedModifications) {
 			// try {
@@ -161,10 +150,8 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 		return null;
 	}
 
-	private String getModKey(int spectrumNumber, String peptideID,
-			String domainKey, int m_counter) {
-		int peptideNumber = Integer.valueOf(peptideID.substring(peptideID
-				.indexOf("_p") + 2));
+	private String getModKey(int spectrumNumber, String peptideID, String domainKey, int m_counter) {
+		int peptideNumber = Integer.valueOf(peptideID.substring(peptideID.indexOf("_p") + 2));
 
 		return "_" + domainKey + "_m" + m_counter;
 
@@ -182,17 +169,14 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 		int charge = spectrum.getPrecursorCharge();
 		if (charge > 0) {
 			// delta
-			sb.append(MiapeXmlUtil.ERROR_MZ + "=" + domain.getDomainDeltaMh()
-					/ charge);
+			sb.append(MiapeXmlUtil.ERROR_MZ + "=" + domain.getDomainDeltaMh() / charge);
 			// experimental
-			final double experimentalMZ = (spectrum.getPrecursorMh() - MiapeXmlUtil.PROTON_MASS)
-					/ charge + MiapeXmlUtil.PROTON_MASS;
-			sb.append(MiapeXmlUtil.TERM_SEPARATOR
-					+ MiapeXmlUtil.EXPERIMENTAL_MZ + "=" + experimentalMZ);
-			final double theoricMZ = (domain.getDomainMh() - MiapeXmlUtil.PROTON_MASS)
-					/ charge + MiapeXmlUtil.PROTON_MASS;
-			sb.append(MiapeXmlUtil.TERM_SEPARATOR + MiapeXmlUtil.CALCULATED_MZ
-					+ "=" + theoricMZ);
+			final double experimentalMZ = (spectrum.getPrecursorMh() - MiapeXmlUtil.PROTON_MASS) / charge
+					+ MiapeXmlUtil.PROTON_MASS;
+			sb.append(MiapeXmlUtil.TERM_SEPARATOR + MiapeXmlUtil.EXPERIMENTAL_MZ + "=" + experimentalMZ);
+			final double theoricMZ = (domain.getDomainMh() - MiapeXmlUtil.PROTON_MASS) / charge
+					+ MiapeXmlUtil.PROTON_MASS;
+			sb.append(MiapeXmlUtil.TERM_SEPARATOR + MiapeXmlUtil.CALCULATED_MZ + "=" + theoricMZ);
 		}
 		return sb.toString();
 	}

@@ -1,11 +1,11 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1.util;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzidml.model.mzidml.AbstractParam;
 import uk.ac.ebi.jmzidml.model.mzidml.CvParam;
 import uk.ac.ebi.jmzidml.model.mzidml.UserParam;
@@ -45,9 +45,8 @@ public class Utils {
 	public static final String PUBLICATION = "Publication";
 	public static final String SUBSTITUTION_MODIFICATION = "Substitution modification";
 
-	public static Map<String, AbstractParam> initParamMap(
-			List<AbstractParam> list) {
-		Map<String, AbstractParam> map = new HashMap<String, AbstractParam>();
+	public static Map<String, AbstractParam> initParamMap(List<AbstractParam> list) {
+		Map<String, AbstractParam> map = new THashMap<String, AbstractParam>();
 		if (list != null) {
 			for (AbstractParam param : list) {
 				if (param instanceof CvParam) {
@@ -65,8 +64,7 @@ public class Utils {
 	public static String writeParam(List<AbstractParam> paramGroup) {
 		StringBuilder sb = new StringBuilder();
 		for (AbstractParam param : paramGroup) {
-			sb.append(MzidentmlControlVocabularyXmlFactory
-					.readEntireParam(param));
+			sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(param));
 		}
 		return sb.toString();
 	}

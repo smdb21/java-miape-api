@@ -1,8 +1,6 @@
 package org.proteored.miapeapi.xml.dtaselect.msi;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +21,8 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import edu.scripps.yates.dtaselectparser.util.DTASelectModification;
 import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.utilities.masses.MassesUtil;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	private final DTASelectPSM dtaSelectPSM;
@@ -30,7 +30,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	private final List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
 	private final int id;
 	private static Integer seed;
-	public final static Map<String, IdentifiedPeptide> map = new HashMap<String, IdentifiedPeptide>();
+	public final static Map<String, IdentifiedPeptide> map = new THashMap<String, IdentifiedPeptide>();
 
 	public IdentifiedPeptideImplFromDTASelect(DTASelectPSM dtaSelectPSM, ControlVocabularyManager cvManager) {
 		this.cvManager = cvManager;
@@ -40,6 +40,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -131,7 +132,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public Set<PeptideScore> getScores() {
-		Set<PeptideScore> ret = new HashSet<PeptideScore>();
+		Set<PeptideScore> ret = new THashSet<PeptideScore>();
 		final Double conf = dtaSelectPSM.getConf();
 		if (conf != null) {
 			PeptideScore score = new PeptideScoreBuilder("Conf%", conf.toString()).build();
@@ -195,7 +196,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	@Override
 	public Set<PeptideModification> getModifications() {
 		final List<DTASelectModification> modifications = dtaSelectPSM.getModifications();
-		Set<PeptideModification> ret = new HashSet<PeptideModification>();
+		Set<PeptideModification> ret = new THashSet<PeptideModification>();
 		if (modifications != null) {
 			for (DTASelectModification dtaSelectPTM : modifications) {
 				ret.add(new PeptideModificationImplFromDTASelect(dtaSelectPTM));

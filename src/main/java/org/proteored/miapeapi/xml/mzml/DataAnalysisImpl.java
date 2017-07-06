@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -15,6 +15,7 @@ import org.proteored.miapeapi.interfaces.MatchMode;
 import org.proteored.miapeapi.interfaces.ms.DataAnalysis;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.ParamGroup;
 import uk.ac.ebi.jmzml.model.mzml.ProcessingMethod;
@@ -41,25 +42,22 @@ public class DataAnalysisImpl implements DataAnalysis {
 	private String parametersLocation = null;
 
 	public DataAnalysisImpl(ProcessingMethod processingMethod, Software software,
-			ReferenceableParamGroupList referenceableParamGroupList,
-			ControlVocabularyManager cvManager) {
+			ReferenceableParamGroupList referenceableParamGroupList, ControlVocabularyManager cvManager) {
 
-		HashMap<String, String> diccSoftware = new HashMap<String, String>();
+		Map<String, String> diccSoftware = new THashMap<String, String>();
 		ParamGroup paramGroupProcessingMethod = null;
 		ParamGroup paramGroupSoftware = null;
 		if (processingMethod != null) {
-			paramGroupProcessingMethod = MzMLControlVocabularyXmlFactory.createParamGroup(
-					processingMethod.getCvParam(), processingMethod.getUserParam(),
-					processingMethod.getReferenceableParamGroupRef());
+			paramGroupProcessingMethod = MzMLControlVocabularyXmlFactory.createParamGroup(processingMethod.getCvParam(),
+					processingMethod.getUserParam(), processingMethod.getReferenceableParamGroupRef());
 		}
 		if (software != null) {
-			paramGroupSoftware = MzMLControlVocabularyXmlFactory.createParamGroup(
-					software.getCvParam(), software.getUserParam(),
-					software.getReferenceableParamGroupRef());
+			paramGroupSoftware = MzMLControlVocabularyXmlFactory.createParamGroup(software.getCvParam(),
+					software.getUserParam(), software.getReferenceableParamGroupRef());
 		}
 		// merge the param groups
-		ParamGroup commonParamGroup = MzMLControlVocabularyXmlFactory.mergeParamGroups(
-				paramGroupProcessingMethod, paramGroupSoftware, referenceableParamGroupList);
+		ParamGroup commonParamGroup = MzMLControlVocabularyXmlFactory.mergeParamGroups(paramGroupProcessingMethod,
+				paramGroupSoftware, referenceableParamGroupList);
 
 		// version
 		if (software != null) {
@@ -67,18 +65,16 @@ public class DataAnalysisImpl implements DataAnalysis {
 			diccSoftware.put(version, version);
 		}
 		// description
-		this.description = MzMLControlVocabularyXmlFactory.getFullCVsFromParamGroup(
-				commonParamGroup, referenceableParamGroupList,
-				DataTransformation.getInstance(cvManager));
+		this.description = MzMLControlVocabularyXmlFactory.getFullCVsFromParamGroup(commonParamGroup,
+				referenceableParamGroupList, DataTransformation.getInstance(cvManager));
 		diccSoftware.put(this.description, this.description);
 
 		// name
 		this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(commonParamGroup,
 				referenceableParamGroupList, SoftwareName.getInstance(cvManager));
 		if (name == null) {
-			this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-					commonParamGroup, referenceableParamGroupList, NAME_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.name = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(commonParamGroup,
+					referenceableParamGroupList, NAME_TEXT_LIST, MatchMode.ANYWHERE);
 		}
 		if (name == null)
 			this.name = "Data analysis";
@@ -86,26 +82,22 @@ public class DataAnalysisImpl implements DataAnalysis {
 			diccSoftware.put(name, name);
 
 		// manufacturer / vendor
-		this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(
-				commonParamGroup, referenceableParamGroupList,
-				SoftwareManufacturer.getInstance(cvManager));
+		this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(commonParamGroup,
+				referenceableParamGroupList, SoftwareManufacturer.getInstance(cvManager));
 		if (this.manufacturer == null)
-			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(
-					commonParamGroup, referenceableParamGroupList, SOFTWARE_VENDOR_CV);
+			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(commonParamGroup,
+					referenceableParamGroupList, SOFTWARE_VENDOR_CV);
 		if (this.manufacturer == null)
-			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(
-					commonParamGroup, referenceableParamGroupList,
-					InstrumentVendor.getInstance(cvManager));
+			this.manufacturer = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(commonParamGroup,
+					referenceableParamGroupList, InstrumentVendor.getInstance(cvManager));
 		if (this.manufacturer == null)
-			this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-					commonParamGroup, referenceableParamGroupList, MANUFACTURER_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.manufacturer = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(commonParamGroup,
+					referenceableParamGroupList, MANUFACTURER_TEXT_LIST, MatchMode.ANYWHERE);
 		diccSoftware.put(manufacturer, manufacturer);
 
 		// catalog number
-		this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(
-				commonParamGroup, referenceableParamGroupList, CATALOG_TEXT_LIST,
-				MatchMode.ANYWHERE);
+		this.catalogNumber = MzMLControlVocabularyXmlFactory.getFullCVFromParamGroupByName(commonParamGroup,
+				referenceableParamGroupList, CATALOG_TEXT_LIST, MatchMode.ANYWHERE);
 		diccSoftware.put(catalogNumber, catalogNumber);
 
 		// uri / reference
@@ -114,22 +106,19 @@ public class DataAnalysisImpl implements DataAnalysis {
 		diccSoftware.put(uri, uri);
 
 		// parameters file
-		this.parametersLocation = MzMLControlVocabularyXmlFactory
-				.getValueFromParamGroupByAccession(commonParamGroup, referenceableParamGroupList,
-						MSFileType.PARAMETER_FILE_CV);
+		this.parametersLocation = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(commonParamGroup,
+				referenceableParamGroupList, MSFileType.PARAMETER_FILE_CV);
 		if (this.parametersLocation == null)
-			this.parametersLocation = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
-					commonParamGroup, referenceableParamGroupList, PARAMETERS_FILE_TEXT_LIST,
-					MatchMode.ANYWHERE);
+			this.parametersLocation = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(commonParamGroup,
+					referenceableParamGroupList, PARAMETERS_FILE_TEXT_LIST, MatchMode.ANYWHERE);
 		diccSoftware.put(parametersLocation, parametersLocation);
 
 		// parameters
 		StringBuilder sb = new StringBuilder();
 
 		// data processing parameters
-		List<CVParam> dataProcessingCVs = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(
-				commonParamGroup, referenceableParamGroupList,
-				DataProcessingParameters.getInstance(cvManager));
+		List<CVParam> dataProcessingCVs = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(commonParamGroup,
+				referenceableParamGroupList, DataProcessingParameters.getInstance(cvManager));
 		if (dataProcessingCVs != null) {
 			for (CVParam cvParam : dataProcessingCVs) {
 				if (!"".equals(sb.toString()))
@@ -142,11 +131,10 @@ public class DataAnalysisImpl implements DataAnalysis {
 
 		// by text
 		if (!"".equals(sb.toString())) {
-			final String valueFromParamGroupByName = MzMLControlVocabularyXmlFactory
-					.getValueFromParamGroupByName(commonParamGroup, referenceableParamGroupList,
-							PARAMETERS_TEXT_LIST,
+			final String valueFromParamGroupByName = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByName(
+					commonParamGroup, referenceableParamGroupList, PARAMETERS_TEXT_LIST,
 
-							MatchMode.ANYWHERE);
+					MatchMode.ANYWHERE);
 			if (valueFromParamGroupByName != null)
 				sb.append(valueFromParamGroupByName);
 		}

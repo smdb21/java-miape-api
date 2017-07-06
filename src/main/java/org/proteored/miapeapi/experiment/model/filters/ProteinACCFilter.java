@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +20,10 @@ import org.proteored.miapeapi.util.UniprotId2AccMapping;
 import com.compomics.dbtoolkit.io.implementations.FASTADBLoader;
 import com.compomics.util.protein.Protein;
 
+import gnu.trove.set.hash.THashSet;
+
 public class ProteinACCFilter implements Filter, Filters<ProteinComparatorKey> {
-	private final Set<ProteinComparatorKey> accessions = new HashSet<ProteinComparatorKey>();
+	private final Set<ProteinComparatorKey> accessions = new THashSet<ProteinComparatorKey>();
 	private final Software software;
 	private final List<String> sortedAccessions = new ArrayList<String>();;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -96,8 +97,9 @@ public class ProteinACCFilter implements Filter, Filters<ProteinComparatorKey> {
 					return false;
 			}
 			return true;
-		} else
+		} else {
 			return super.equals(obj);
+		}
 	}
 
 	@Override

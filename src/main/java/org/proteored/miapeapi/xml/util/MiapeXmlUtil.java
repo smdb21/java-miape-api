@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.util;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -9,9 +8,10 @@ import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 
+import gnu.trove.set.hash.THashSet;
+
 public class MiapeXmlUtil {
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	public static final String TERM_SEPARATOR = "\n";
 	public static final String CALCULATED_MZ = "Calculated Mass to Charge";
 	public static final String EXPERIMENTAL_MZ = "Experimental Mass to Charge";
@@ -62,12 +62,11 @@ public class MiapeXmlUtil {
 	 * 
 	 */
 	public enum IdentifierPrefixes {
-		PROTEIN("PROT_"), SOFTWARE("SW_"), SPECTRUM("SPEC_"), INPUTDATA(
-				"INDATA_"), INPUTDATASET("INDATASET_"), PARAMETERS("PARAM_"), DIRECTDETECTION(
-				"DD_"), DIRECTDETECTIONAGENT("DDA_"), INDIRECTDETECTION("ID_"), IMAGE(
-				"IM_"), GELMATRIX("GM_"), SAMPLE("SMPL_"), LANE("LN_"), SUBSTANCE(
-				"SUBS_"), EQUIPMENT("EQ_"), EPROTOCOL("EP_"), BUFFER("BU_"), PEPTIDE(
-				"PEP_");
+		PROTEIN("PROT_"), SOFTWARE("SW_"), SPECTRUM("SPEC_"), INPUTDATA("INDATA_"), INPUTDATASET(
+				"INDATASET_"), PARAMETERS("PARAM_"), DIRECTDETECTION("DD_"), DIRECTDETECTIONAGENT(
+						"DDA_"), INDIRECTDETECTION("ID_"), IMAGE("IM_"), GELMATRIX("GM_"), SAMPLE("SMPL_"), LANE(
+								"LN_"), SUBSTANCE(
+										"SUBS_"), EQUIPMENT("EQ_"), EPROTOCOL("EP_"), BUFFER("BU_"), PEPTIDE("PEP_");
 		private final String prefix;
 
 		private IdentifierPrefixes(String prefix) {
@@ -140,7 +139,7 @@ public class MiapeXmlUtil {
 			String replacedProteinSeq = proteinSequence.replace("I", "*");
 			replacedProteinSeq = replacedProteinSeq.replace("L", "*");
 			int[] cov = new int[replacedProteinSeq.length()];
-			Set<String> peptideSequencesProcessed = new HashSet<String>();
+			Set<String> peptideSequencesProcessed = new THashSet<String>();
 			for (ExtendedIdentifiedPeptide peptide : supportingPeptides) {
 				String seq = peptide.getSequence();
 
@@ -156,9 +155,7 @@ public class MiapeXmlUtil {
 								cov[index + i] = 1;
 							}
 						} else {
-							log.warn("The peptide "
-									+ seq
-									+ " doesn't fit with the sequence of the protein "
+							log.warn("The peptide " + seq + " doesn't fit with the sequence of the protein "
 									+ replacedProteinSeq);
 						}
 					}
@@ -170,8 +167,7 @@ public class MiapeXmlUtil {
 				if (num == 1)
 					count++;
 			}
-			if (count != 0 && replacedProteinSeq != null
-					&& replacedProteinSeq.length() > 0)
+			if (count != 0 && replacedProteinSeq != null && replacedProteinSeq.length() > 0)
 				return (double) count / replacedProteinSeq.length();
 
 		}
@@ -185,8 +181,7 @@ public class MiapeXmlUtil {
 	 * @param supportingPeptides
 	 * @return a value from 0 to 1
 	 */
-	public static Double calculateProteinCoverage2(String proteinSequence,
-			List<IdentifiedPeptide> supportingPeptides) {
+	public static Double calculateProteinCoverage2(String proteinSequence, List<IdentifiedPeptide> supportingPeptides) {
 		if (proteinSequence != null) {
 			int[] cov = new int[proteinSequence.length()];
 			for (IdentifiedPeptide peptide : supportingPeptides) {
@@ -198,10 +193,8 @@ public class MiapeXmlUtil {
 							cov[index + i] = 1;
 						}
 					} else {
-						log.warn("The peptide "
-								+ peptide.getSequence()
-								+ " doesn't fit with the sequence of the protein "
-								+ proteinSequence);
+						log.warn("The peptide " + peptide.getSequence()
+								+ " doesn't fit with the sequence of the protein " + proteinSequence);
 					}
 				}
 			}
@@ -211,8 +204,7 @@ public class MiapeXmlUtil {
 				if (num == 1)
 					count++;
 			}
-			if (count != 0 && proteinSequence != null
-					&& proteinSequence.length() > 0)
+			if (count != 0 && proteinSequence != null && proteinSequence.length() > 0)
 				return (double) count / proteinSequence.length();
 
 		}

@@ -9,8 +9,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +46,9 @@ import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import edu.scripps.yates.utilities.fasta.FastaParser;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.pridemod.PrideModController;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
@@ -269,14 +270,14 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		BufferedReader dis = null;
 		try {
 
-			Map<TableTextFileColumn, Integer> indexesByHeaders = new HashMap<TableTextFileColumn, Integer>();
-			Map<String, Integer> indexesByScoreNames = new HashMap<String, Integer>();
+			Map<TableTextFileColumn, Integer> indexesByHeaders = new THashMap<TableTextFileColumn, Integer>();
+			Map<String, Integer> indexesByScoreNames = new THashMap<String, Integer>();
 
 			dis = new BufferedReader(new FileReader(tsvFile));
 			String line = "";
 			log.info("Parsing file TSV " + tsvFile.getAbsolutePath());
-			HashMap<String, IdentifiedProtein> proteins = new HashMap<String, IdentifiedProtein>();
-			Map<String, IdentifiedPeptide> peptides = new HashMap<String, IdentifiedPeptide>();
+			Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
+			Map<String, IdentifiedPeptide> peptides = new THashMap<String, IdentifiedPeptide>();
 			String previousProteinACC = null;
 			// String scoreName = null;
 			while ((line = dis.readLine()) != null) {
@@ -335,8 +336,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 							peptide = new IdentifiedPeptideImplFromTSV(seq);
 							peptides.put(psmID, peptide);
 							if (FastaParser.somethingExtrangeInSequence(rawSeq)) {
-								Map<Integer, Double> pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
-								for (Integer position : pTMsByPosition.keySet()) {
+								TIntObjectHashMap<Double> pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
+								for (int position : pTMsByPosition.keys()) {
 									String aa = String.valueOf(peptide.getSequence().charAt(position - 1));
 									double deltaMass = pTMsByPosition.get(position);
 									PeptideModificationBuilder ptmBuilder = MiapeMSIDocumentFactory
@@ -453,7 +454,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
 			peptideList.addAll(peptides.values());
 			builder.identifiedPeptides(peptideList);
-			Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+			Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
 			IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory.createIdentifiedProteinSetBuilder("Protein set")
 					.identifiedProteins(proteins).build();
 			proteinSets.add(proteinSet);
@@ -483,7 +484,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	 * @return
 	 */
 	private void checkRelationBetweenPeptidesAndProteins(Map<String, IdentifiedPeptide> peptides,
-			HashMap<String, IdentifiedProtein> proteins) {
+			Map<String, IdentifiedProtein> proteins) {
 		for (String psmID : peptides.keySet()) {
 			IdentifiedPeptide identifiedPeptide = peptides.get(psmID);
 			if (identifiedPeptide.getIdentifiedProteins() == null

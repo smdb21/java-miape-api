@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.experiment.model.filters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -13,11 +12,12 @@ import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 public class ModificationFilter implements Filter {
 	private final List<ModificationFilterItem> modificationItemList = new ArrayList<ModificationFilterItem>();;
 
-	private static final Logger log = Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	public static final String NOT_MODIFIED = "NOT MODIFIED";
 	private final Software software;
@@ -26,10 +26,9 @@ public class ModificationFilter implements Filter {
 
 	}
 
-	public ModificationFilter(String modificationName, LogicOperator operator,
-			boolean contain, int number, Software software) {
-		ModificationFilterItem modifItem = new ModificationFilterItem(operator,
-				modificationName, contain, number);
+	public ModificationFilter(String modificationName, LogicOperator operator, boolean contain, int number,
+			Software software) {
+		ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain, number);
 		this.modificationItemList.add(modifItem);
 		this.software = software;
 
@@ -40,10 +39,8 @@ public class ModificationFilter implements Filter {
 
 	}
 
-	public void addModificationItem(String modificationName,
-			LogicOperator operator, boolean contain, int number) {
-		ModificationFilterItem modifItem = new ModificationFilterItem(operator,
-				modificationName, contain, number);
+	public void addModificationItem(String modificationName, LogicOperator operator, boolean contain, int number) {
+		ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain, number);
 		this.modificationItemList.add(modifItem);
 
 	}
@@ -60,19 +57,14 @@ public class ModificationFilter implements Filter {
 	public boolean equals(Object obj) {
 		if (obj instanceof ModificationFilter) {
 			ModificationFilter filter = (ModificationFilter) obj;
-			List<ModificationFilterItem> modificationFilterItems = filter
-					.getModificationFilterItems();
-			List<ModificationFilterItem> localModificationFilterItems = this
-					.getModificationFilterItems();
-			if (modificationFilterItems.size() != localModificationFilterItems
-					.size())
+			List<ModificationFilterItem> modificationFilterItems = filter.getModificationFilterItems();
+			List<ModificationFilterItem> localModificationFilterItems = this.getModificationFilterItems();
+			if (modificationFilterItems.size() != localModificationFilterItems.size())
 				return false;
 
 			for (int i = 0; i < localModificationFilterItems.size(); i++) {
-				ModificationFilterItem localModificationFilterItem = localModificationFilterItems
-						.get(i);
-				ModificationFilterItem modificationFilterItem = modificationFilterItems
-						.get(i);
+				ModificationFilterItem localModificationFilterItem = localModificationFilterItems.get(i);
+				ModificationFilterItem modificationFilterItem = modificationFilterItems.get(i);
 				if (!localModificationFilterItem.equals(modificationFilterItem))
 					return false;
 			}
@@ -81,11 +73,10 @@ public class ModificationFilter implements Filter {
 			return super.equals(obj);
 	}
 
-	private Set<Integer> filterPeptides(
-			List<ExtendedIdentifiedPeptide> identifiedPeptides,
+	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
 		log.info("Filtering by Modification: " + this);
-		Set<Integer> ret = new HashSet<Integer>();
+		TIntHashSet ret = new TIntHashSet();
 		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 			if (passFilter(peptide)) {
 				if (!ret.contains(peptide.getId()))
@@ -95,8 +86,7 @@ public class ModificationFilter implements Filter {
 			}
 
 		}
-		log.info("Filtered " + ret.size() + " out of "
-				+ identifiedPeptides.size() + " peptides");
+		log.info("Filtered " + ret.size() + " out of " + identifiedPeptides.size() + " peptides");
 		return ret;
 	}
 
@@ -107,10 +97,8 @@ public class ModificationFilter implements Filter {
 
 			operator = this.modificationItemList.get(i).getOperator();
 
-			ModificationFilterItem modificationFilterItem = this.modificationItemList
-					.get(i);
-			boolean passFilterItemTMP = passFilterItem(peptide,
-					modificationFilterItem);
+			ModificationFilterItem modificationFilterItem = this.modificationItemList.get(i);
+			boolean passFilterItemTMP = passFilterItem(peptide, modificationFilterItem);
 			// if operator==null -> if this is the first modificationItem
 			if (operator == null) {
 				passFilter = passFilterItemTMP;
@@ -132,37 +120,31 @@ public class ModificationFilter implements Filter {
 		return passFilter;
 	}
 
-	private boolean passFilterItem(ExtendedIdentifiedPeptide peptide,
-			ModificationFilterItem filterItem) {
+	private boolean passFilterItem(ExtendedIdentifiedPeptide peptide, ModificationFilterItem filterItem) {
 		if (peptide == null)
 			return false;
-		final Set<PeptideModification> modifications = peptide
-				.getModifications();
+		final Set<PeptideModification> modifications = peptide.getModifications();
 		if (modifications != null && !modifications.isEmpty()) {
 			boolean containsThisModification = false;
 			int num = 0;
 			for (PeptideModification modification : modifications) {
-				if (modification.getName().equalsIgnoreCase(
-						filterItem.getModifName())) {
+				if (modification.getName().equalsIgnoreCase(filterItem.getModifName())) {
 					containsThisModification = true;
 					num++;
 				}
 			}
 			final Integer number = filterItem.getNumber();
 			// log.info("Number=" + number);
-			if (filterItem.isContain() && containsThisModification
-					&& (number == null || number.equals(0)))
+			if (filterItem.isContain() && containsThisModification && (number == null || number.equals(0)))
 				return true;
 
-			if (filterItem.isContain() && containsThisModification
-					&& number.equals(num))
+			if (filterItem.isContain() && containsThisModification && number.equals(num))
 				return true;
 
 			if (!filterItem.isContain() && !containsThisModification)
 				return true;
 		} else {
-			if (filterItem.getModifName().equals(
-					ModificationFilter.NOT_MODIFIED))
+			if (filterItem.getModifName().equals(ModificationFilter.NOT_MODIFIED))
 				return true;
 		}
 		return false;
@@ -175,8 +157,7 @@ public class ModificationFilter implements Filter {
 		for (int i = 0; i < this.modificationItemList.size(); i++) {
 			ModificationFilterItem modifItem = this.modificationItemList.get(i);
 
-			LogicOperator operator = this.modificationItemList.get(i)
-					.getOperator();
+			LogicOperator operator = this.modificationItemList.get(i).getOperator();
 			if (operator != null)
 				ret = " ( " + ret + " " + operator + " ";
 
@@ -192,14 +173,11 @@ public class ModificationFilter implements Filter {
 	}
 
 	@Override
-	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups,
-			IdentificationSet currentIdSet) {
+	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
-		Set<Integer> filteredPeptides = filterPeptides(identifiedPeptides,
-				currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(proteinGroups,
-				filteredPeptides, currentIdSet.getCvManager());
+		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+		return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides, currentIdSet.getCvManager());
 	}
 
 	@Override

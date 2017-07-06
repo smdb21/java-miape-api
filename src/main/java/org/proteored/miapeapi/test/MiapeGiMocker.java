@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.test;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.mockito.Mockito;
@@ -22,8 +21,9 @@ import org.proteored.miapeapi.interfaces.gi.ImageProcessingStep;
 import org.proteored.miapeapi.interfaces.gi.Matching;
 import org.proteored.miapeapi.interfaces.gi.MiapeGIDocument;
 
-public class MiapeGiMocker {
+import gnu.trove.set.hash.THashSet;
 
+public class MiapeGiMocker {
 
 	public static final String IMAGE2_URI = "http://image2.com";
 	public static final String IMAGE1_URI = "http://image1.com";
@@ -116,7 +116,6 @@ public class MiapeGiMocker {
 	public static ImageGelInformatics IMAGE_1;
 	public static ImageGelInformatics IMAGE_2;
 
-
 	public static MiapeGIDocument mockGIMiapeDocument() {
 
 		MiapeGIDocument miape = Mockito.mock(MiapeGIDocument.class);
@@ -133,9 +132,10 @@ public class MiapeGiMocker {
 		Mockito.when(miape.getDataExtractions()).thenReturn(DATA_EXTRACTIONS);
 		Mockito.when(miape.getDataReportings()).thenReturn(DATA_REPORTINGS);
 		MiapeGEDocument document = MiapeGeMocker.mockGEMiapeDocument();
-		/*final int id = document.getId();
-		Mockito.when(miape.getGEDocumentReference()).thenReturn(id);*/
-
+		/*
+		 * final int id = document.getId();
+		 * Mockito.when(miape.getGEDocumentReference()).thenReturn(id);
+		 */
 
 		Mockito.when(miape.getImages()).thenReturn(IMAGES);
 
@@ -146,19 +146,19 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<GIAdditionalInformation> mockAdditionalInformations() {
-		Set<GIAdditionalInformation> result = new HashSet<GIAdditionalInformation>();
+		Set<GIAdditionalInformation> result = new THashSet<GIAdditionalInformation>();
 		result.add(MiapeMocker.mockGIAdditionalInformation(0));
 		return result;
 	}
 
 	private static Set<ImageAnalysisSoftware> mockPreparationSoftwares() {
-		Set<ImageAnalysisSoftware> result = new HashSet<ImageAnalysisSoftware>();
+		Set<ImageAnalysisSoftware> result = new THashSet<ImageAnalysisSoftware>();
 		result.add(MiapeMocker.mockImageAnalysisSoftware(29));
 		return result;
 	}
 
 	private static Set<ImagePreparationStep> mockPreparations() {
-		Set<ImagePreparationStep> result = new HashSet<ImagePreparationStep>();
+		Set<ImagePreparationStep> result = new THashSet<ImagePreparationStep>();
 		result.add(mockPreparation(0));
 		return result;
 	}
@@ -173,7 +173,7 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<ImageGelInformatics> mockImages() {
-		Set<ImageGelInformatics> result = new HashSet<ImageGelInformatics>();
+		Set<ImageGelInformatics> result = new THashSet<ImageGelInformatics>();
 		IMAGE_1 = mockImage(1);
 		IMAGE_2 = mockImage(2);
 		result.add(IMAGE_1);
@@ -182,7 +182,7 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<DataReporting> mockDataReportings() {
-		Set<DataReporting> result = new HashSet<DataReporting>();
+		Set<DataReporting> result = new THashSet<DataReporting>();
 		result.add(mockDataReporting(0));
 		return result;
 	}
@@ -201,7 +201,7 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<DataExtraction> mockDataExtractions() {
-		Set<DataExtraction> result = new HashSet<DataExtraction>();
+		Set<DataExtraction> result = new THashSet<DataExtraction>();
 		result.add(DATA_EXTRACTION);
 		return result;
 	}
@@ -209,17 +209,17 @@ public class MiapeGiMocker {
 	private static DataExtraction mockDataExtraction(int i) {
 		DataExtraction dataExtraction = Mockito.mock(DataExtraction.class);
 		Mockito.when(dataExtraction.getInputImages()).thenReturn(IMAGES);
-		PROCESSED_IMAGE_URIS = new HashSet<String>();
+		PROCESSED_IMAGE_URIS = new THashSet<String>();
 		PROCESSED_IMAGE_URIS.add(IMAGE1_URI);
 		Mockito.when(dataExtraction.getInputImageUris()).thenReturn(PROCESSED_IMAGE_URIS);
 		Mockito.when(dataExtraction.getName()).thenReturn(DATA_EXTRACTION_NAME + i);
-		Set<FeatureDetection> featureDetections = new HashSet<FeatureDetection>();
+		Set<FeatureDetection> featureDetections = new THashSet<FeatureDetection>();
 		featureDetections.add(mockFeatureDetection(0));
 		Mockito.when(dataExtraction.getFeatureDetections()).thenReturn(featureDetections);
-		Set<FeatureQuantitation> quantitations = new HashSet<FeatureQuantitation>();
+		Set<FeatureQuantitation> quantitations = new THashSet<FeatureQuantitation>();
 		quantitations.add(mockFeatureQuantitation(0));
 		Mockito.when(dataExtraction.getFeatureQuantitations()).thenReturn(quantitations);
-		Set<Matching> matchings = new HashSet<Matching>();
+		Set<Matching> matchings = new THashSet<Matching>();
 		matchings.add(mockMatching(0));
 		Mockito.when(dataExtraction.getMatchings()).thenReturn(matchings);
 
@@ -230,30 +230,27 @@ public class MiapeGiMocker {
 		Matching matching = Mockito.mock(Matching.class);
 		Mockito.when(matching.getEditing()).thenReturn(MATCHING_EDITING + i);
 		Mockito.when(matching.getReferenceImage()).thenReturn(IMAGE_1);
-		Mockito.when(matching.getLandmarks()).thenReturn(LANDMARKS+ i);
-		Mockito.when(matching.getName()).thenReturn(MATCHING_NAME+ i);
-		Mockito.when(matching.getCatalogNumber()).thenReturn(MiapeMocker.ALGORITHM_C_ATALOG_NUMBER+ i);
-		Mockito.when(matching.getStepOrder()).thenReturn(MATCHING_STEP_ORDER+ i);
+		Mockito.when(matching.getLandmarks()).thenReturn(LANDMARKS + i);
+		Mockito.when(matching.getName()).thenReturn(MATCHING_NAME + i);
+		Mockito.when(matching.getCatalogNumber()).thenReturn(MiapeMocker.ALGORITHM_C_ATALOG_NUMBER + i);
+		Mockito.when(matching.getStepOrder()).thenReturn(MATCHING_STEP_ORDER + i);
 		Mockito.when(matching.getReferenceImage()).thenReturn(IMAGE_1);
 		return matching;
 	}
-
-
-
 
 	private static FeatureQuantitation mockFeatureQuantitation(int i) {
 		FeatureQuantitation featureQuantitation = Mockito.mock(FeatureQuantitation.class);
 		Mockito.when(featureQuantitation.getName()).thenReturn(FEATURE_QUANTITATION_NAME + i);
 		Mockito.when(featureQuantitation.getStepOrder()).thenReturn(FEATURE_QUANTITATION_STEP_ORDER + i);
 		Mockito.when(featureQuantitation.getType()).thenReturn(FEATURE_QUANTITATION_TYPE + i);
-		Set<Algorithm> normalizations =  new HashSet<Algorithm>();
+		Set<Algorithm> normalizations = new THashSet<Algorithm>();
 		Algorithm algorithm14 = MiapeMocker.mockAlgorithm(14);
 		Algorithm algorithm13 = MiapeMocker.mockAlgorithm(13);
 		Algorithm algorithm12 = MiapeMocker.mockAlgorithm(12);
 		normalizations.add(algorithm14);
-		Set<Algorithm> backgrounds =  new HashSet<Algorithm>();
+		Set<Algorithm> backgrounds = new THashSet<Algorithm>();
 		backgrounds.add(algorithm13);
-		Set<Algorithm> algorithms =  new HashSet<Algorithm>();
+		Set<Algorithm> algorithms = new THashSet<Algorithm>();
 		algorithms.add(algorithm12);
 		Mockito.when(featureQuantitation.getFeatureQuantitationAlgorithms()).thenReturn(algorithms);
 		Mockito.when(featureQuantitation.getFeatureQuantitationBackgrounds()).thenReturn(backgrounds);
@@ -261,7 +258,6 @@ public class MiapeGiMocker {
 
 		return featureQuantitation;
 	}
-
 
 	private static FeatureDetection mockFeatureDetection(int i) {
 		FeatureDetection featureDetection = Mockito.mock(FeatureDetection.class);
@@ -275,9 +271,8 @@ public class MiapeGiMocker {
 		return featureDetection;
 	}
 
-
 	private static Set<DataAnalysis> mockDataAnalysises() {
-		Set<DataAnalysis> result = new HashSet<DataAnalysis>();
+		Set<DataAnalysis> result = new THashSet<DataAnalysis>();
 		result.add(mockDataAnalysis(0));
 		return result;
 	}
@@ -296,25 +291,25 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<Algorithm> mockDataAnalysisTransformations() {
-		Set<Algorithm> result = new HashSet<Algorithm>();
+		Set<Algorithm> result = new THashSet<Algorithm>();
 		result.add(MiapeMocker.mockAlgorithm(9));
 		return result;
 	}
 
 	private static Set<ImageAnalysisSoftware> mockDataAnalysisSoftwares() {
-		Set<ImageAnalysisSoftware> result = new HashSet<ImageAnalysisSoftware>();
+		Set<ImageAnalysisSoftware> result = new THashSet<ImageAnalysisSoftware>();
 		result.add(MiapeMocker.mockImageAnalysisSoftware(9));
 		return result;
 	}
 
 	private static Set<ImageAnalysisSoftware> mockAnalysisSoftwares() {
-		Set<ImageAnalysisSoftware> result = new HashSet<ImageAnalysisSoftware>();
+		Set<ImageAnalysisSoftware> result = new THashSet<ImageAnalysisSoftware>();
 		result.add(MiapeMocker.mockImageAnalysisSoftware(8));
 		return result;
 	}
 
 	private static Set<ImageProcessing> mockImageProcessings() {
-		Set<ImageProcessing> result = new HashSet<ImageProcessing>();
+		Set<ImageProcessing> result = new THashSet<ImageProcessing>();
 		result.add(mockImageProcessing(0));
 		return result;
 	}
@@ -324,7 +319,7 @@ public class MiapeGiMocker {
 		Mockito.when(imageProcessing.getInputImages()).thenReturn(IMAGES);
 		Mockito.when(imageProcessing.getName()).thenReturn(IMAGE_PROCESSING_NAME + i);
 		Mockito.when(imageProcessing.getImageProcessingSoftwares()).thenReturn(IMAGE_PROCESSING_SOFTWARES);
-		Set<ImageProcessingStep> steps = new HashSet<ImageProcessingStep>();
+		Set<ImageProcessingStep> steps = new THashSet<ImageProcessingStep>();
 		steps.add(mockAnalysisProcessingStep(0));
 
 		Mockito.when(imageProcessing.getImageProcessingSteps()).thenReturn(steps);
@@ -349,13 +344,13 @@ public class MiapeGiMocker {
 	}
 
 	private static Set<ImageAnalysisSoftware> mockAnalysisProcessingSoftwares() {
-		Set<ImageAnalysisSoftware> result = new HashSet<ImageAnalysisSoftware>();
+		Set<ImageAnalysisSoftware> result = new THashSet<ImageAnalysisSoftware>();
 		result.add(MiapeMocker.mockImageAnalysisSoftware(0));
 		return result;
 	}
 
 	private static Set<AnalysisDesign> mockAnalysisDesigns() {
-		Set<AnalysisDesign> result = new HashSet<AnalysisDesign>();
+		Set<AnalysisDesign> result = new THashSet<AnalysisDesign>();
 		result.add(mockAnalysisDesign(0));
 		return result;
 	}

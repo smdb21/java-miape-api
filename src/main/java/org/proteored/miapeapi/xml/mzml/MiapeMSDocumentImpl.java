@@ -3,8 +3,6 @@ package org.proteored.miapeapi.xml.mzml;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +37,8 @@ import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.ms.MiapeMSXmlFactory;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.jmzml.MzMLElement;
 import uk.ac.ebi.jmzml.model.mzml.CVParam;
 import uk.ac.ebi.jmzml.model.mzml.Chromatogram;
@@ -82,20 +82,20 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	private final String projectName;
 	private MSContact contact;
 	private int id = -1;
-	private final Set<Maldi> maldis = new HashSet<Maldi>();
-	private final Set<Esi> esis = new HashSet<Esi>();
-	private final Set<Other_IonSource> otherIonSources = new HashSet<Other_IonSource>();
+	private final Set<Maldi> maldis = new THashSet<Maldi>();
+	private final Set<Esi> esis = new THashSet<Esi>();
+	private final Set<Other_IonSource> otherIonSources = new THashSet<Other_IonSource>();
 	private final List<Analyser> analyzers = new ArrayList<Analyser>();
-	private final Set<Spectrometer> spectrometers = new HashSet<Spectrometer>();
-	// private final Set<IonOptic> ionOptics = new HashSet<IonOptic>();
-	private final Set<Acquisition> acquisitions = new HashSet<Acquisition>();
-	private final Set<ActivationDissociation> collisionCells = new HashSet<ActivationDissociation>();
+	private final Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
+	// private final Set<IonOptic> ionOptics = new THashSet<IonOptic>();
+	private final Set<Acquisition> acquisitions = new THashSet<Acquisition>();
+	private final Set<ActivationDissociation> collisionCells = new THashSet<ActivationDissociation>();
 	private final List<org.proteored.miapeapi.interfaces.ms.InstrumentConfiguration> instrumentConfigurations = new ArrayList<org.proteored.miapeapi.interfaces.ms.InstrumentConfiguration>();
-	private Set<DataAnalysis> dataAnalysises = new HashSet<DataAnalysis>();
+	private Set<DataAnalysis> dataAnalysises = new THashSet<DataAnalysis>();
 	private final List<ResultingData> resultingDatas = new ArrayList<ResultingData>();
 	private final List<MSAdditionalInformation> additionalInformations = new ArrayList<MSAdditionalInformation>();
 	private String standardXMLLocation = null;
-	private final HashMap<String, String> diccSourceFiles = new HashMap<String, String>();
+	private final Map<String, String> diccSourceFiles = new THashMap<String, String>();
 	private MiapeDate date;
 
 	// Elements from mzML
@@ -113,9 +113,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	private Map<String, String> runAttributes;
 	private final String mzMLFileName;
 
-	public MiapeMSDocumentImpl(MzMLUnmarshaller mzMLUnmarshaller,
-			ControlVocabularyManager cvManager, String mzMLFileName,
-			String projectName) {
+	public MiapeMSDocumentImpl(MzMLUnmarshaller mzMLUnmarshaller, ControlVocabularyManager cvManager,
+			String mzMLFileName, String projectName) {
 		mzML = null;
 		this.mzMLUnmarshaller = mzMLUnmarshaller;
 		user = null;
@@ -125,8 +124,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		processMzML();
 	}
 
-	public MiapeMSDocumentImpl(MzML mzML, ControlVocabularyManager cvManager,
-			String mzMLFileName, String projectName) {
+	public MiapeMSDocumentImpl(MzML mzML, ControlVocabularyManager cvManager, String mzMLFileName, String projectName) {
 		this.mzML = mzML;
 		mzMLUnmarshaller = null;
 		user = null;
@@ -137,10 +135,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		processMzML();
 	}
 
-	public MiapeMSDocumentImpl(MzMLUnmarshaller mzMLUnmarshaller,
-			PersistenceManager databaseManager,
-			ControlVocabularyManager cvManager, String user, String password,
-			String mzMLFileName, String projectName)
+	public MiapeMSDocumentImpl(MzMLUnmarshaller mzMLUnmarshaller, PersistenceManager databaseManager,
+			ControlVocabularyManager cvManager, String user, String password, String mzMLFileName, String projectName)
 			throws MiapeDatabaseException, MiapeSecurityException {
 		mzML = null;
 		this.mzMLUnmarshaller = mzMLUnmarshaller;
@@ -153,9 +149,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		processMzML();
 	}
 
-	public MiapeMSDocumentImpl(MzML mzML, PersistenceManager databaseManager,
-			ControlVocabularyManager cvManager, String user, String password,
-			String mzMLFileName, String projectName)
+	public MiapeMSDocumentImpl(MzML mzML, PersistenceManager databaseManager, ControlVocabularyManager cvManager,
+			String user, String password, String mzMLFileName, String projectName)
 			throws MiapeDatabaseException, MiapeSecurityException {
 		this.mzML = mzML;
 		mzMLUnmarshaller = null;
@@ -179,23 +174,19 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		// file content
 		processFileContent(fileContent, referenceableParamGroupList);
 		// InstrumentConfigurationList
-		processInstrumentConfigurations(instrumentConfigurationList,
-				softwareList, sourceFileList, scanSettingsList,
+		processInstrumentConfigurations(instrumentConfigurationList, softwareList, sourceFileList, scanSettingsList,
 				referenceableParamGroupList);
 
 		// DataProcessing list
 		// Note, this call has to be necessarily after the
 		// processInstrumentConfigurations in order to avoid redundancies over
 		// the acquisition software and the processing software
-		processDataProcessings(dataProcessingList, softwareList,
-				referenceableParamGroupList);
+		processDataProcessings(dataProcessingList, softwareList, referenceableParamGroupList);
 
 		// run
-		processRunHeader(runAttributes, sourceFileList, sampleList,
-				referenceableParamGroupList);
+		processRunHeader(runAttributes, sourceFileList, sampleList, referenceableParamGroupList);
 		// spectrums and chromatograms
-		processSpectrumsAndChromatograms(spectrumIterator,
-				chromatogramIterator, referenceableParamGroupList,
+		processSpectrumsAndChromatograms(spectrumIterator, chromatogramIterator, referenceableParamGroupList,
 				sourceFileList);
 		log.info("end processing elements");
 	}
@@ -246,77 +237,66 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	private void parseMzMLElementsByUnmarshaller() {
 		log.info("Parsing elements from mzML using unmarshaller");
 		// File descriptor (fileContent, sourceFileList and Contacts)
-		fileDescriptor = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.FileDescription.getXpath(), FileDescription.class);
+		fileDescriptor = mzMLUnmarshaller.unmarshalFromXpath(MzMLElement.FileDescription.getXpath(),
+				FileDescription.class);
 		// source file list
 		sourceFileList = fileDescriptor.getSourceFileList();
 		// file content
 		fileContent = fileDescriptor.getFileContent();
 		// ReferenceableParamGroup
 		referenceableParamGroupList = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.ReferenceableParamGroupList.getXpath(),
-				ReferenceableParamGroupList.class);
+				MzMLElement.ReferenceableParamGroupList.getXpath(), ReferenceableParamGroupList.class);
 		// Software list
-		softwareList = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.SoftwareList.getXpath(), SoftwareList.class);
+		softwareList = mzMLUnmarshaller.unmarshalFromXpath(MzMLElement.SoftwareList.getXpath(), SoftwareList.class);
 		// ScanSettings list
-		scanSettingsList = mzMLUnmarshaller
-				.unmarshalFromXpath(MzMLElement.ScanSettingsList.getXpath(),
-						ScanSettingsList.class);
+		scanSettingsList = mzMLUnmarshaller.unmarshalFromXpath(MzMLElement.ScanSettingsList.getXpath(),
+				ScanSettingsList.class);
 		// InstrumentConfigurationList
 		instrumentConfigurationList = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.InstrumentConfigurationList.getXpath(),
-				InstrumentConfigurationList.class);
+				MzMLElement.InstrumentConfigurationList.getXpath(), InstrumentConfigurationList.class);
 		// DataProcessing list
-		dataProcessingList = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.DataProcessingList.getXpath(),
+		dataProcessingList = mzMLUnmarshaller.unmarshalFromXpath(MzMLElement.DataProcessingList.getXpath(),
 				DataProcessingList.class);
 		// Sample list
-		sampleList = mzMLUnmarshaller.unmarshalFromXpath(
-				MzMLElement.SampleList.getXpath(), SampleList.class);
+		sampleList = mzMLUnmarshaller.unmarshalFromXpath(MzMLElement.SampleList.getXpath(), SampleList.class);
 		// run
 
 		// this.run = mzMLUnmarshaller.unmarshalFromXpath("/run", Run.class);
-		runAttributes = mzMLUnmarshaller
-				.getSingleElementAttributes(MzMLElement.Run.getXpath());
+		runAttributes = mzMLUnmarshaller.getSingleElementAttributes(MzMLElement.Run.getXpath());
 
 		// spectrums and chromatograms
-		spectrumIterator = mzMLUnmarshaller.unmarshalCollectionFromXpath(
-				MzMLElement.Spectrum.getXpath(), Spectrum.class);
-		chromatogramIterator = mzMLUnmarshaller.unmarshalCollectionFromXpath(
-				MzMLElement.Chromatogram.getXpath(), Chromatogram.class);
+		spectrumIterator = mzMLUnmarshaller.unmarshalCollectionFromXpath(MzMLElement.Spectrum.getXpath(),
+				Spectrum.class);
+		chromatogramIterator = mzMLUnmarshaller.unmarshalCollectionFromXpath(MzMLElement.Chromatogram.getXpath(),
+				Chromatogram.class);
 
 		log.info("parsing done");
 	}
 
-	private void processFileContent(ParamGroup fileContent,
-			ReferenceableParamGroupList referenceableParamGroupList) {
-		addAdditionalInformationsFromParamGroup(fileContent,
-				referenceableParamGroupList);
+	private void processFileContent(ParamGroup fileContent, ReferenceableParamGroupList referenceableParamGroupList) {
+		addAdditionalInformationsFromParamGroup(fileContent, referenceableParamGroupList);
 	}
 
-	private void processRunHeader(Map<String, String> runAttributes,
-			SourceFileList sourceFileList, SampleList sampleList,
-			ReferenceableParamGroupList referenceableParamGroupList) {
+	private void processRunHeader(Map<String, String> runAttributes, SourceFileList sourceFileList,
+			SampleList sampleList, ReferenceableParamGroupList referenceableParamGroupList) {
 
 		log.info("processing run header");
 		// Default source file
 
-		if (runAttributes != null
-				&& runAttributes.containsKey("defaultSourceFileRef")) {
+		if (runAttributes != null && runAttributes.containsKey("defaultSourceFileRef")) {
 			// if sourceFileRef!=null, add resulting data
-			processSourceFileRef(runAttributes.get("defaultSourceFileRef"),
-					sourceFileList, referenceableParamGroupList);
+			processSourceFileRef(runAttributes.get("defaultSourceFileRef"), sourceFileList,
+					referenceableParamGroupList);
 		} else if (sourceFileList != null) {
 			// COLLAPSE RESULTING DATA
 			List<ResultingData> resultingData = new ArrayList<ResultingData>();
 
-			HashMap<String, List<ResultingDataImpl>> fileTypes = new HashMap<String, List<ResultingDataImpl>>();
+			Map<String, List<ResultingDataImpl>> fileTypes = new THashMap<String, List<ResultingDataImpl>>();
 			for (SourceFile sourceFile : sourceFileList.getSourceFile()) {
 				if (!diccSourceFiles.containsKey(sourceFile.getId()))
 					diccSourceFiles.put(sourceFile.getId(), sourceFile.getId());
-				final ResultingDataImpl resData = new ResultingDataImpl(
-						sourceFile, referenceableParamGroupList, cvManager);
+				final ResultingDataImpl resData = new ResultingDataImpl(sourceFile, referenceableParamGroupList,
+						cvManager);
 				final String dataFileType = resData.getDataFileType();
 				if (!fileTypes.containsKey(dataFileType)) {
 					List<ResultingDataImpl> list = new ArrayList<ResultingDataImpl>();
@@ -334,8 +314,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 		}
 		// Start time
-		if (runAttributes != null
-				&& runAttributes.containsKey("startTimeStamp")) {
+		if (runAttributes != null && runAttributes.containsKey("startTimeStamp")) {
 			try {
 				date = new MiapeDate(runAttributes.get("startTimeStamp"));
 			} catch (IllegalMiapeArgumentException ex) {
@@ -359,16 +338,11 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		// }
 		// }
 		if (runAttributes != null && runAttributes.containsKey("sampleRef")) {
-			Sample sample = searchSampleInSampleList(
-					runAttributes.get("sampleRef"), sampleList);
-			additionalInformations.add(new AdditionalInformationImpl(sample
-					.getName()));
-			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory
-					.createParamGroup(sample.getCvParam(),
-							sample.getUserParam(),
-							sample.getReferenceableParamGroupRef());
-			addAdditionalInformationsFromParamGroup(paramGroup,
-					referenceableParamGroupList);
+			Sample sample = searchSampleInSampleList(runAttributes.get("sampleRef"), sampleList);
+			additionalInformations.add(new AdditionalInformationImpl(sample.getName()));
+			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory.createParamGroup(sample.getCvParam(),
+					sample.getUserParam(), sample.getReferenceableParamGroupRef());
+			addAdditionalInformationsFromParamGroup(paramGroup, referenceableParamGroupList);
 
 		}
 		log.info("end processing run header");
@@ -382,21 +356,16 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 			additionalInformations.add(new AdditionalInformationImpl(cvParam));
 		}
 		for (UserParam userParam : paramGroup.getUserParam()) {
-			additionalInformations
-					.add(new AdditionalInformationImpl(userParam));
+			additionalInformations.add(new AdditionalInformationImpl(userParam));
 		}
-		for (ReferenceableParamGroupRef paramRef : paramGroup
-				.getReferenceableParamGroupRef()) {
-			for (ReferenceableParamGroup refParamGroup : referenceableParamGroupList
-					.getReferenceableParamGroup()) {
+		for (ReferenceableParamGroupRef paramRef : paramGroup.getReferenceableParamGroupRef()) {
+			for (ReferenceableParamGroup refParamGroup : referenceableParamGroupList.getReferenceableParamGroup()) {
 				if (refParamGroup.getId().equals(paramRef.getRef())) {
 					for (CVParam cvParam : refParamGroup.getCvParam()) {
-						additionalInformations
-								.add(new AdditionalInformationImpl(cvParam));
+						additionalInformations.add(new AdditionalInformationImpl(cvParam));
 					}
 					for (UserParam userParam : refParamGroup.getUserParam()) {
-						additionalInformations
-								.add(new AdditionalInformationImpl(userParam));
+						additionalInformations.add(new AdditionalInformationImpl(userParam));
 					}
 				}
 			}
@@ -406,10 +375,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private Sample searchSampleInSampleList(String sampleRef,
-			SampleList sampleList) {
-		if (sampleRef == null || "".equals(sampleRef) || sampleList == null
-				|| sampleList.getCount().longValue() <= 0)
+	private Sample searchSampleInSampleList(String sampleRef, SampleList sampleList) {
+		if (sampleRef == null || "".equals(sampleRef) || sampleList == null || sampleList.getCount().longValue() <= 0)
 			return null;
 		for (Sample sample : sampleList.getSample()) {
 			if (sample.getId().equals(sampleRef))
@@ -418,10 +385,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		return null;
 	}
 
-	private SourceFile searchSourceFileInSourceFileRefList(
-			String sourceFileRef, SourceFileList sourceFileList) {
-		if (sourceFileRef == null || "".equals(sourceFileRef)
-				|| sourceFileList == null
+	private SourceFile searchSourceFileInSourceFileRefList(String sourceFileRef, SourceFileList sourceFileList) {
+		if (sourceFileRef == null || "".equals(sourceFileRef) || sourceFileList == null
 				|| sourceFileList.getCount().longValue() <= 0)
 			return null;
 		for (SourceFile sourceFile : sourceFileList.getSourceFile()) {
@@ -432,27 +397,20 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		return null;
 	}
 
-	private void processDataProcessings(DataProcessingList dataProcessingList,
-			SoftwareList softwareList,
+	private void processDataProcessings(DataProcessingList dataProcessingList, SoftwareList softwareList,
 			ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing data processings");
-		HashMap<String, String> softwareRefMap = new HashMap<String, String>();
+		Map<String, String> softwareRefMap = new THashMap<String, String>();
 		// for each processing method, create a DataAnalysis
 		if (dataProcessingList != null) {
-			for (DataProcessing dataProcessing : dataProcessingList
-					.getDataProcessing()) {
-				if (dataProcessing.getProcessingMethod() != null
-						&& dataProcessing.getProcessingMethod().size() > 0) {
-					for (ProcessingMethod processingMethod : dataProcessing
-							.getProcessingMethod()) {
+			for (DataProcessing dataProcessing : dataProcessingList.getDataProcessing()) {
+				if (dataProcessing.getProcessingMethod() != null && dataProcessing.getProcessingMethod().size() > 0) {
+					for (ProcessingMethod processingMethod : dataProcessing.getProcessingMethod()) {
 						if (processingMethod.getSoftwareRef() != null)
-							softwareRefMap.put(
-									processingMethod.getSoftwareRef(),
-									processingMethod.getSoftwareRef());
-						Software processingSoftware = searchSoftwareInSoftwareList(
-								processingMethod.getSoftwareRef(), softwareList);
-						dataAnalysises.add(new DataAnalysisImpl(
-								processingMethod, processingSoftware,
+							softwareRefMap.put(processingMethod.getSoftwareRef(), processingMethod.getSoftwareRef());
+						Software processingSoftware = searchSoftwareInSoftwareList(processingMethod.getSoftwareRef(),
+								softwareList);
+						dataAnalysises.add(new DataAnalysisImpl(processingMethod, processingSoftware,
 								referenceableParamGroupList, cvManager));
 
 					}
@@ -468,14 +426,12 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 			// new dataAnalysis
 			for (Software software : softwareList.getSoftware()) {
 				if (!softwareRefMap.containsKey(software.getId())) {
-					final DataAnalysis dataAnalysis = new DataAnalysisImpl(
-							null, software, referenceableParamGroupList,
+					final DataAnalysis dataAnalysis = new DataAnalysisImpl(null, software, referenceableParamGroupList,
 							cvManager);
 					boolean include = true;
 					if (acquisitions != null) {
 						for (Acquisition acquisition : acquisitions) {
-							if (dataAnalysis.getName().equals(
-									acquisition.getName()))
+							if (dataAnalysis.getName().equals(acquisition.getName()))
 								include = false;
 						}
 					}
@@ -488,20 +444,17 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private Set<DataAnalysis> removeRedundantDataAnalysis(
-			Set<DataAnalysis> dataAnalysisSet) {
-		Set<DataAnalysis> ret = new HashSet<DataAnalysis>();
-		HashMap<String, DataAnalysis> dataAnalysisDicc = new HashMap<String, DataAnalysis>();
+	private Set<DataAnalysis> removeRedundantDataAnalysis(Set<DataAnalysis> dataAnalysisSet) {
+		Set<DataAnalysis> ret = new THashSet<DataAnalysis>();
+		Map<String, DataAnalysis> dataAnalysisDicc = new THashMap<String, DataAnalysis>();
 		if (dataAnalysisSet != null) {
 			for (DataAnalysis dataAnalysis : dataAnalysisSet) {
 				if (!dataAnalysisDicc.containsKey(dataAnalysis.getName())) {
 					dataAnalysisDicc.put(dataAnalysis.getName(), dataAnalysis);
 				} else {
-					DataAnalysis dataAnalysis2 = dataAnalysisDicc
-							.get(dataAnalysis.getName());
+					DataAnalysis dataAnalysis2 = dataAnalysisDicc.get(dataAnalysis.getName());
 					dataAnalysisDicc.remove(dataAnalysis.getName());
-					dataAnalysisDicc.put(dataAnalysis.getName(),
-							mergeDataAnalysis(dataAnalysis, dataAnalysis2));
+					dataAnalysisDicc.put(dataAnalysis.getName(), mergeDataAnalysis(dataAnalysis, dataAnalysis2));
 				}
 			}
 		}
@@ -511,18 +464,15 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		return ret;
 	}
 
-	private DataAnalysis mergeDataAnalysis(DataAnalysis dataAnalysis,
-			DataAnalysis dataAnalysis2) {
-		DataAnalysisBuilder ret = MiapeMSDocumentFactory
-				.createDataAnalysisBuilder(dataAnalysis.getName());
+	private DataAnalysis mergeDataAnalysis(DataAnalysis dataAnalysis, DataAnalysis dataAnalysis2) {
+		DataAnalysisBuilder ret = MiapeMSDocumentFactory.createDataAnalysisBuilder(dataAnalysis.getName());
 
 		// catalogNumber
 		StringBuilder catalogNumber = new StringBuilder();
 		if (dataAnalysis.getCatalogNumber() != null)
 			append(catalogNumber, dataAnalysis.getCatalogNumber());
 		if (dataAnalysis2.getCatalogNumber() != null
-				&& !dataAnalysis2.getCatalogNumber().equals(
-						dataAnalysis.getCatalogNumber()))
+				&& !dataAnalysis2.getCatalogNumber().equals(dataAnalysis.getCatalogNumber()))
 			append(catalogNumber, dataAnalysis2.getCatalogNumber());
 		if (!"".equals(catalogNumber.toString()))
 			ret.catalogNumber(catalogNumber.toString());
@@ -531,9 +481,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		StringBuilder comments = new StringBuilder();
 		if (dataAnalysis.getComments() != null)
 			append(comments, dataAnalysis.getComments());
-		if (dataAnalysis2.getComments() != null
-				&& !dataAnalysis2.getComments().equals(
-						dataAnalysis.getComments()))
+		if (dataAnalysis2.getComments() != null && !dataAnalysis2.getComments().equals(dataAnalysis.getComments()))
 			append(comments, dataAnalysis2.getComments());
 		if (!"".equals(comments.toString()))
 			ret.comments(comments.toString());
@@ -543,8 +491,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		if (dataAnalysis.getCustomizations() != null)
 			append(customizations, dataAnalysis.getCustomizations());
 		if (dataAnalysis2.getCustomizations() != null
-				&& !dataAnalysis2.getCustomizations().equals(
-						dataAnalysis.getCustomizations()))
+				&& !dataAnalysis2.getCustomizations().equals(dataAnalysis.getCustomizations()))
 			append(customizations, dataAnalysis2.getCustomizations());
 		if (!"".equals(customizations.toString()))
 			ret.customizations(customizations.toString());
@@ -554,8 +501,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		if (dataAnalysis.getDescription() != null)
 			append(description, dataAnalysis.getDescription());
 		if (dataAnalysis2.getDescription() != null
-				&& !dataAnalysis2.getDescription().equals(
-						dataAnalysis.getDescription()))
+				&& !dataAnalysis2.getDescription().equals(dataAnalysis.getDescription()))
 			append(description, dataAnalysis2.getDescription());
 		if (!"".equals(description.toString()))
 			ret.description(description.toString());
@@ -565,8 +511,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		if (dataAnalysis.getManufacturer() != null)
 			append(manufacturer, dataAnalysis.getManufacturer());
 		if (dataAnalysis2.getManufacturer() != null
-				&& !dataAnalysis2.getManufacturer().equals(
-						dataAnalysis.getManufacturer()))
+				&& !dataAnalysis2.getManufacturer().equals(dataAnalysis.getManufacturer()))
 			append(manufacturer, dataAnalysis2.getManufacturer());
 		if (!"".equals(manufacturer.toString()))
 			ret.manufacturer(manufacturer.toString());
@@ -575,8 +520,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		StringBuilder model = new StringBuilder();
 		if (dataAnalysis.getModel() != null)
 			append(model, dataAnalysis.getModel());
-		if (dataAnalysis2.getModel() != null
-				&& !dataAnalysis2.getModel().equals(dataAnalysis.getModel()))
+		if (dataAnalysis2.getModel() != null && !dataAnalysis2.getModel().equals(dataAnalysis.getModel()))
 			append(model, dataAnalysis2.getModel());
 		if (!"".equals(model.toString()))
 			ret.model(model.toString());
@@ -586,8 +530,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		if (dataAnalysis.getParameters() != null)
 			append(parameters, dataAnalysis.getParameters());
 		if (dataAnalysis2.getParameters() != null
-				&& !dataAnalysis2.getParameters().equals(
-						dataAnalysis.getParameters()))
+				&& !dataAnalysis2.getParameters().equals(dataAnalysis.getParameters()))
 			append(parameters, dataAnalysis2.getParameters());
 		if (!"".equals(parameters.toString()))
 			ret.parameters(parameters.toString());
@@ -597,8 +540,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		if (dataAnalysis.getParametersLocation() != null)
 			append(parametersLocation, dataAnalysis.getParametersLocation());
 		if (dataAnalysis2.getParametersLocation() != null
-				&& !dataAnalysis2.getParametersLocation().equals(
-						dataAnalysis.getParametersLocation()))
+				&& !dataAnalysis2.getParametersLocation().equals(dataAnalysis.getParametersLocation()))
 			append(parametersLocation, dataAnalysis2.getParametersLocation());
 		if (!"".equals(parametersLocation.toString()))
 			ret.parametersLocation(parametersLocation.toString());
@@ -607,8 +549,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		StringBuilder uri = new StringBuilder();
 		if (dataAnalysis.getURI() != null)
 			append(uri, dataAnalysis.getURI());
-		if (dataAnalysis2.getURI() != null
-				&& !dataAnalysis2.getURI().equals(dataAnalysis.getURI()))
+		if (dataAnalysis2.getURI() != null && !dataAnalysis2.getURI().equals(dataAnalysis.getURI()))
 			append(uri, dataAnalysis2.getURI());
 		if (!"".equals(uri.toString()))
 			ret.uri(uri.toString());
@@ -617,9 +558,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		StringBuilder version = new StringBuilder();
 		if (dataAnalysis.getVersion() != null)
 			append(version, dataAnalysis.getVersion());
-		if (dataAnalysis2.getVersion() != null
-				&& !dataAnalysis2.getVersion()
-						.equals(dataAnalysis.getVersion()))
+		if (dataAnalysis2.getVersion() != null && !dataAnalysis2.getVersion().equals(dataAnalysis.getVersion()))
 			append(version, dataAnalysis2.getVersion());
 		if (!"".equals(version.toString()))
 			ret.version(version.toString());
@@ -628,20 +567,17 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	}
 
 	private void append(StringBuilder stringBuilder, String cadena) {
-		if (stringBuilder.toString() != null
-				&& !"".equals(stringBuilder.toString()))
+		if (stringBuilder.toString() != null && !"".equals(stringBuilder.toString()))
 			stringBuilder.append("\n");
 		stringBuilder.append(cadena);
 	}
 
-	private void processSpectrumsAndChromatograms(
-			MzMLObjectIterator<Spectrum> spectrumIterator,
+	private void processSpectrumsAndChromatograms(MzMLObjectIterator<Spectrum> spectrumIterator,
 			MzMLObjectIterator<Chromatogram> chromatogramIterator,
-			ReferenceableParamGroupList referenceableParamGroupList,
-			SourceFileList sourceFileList) {
+			ReferenceableParamGroupList referenceableParamGroupList, SourceFileList sourceFileList) {
 		log.info("processing spectrums and chromatograms");
 
-		HashMap<String, String> diccCollCell = new HashMap<String, String>();
+		Map<String, String> diccCollCell = new THashMap<String, String>();
 		// TODO by default, the collision cell has this name:
 		String name = "collision cell";
 		String gasType = null;
@@ -655,26 +591,22 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 				Spectrum spectrum = spectrumIterator.next();
 
 				// if sourceFileRef!=null, add resulting data
-				processSourceFileRef(spectrum.getSourceFileRef(),
-						sourceFileList, referenceableParamGroupList);
+				processSourceFileRef(spectrum.getSourceFileRef(), sourceFileList, referenceableParamGroupList);
 
 				// Scans
 				final ScanList scanlist = spectrum.getScanList();
 				if (scanlist != null) {
 					for (Scan scan : scanlist.getScan()) {
 						// if sourceFileRef!=null, add resulting data
-						processSourceFileRef(scan.getSourceFileRef(),
-								sourceFileList, referenceableParamGroupList);
+						processSourceFileRef(scan.getSourceFileRef(), sourceFileList, referenceableParamGroupList);
 					}
 				}
 				// Precursor
 				final PrecursorList precursorList = spectrum.getPrecursorList();
-				if (precursorList != null
-						&& precursorList.getCount().longValue() > 0) {
+				if (precursorList != null && precursorList.getCount().longValue() > 0) {
 					for (Precursor precursor : precursorList.getPrecursor()) {
 						// if sourceFileRef!=null, add resulting data
-						processSourceFileRef(precursor.getSourceFileRef(),
-								sourceFileList, referenceableParamGroupList);
+						processSourceFileRef(precursor.getSourceFileRef(), sourceFileList, referenceableParamGroupList);
 
 						// initialize variables
 						gasType = null;
@@ -682,51 +614,38 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 						gasPressureUnit = null;
 						activationType = null;
 
-						ParamGroup activationParamGroup = precursor
-								.getActivation();
+						ParamGroup activationParamGroup = precursor.getActivation();
 						// activation type
-						activationType = MzMLControlVocabularyXmlFactory
-								.getValueFromParamGroup(activationParamGroup,
-										referenceableParamGroupList,
-										DissociationMethod
-												.getInstance(cvManager));
+						activationType = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(activationParamGroup,
+								referenceableParamGroupList, DissociationMethod.getInstance(cvManager));
 
 						// gas type
 						// Firstly, search <cvparam name="collision gas"
 						// value"helium"/>
-						gasType = MzMLControlVocabularyXmlFactory
-								.getValueFromParamGroupByAccession(
-										activationParamGroup,
-										referenceableParamGroupList,
-										GasType.COLLISION_GAS);
+						gasType = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(
+								activationParamGroup, referenceableParamGroupList, GasType.COLLISION_GAS);
 						// if not found, search a CV allowed in MS_GAS_TYPE
 						// section
 						if (gasType == null) {
-							List<CVParam> gasTypeCVs = MzMLControlVocabularyXmlFactory
-									.getCvsFromParamGroup(activationParamGroup,
-											referenceableParamGroupList,
-											GasType.getInstance(cvManager));
+							List<CVParam> gasTypeCVs = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(
+									activationParamGroup, referenceableParamGroupList, GasType.getInstance(cvManager));
 							if (gasTypeCVs != null) {
-								gasType = MzMLControlVocabularyXmlFactory
-										.parseAllCvParams(gasTypeCVs, null);
+								gasType = MzMLControlVocabularyXmlFactory.parseAllCvParams(gasTypeCVs, null);
 							}
 						}
 
 						// gas pressure
-						CVParam gasPressureCV = MzMLControlVocabularyXmlFactory
-								.getCvFromParamGroup(activationParamGroup,
-										referenceableParamGroupList,
-										GasType.GAS_PRESSURE_CV);
+						CVParam gasPressureCV = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(
+								activationParamGroup, referenceableParamGroupList, GasType.GAS_PRESSURE_CV);
 						if (gasPressureCV != null) {
 							gasPressure = gasPressureCV.getValue();
 							gasPressureUnit = gasPressureCV.getUnitName();
 						}
 					}
-					String temp = gasType + gasPressure + gasPressureUnit
-							+ activationType;
+					String temp = gasType + gasPressure + gasPressureUnit + activationType;
 					if (!"".equals(temp) && !diccCollCell.containsKey(temp)) {
-						collisionCells.add(new CollisionCellImpl(name, gasType,
-								gasPressure, gasPressureUnit, activationType));
+						collisionCells.add(
+								new CollisionCellImpl(name, gasType, gasPressure, gasPressureUnit, activationType));
 						diccCollCell.put(temp, temp);
 					}
 				}
@@ -737,16 +656,13 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 				// read next spectrum from XML file
 				Chromatogram chromatogram = chromatogramIterator.next();
 				// resulting data
-				if (chromatogram != null && chromatogram.getCvParam() != null
-						&& !chromatogram.getCvParam().isEmpty())
-					resultingDatas.add(new ResultingDataImpl(chromatogram,
-							referenceableParamGroupList, cvManager));
+				if (chromatogram != null && chromatogram.getCvParam() != null && !chromatogram.getCvParam().isEmpty())
+					resultingDatas.add(new ResultingDataImpl(chromatogram, referenceableParamGroupList, cvManager));
 
 				final Precursor precursor = chromatogram.getPrecursor();
 				if (precursor != null) {
 					// if sourceFileRef!=null, add resulting data
-					processSourceFileRef(precursor.getSourceFileRef(),
-							sourceFileList, referenceableParamGroupList);
+					processSourceFileRef(precursor.getSourceFileRef(), sourceFileList, referenceableParamGroupList);
 
 					// initialize variables
 					gasType = null;
@@ -756,46 +672,35 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 					ParamGroup activationParamGroup = precursor.getActivation();
 					// activation type
-					activationType = MzMLControlVocabularyXmlFactory
-							.getValueFromParamGroup(activationParamGroup,
-									referenceableParamGroupList,
-									DissociationMethod.getInstance(cvManager));
+					activationType = MzMLControlVocabularyXmlFactory.getValueFromParamGroup(activationParamGroup,
+							referenceableParamGroupList, DissociationMethod.getInstance(cvManager));
 
 					// gas type
 					// Firstly, search <cvparam name="collision gas"
 					// value"helium"/>
-					gasType = MzMLControlVocabularyXmlFactory
-							.getValueFromParamGroupByAccession(
-									activationParamGroup,
-									referenceableParamGroupList,
-									GasType.COLLISION_GAS);
+					gasType = MzMLControlVocabularyXmlFactory.getValueFromParamGroupByAccession(activationParamGroup,
+							referenceableParamGroupList, GasType.COLLISION_GAS);
 					// if not found, search a CV allowed in MS_GAS_TYPE section
 					if (gasType == null) {
-						List<CVParam> gasTypeCVs = MzMLControlVocabularyXmlFactory
-								.getCvsFromParamGroup(activationParamGroup,
-										referenceableParamGroupList,
-										GasType.getInstance(cvManager));
+						List<CVParam> gasTypeCVs = MzMLControlVocabularyXmlFactory.getCvsFromParamGroup(
+								activationParamGroup, referenceableParamGroupList, GasType.getInstance(cvManager));
 						if (gasTypeCVs != null) {
-							gasType = MzMLControlVocabularyXmlFactory
-									.parseAllCvParams(gasTypeCVs, null);
+							gasType = MzMLControlVocabularyXmlFactory.parseAllCvParams(gasTypeCVs, null);
 						}
 					}
 
 					// gas pressure
-					CVParam gasPressureCV = MzMLControlVocabularyXmlFactory
-							.getCvFromParamGroup(activationParamGroup,
-									referenceableParamGroupList,
-									GasType.GAS_PRESSURE_CV);
+					CVParam gasPressureCV = MzMLControlVocabularyXmlFactory.getCvFromParamGroup(activationParamGroup,
+							referenceableParamGroupList, GasType.GAS_PRESSURE_CV);
 					if (gasPressureCV != null) {
 						gasPressure = gasPressureCV.getValue();
 						gasPressureUnit = gasPressureCV.getUnitName();
 					}
 				}
-				String temp = gasType + gasPressure + gasPressureUnit
-						+ activationType;
+				String temp = gasType + gasPressure + gasPressureUnit + activationType;
 				if (!"".equals(temp) && !diccCollCell.containsKey(temp)) {
-					collisionCells.add(new CollisionCellImpl(name, gasType,
-							gasPressure, gasPressureUnit, activationType));
+					collisionCells
+							.add(new CollisionCellImpl(name, gasType, gasPressure, gasPressureUnit, activationType));
 					diccCollCell.put(temp, temp);
 				}
 			}
@@ -804,42 +709,36 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private void processSourceFileRef(String sourceFileRef,
-			SourceFileList sourceFileList,
+	private void processSourceFileRef(String sourceFileRef, SourceFileList sourceFileList,
 			ReferenceableParamGroupList referenceableParamGroupList) {
 		// log.info("processing source file refs");
 
 		if (sourceFileRef != null && !"".equals(sourceFileRef)) {
-			SourceFile sourceFile = searchSourceFileInSourceFileRefList(
-					sourceFileRef, sourceFileList);
+			SourceFile sourceFile = searchSourceFileInSourceFileRefList(sourceFileRef, sourceFileList);
 			// in order to not getting the same source file several times
-			if (sourceFile != null
-					&& !diccSourceFiles.containsKey(sourceFile.getId())) {
+			if (sourceFile != null && !diccSourceFiles.containsKey(sourceFile.getId())) {
 				diccSourceFiles.put(sourceFile.getId(), sourceFile.getId());
-				resultingDatas.add(new ResultingDataImpl(sourceFile,
-						referenceableParamGroupList, cvManager));
+				resultingDatas.add(new ResultingDataImpl(sourceFile, referenceableParamGroupList, cvManager));
 			}
 		}
 		// log.info("end processing source file refs");
 
 	}
 
-	private void processAcquisitions(Software software,
-			SourceFileList sourceFileList, ScanSettingsList scanSettingsList,
-			ReferenceableParamGroupList referenceableParamGroupList) {
+	private void processAcquisitions(Software software, SourceFileList sourceFileList,
+			ScanSettingsList scanSettingsList, ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing acquisitions");
 
-		acquisitions.add(new AcquisitionImpl(software, scanSettingsList,
-				sourceFileList, referenceableParamGroupList, cvManager));
+		acquisitions.add(new AcquisitionImpl(software, scanSettingsList, sourceFileList, referenceableParamGroupList,
+				cvManager));
 
 		log.info("end processing acquisitions");
 
 	}
 
-	private ScanSettings searchScanSettingsInScanSettingsList(
-			String scanSettingsRef, ScanSettingsList scanSettingsList) {
-		if (scanSettingsRef == null || "".equals(scanSettingsRef)
-				|| scanSettingsList == null
+	private ScanSettings searchScanSettingsInScanSettingsList(String scanSettingsRef,
+			ScanSettingsList scanSettingsList) {
+		if (scanSettingsRef == null || "".equals(scanSettingsRef) || scanSettingsList == null
 				|| scanSettingsList.getCount().longValue() <= 0)
 			return null;
 		for (ScanSettings scanSettings : scanSettingsList.getScanSettings()) {
@@ -849,10 +748,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		return null;
 	}
 
-	private Software searchSoftwareInSoftwareList(String softwareRef,
-			SoftwareList softwareList) {
-		if (softwareRef == null || "".equals(softwareRef)
-				|| softwareList == null
+	private Software searchSoftwareInSoftwareList(String softwareRef, SoftwareList softwareList) {
+		if (softwareRef == null || "".equals(softwareRef) || softwareList == null
 				|| softwareList.getCount().longValue() <= 0)
 			return null;
 		for (Software software : softwareList.getSoftware()) {
@@ -862,31 +759,24 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 		return null;
 	}
 
-	private void processInstrumentConfigurations(
-			InstrumentConfigurationList instrumentConfigurationList,
-			SoftwareList softwareList, SourceFileList sourceFileList,
-			ScanSettingsList scanSettingsList,
+	private void processInstrumentConfigurations(InstrumentConfigurationList instrumentConfigurationList,
+			SoftwareList softwareList, SourceFileList sourceFileList, ScanSettingsList scanSettingsList,
 			ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing insturment config");
-		HashMap<String, Software> diccSoftware = new HashMap<String, Software>();
+		Map<String, Software> diccSoftware = new THashMap<String, Software>();
 		// foreach instrument configuration, create an spectrometer, ion optic
 		// and acquisition
-		if (instrumentConfigurationList != null
-				&& instrumentConfigurationList.getCount().longValue() > 0) {
+		if (instrumentConfigurationList != null && instrumentConfigurationList.getCount().longValue() > 0) {
 			// parse spectrometers
-			processSpectrometers(
-					instrumentConfigurationList.getInstrumentConfiguration(),
-					referenceableParamGroupList);
+			processSpectrometers(instrumentConfigurationList.getInstrumentConfiguration(), referenceableParamGroupList);
 			for (InstrumentConfiguration instrumentConfiguration : instrumentConfigurationList
 					.getInstrumentConfiguration()) {
 
-				instrumentConfigurations.add(new InstrumentConfigurationImpl(
-						instrumentConfiguration, referenceableParamGroupList,
-						cvManager));
+				instrumentConfigurations.add(new InstrumentConfigurationImpl(instrumentConfiguration,
+						referenceableParamGroupList, cvManager));
 
 				// parse ion optics
-				processIonOptics(instrumentConfiguration,
-						referenceableParamGroupList);
+				processIonOptics(instrumentConfiguration, referenceableParamGroupList);
 
 				ScanSettings scanSettings = null;
 				Software software = null;
@@ -903,14 +793,11 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 				// get referenced software
 
 				String softwareRef = instrumentConfiguration.getSoftwareRef();
-				if (softwareRef != null && !"".equals(softwareRef)
-						&& !diccSoftware.containsKey(softwareRef)) {
-					software = searchSoftwareInSoftwareList(softwareRef,
-							softwareList);
+				if (softwareRef != null && !"".equals(softwareRef) && !diccSoftware.containsKey(softwareRef)) {
+					software = searchSoftwareInSoftwareList(softwareRef, softwareList);
 					diccSoftware.put(softwareRef, software);
 					// parse acquisitions
-					processAcquisitions(software, sourceFileList,
-							scanSettingsList, referenceableParamGroupList);
+					processAcquisitions(software, sourceFileList, scanSettingsList, referenceableParamGroupList);
 				}
 
 			}
@@ -919,18 +806,15 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private void processIonOptics(
-			InstrumentConfiguration instrumentConfiguration,
+	private void processIonOptics(InstrumentConfiguration instrumentConfiguration,
 			ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing ion optics");
 
 		if (instrumentConfiguration != null) {
 			// Create a paramGroup
-			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory
-					.createParamGroup(instrumentConfiguration.getCvParam(),
-							instrumentConfiguration.getUserParam(),
-							instrumentConfiguration
-									.getReferenceableParamGroupRef());
+			ParamGroup paramGroup = MzMLControlVocabularyXmlFactory.createParamGroup(
+					instrumentConfiguration.getCvParam(), instrumentConfiguration.getUserParam(),
+					instrumentConfiguration.getReferenceableParamGroupRef());
 
 			// Search for a CV that belongs to a MS_ION_OPTICS_NAME section
 			// List<CVParam> ionOpticsCVList =
@@ -972,15 +856,13 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private void processSpectrometers(
-			List<InstrumentConfiguration> instrumentConfigurationList,
+	private void processSpectrometers(List<InstrumentConfiguration> instrumentConfigurationList,
 			ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing spectrometers");
 
 		if (instrumentConfigurationList != null) {
-			final Spectrometer spectrometer = new SpectrometerImpl(
-					instrumentConfigurationList, referenceableParamGroupList,
-					cvManager);
+			final Spectrometer spectrometer = new SpectrometerImpl(instrumentConfigurationList,
+					referenceableParamGroupList, cvManager);
 			if (spectrometer != null)
 				spectrometers.add(spectrometer);
 		}
@@ -988,14 +870,12 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	}
 
-	private void processContact(List<ParamGroup> contacts,
-			ReferenceableParamGroupList referenceableParamGroupList) {
+	private void processContact(List<ParamGroup> contacts, ReferenceableParamGroupList referenceableParamGroupList) {
 		log.info("processing contacts");
 
 		if (contacts != null && contacts.size() > 0) {
 			log.info("there are contacts to process");
-			contact = new ContactImpl(contacts, referenceableParamGroupList,
-					user, cvManager);
+			contact = new ContactImpl(contacts, referenceableParamGroupList, user, cvManager);
 		}
 		log.info("end processing contacts");
 
@@ -1087,21 +967,17 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	@Override
 	public int store() throws MiapeDatabaseException, MiapeSecurityException {
 		if (dbManager == null)
-			throw new MiapeDatabaseException(
-					"The persistance method is not defined.");
+			throw new MiapeDatabaseException("The persistance method is not defined.");
 		id = dbManager.getMiapeMSPersistenceManager().store(this);
 		return id;
 	}
 
 	@Override
-	public void delete(String userName, String password)
-			throws MiapeDatabaseException, MiapeSecurityException {
+	public void delete(String userName, String password) throws MiapeDatabaseException, MiapeSecurityException {
 		if (dbManager == null)
-			throw new MiapeDatabaseException(
-					"The persistance method is not defined.");
+			throw new MiapeDatabaseException("The persistance method is not defined.");
 		if (id > 0) {
-			dbManager.getMiapeMSPersistenceManager().deleteById(id, userName,
-					password);
+			dbManager.getMiapeMSPersistenceManager().deleteById(id, userName, password);
 		} else
 			throw new MiapeDatabaseException("The MIAPE is not stored yet!");
 
@@ -1159,8 +1035,7 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 
 	@Override
 	public List<org.proteored.miapeapi.interfaces.ms.InstrumentConfiguration> getInstrumentConfigurations() {
-		if (instrumentConfigurations != null
-				&& !instrumentConfigurations.isEmpty())
+		if (instrumentConfigurations != null && !instrumentConfigurations.isEmpty())
 			return instrumentConfigurations;
 		return null;
 	}

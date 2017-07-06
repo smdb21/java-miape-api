@@ -1,14 +1,15 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.InputData;
 import org.proteored.miapeapi.interfaces.msi.InputDataSet;
 
+import gnu.trove.set.hash.THashSet;
+
 public class InputDataSetImpl implements InputDataSet {
 	private final Integer identifier;
-	private final Set<InputData> inputDatas = new HashSet<InputData>();
+	private final Set<InputData> inputDatas = new THashSet<InputData>();
 
 	public InputDataSetImpl(Integer inputDataSetID) {
 		this.identifier = inputDataSetID;

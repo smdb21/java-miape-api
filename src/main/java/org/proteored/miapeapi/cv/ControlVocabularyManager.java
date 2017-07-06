@@ -1,7 +1,7 @@
 package org.proteored.miapeapi.cv;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface that defines the functions that a CV manager, that manage CV terms
@@ -70,8 +70,7 @@ public interface ControlVocabularyManager {
 	 * @param cvSet
 	 * @return the cv term
 	 */
-	public ControlVocabularyTerm getCVTermByAccession(Accession accession,
-			ControlVocabularySet cvSet);
+	public ControlVocabularyTerm getCVTermByAccession(Accession accession, ControlVocabularySet cvSet);
 
 	/**
 	 * Get the parents of a cv term a hash map with the String accession and the
@@ -81,7 +80,7 @@ public interface ControlVocabularyManager {
 	 * @return The has map
 	 * @throws UnsupportedOperationException
 	 */
-	public HashMap<String, ControlVocabularyTerm> getAccesionParents(Accession accession)
+	public Map<String, ControlVocabularyTerm> getAccesionParents(Accession accession)
 			throws UnsupportedOperationException;
 
 	/**
@@ -92,7 +91,6 @@ public interface ControlVocabularyManager {
 	 * @return true if it is son of the other or false if not
 	 * @throws UnsupportedOperationException
 	 */
-	public boolean isSonOf(Accession accession, Accession potentialParent)
-			throws UnsupportedOperationException;
+	public boolean isSonOf(Accession accession, Accession potentialParent) throws UnsupportedOperationException;
 
 }

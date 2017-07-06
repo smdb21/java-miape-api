@@ -1,9 +1,8 @@
 package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -19,6 +18,9 @@ import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>, PeptideContainer {
 
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -29,7 +31,7 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 
 	private ExtendedIdentifiedPeptide bestPeptide;
 
-	private final HashMap<String, List<ExtendedIdentifiedPeptide>> peptideListByScoreNames = new HashMap<String, List<ExtendedIdentifiedPeptide>>();
+	private final Map<String, List<ExtendedIdentifiedPeptide>> peptideListByScoreNames = new THashMap<String, List<ExtendedIdentifiedPeptide>>();
 
 	public PeptideOccurrence(String key) {
 		this.key = key;
@@ -84,7 +86,7 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 	}
 
 	public Set<ExtendedIdentifiedProtein> getProteinList() {
-		Set<ExtendedIdentifiedProtein> ret = new HashSet<ExtendedIdentifiedProtein>();
+		Set<ExtendedIdentifiedProtein> ret = new THashSet<ExtendedIdentifiedProtein>();
 		for (ExtendedIdentifiedPeptide peptide : peptideList) {
 			ret.addAll(peptide.getProteins());
 		}
@@ -278,7 +280,7 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 	 */
 	@Override
 	public Set<String> getScoreNames() {
-		Set<String> ret = new HashSet<String>();
+		Set<String> ret = new THashSet<String>();
 		if (peptideList != null) {
 			for (ExtendedIdentifiedPeptide peptide : peptideList) {
 				List<String> scoreNames = peptide.getScoreNames();
