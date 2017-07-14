@@ -47,7 +47,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import edu.scripps.yates.utilities.fasta.FastaParser;
 import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.pridemod.PrideModController;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
@@ -336,7 +336,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 							peptide = new IdentifiedPeptideImplFromTSV(seq);
 							peptides.put(psmID, peptide);
 							if (FastaParser.somethingExtrangeInSequence(rawSeq)) {
-								TIntObjectHashMap<Double> pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
+								TIntDoubleHashMap pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
 								for (int position : pTMsByPosition.keys()) {
 									String aa = String.valueOf(peptide.getSequence().charAt(position - 1));
 									double deltaMass = pTMsByPosition.get(position);
