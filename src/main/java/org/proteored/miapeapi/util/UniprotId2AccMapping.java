@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
+import org.springframework.core.io.ClassPathResource;
+
 import gnu.trove.map.hash.THashMap;
 
 public class UniprotId2AccMapping {
@@ -52,22 +54,27 @@ public class UniprotId2AccMapping {
 	private UniprotId2AccMapping(String mappingFileName) throws IOException {
 		log.info("REading mapping file: " + mappingFileName);
 		long t1 = System.currentTimeMillis();
-		ClassLoader cl = this.getClass().getClassLoader();
+		BufferedReader br = null;
 
-		InputStream istream = cl.getResourceAsStream(mappingFileName);
-		DataInputStream in = new DataInputStream(istream);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		try {
+			InputStream istream = new ClassPathResource(mappingFileName).getInputStream();
+			DataInputStream in = new DataInputStream(istream);
+			br = new BufferedReader(new InputStreamReader(in));
 
-		String line = "";
-		while ((line = br.readLine()) != null) {
-			if (line.contains(",")) {
-				final String[] split = line.split(",");
-				uniprotIDACCMap.put(split[0], split[1]);
-				uniprotACCIDMap.put(split[1], split[0]);
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				if (line.contains(",")) {
+					final String[] split = line.split(",");
+					uniprotIDACCMap.put(split[0], split[1]);
+					uniprotACCIDMap.put(split[1], split[0]);
+				}
+			}
+			br.close();
+		} finally {
+			if (br != null) {
+				br.close();
 			}
 		}
-		br.close();
-
 		log.info(uniprotIDACCMap.size() + " entries mapped");
 		log.info("in " + (System.currentTimeMillis() - t1) / 1000 + " sg");
 	}
