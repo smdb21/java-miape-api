@@ -74,11 +74,21 @@ public class ProteinACCFilter implements Filter, Filters<ProteinComparatorKey> {
 		final long countNumberOfEntries = fastaLoader.countNumberOfEntries();
 		for (int i = 0; i < countNumberOfEntries; i++) {
 			final Protein nextProtein = fastaLoader.nextProtein();
-			if (nextProtein == null)
+			if (nextProtein == null) {
 				break;
-			accessions.add(new ProteinComparatorKey(nextProtein.getHeader().getAccession(),
-					ProteinGroupComparisonType.BEST_PROTEIN));
-			sortedAccessions.add(nextProtein.getHeader().getAccession());
+			}
+			String accession = nextProtein.getHeader().getAccession();
+			if (accession == null) {
+				accession = nextProtein.getHeader().getID();
+			}
+			if (accession == null) {
+				accession = nextProtein.getHeader().getAbbreviatedFASTAHeader();
+			}
+			if (accession == null) {
+				accession = nextProtein.getHeader().toString();
+			}
+			accessions.add(new ProteinComparatorKey(accession, ProteinGroupComparisonType.BEST_PROTEIN));
+			sortedAccessions.add(accession);
 		}
 		this.software = software;
 		log.info("Loaded " + accessions.size() + " proteins from " + fastaFile.getAbsolutePath());
