@@ -27,7 +27,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	private String retentionTime;
 
 	public IdentifiedPeptideImplFromTSV(String seq) {
-		this.sequence = seq;
+		this.sequence = seq.toUpperCase();
 		this.id = getRandomInt();
 	}
 
