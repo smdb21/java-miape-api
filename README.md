@@ -14,57 +14,56 @@ The Java MIAPE API is designed in 4 different modules:
  This example shows how a MIAPE MS document object (*object module*) is created using the *factory module* and then is exported to a XML file (*XML module*) and stored in a database (*persistence module*): 
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
-  // project
-  ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
-				.date(new MiapeDate(new Date()));
+	// project
+    ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
+		.date(new MiapeDate(new Date()));
 
-  // User (if needed for persistence, like a database)
-  UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
+	// User (if needed for persistence, like a database)
+    UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
 
-  // Spectrometer
-		SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
-				.createSpectrometerBuilder(SpectrometerName.LTQ_ORBITRAP_XL_NAME).manufacturer("Thermo Scientific")
-				.version("version XL").catalogNumber("#12345").model("The new Orbitrap XL");
+   // Spectrometer
+   SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
+   		.createSpectrometerBuilder(SpectrometerName.LTQ_ORBITRAP_XL_NAME).manufacturer("Thermo Scientific")
+		.version("version XL").catalogNumber("#12345").model("The new Orbitrap XL");
 
-		// Analyzer
-		AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
-				.description("Description of the orbitrap");
+   // Analyzer
+   AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
+		.description("Description of the orbitrap");
 
-		// Ion source
-		EsiBuilder esiBuilder = MiapeMSDocumentFactory.createEsiBuilder("nano-ESI").parameters("xx Volts")
-				.supplyType("regular supply");
+	// Ion source
+	EsiBuilder esiBuilder = MiapeMSDocumentFactory.createEsiBuilder("nano-ESI").parameters("xx Volts")
+		.supplyType("regular supply");
 
-		// Instrument Configuration (analiser + esi)
-		InstrumentConfigurationBuilder instrumentConfigurationBuilder = MiapeMSDocumentFactory
-				.createInstrumentConfigurationBuilder("LTQ configuration").analyser(analyserBuilder.build())
-				.esi(esiBuilder.build());
+	// Instrument Configuration (analiser + esi)
+	InstrumentConfigurationBuilder instrumentConfigurationBuilder = MiapeMSDocumentFactory
+		.createInstrumentConfigurationBuilder("LTQ configuration").analyser(analyserBuilder.build())
+		.esi(esiBuilder.build());
 
-		// MIAPE MS document (user + miape project + spectrometer + instrument
-		// configuration
-		MiapeMSDocument miapeMS = (MiapeMSDocument) MiapeMSDocumentFactory
-				.createMiapeMSDocumentBuilder(projectBuilder.build(), "my first miape document", userBuilder.build())
-				.instrumentConfiguration(instrumentConfigurationBuilder.build())  
-				.spectrometer(spectrometerBuilder.build()).cvManager(cvManager)  
-				.dbManager(databaseManager) // needed for later use of .store()
-				.build();
+	// MIAPE MS document (user + miape project + spectrometer + instrument
+	// configuration
+	MiapeMSDocument miapeMS = (MiapeMSDocument) MiapeMSDocumentFactory
+		.createMiapeMSDocumentBuilder(projectBuilder.build(), "my first miape document", userBuilder.build())
+		.instrumentConfiguration(instrumentConfigurationBuilder.build())  
+		.spectrometer(spectrometerBuilder.build()).cvManager(cvManager)  
+		.dbManager(databaseManager) // needed for later use of .store()
+		.build();
 
-		// Save MIAPE MS to XML file
-		MiapeXmlFile<MiapeMSDocument> miapeMSXML = MiapeMSXmlFactory.getFactory().toXml(miapeMS, cvManager);
-		try {
-			miapeMSXML.saveAs("/home/username/myFirstMiapeMS.xml");
-			System.out.println("New file created at :" + miapeMSXML.getPath());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+	// Save MIAPE MS to XML file
+	MiapeXmlFile<MiapeMSDocument> miapeMSXML = MiapeMSXmlFactory.getFactory().toXml(miapeMS, cvManager);
+	try {
+		miapeMSXML.saveAs("/home/username/myFirstMiapeMS.xml");
+		System.out.println("New file created at :" + miapeMSXML.getPath());
+	} catch (IOException e1) {
+		e1.printStackTrace();
+	}
 
-		// Store it in the database
-		try {
-			int identifier = miapeMS.store();
-			System.out.println("Document stored in the database with identifier " + identifier);
-		} catch (MiapeDatabaseException | MiapeSecurityException e) {
-			e.printStackTrace();
-		}
-
+	// Store it in the database
+	try {
+		int identifier = miapeMS.store();
+		System.out.println("Document stored in the database with identifier " + identifier);
+	} catch (MiapeDatabaseException | MiapeSecurityException e) {
+		e.printStackTrace();
+	}
 }
 ```
 
@@ -73,114 +72,112 @@ This example shows how to extract the MIAPE information from commonly used prote
 ```java
 public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
 			throws MiapeDatabaseException, MiapeSecurityException {
-		File prideXMLFile = new File("path_to_pride_xml");
-		File xtandemXMLFile = new File("path_to_xtandem_xml");
-		File mzIdentMLFile = new File("path_to_mzIdentML");
-		File mzMLFile = new File("path_to_mzML");
-		File tsvFile = new File("path_to_tsv_xml");
-		File dtaSelectFile = new File("path_to_dtaSelect_xml");
+	File prideXMLFile = new File("path_to_pride_xml");
+	File xtandemXMLFile = new File("path_to_xtandem_xml");
+	File mzIdentMLFile = new File("path_to_mzIdentML");
+	File mzMLFile = new File("path_to_mzML");
+	File tsvFile = new File("path_to_tsv_xml");
+	File dtaSelectFile = new File("path_to_dtaSelect_xml");
 
-		// PRIDE XML
-		MiapeFullPrideXMLFile miapeFullPride = new MiapeFullPrideXMLFile(prideXMLFile);
-		miapeFullPride.setCVManager(cvManager);
-		// because all MIAPEs are under a project
-		miapeFullPride.setProjectName("my project");
-		MiapeMSDocument miapeMSFromPRIDEXML = miapeFullPride.toMiapeMS();
-		MiapeMSIDocument miapeMSIromPRIDEXML = miapeFullPride.toMiapeMSI();
-		printMiapeMS(miapeMSFromPRIDEXML);
-		printMiapeMSI(miapeMSIromPRIDEXML);
+	// PRIDE XML
+	MiapeFullPrideXMLFile miapeFullPride = new MiapeFullPrideXMLFile(prideXMLFile);
+	miapeFullPride.setCVManager(cvManager);
+	// because all MIAPEs are under a project
+	miapeFullPride.setProjectName("my project");
+	MiapeMSDocument miapeMSFromPRIDEXML = miapeFullPride.toMiapeMS();
+	MiapeMSIDocument miapeMSIromPRIDEXML = miapeFullPride.toMiapeMSI();
+	printMiapeMS(miapeMSFromPRIDEXML);
+	printMiapeMSI(miapeMSIromPRIDEXML);
+    
+    // XTANDEM XML
+	MiapeXTandemFile miapeXTandemXMLFile = new MiapeXTandemFile(xtandemXMLFile);
+	miapeXTandemXMLFile.setCvManager(cvManager);
+	miapeXTandemXMLFile.setProjectName("my project");
+	MiapeMSIDocument miapeMSIFromXTandem = miapeXTandemXMLFile.toDocument();
+	printMiapeMSI(miapeMSIFromXTandem);
 
-		// XTANDEM XML
-		MiapeXTandemFile miapeXTandemXMLFile = new MiapeXTandemFile(xtandemXMLFile);
-		miapeXTandemXMLFile.setCvManager(cvManager);
-		miapeXTandemXMLFile.setProjectName("my project");
-		MiapeMSIDocument miapeMSIFromXTandem = miapeXTandemXMLFile.toDocument();
-		printMiapeMSI(miapeMSIFromXTandem);
+	// MZIDENTML
+	MiapeMzIdentMLFile miapeMzIdentMLFile = new MiapeMzIdentMLFile(mzIdentMLFile);
+	miapeMzIdentMLFile.setCvManager(cvManager);
+	miapeMzIdentMLFile.setProjectName("my project");
+	MiapeMSIDocument miapeMSIFromMzIdentML = miapeMzIdentMLFile.toDocument();
+	printMiapeMSI(miapeMSIFromMzIdentML);
 
-		// MZIDENTML
-		MiapeMzIdentMLFile miapeMzIdentMLFile = new MiapeMzIdentMLFile(mzIdentMLFile);
-		miapeMzIdentMLFile.setCvManager(cvManager);
-		miapeMzIdentMLFile.setProjectName("my project");
-		MiapeMSIDocument miapeMSIFromMzIdentML = miapeMzIdentMLFile.toDocument();
-		printMiapeMSI(miapeMSIFromMzIdentML);
+	// MZML
+	MiapeMzMLFile miapeMzMLFile = new MiapeMzMLFile(mzMLFile);
+	miapeMzMLFile.setCvManager(cvManager);
+	miapeMzMLFile.setProjectName("my project");
+	MiapeMSDocument miapeMSFromMzML = miapeMzMLFile.toDocument();
+	printMiapeMS(miapeMSFromMzML);
 
-		// MZML
-		MiapeMzMLFile miapeMzMLFile = new MiapeMzMLFile(mzMLFile);
-		miapeMzMLFile.setCvManager(cvManager);
-		miapeMzMLFile.setProjectName("my project");
-		MiapeMSDocument miapeMSFromMzML = miapeMzMLFile.toDocument();
-		printMiapeMS(miapeMSFromMzML);
+	// TAB SEPARATED FILE
+	MiapeTSVFile miapeTSVFile = new MiapeTSVFile(tsvFile, TableTextFileSeparator.TAB);
+	miapeTSVFile.setCvManager(cvManager);
+	miapeTSVFile.setProjectName("my project");
+	MiapeMSIDocument miapeMSIFromTSV = miapeTSVFile.toDocument();
+	printMiapeMSI(miapeMSIFromTSV);
 
-		// TAB SEPARATED FILE
-		MiapeTSVFile miapeTSVFile = new MiapeTSVFile(tsvFile, TableTextFileSeparator.TAB);
-		miapeTSVFile.setCvManager(cvManager);
-		miapeTSVFile.setProjectName("my project");
-		MiapeMSIDocument miapeMSIFromTSV = miapeTSVFile.toDocument();
-		printMiapeMSI(miapeMSIFromTSV);
-
-		// DTASELECT
-		MiapeDTASelectFile miapeDTASelectFile = new MiapeDTASelectFile(dtaSelectFile);
-		miapeDTASelectFile.setCvManager(cvManager);
-		miapeDTASelectFile.setProjectName("my project");
-		MiapeMSIDocument miapeMSIFromDTASelect = miapeDTASelectFile.toDocument();
-		printMiapeMSI(miapeMSIFromDTASelect);
-	}
+	// DTASELECT
+	MiapeDTASelectFile miapeDTASelectFile = new MiapeDTASelectFile(dtaSelectFile);
+	miapeDTASelectFile.setCvManager(cvManager);
+	miapeDTASelectFile.setProjectName("my project");
+	MiapeMSIDocument miapeMSIFromDTASelect = miapeDTASelectFile.toDocument();
+	printMiapeMSI(miapeMSIFromDTASelect);
+}
 ```
 **Example 3**
 This example show the *printMiapeMS* and *printMiapeMSI* methods called in the previous example, showing how the information contained in each document can be extracted and printed
 ```java
 private void printMiapeMSI(MiapeMSIDocument miapeMSI) {
-		System.out.println("MIAPE MSI: ");
-		System.out.println("Name: " + miapeMSI.getName());
-		System.out.println("");
-		System.out.println("Total number of PSMs: " + miapeMSI.getIdentifiedPeptides().size());
-		for (IdentifiedProteinSet proteinSet : miapeMSI.getIdentifiedProteinSets()) {
-			InputParameter ip = proteinSet.getInputParameter();
-			System.out.println("Input parameters: " + ip.getName());
-			System.out.println("Search engine: " + ip.getSoftware().getName());
-			System.out.println(
-					"Parent tolerance: " + ip.getPrecursorMassTolerance() + " " + ip.getPrecursorMassToleranceUnit());
-			System.out.println(
-					"Fragment tolerance: " + ip.getFragmentMassTolerance() + " " + ip.getFragmentMassToleranceUnit());
-			System.out.println("Num miss-cleavages: " + ip.getMisscleavages());
+	System.out.println("MIAPE MSI: ");
+	System.out.println("Name: " + miapeMSI.getName());
+	System.out.println("");
+	System.out.println("Total number of PSMs: " + miapeMSI.getIdentifiedPeptides().size());
+	for (IdentifiedProteinSet proteinSet : miapeMSI.getIdentifiedProteinSets()) {
+		InputParameter ip = proteinSet.getInputParameter();
+		System.out.println("Input parameters: " + ip.getName());
+		System.out.println("Search engine: " + ip.getSoftware().getName());
+		System.out.println(
+				"Parent tolerance: " + ip.getPrecursorMassTolerance() + " " + ip.getPrecursorMassToleranceUnit());
+		System.out.println(
+				"Fragment tolerance: " + ip.getFragmentMassTolerance() + " " + ip.getFragmentMassToleranceUnit());
+		System.out.println("Num miss-cleavages: " + ip.getMisscleavages());
 
-			System.out.println("Number of proteins: " + proteinSet.getIdentifiedProteins().size());
-			for (String proteinACC : proteinSet.getIdentifiedProteins().keySet()) {
-				IdentifiedProtein protein = proteinSet.getIdentifiedProteins().get(proteinACC);
-				System.out.println(
-						"Protein " + proteinACC + " contains " + protein.getIdentifiedPeptides().size() + " PSMs");
-				for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
-					System.out.println("PSM " + peptide.getSpectrumRef() + " with sequence " + peptide.getSequence()
-							+ " and charge " + peptide.getCharge());
-				}
+		System.out.println("Number of proteins: " + proteinSet.getIdentifiedProteins().size());
+		for (String proteinACC : proteinSet.getIdentifiedProteins().keySet()) {
+			IdentifiedProtein protein = proteinSet.getIdentifiedProteins().get(proteinACC);
+			System.out.println(
+					"Protein " + proteinACC + " contains " + protein.getIdentifiedPeptides().size() + " PSMs");
+			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
+				System.out.println("PSM " + peptide.getSpectrumRef() + " with sequence " + peptide.getSequence()
+						+ " and charge " + peptide.getCharge());
 			}
 		}
-
 	}
+}
 
-	private void printMiapeMS(MiapeMSDocument miapeMS) {
-		System.out.println("MIAPE MS: ");
-		System.out.println("Name: " + miapeMS.getName());
-		System.out.println("");
-		for (InstrumentConfiguration ic : miapeMS.getInstrumentConfigurations()) {
-			for (Analyser analyser : ic.getAnalyzers()) {
-				System.out.println("Analyser: " + analyser.getName());
-				System.out.println("Description: " + analyser.getDescription());
-			}
-			for (Esi esi : ic.getEsis()) {
-				System.out.println("ESI: " + esi.getName());
-				System.out.println("Parameters: " + esi.getParameters());
-				System.out.println("Supply type: " + esi.getSupplyType());
-			}
-			for (ActivationDissociation ad : ic.getActivationDissociations()) {
-				System.out.println("Name: " + ad.getName());
-				System.out.println("Activation type: " + ad.getActivationType());
-				System.out.println("Gas type: " + ad.getGasType());
-				System.out.println("Gas pressure: " + ad.getGasPressure() + " " + ad.getPressureUnit());
-			}
+private void printMiapeMS(MiapeMSDocument miapeMS) {
+	System.out.println("MIAPE MS: ");
+	System.out.println("Name: " + miapeMS.getName());
+	System.out.println("");
+	for (InstrumentConfiguration ic : miapeMS.getInstrumentConfigurations()) {
+		for (Analyser analyser : ic.getAnalyzers()) {
+			System.out.println("Analyser: " + analyser.getName());
+			System.out.println("Description: " + analyser.getDescription());
 		}
-
+		for (Esi esi : ic.getEsis()) {
+			System.out.println("ESI: " + esi.getName());
+			System.out.println("Parameters: " + esi.getParameters());
+			System.out.println("Supply type: " + esi.getSupplyType());
+		}
+		for (ActivationDissociation ad : ic.getActivationDissociations()) {
+			System.out.println("Name: " + ad.getName());
+			System.out.println("Activation type: " + ad.getActivationType());
+			System.out.println("Gas type: " + ad.getGasType());
+			System.out.println("Gas pressure: " + ad.getGasPressure() + " " + ad.getPressureUnit());
+		}
 	}
+}
 ```
 
 ---
