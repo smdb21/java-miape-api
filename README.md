@@ -14,14 +14,14 @@ The Java MIAPE API is designed in 4 different modules:
  This example shows how a MIAPE MS document object (*object module*) is created using the *factory module* and then is exported to a XML file (*XML module*) and stored in a database (*persistence module*): 
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
-		// project
-		ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
+  // project
+  ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
 				.date(new MiapeDate(new Date()));
 
-		// User (if needed for persistence, like a database)
-		UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
+  // User (if needed for persistence, like a database)
+  UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
 
-		// Spectrometer
+  // Spectrometer
 		SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
 				.createSpectrometerBuilder(SpectrometerName.LTQ_ORBITRAP_XL_NAME).manufacturer("Thermo Scientific")
 				.version("version XL").catalogNumber("#12345").model("The new Orbitrap XL");
