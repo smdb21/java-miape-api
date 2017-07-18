@@ -15,19 +15,19 @@ The Java MIAPE API is designed in 4 different modules:
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
 	// project
-    ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
+	ProjectBuilder projectBuilder = MiapeDocumentFactory.createProjectBuilder("my project")
 		.date(new MiapeDate(new Date()));
 
 	// User (if needed for persistence, like a database)
-    UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
+	UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
 
-   // Spectrometer
-   SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
+	// Spectrometer	
+    SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
    		.createSpectrometerBuilder(SpectrometerName.LTQ_ORBITRAP_XL_NAME).manufacturer("Thermo Scientific")
 		.version("version XL").catalogNumber("#12345").model("The new Orbitrap XL");
 
-   // Analyzer
-   AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
+	// Analyzer	
+    AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
 		.description("Description of the orbitrap");
 
 	// Ion source
@@ -89,7 +89,7 @@ public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
 	printMiapeMS(miapeMSFromPRIDEXML);
 	printMiapeMSI(miapeMSIromPRIDEXML);
     
-    // XTANDEM XML
+	// XTANDEM XML
 	MiapeXTandemFile miapeXTandemXMLFile = new MiapeXTandemFile(xtandemXMLFile);
 	miapeXTandemXMLFile.setCvManager(cvManager);
 	miapeXTandemXMLFile.setProjectName("my project");
@@ -137,17 +137,14 @@ private void printMiapeMSI(MiapeMSIDocument miapeMSI) {
 		InputParameter ip = proteinSet.getInputParameter();
 		System.out.println("Input parameters: " + ip.getName());
 		System.out.println("Search engine: " + ip.getSoftware().getName());
-		System.out.println(
-				"Parent tolerance: " + ip.getPrecursorMassTolerance() + " " + ip.getPrecursorMassToleranceUnit());
-		System.out.println(
-				"Fragment tolerance: " + ip.getFragmentMassTolerance() + " " + ip.getFragmentMassToleranceUnit());
+		System.out.println("Parent tolerance: " + ip.getPrecursorMassTolerance() + " " + ip.getPrecursorMassToleranceUnit());
+		System.out.println("Fragment tolerance: " + ip.getFragmentMassTolerance() + " " + ip.getFragmentMassToleranceUnit());
 		System.out.println("Num miss-cleavages: " + ip.getMisscleavages());
 
 		System.out.println("Number of proteins: " + proteinSet.getIdentifiedProteins().size());
 		for (String proteinACC : proteinSet.getIdentifiedProteins().keySet()) {
 			IdentifiedProtein protein = proteinSet.getIdentifiedProteins().get(proteinACC);
-			System.out.println(
-					"Protein " + proteinACC + " contains " + protein.getIdentifiedPeptides().size() + " PSMs");
+			System.out.println("Protein " + proteinACC + " contains " + protein.getIdentifiedPeptides().size() + " PSMs");
 			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
 				System.out.println("PSM " + peptide.getSpectrumRef() + " with sequence " + peptide.getSequence()
 						+ " and charge " + peptide.getCharge());
