@@ -133,12 +133,12 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof IdentifiedProtein))
-			return super.equals(obj);
-		else {
-			IdentifiedProtein protein = (IdentifiedProtein) obj;
-			return protein.getAccession().equals(getAccession());
-		}
+		// if (!(obj instanceof IdentifiedProtein))
+		return super.equals(obj);
+		// else {
+		// IdentifiedProtein protein = (IdentifiedProtein) obj;
+		// return protein.getAccession().equals(getAccession());
+		// }
 	}
 
 	@Override
