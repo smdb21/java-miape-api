@@ -70,7 +70,7 @@ public class MiapeMzIdentMLFile extends MiapeXmlFile<MiapeMSIDocument> {
 		this.dbManager = dbManager;
 	}
 
-	public void setCvUtil(ControlVocabularyManager cvUtil) {
+	public void setCvManager(ControlVocabularyManager cvUtil) {
 		this.cvUtil = cvUtil;
 	}
 
