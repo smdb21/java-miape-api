@@ -10,7 +10,36 @@ The Java MIAPE API is designed in 4 different modules:
  - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: mzIdentML, mzML, pepXML, PRIDE XML, DtaSelect txt or XTandem XML.
  - The *persistence model*: This module provides the methods to be implemented by a persistence system, which will be able to persist the MIAPE information, on files, a database, etc...
  
- **Example 1**:
+ #### How to get the API
+ 
+ **Latest build** available at: [http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/](http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/)
+ 
+ **Using MAVEN**:
+ Add this to your pom.xml: 
+ ```xml
+<repository>
+    <id>internal</id>
+    <name>John Yates lab Internal Repository</name>
+    <url>http://sealion.scripps.edu/archiva/repository/internal/</url>
+</repository>
+<repository>
+    <id>snapshots</id>
+    <name>John Yates lab snapshots maven repository</name>
+    <url>http://sealion.scripps.edu/archiva/repository/snapshots/</url>
+</repository>
+ ```
+ Including this dependency:
+ ```xml 
+<dependency>
+    <groupId>org.proteored.miape.api</groupId>
+    <artifactId>miape-api</artifactId>
+    <version>1.9.1-SNAPSHOT</version> <!-- or the latest version available -->
+</dependency>
+```
+
+ #### How to use the API
+ 
+ ##### Example 1:
  This example shows how a MIAPE MS document object (*object module*) is created using the *factory module* and then is exported to a XML file (*XML module*) and stored in a database (*persistence module*): 
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
@@ -67,7 +96,7 @@ public class createMiape(PersistenceManager databaseManager, ControlVocabularyMa
 }
 ```
 
-**Example 2:**
+ ##### Example 2: 
 This example shows how to extract the MIAPE information from commonly used proteomics data files:
 ```java
 public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
@@ -125,7 +154,7 @@ public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
 	printMiapeMSI(miapeMSIFromDTASelect);
 }
 ```
-**Example 3**
+ ##### Example 3:
 This example show the *printMiapeMS* and *printMiapeMSI* methods called in the previous example, showing how the information contained in each document can be extracted and printed
 ```java
 private void printMiapeMSI(MiapeMSIDocument miapeMSI) {
@@ -179,7 +208,7 @@ private void printMiapeMS(MiapeMSDocument miapeMS) {
 
 ---
 (1) [The Minimal Information about a Proteomics Experiment (MIAPE) from the Proteomics Standards Initiative. 
-Mart?nez-Bartolom? S, Binz PA, Albar JP. 
+Martinez-Bartolome S, Binz PA, Albar JP. 
 Methods Mol Biol. 2014;1072:765-80. doi: 10.1007/978-1-62703-631-3_53.](https://www.ncbi.nlm.nih.gov/pubmed/24136562).
 
 (2) [Guidelines for reporting the use of gel electrophoresis in proteomics.
@@ -187,7 +216,7 @@ Gibson F, Anderson L, Babnigg G, Baker M, Berth M, Binz PA, Borthwick A, Cash P,
 Nat Biotechnol. 2008 Aug;26(8):863-4. doi: 10.1038/nbt0808-863.](https://www.ncbi.nlm.nih.gov/pubmed/18688234)
 
 (3) [Guidelines for reporting the use of gel image informatics in proteomics. 
-Hoogland C, O'Gorman M, Bogard P, Gibson F, Berth M, Cockell SJ, Ekefj?rd A, Forsstrom-Olsson O, Kapferer A, Nilsson M, Mart?nez-Bartolom? S, Albar JP, Echevarr?a-Zome?o S, Mart?nez-Gomariz M, Joets J, Binz PA, Taylor CF, Dowsey A, Jones AR.
+Hoogland C, O'Gorman M, Bogard P, Gibson F, Berth M, Cockell SJ, Ekefj?rd A, Forsstrom-Olsson O, Kapferer A, Nilsson M, Martinez-Bartolome S, Albar JP, Echevarr?a-Zome?o S, Martinez-Gomariz M, Joets J, Binz PA, Taylor CF, Dowsey A, Jones AR.
 Nat Biotechnol. 2010 Jul;28(7):655-6. doi: 10.1038/nbt0710-655.](https://www.ncbi.nlm.nih.gov/pubmed/20622830)
 
 (4) [Guidelines for reporting the use of mass spectrometry in proteomics.
