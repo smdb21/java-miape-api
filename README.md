@@ -7,11 +7,11 @@ What is the *MIAPE information*?
 The Java MIAPE API is designed in 4 different modules:
  - The *model module*: This module contains the classes needed to represent the MIAPE information of the different types of experiments. The interfaces (under package *org.proteored.miapeapi.interfaces*) MiapeGEDocument, MiapeGIDocument, MiapeMSDocumen and MiapeMSIDocument, define the MIAPE information for the Gel Electrophoresis<sup>[(2)](https://www.ncbi.nlm.nih.gov/pubmed/18688234)</sup>, Gel Image Informatics<sup>[(3)](https://www.ncbi.nlm.nih.gov/pubmed/20622830)</sup>, Mass Spectrometry<sup>[(4)](https://www.ncbi.nlm.nih.gov/pubmed/18688232)</sup> and Mass Spectrometry Informatics<sup>[(5)](https://www.ncbi.nlm.nih.gov/pubmed/18688233)</sup> MIAPE modules. 
  - The *factory module*: This module provides the util classes for the creation of the MIAPE document objects.
- - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: mzIdentML, mzML, pepXML, PRIDE XML or XTandem XML.
+ - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: mzIdentML, mzML, pepXML, PRIDE XML, DtaSelect txt or XTandem XML.
  - The *persistence model*: This module provides the methods to be implemented by a persistence system, which will be able to persist the MIAPE information, on files, a database, etc...
  
- **Example**:
- 
+ **Example 1**:
+ This example shows how a MIAPE MS document object (*object module*) is created using the *factory module* and then is exported to a XML file (*XML module*) and stored in a database (*persistence module*): 
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
 		// project
@@ -67,13 +67,122 @@ public class createMiape(PersistenceManager databaseManager, ControlVocabularyMa
 
 }
 ```
- 
 
-```css #button { border: none; } ```
+**Example 2:**
+This example shows how to extract the MIAPE information from commonly used proteomics data files:
+```java
+public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
+			throws MiapeDatabaseException, MiapeSecurityException {
+		File prideXMLFile = new File("path_to_pride_xml");
+		File xtandemXMLFile = new File("path_to_xtandem_xml");
+		File mzIdentMLFile = new File("path_to_mzIdentML");
+		File mzMLFile = new File("path_to_mzML");
+		File tsvFile = new File("path_to_tsv_xml");
+		File dtaSelectFile = new File("path_to_dtaSelect_xml");
 
-~~~~ This is a piece of code in a block ~~~~
+		// PRIDE XML
+		MiapeFullPrideXMLFile miapeFullPride = new MiapeFullPrideXMLFile(prideXMLFile);
+		miapeFullPride.setCVManager(cvManager);
+		// because all MIAPEs are under a project
+		miapeFullPride.setProjectName("my project");
+		MiapeMSDocument miapeMSFromPRIDEXML = miapeFullPride.toMiapeMS();
+		MiapeMSIDocument miapeMSIromPRIDEXML = miapeFullPride.toMiapeMSI();
+		printMiapeMS(miapeMSFromPRIDEXML);
+		printMiapeMSI(miapeMSIromPRIDEXML);
 
-``` This too ```
+		// XTANDEM XML
+		MiapeXTandemFile miapeXTandemXMLFile = new MiapeXTandemFile(xtandemXMLFile);
+		miapeXTandemXMLFile.setCvManager(cvManager);
+		miapeXTandemXMLFile.setProjectName("my project");
+		MiapeMSIDocument miapeMSIFromXTandem = miapeXTandemXMLFile.toDocument();
+		printMiapeMSI(miapeMSIFromXTandem);
+
+		// MZIDENTML
+		MiapeMzIdentMLFile miapeMzIdentMLFile = new MiapeMzIdentMLFile(mzIdentMLFile);
+		miapeMzIdentMLFile.setCvManager(cvManager);
+		miapeMzIdentMLFile.setProjectName("my project");
+		MiapeMSIDocument miapeMSIFromMzIdentML = miapeMzIdentMLFile.toDocument();
+		printMiapeMSI(miapeMSIFromMzIdentML);
+
+		// MZML
+		MiapeMzMLFile miapeMzMLFile = new MiapeMzMLFile(mzMLFile);
+		miapeMzMLFile.setCvManager(cvManager);
+		miapeMzMLFile.setProjectName("my project");
+		MiapeMSDocument miapeMSFromMzML = miapeMzMLFile.toDocument();
+		printMiapeMS(miapeMSFromMzML);
+
+		// TAB SEPARATED FILE
+		MiapeTSVFile miapeTSVFile = new MiapeTSVFile(tsvFile, TableTextFileSeparator.TAB);
+		miapeTSVFile.setCvManager(cvManager);
+		miapeTSVFile.setProjectName("my project");
+		MiapeMSIDocument miapeMSIFromTSV = miapeTSVFile.toDocument();
+		printMiapeMSI(miapeMSIFromTSV);
+
+		// DTASELECT
+		MiapeDTASelectFile miapeDTASelectFile = new MiapeDTASelectFile(dtaSelectFile);
+		miapeDTASelectFile.setCvManager(cvManager);
+		miapeDTASelectFile.setProjectName("my project");
+		MiapeMSIDocument miapeMSIFromDTASelect = miapeDTASelectFile.toDocument();
+		printMiapeMSI(miapeMSIFromDTASelect);
+	}
+```
+**Example 3**
+This example show the *printMiapeMS* and *printMiapeMSI* methods called in the previous example, showing how the information contained in each document can be extracted and printed
+```java
+private void printMiapeMSI(MiapeMSIDocument miapeMSI) {
+		System.out.println("MIAPE MSI: ");
+		System.out.println("Name: " + miapeMSI.getName());
+		System.out.println("");
+		System.out.println("Total number of PSMs: " + miapeMSI.getIdentifiedPeptides().size());
+		for (IdentifiedProteinSet proteinSet : miapeMSI.getIdentifiedProteinSets()) {
+			InputParameter ip = proteinSet.getInputParameter();
+			System.out.println("Input parameters: " + ip.getName());
+			System.out.println("Search engine: " + ip.getSoftware().getName());
+			System.out.println(
+					"Parent tolerance: " + ip.getPrecursorMassTolerance() + " " + ip.getPrecursorMassToleranceUnit());
+			System.out.println(
+					"Fragment tolerance: " + ip.getFragmentMassTolerance() + " " + ip.getFragmentMassToleranceUnit());
+			System.out.println("Num miss-cleavages: " + ip.getMisscleavages());
+
+			System.out.println("Number of proteins: " + proteinSet.getIdentifiedProteins().size());
+			for (String proteinACC : proteinSet.getIdentifiedProteins().keySet()) {
+				IdentifiedProtein protein = proteinSet.getIdentifiedProteins().get(proteinACC);
+				System.out.println(
+						"Protein " + proteinACC + " contains " + protein.getIdentifiedPeptides().size() + " PSMs");
+				for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
+					System.out.println("PSM " + peptide.getSpectrumRef() + " with sequence " + peptide.getSequence()
+							+ " and charge " + peptide.getCharge());
+				}
+			}
+		}
+
+	}
+
+	private void printMiapeMS(MiapeMSDocument miapeMS) {
+		System.out.println("MIAPE MS: ");
+		System.out.println("Name: " + miapeMS.getName());
+		System.out.println("");
+		for (InstrumentConfiguration ic : miapeMS.getInstrumentConfigurations()) {
+			for (Analyser analyser : ic.getAnalyzers()) {
+				System.out.println("Analyser: " + analyser.getName());
+				System.out.println("Description: " + analyser.getDescription());
+			}
+			for (Esi esi : ic.getEsis()) {
+				System.out.println("ESI: " + esi.getName());
+				System.out.println("Parameters: " + esi.getParameters());
+				System.out.println("Supply type: " + esi.getSupplyType());
+			}
+			for (ActivationDissociation ad : ic.getActivationDissociations()) {
+				System.out.println("Name: " + ad.getName());
+				System.out.println("Activation type: " + ad.getActivationType());
+				System.out.println("Gas type: " + ad.getGasType());
+				System.out.println("Gas pressure: " + ad.getGasPressure() + " " + ad.getPressureUnit());
+			}
+		}
+
+	}
+```
+
 ---
 (1) [The Minimal Information about a Proteomics Experiment (MIAPE) from the Proteomics Standards Initiative. 
 Mart?nez-Bartolom? S, Binz PA, Albar JP. 
