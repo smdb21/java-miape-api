@@ -1,5 +1,5 @@
-# Java MIAPE API
-The Java MIAPE API is an open source Java API designed for the extraction and management of MIAPE information from commonly used proteomics data files.
+## Java MIAPE API
+The **Java MIAPE API** is an open source Java API designed for the extraction and management of MIAPE information from commonly used proteomics data files.
 
 What is the *MIAPE information*?
  - MIAPE stands for the **M**inimal **I**nformation **A**bout a **P**roteomics **E**xperiment, and it is a set of guidelines defined by the Human Proteome Organization's [Proteomics Standard Initiative (HUPO-PSI)](http://psidev.info)  <sup>[(1)](https://www.ncbi.nlm.nih.gov/pubmed/24136562)</sup>
@@ -10,9 +10,10 @@ The Java MIAPE API is designed in 4 different modules:
  - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: **mzIdentML, mzML, pepXML, PRIDE XML, DtaSelect txt** or **XTandem XML**.
  - The *persistence model*: This module provides the methods to be implemented by a persistence system, which will be able to persist the MIAPE information, on files, a database, etc...
  
- #### About developers
- This API was firstly designed by Emilio Salazar Do?ate and [Salvador Martinez-Bartolome](https://www.ncbi.nlm.nih.gov/pubmed/?term=Martinez-Bartolome+S) under the supervision of Juan Pablo Albar, at the [Proteomics Laboratory](http://proteo.cnb.csic.es/proteomica/) of the  [National Center for Biotechnology (CNB-CSIC)](http://www.cnb.csic.es) in Madrid, Spain. Later, the project was continued by Salvador Martinez-Bartolome under the supervision of John R. Yates III at the [John Yates laboratory](http://www.scripps.edu/yates) at [The Scripps Research Institute](http://www.scripps.edu)
- #### How to get the API
+ ### About developers
+ This API was firstly designed by Emilio Salazar Do?ate and [Salvador Martinez-Bartolome](https://www.ncbi.nlm.nih.gov/pubmed/?term=Martinez-Bartolome+S) under the supervision of Juan Pablo Albar, at the [Proteomics Laboratory](http://proteo.cnb.csic.es/proteomica/) of the  [National Center for Biotechnology (CNB-CSIC)](http://www.cnb.csic.es) in Madrid, Spain. Later, the project was continued by Salvador Martinez-Bartolome under the supervision of John R. Yates III at the [John Yates laboratory](http://www.scripps.edu/yates) at [The Scripps Research Institute](http://www.scripps.edu), La Jolla, California, USA.
+ 
+ ### How to get the API
  
  **Latest build** available at: [http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/](http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/)
  
@@ -39,9 +40,9 @@ The Java MIAPE API is designed in 4 different modules:
 </dependency>
 ```
 
- #### How to use the API
+ ### How to use the API
  
- ##### Example 1:
+ #### Example 1:
  This example shows how a MIAPE MS document object (*object module*) is created using the *factory module* and then is exported to a XML file (*XML module*) and stored in a database (*persistence module*): 
 ```java
 public class createMiape(PersistenceManager databaseManager, ControlVocabularyManager cvManager) {
@@ -98,7 +99,7 @@ public class createMiape(PersistenceManager databaseManager, ControlVocabularyMa
 }
 ```
 
- ##### Example 2: 
+ #### Example 2: 
 This example shows how to extract the MIAPE information from commonly used proteomics data files:
 ```java
 public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
@@ -156,7 +157,7 @@ public void extractMIAPEInformationFromFiles(ControlVocabularyManager cvManager)
 	printMiapeMSI(miapeMSIFromDTASelect);
 }
 ```
- ##### Example 3:
+ #### Example 3:
 This example show the *printMiapeMS* and *printMiapeMSI* methods called in the previous example, showing how the information contained in each document can be extracted and printed
 ```java
 private void printMiapeMSI(MiapeMSIDocument miapeMSI) {
