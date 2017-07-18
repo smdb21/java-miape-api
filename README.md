@@ -7,9 +7,11 @@ What is the *MIAPE information*?
 The Java MIAPE API is designed in 4 different modules:
  - The *model module*: This module contains the classes needed to represent the MIAPE information of the different types of experiments. The interfaces (under package *org.proteored.miapeapi.interfaces*) MiapeGEDocument, MiapeGIDocument, MiapeMSDocumen and MiapeMSIDocument, define the MIAPE information for the Gel Electrophoresis<sup>[(2)](https://www.ncbi.nlm.nih.gov/pubmed/18688234)</sup>, Gel Image Informatics<sup>[(3)](https://www.ncbi.nlm.nih.gov/pubmed/20622830)</sup>, Mass Spectrometry<sup>[(4)](https://www.ncbi.nlm.nih.gov/pubmed/18688232)</sup> and Mass Spectrometry Informatics<sup>[(5)](https://www.ncbi.nlm.nih.gov/pubmed/18688233)</sup> MIAPE modules. 
  - The *factory module*: This module provides the util classes for the creation of the MIAPE document objects.
- - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: mzIdentML, mzML, pepXML, PRIDE XML, DtaSelect txt or XTandem XML.
+ - The *XML module*: This module provides the methods for the extraction of the MIAPE information from commonly used proteomics data files (most of them XML), such as: **mzIdentML, mzML, pepXML, PRIDE XML, DtaSelect txt** or **XTandem XML**.
  - The *persistence model*: This module provides the methods to be implemented by a persistence system, which will be able to persist the MIAPE information, on files, a database, etc...
  
+ #### About developers
+ This API was firstly designed by Emilio Salazar Do?ate and [Salvador Martinez-Bartolome](https://www.ncbi.nlm.nih.gov/pubmed/?term=Martinez-Bartolome+S) under the supervision of Juan Pablo Albar, at the [Proteomics Laboratory](http://proteo.cnb.csic.es/proteomica/) of the  [National Center for Biotechnology (CNB-CSIC)](http://www.cnb.csic.es) in Madrid, Spain. Later, the project was continued by Salvador Martinez-Bartolome under the supervision of John R. Yates III at the [John Yates laboratory](http://www.scripps.edu/yates) at [The Scripps Research Institute](http://www.scripps.edu)
  #### How to get the API
  
  **Latest build** available at: [http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/](http://sealion.scripps.edu:8080/hudson/job/java-miape-api/lastSuccessfulBuild/artifact/)
