@@ -22,12 +22,12 @@ public class createMiape(PersistenceManager databaseManager, ControlVocabularyMa
 	UserBuilder userBuilder = MiapeDocumentFactory.createUserBuilder("myUserName", "myPassword", databaseManager);
 
 	// Spectrometer	
-    SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
+	SpectrometerBuilder spectrometerBuilder = (SpectrometerBuilder) MiapeMSDocumentFactory
    		.createSpectrometerBuilder(SpectrometerName.LTQ_ORBITRAP_XL_NAME).manufacturer("Thermo Scientific")
 		.version("version XL").catalogNumber("#12345").model("The new Orbitrap XL");
 
 	// Analyzer	
-    AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
+	AnalyserBuilder analyserBuilder = MiapeMSDocumentFactory.createAnalyserBuilder("orbitrap")
 		.description("Description of the orbitrap");
 
 	// Ion source
