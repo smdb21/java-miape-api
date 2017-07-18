@@ -11,7 +11,7 @@ The Java MIAPE API is designed in 4 different modules:
  - The *persistence model*: This module provides the methods to be implemented by a persistence system, which will be able to persist the MIAPE information, on files, a database, etc...
  
  ### About developers
- This API was firstly designed by Emilio Salazar Do?ate and [Salvador Martinez-Bartolome](https://www.ncbi.nlm.nih.gov/pubmed/?term=Martinez-Bartolome+S) under the supervision of Juan Pablo Albar, at the [Proteomics Laboratory](http://proteo.cnb.csic.es/proteomica/) of the  [National Center for Biotechnology (CNB-CSIC)](http://www.cnb.csic.es) in Madrid, Spain. Later, the project was continued by Salvador Martinez-Bartolome under the supervision of John R. Yates III at the [John Yates laboratory](http://www.scripps.edu/yates) at [The Scripps Research Institute](http://www.scripps.edu), La Jolla, California, USA.
+ This API was firstly designed by Emilio Salazar Do?ate and [Salvador Martinez-Bartolome](https://www.ncbi.nlm.nih.gov/pubmed/?term=Martinez-Bartolome+S) members of the ProteoRed Bioinformatics Working Group, under the supervision of Juan Pablo Albar, at the [Proteomics Laboratory](http://proteo.cnb.csic.es/proteomica/) of the  [National Center for Biotechnology (CNB-CSIC)](http://www.cnb.csic.es) in Madrid, Spain. Later, the project was continued by Salvador Martinez-Bartolome under the supervision of John R. Yates III at the [John Yates laboratory](http://www.scripps.edu/yates) at [The Scripps Research Institute](http://www.scripps.edu), La Jolla, California, USA.
  
  ### How to get the API
  
