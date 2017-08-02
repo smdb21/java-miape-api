@@ -189,7 +189,7 @@
 		<dependency>
 			<groupId>uk.ac.ebi.jmzidml</groupId>
 			<artifactId>jmzidentml</artifactId>
-			<version>1.2.3</version>
+			<version>1.2.7</version>
 			<exclusions>
                 <exclusion>
                     <groupId>org.jboss.jsfunit</groupId>
@@ -200,7 +200,7 @@
  		<dependency> 
  			<groupId>de.proteinms.xtandemparser</groupId> 
  			<artifactId>xtandem-parser</artifactId> 
- 			<version>1.5.15</version> 
+ 			<version>1.13.0</version> 
  			<exclusions> 
  				<exclusion>
 					<groupId>batik</groupId>
@@ -382,6 +382,14 @@
 			<artifactId>dtaselectparser</artifactId>
 			<version>1.1.1-SNAPSHOT</version>
 		</dependency>
+		
+		<!-- MSFTBX MS File Tool Box for pepXML parser -->
+		<dependency>
+  			<groupId>com.github.chhh</groupId>
+  			<artifactId>msftbx</artifactId>
+  			<version>1.3.1</version>
+  		</dependency>
+  	
 	</dependencies>
 	<organization>
 		<name>ProteoRed - National Center for Biotechnology - CSIC</name>
