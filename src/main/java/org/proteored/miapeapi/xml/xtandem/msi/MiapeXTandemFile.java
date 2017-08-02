@@ -3,6 +3,8 @@ package org.proteored.miapeapi.xml.xtandem.msi;
 import java.io.File;
 import java.io.IOException;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
@@ -61,12 +63,11 @@ public class MiapeXTandemFile extends MiapeXmlFile<MiapeMSIDocument> {
 
 	@Override
 	public MiapeMSIDocument toDocument() throws MiapeDatabaseException, MiapeSecurityException {
-		return MSIMiapeFactory.getFactory().toDocument(this, dbManager, cvUtil, userName, password,
-				projectName);
+		return MSIMiapeFactory.getFactory().toDocument(this, dbManager, cvUtil, userName, password, projectName);
 
 	}
 
-	public XTandemFile toXTandemFile() throws SAXException {
+	public XTandemFile toXTandemFile() throws ParserConfigurationException, SAXException {
 		return new XTandemFile(this.getPath());
 	}
 

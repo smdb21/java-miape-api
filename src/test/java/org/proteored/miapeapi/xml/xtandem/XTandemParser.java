@@ -1,5 +1,7 @@
 package org.proteored.miapeapi.xml.xtandem;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Test;
 import org.proteored.miapeapi.cv.LocalOboControlVocabularyManager;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
@@ -17,10 +19,13 @@ public class XTandemParser {
 
 			XTandemFile xfile = new XTandemFile(path2XtandemFile);
 
-			MiapeMSIDocument miapeMSI = new MiapeMsiDocumentImpl(xfile,
-					new LocalOboControlVocabularyManager(), xfile.getFileName(), "project name");
+			MiapeMSIDocument miapeMSI = new MiapeMsiDocumentImpl(xfile, new LocalOboControlVocabularyManager(),
+					xfile.getFileName(), "project name");
 			System.out.println(miapeMSI.toXml());
 		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -35,10 +40,13 @@ public class XTandemParser {
 
 			XTandemFile xfile = new XTandemFile(path2XtandemFile);
 
-			MiapeMSIDocument miapeMSI = new MiapeMsiDocumentImpl(xfile,
-					new LocalOboControlVocabularyManager(), xfile.getFileName(), "project name");
+			MiapeMSIDocument miapeMSI = new MiapeMsiDocumentImpl(xfile, new LocalOboControlVocabularyManager(),
+					xfile.getFileName(), "project name");
 			System.out.println(miapeMSI.toXml());
 		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
