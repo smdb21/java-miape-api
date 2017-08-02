@@ -16,7 +16,7 @@ import org.proteored.miapeapi.experiment.model.filters.PeptideLengthFilter;
 import org.proteored.miapeapi.experiment.model.filters.PeptideNumberFilter;
 import org.proteored.miapeapi.experiment.model.filters.PeptideSequenceFilter;
 import org.proteored.miapeapi.experiment.model.filters.PeptidesForMRMFilter;
-import org.proteored.miapeapi.experiment.model.filters.ProteinACCFilter;
+import org.proteored.miapeapi.experiment.model.filters.ProteinACCFilterByProteinComparatorKey;
 import org.proteored.miapeapi.experiment.model.filters.ScoreFilter;
 
 public class ComparatorManager {
@@ -512,7 +512,7 @@ public class ComparatorManager {
 	 * Gets a comparator that sorts the Filters in the following order (from
 	 * first to last): {@link PeptideLengthFilter} < {@link FDRFilter} <
 	 * {@link ScoreFilter} < {@link OccurrenceFilter} <
-	 * {@link ModificationFilter} < {@link ProteinACCFilter}
+	 * {@link ModificationFilter} < {@link ProteinACCFilterByProteinComparatorKey}
 	 *
 	 * @return
 	 */
@@ -545,7 +545,7 @@ public class ComparatorManager {
 					return 3;
 				if (o1 instanceof PeptideNumberFilter)
 					return 4;
-				if (o1 instanceof ProteinACCFilter)
+				if (o1 instanceof ProteinACCFilterByProteinComparatorKey)
 					return 5;
 				if (o1 instanceof PeptideSequenceFilter)
 					return 6;
