@@ -24,7 +24,7 @@ import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
 import org.proteored.miapeapi.experiment.model.filters.Filter;
 import org.proteored.miapeapi.experiment.model.filters.ModificationFilter;
 import org.proteored.miapeapi.experiment.model.filters.OccurrenceFilter;
-import org.proteored.miapeapi.experiment.model.filters.ProteinACCFilter;
+import org.proteored.miapeapi.experiment.model.filters.ProteinACCFilterByProteinComparatorKey;
 import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
 import org.proteored.miapeapi.experiment.model.grouping.PanalyzerStats;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
@@ -1024,11 +1024,11 @@ public abstract class DataManager {
 						applyFilter = true;
 				}
 				// if it is a protein ACC filter, filter on Replicates
-				if (filter instanceof ProteinACCFilter && this instanceof ReplicateDataManager)
+				if (filter instanceof ProteinACCFilterByProteinComparatorKey && this instanceof ReplicateDataManager)
 					applyFilter = true;
 
 				// if it is not a FDR filter
-				if (!(filter instanceof FDRFilter) && !(filter instanceof ProteinACCFilter))
+				if (!(filter instanceof FDRFilter) && !(filter instanceof ProteinACCFilterByProteinComparatorKey))
 					applyFilter = true;
 
 				log.info("Apply filter= " + applyFilter);

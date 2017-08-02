@@ -27,52 +27,59 @@ public class ContactImpl implements MSContact {
 	private static final String faxCV = "MS:1001756";
 	private static final String phoneCV = "MS:1001755";
 
-	public ContactImpl(Provider provider, AuditCollection auditCollection,
-			List<AbstractContact> mzIdentContactList, User user) {
+	public ContactImpl(Provider provider, AuditCollection auditCollection, List<AbstractContact> mzIdentContactList,
+			User user) {
 
 		ContactRole contactRole = provider.getContactRole();
-		if (contactRole.getRole() != null) {
-			position = contactRole.getRole().getCvParam().getName();
-		} else {
-			position = null;
-		}
-		if (contactRole.getRole() != null && auditCollection != null) {
-			final AbstractContact abstractContact = contactRole.getContact();
-			if (abstractContact != null) {
-				if (abstractContact instanceof Person) {
-					Person contactDetails = (Person) abstractContact;
-					nameCreator = new NameCreator(contactDetails.getName(),
-							contactDetails.getLastName(), user);
-					for (CvParam cvParam : contactDetails.getCvParam()) {
-						final String accession = cvParam.getAccession();
-						if (accession.equals(emailCV))
-							email = cvParam.getValue();
-						if (accession.equals(addressCV))
-							address = cvParam.getValue();
-						if (accession.equals(faxCV))
-							fax = cvParam.getValue();
-						if (accession.equals(phoneCV))
-							phone = cvParam.getValue();
-						institution = getContactPosition(contactDetails);
-					}
-				} else if (abstractContact instanceof Organization) {
-					Organization contactDetails = (Organization) abstractContact;
-					nameCreator = new NameCreator(contactDetails.getName(),
-							null, user);
-					for (CvParam cvParam : contactDetails.getCvParam()) {
-						final String accession = cvParam.getAccession();
-						if (accession.equals(emailCV))
-							email = cvParam.getValue();
-						if (accession.equals(addressCV))
-							address = cvParam.getValue();
-						if (accession.equals(faxCV))
-							fax = cvParam.getValue();
-						if (accession.equals(phoneCV))
-							phone = cvParam.getValue();
-						institution = contactDetails.getName();
+		if (contactRole != null) {
+			if (contactRole.getRole() != null) {
+				position = contactRole.getRole().getCvParam().getName();
+			} else {
+				position = null;
+			}
+			if (contactRole.getRole() != null && auditCollection != null) {
+				final AbstractContact abstractContact = contactRole.getContact();
+				if (abstractContact != null) {
+					if (abstractContact instanceof Person) {
+						Person contactDetails = (Person) abstractContact;
+						nameCreator = new NameCreator(contactDetails.getName(), contactDetails.getLastName(), user);
+						for (CvParam cvParam : contactDetails.getCvParam()) {
+							final String accession = cvParam.getAccession();
+							if (accession.equals(emailCV))
+								email = cvParam.getValue();
+							if (accession.equals(addressCV))
+								address = cvParam.getValue();
+							if (accession.equals(faxCV))
+								fax = cvParam.getValue();
+							if (accession.equals(phoneCV))
+								phone = cvParam.getValue();
+							institution = getContactPosition(contactDetails);
+						}
+					} else if (abstractContact instanceof Organization) {
+						Organization contactDetails = (Organization) abstractContact;
+						nameCreator = new NameCreator(contactDetails.getName(), null, user);
+						for (CvParam cvParam : contactDetails.getCvParam()) {
+							final String accession = cvParam.getAccession();
+							if (accession.equals(emailCV))
+								email = cvParam.getValue();
+							if (accession.equals(addressCV))
+								address = cvParam.getValue();
+							if (accession.equals(faxCV))
+								fax = cvParam.getValue();
+							if (accession.equals(phoneCV))
+								phone = cvParam.getValue();
+							institution = contactDetails.getName();
+						}
+					} else {
+						nameCreator = null;
 					}
 				} else {
-					nameCreator = null;
+					nameCreator = new NameCreator(user);
+					email = null;
+					address = null;
+					fax = null;
+					phone = null;
+					institution = null;
 				}
 			} else {
 				nameCreator = new NameCreator(user);
@@ -83,12 +90,8 @@ public class ContactImpl implements MSContact {
 				institution = null;
 			}
 		} else {
-			nameCreator = new NameCreator(user);
-			email = null;
-			address = null;
-			fax = null;
-			phone = null;
-			institution = null;
+			position = null;
+			nameCreator = new NameCreator(provider.getId(), null, null);
 		}
 	}
 
@@ -155,8 +158,7 @@ public class ContactImpl implements MSContact {
 
 	private String getContactPosition(Person contactDetails) {
 		List<Affiliation> affiliations = contactDetails.getAffiliation();
-		if (contactDetails.getAffiliation() != null
-				&& !contactDetails.getAffiliation().isEmpty()) {
+		if (contactDetails.getAffiliation() != null && !contactDetails.getAffiliation().isEmpty()) {
 			Affiliation aff = affiliations.get(0);
 			final Organization organization = aff.getOrganization();
 			if (organization != null)
@@ -188,6 +190,7 @@ public class ContactImpl implements MSContact {
 		}
 
 		public NameCreator(String name, String lastName, User user) {
+			this(user);
 			if (name != null) {
 				this.name = name;
 			}
