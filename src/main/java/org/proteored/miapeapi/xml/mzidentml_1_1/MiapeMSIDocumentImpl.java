@@ -51,8 +51,8 @@ import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
 import edu.scripps.yates.utilities.cores.SystemCoreManager;
 import edu.scripps.yates.utilities.pi.ParIterator;
-import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
+import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.exceptions.ParIteratorException;
 import edu.scripps.yates.utilities.pi.reductions.Reducible;
 import edu.scripps.yates.utilities.pi.reductions.Reduction;
@@ -662,10 +662,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						boolean includePeptide = false;
 						Set<PeptideScore> scores = IdentifiedPeptideImpl.getScoresFromThisPeptide(spectIdentItemXML,
 								peptideXML, cvManager);
-						if (scores == null || scores.isEmpty()) {
-							log.info("Skipping SII:" + spectIdentItemXML.getId() + " because no scores have found");
-							continue;
-						}
+						// if (scores == null || scores.isEmpty()) {
+						// log.info("Skipping SII:" + spectIdentItemXML.getId()
+						// + " because no scores have found");
+						// continue;
+						// }
 						if (spectIdentItemXML.getRank() == 1) {
 							includePeptide = true;
 							scoresFromFirstPeptide.clear();
@@ -687,9 +688,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 									new MapSync<String, ProteinDetectionHypothesis>(
 											proteinDetectionHypotesisWithPeptideEvidence),
 									proteinHash, RT);
-							if (peptide.getScores() == null || peptide.getScores().isEmpty())
-								throw new IllegalMiapeArgumentException(
-										"The peptide from SII:" + spectIdentItemXML.getId() + " has no scores!");
+							// if (peptide.getScores() == null ||
+							// peptide.getScores().isEmpty())
+							// throw new IllegalMiapeArgumentException(
+							// "The peptide from SII:" +
+							// spectIdentItemXML.getId() + " has no scores!");
 							// Add the peptide to the peptide list
 							peptides.add(peptide);
 							peptideCount++;

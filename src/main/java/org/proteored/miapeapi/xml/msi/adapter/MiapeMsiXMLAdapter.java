@@ -36,20 +36,16 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 	private final ObjectFactory factory;
 	private final MiapeMSIDocument document;
 	private final MSIControlVocabularyXmlFactory cvFactory;
-	private static org.apache.log4j.Logger log = org.apache.log4j.Logger
-			.getLogger("log4j.logger.org.proteored");
+	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private boolean processPeptidesInParallel = true;
 
-	public MiapeMsiXMLAdapter(MiapeMSIDocument document,
-			ControlVocabularyManager controlVocabularyUtil) {
+	public MiapeMsiXMLAdapter(MiapeMSIDocument document, ControlVocabularyManager controlVocabularyUtil) {
 		factory = new ObjectFactory();
 		this.document = document;
-		cvFactory = new MSIControlVocabularyXmlFactory(factory,
-				controlVocabularyUtil);
+		cvFactory = new MSIControlVocabularyXmlFactory(factory, controlVocabularyUtil);
 	}
 
-	public MiapeMsiXMLAdapter(MiapeMSIDocument document,
-			ControlVocabularyManager controlVocabularyUtil,
+	public MiapeMsiXMLAdapter(MiapeMSIDocument document, ControlVocabularyManager controlVocabularyUtil,
 			boolean processPeptidesInParallel) {
 		this(document, controlVocabularyUtil);
 		this.processPeptidesInParallel = processPeptidesInParallel;
@@ -63,14 +59,12 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 
 		addMiapeData(xmlMiape);
 		log.info("Adding IdentifiedProteins");
-		Set<IdentifiedProteinSet> identifiedProteinSets = document
-				.getIdentifiedProteinSets();
+		Set<IdentifiedProteinSet> identifiedProteinSets = document.getIdentifiedProteinSets();
 		if (identifiedProteinSets != null)
 			addProteinSets(xmlMiape, identifiedProteinSets);
 
 		log.info("Adding IdentifiedPeptides");
-		List<IdentifiedPeptide> identifiedPeptides = document
-				.getIdentifiedPeptides();
+		List<IdentifiedPeptide> identifiedPeptides = document.getIdentifiedPeptides();
 		if (identifiedPeptides != null)
 			addPeptideSet(xmlMiape, identifiedPeptides);
 
@@ -95,98 +89,79 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 		if (validations != null)
 			addValidations(xmlMiape, validations);
 
-		Set<MSIAdditionalInformation> additionalInformations = document
-				.getAdditionalInformations();
+		Set<MSIAdditionalInformation> additionalInformations = document.getAdditionalInformations();
 		if (additionalInformations != null)
-			addAdditionalInformations(xmlMiape.getMSIAdditionalInformation(),
-					additionalInformations);
+			addAdditionalInformations(xmlMiape.getMSIAdditionalInformation(), additionalInformations);
 
 		return xmlMiape;
 	}
 
-	private void addProteinSets(MSIMIAPEMSI xmlMiape,
-			Set<IdentifiedProteinSet> identifiedProteinSets) {
+	private void addProteinSets(MSIMIAPEMSI xmlMiape, Set<IdentifiedProteinSet> identifiedProteinSets) {
 		if (identifiedProteinSets == null)
 			return;
 		for (IdentifiedProteinSet proteinSet : identifiedProteinSets) {
 			// MSIIdentifiedProteinSet adapt = new
 			// IdentifiedProteinSetParallelAdapter(proteinSet,
 			// factory, cvFactory).adapt();
-			MSIIdentifiedProteinSet adapt = new IdentifiedProteinSetAdapter(
-					proteinSet, factory, cvFactory).adapt();
+			MSIIdentifiedProteinSet adapt = new IdentifiedProteinSetAdapter(proteinSet, factory, cvFactory).adapt();
 			xmlMiape.getMSIIdentifiedProteinSet().add(adapt);
 
 		}
 
 	}
 
-	private void addPeptideSet(MSIMIAPEMSI xmlMiape,
-			List<IdentifiedPeptide> identifiedPeptides) {
+	private void addPeptideSet(MSIMIAPEMSI xmlMiape, List<IdentifiedPeptide> identifiedPeptides) {
 		if (identifiedPeptides == null || identifiedPeptides.isEmpty())
 			return;
 		log.info("Adapting " + identifiedPeptides.size() + " peptides");
 		if (processPeptidesInParallel) {
-			xmlMiape.setMSIIdentifiedPeptideSet(new IdentifiedPeptideSetParallelAdapter(
-					identifiedPeptides, factory, cvFactory).adapt());
+			xmlMiape.setMSIIdentifiedPeptideSet(
+					new IdentifiedPeptideSetParallelAdapter(identifiedPeptides, factory, cvFactory).adapt());
 		} else {
-			xmlMiape.setMSIIdentifiedPeptideSet(new IdentifiedPeptideSetAdapter(
-					identifiedPeptides, factory, cvFactory).adapt());
+			xmlMiape.setMSIIdentifiedPeptideSet(
+					new IdentifiedPeptideSetAdapter(identifiedPeptides, factory, cvFactory).adapt());
 		}
-		log.info("Peptides adapted");
+		log.info(xmlMiape.getMSIIdentifiedPeptideSet().getMSIIdentifiedPeptide().size() + " peptides adapted to XML");
 	}
 
-	private void addAdditionalInformations(List<ParamType> xmlAddInfos,
-			Set<MSIAdditionalInformation> addInfos) {
+	private void addAdditionalInformations(List<ParamType> xmlAddInfos, Set<MSIAdditionalInformation> addInfos) {
 		if (addInfos == null)
 			return;
 		for (MSIAdditionalInformation addInfo : addInfos) {
-			xmlAddInfos.add(new AdditionalInformationAdapter(addInfo, factory,
-					cvFactory).adapt());
+			xmlAddInfos.add(new AdditionalInformationAdapter(addInfo, factory, cvFactory).adapt());
 		}
 	}
 
-	private void addValidations(MSIMIAPEMSI xmlMiape,
-			Set<Validation> validations) {
+	private void addValidations(MSIMIAPEMSI xmlMiape, Set<Validation> validations) {
 		if (validations == null)
 			return;
 		for (Validation validation : validations) {
-			xmlMiape.getMSIValidation().add(
-					new ValidationAdapter(validation, factory, cvFactory)
-							.adapt());
+			xmlMiape.getMSIValidation().add(new ValidationAdapter(validation, factory, cvFactory).adapt());
 		}
 	}
 
-	private void addMsiSoftwares(MSIMIAPEMSI xmlMiape,
-			Set<Software> msiSoftwares) {
+	private void addMsiSoftwares(MSIMIAPEMSI xmlMiape, Set<Software> msiSoftwares) {
 		if (msiSoftwares == null)
 			return;
 		for (Software software : msiSoftwares) {
-			xmlMiape.getMSISoftware().add(
-					new SoftwareMSIAdapter(software, factory, cvFactory)
-							.adapt());
+			xmlMiape.getMSISoftware().add(new SoftwareMSIAdapter(software, factory, cvFactory).adapt());
 
 		}
 	}
 
-	private void addInputParameters(MSIMIAPEMSI xmlMiape,
-			Set<InputParameter> inputParameters) {
+	private void addInputParameters(MSIMIAPEMSI xmlMiape, Set<InputParameter> inputParameters) {
 		if (inputParameters == null)
 			return;
 		for (InputParameter inputParameter : inputParameters) {
-			xmlMiape.getMSIInputParameters().add(
-					new InputParameterAdapter(inputParameter, factory,
-							cvFactory).adapt());
+			xmlMiape.getMSIInputParameters().add(new InputParameterAdapter(inputParameter, factory, cvFactory).adapt());
 		}
 	}
 
-	private void addInputDataSets(MSIMIAPEMSI xmlMiape,
-			Set<InputDataSet> inputDataSets) {
+	private void addInputDataSets(MSIMIAPEMSI xmlMiape, Set<InputDataSet> inputDataSets) {
 		if (inputDataSets == null)
 			return;
 		for (InputDataSet inputDataSet : inputDataSets) {
-			xmlMiape.getMSIInputDataSet().add(
-					new InputDataSetAdapter(inputDataSet, factory, cvFactory)
-							.adapt());
+			xmlMiape.getMSIInputDataSet().add(new InputDataSetAdapter(inputDataSet, factory, cvFactory).adapt());
 		}
 	}
 
@@ -202,13 +177,11 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 			xmlMiape.setDate(date.getValue());
 		}
 		final Date modificationDate2 = document.getModificationDate();
-		XMLGregorianCalendar modificationDate = new DateAdapter(
-				modificationDate2).adapt();
+		XMLGregorianCalendar modificationDate = new DateAdapter(modificationDate2).adapt();
 		xmlMiape.setModificationDate(modificationDate);
 		final MSContact contact = document.getContact();
 		if (contact != null)
-			xmlMiape.setMSIContact(new ContactAdapter(contact, factory,
-					cvFactory).adapt());
+			xmlMiape.setMSIContact(new ContactAdapter(contact, factory, cvFactory).adapt());
 		xmlMiape.setName(document.getName());
 		xmlMiape.setAttachedFileLocation(document.getAttachedFileLocation());
 		final Boolean template = document.getTemplate();
@@ -223,10 +196,8 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 		// even if project is null, create a project
 		xmlMiape.setMIAPEProject(new ProjectAdapter(project, factory).adapt());
 		if (modificationDate2 != null)
-			xmlMiape.setModificationDate(new DateAdapter(modificationDate2)
-					.adapt());
-		xmlMiape.setGeneratedFilesDescription(document
-				.getGeneratedFilesDescription());
+			xmlMiape.setModificationDate(new DateAdapter(modificationDate2).adapt());
+		xmlMiape.setGeneratedFilesDescription(document.getGeneratedFilesDescription());
 		xmlMiape.setGeneratedFilesURL(document.getGeneratedFilesURI());
 		final int msDocumentReference = document.getMSDocumentReference();
 		if (msDocumentReference > 0)

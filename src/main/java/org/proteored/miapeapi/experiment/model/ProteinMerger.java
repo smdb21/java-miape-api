@@ -34,6 +34,7 @@ public class ProteinMerger {
 		List<Double> coverages = new ArrayList<Double>();
 		if (proteinGroupOccurrence != null) {
 			List<String> accessions = proteinGroupOccurrence.getAccessions();
+
 			ProteinSequenceRetrieval.getProteinSequence(accessions, retrieveProteinSeqIfNotAvailable, upr);
 			for (String accession : accessions) {
 				final List<ExtendedIdentifiedProtein> proteins = proteinGroupOccurrence.getProteins(accession);

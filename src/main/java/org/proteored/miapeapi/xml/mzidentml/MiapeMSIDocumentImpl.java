@@ -17,7 +17,6 @@ import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.cv.ControlVocabularyTerm;
 import org.proteored.miapeapi.cv.ms.RetentionTime;
-import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.interfaces.Contact;
@@ -81,8 +80,8 @@ import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
 import edu.scripps.yates.utilities.cores.SystemCoreManager;
 import edu.scripps.yates.utilities.pi.ParIterator;
-import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
+import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.reductions.Reducible;
 import edu.scripps.yates.utilities.pi.reductions.Reduction;
 import gnu.trove.map.hash.THashMap;
@@ -492,10 +491,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					boolean includePeptide = false;
 					final Set<PeptideScore> scores = IdentifiedPeptideImpl.getScoresFromThisPeptides(spectIdentItemXML,
 							peptideXML, cvManager);
-					if (scores == null || scores.isEmpty()) {
-						log.info("Skipping SII:" + spectIdentItemXML.getId() + " because no scores have found");
-						continue;
-					}
+					// if (scores == null || scores.isEmpty()) {
+					// log.info("Skipping SII:" + spectIdentItemXML.getId() + "
+					// because no scores have found");
+					// continue;
+					// }
 					if (spectIdentItemXML.getRank() == 1) {
 						includePeptide = true;
 						scoresFromFirstPeptide.clear();
@@ -516,9 +516,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML, mzIdentML,
 								inputData, spectrumRef, peptideID, cvManager, proteinHash, RT);
 						// if the peptide has no scores, not report it
-						if (peptide.getScores() == null || peptide.getScores().isEmpty())
-							throw new IllegalMiapeArgumentException(
-									"The peptide from SII:" + spectIdentItemXML.getId() + " has no scores!");
+						// if (peptide.getScores() == null ||
+						// peptide.getScores().isEmpty())
+						// throw new IllegalMiapeArgumentException(
+						// "The peptide from SII:" + spectIdentItemXML.getId() +
+						// " has no scores!");
 
 						// Add the peptide to the peptide list
 						peptides.add(peptide);

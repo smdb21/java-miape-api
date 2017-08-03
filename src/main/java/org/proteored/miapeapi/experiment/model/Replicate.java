@@ -138,9 +138,9 @@ public class Replicate implements IdentificationSet<Void> {
 	 */
 	@Override
 	public List<ExtendedIdentifiedPeptide> getIdentifiedPeptides() {
-		log.info("Getting peptides from replicate:" + getName());
+		log.debug("Getting peptides from replicate:" + getName());
 		final List<ExtendedIdentifiedPeptide> identifiedPeptides = dataManager.getIdentifiedPeptides();
-		log.info("returning " + identifiedPeptides.size() + " peptides in replicate " + getName());
+		log.debug("returning " + identifiedPeptides.size() + " peptides in replicate " + getName());
 		return identifiedPeptides;
 	}
 

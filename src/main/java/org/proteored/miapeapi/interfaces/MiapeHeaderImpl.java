@@ -343,7 +343,9 @@ public class MiapeHeaderImpl implements MiapeDocument {
 					}
 				}
 				if (line.contains("<Date>") && !inProject) {
-					date = new MiapeDate(line.substring(line.indexOf(">") + 1, line.indexOf("</")));
+					if (date == null) {
+						date = new MiapeDate(line.substring(line.indexOf(">") + 1, line.indexOf("</")));
+					}
 				}
 				if (line.contains("id=") && !inProject) {
 					final Matcher matcher = idPattern.matcher(line);
@@ -360,8 +362,10 @@ public class MiapeHeaderImpl implements MiapeDocument {
 					}
 				}
 				if (line.contains("<Modification_Date>") && !inProject) {
-					modificationDate = new MiapeDate(line.substring(line.indexOf(">") + 1, line.indexOf("</")))
-							.toDate();
+					if (modificationDate == null) {
+						modificationDate = new MiapeDate(line.substring(line.indexOf(">") + 1, line.indexOf("</")))
+								.toDate();
+					}
 				}
 				if (line.contains("<AttachedFileLocation>") && !inProject) {
 					attachedFileLocation = line.substring(line.indexOf(">") + 1, line.indexOf("</"));

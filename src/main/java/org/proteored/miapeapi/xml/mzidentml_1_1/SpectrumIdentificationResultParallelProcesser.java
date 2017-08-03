@@ -154,10 +154,12 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 							boolean includePeptide = false;
 							final Set<PeptideScore> scores = IdentifiedPeptideImpl
 									.getScoresFromThisPeptide(spectIdentItemXML, peptideXML, cvManager);
-							if (scores == null || scores.isEmpty()) {
-								log.info("Skipping SII:" + spectIdentItemXML.getId() + " because no scores have found");
-								continue;
-							}
+							// if (scores == null || scores.isEmpty()) {
+							// log.info("Skipping SII:" +
+							// spectIdentItemXML.getId() + " because no scores
+							// have found");
+							// continue;
+							// }
 							if (spectIdentItemXML.getRank() == 1) {
 								includePeptide = true;
 								scoresFromFirstPeptide.clear();
@@ -178,9 +180,12 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 								IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
 										inputData, spectrumRef, peptideID, cvManager, pdhWithPeptideEvidence,
 										proteinHash, RT);
-								if (peptide.getScores() == null || peptide.getScores().isEmpty())
-									throw new IllegalMiapeArgumentException(
-											"The peptide from SII:" + spectIdentItemXML.getId() + " has no scores!");
+								// if (peptide.getScores() == null ||
+								// peptide.getScores().isEmpty())
+								// throw new IllegalMiapeArgumentException(
+								// "The peptide from SII:" +
+								// spectIdentItemXML.getId() + " has no
+								// scores!");
 								// Add the peptide to the peptide list
 								peptideList.add(peptide);
 

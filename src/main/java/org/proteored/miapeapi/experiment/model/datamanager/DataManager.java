@@ -42,8 +42,8 @@ import org.proteored.miapeapi.spring.SpringHandler;
 
 import edu.scripps.yates.utilities.cores.SystemCoreManager;
 import edu.scripps.yates.utilities.pi.ParIterator;
-import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
+import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.reductions.Reducible;
 import edu.scripps.yates.utilities.pi.reductions.Reduction;
 import gnu.trove.map.hash.THashMap;
@@ -429,7 +429,7 @@ public abstract class DataManager {
 						for (IdentifiedPeptide peptide : identifiedPeptides2) {
 							if (peptide.getIdentifiedProteins().isEmpty()) {
 								peptideWithoutProteins++;
-								continue;
+								// continue;
 							}
 							if (peptide.getSequence() != null && peptide.getSequence().length() >= minPepLength) {
 								// NOT ADD PEPTIDES THAT
@@ -847,9 +847,13 @@ public abstract class DataManager {
 			}
 			identifiedProteinGroups = applyFilters(toFilter, filters);
 			if (processInParallel) {
-				identifiedPeptides = getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
+				if (!identifiedProteinGroups.isEmpty()) {
+					identifiedPeptides = getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
+				}
 			} else {
-				identifiedPeptides = getPeptidesFromProteinGroups(identifiedProteinGroups);
+				if (!identifiedProteinGroups.isEmpty()) {
+					identifiedPeptides = getPeptidesFromProteinGroups(identifiedProteinGroups);
+				}
 			}
 			PanalyzerStats panalyzerStats = new PanalyzerStats(identifiedProteinGroups);
 			numNonConclusiveGroups = panalyzerStats.nonConclusiveCount;
@@ -2332,6 +2336,7 @@ public abstract class DataManager {
 				}
 			}
 		}
+
 		log.info(ret.size() + " peptides extracted from " + proteinGroups.size() + " protein groups");
 		return ret;
 	}

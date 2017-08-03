@@ -76,8 +76,8 @@ public class ProteinSequenceRetrieval {
 	public static Map<String, String> getProteinSequence(List<String> proteinAccs,
 			boolean retrieveFromInternetIfNotCached, UniprotProteinLocalRetriever upr) {
 		Map<String, String> ret = new THashMap<String, String>();
-
 		try {
+			System.out.println("asdf");
 			List<String> uniprotAccs = new ArrayList<String>();
 			List<String> ncbiAccs = new ArrayList<String>();
 
@@ -91,7 +91,10 @@ public class ProteinSequenceRetrieval {
 					continue;
 
 				if (FastaParser.isUniProtACC(proteinAcc)) {
-					uniprotAccs.add(FastaParser.getUniProtACC(proteinAcc));
+					String uniProtACC = FastaParser.getUniProtACC(proteinAcc);
+					if (uniProtACC != null) {
+						uniprotAccs.add(uniProtACC);
+					}
 				} else {
 					String ncbiacc = FastaParser.getNCBIACC(proteinAcc);
 					if (ncbiacc != null) {

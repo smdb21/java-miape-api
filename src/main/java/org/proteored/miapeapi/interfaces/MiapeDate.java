@@ -43,7 +43,6 @@ public class MiapeDate {
 	 *            in format "yyyy-MM-dd" or "yyyy-MM-dd HH:mm:ss:S"
 	 */
 	public MiapeDate(String date) {
-
 		String day;
 		String month;
 		String year;
@@ -54,9 +53,12 @@ public class MiapeDate {
 		String second;
 		String regexp;
 		String regexp2;
+		String regexp3;
 		try {
 			regexp = "^(\\d+)-(\\d\\d)-(\\d\\d).*(\\d\\d):(\\d\\d):(\\d\\d).*";
 			regexp2 = "^(\\d+)-(\\d\\d)-(\\d\\d).*";
+
+			regexp3 = "^(\\d+)-(\\d\\d)-(\\d\\d)T(\\d\\d):(\\d\\d):(\\d\\d).*";
 			if (Pattern.matches(regexp, date)) {
 				Pattern p = Pattern.compile(regexp);
 				Matcher m = p.matcher(date);
@@ -68,8 +70,7 @@ public class MiapeDate {
 					minute = m.group(5);
 					second = m.group(6);
 
-					this.date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":"
-							+ second;
+					this.date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 					DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					String cadena = this.date;
 					this.asDate = formatter.parse(cadena);
@@ -87,6 +88,22 @@ public class MiapeDate {
 					String cadena = this.date;
 					this.asDate = formatter.parse(cadena);
 
+				}
+			} else if (Pattern.matches(regexp3, date)) {
+				Pattern p = Pattern.compile(regexp3);
+				Matcher m = p.matcher(date);
+				if (m.find()) {
+					year = m.group(1);
+					month = m.group(2);
+					day = m.group(3);
+					hour = m.group(4);
+					minute = m.group(5);
+					second = m.group(6);
+
+					this.date = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+					DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String cadena = this.date;
+					this.asDate = formatter.parse(cadena);
 				}
 			} else {
 
