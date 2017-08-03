@@ -10,7 +10,6 @@ import org.proteored.miapeapi.exceptions.WrongXMLFormatException;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.xml.dtaselect.MiapeDTASelectFile;
-import org.xml.sax.SAXException;
 
 public class MSIMiapeFactory {
 	private static MSIMiapeFactory instance;
@@ -36,20 +35,24 @@ public class MSIMiapeFactory {
 			log.info("toDocument");
 
 			final String miapeName = FilenameUtils.getBaseName(xmlFile.toFile().getAbsolutePath());
-			if (databaseManager == null) {
-				result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(), cvManager,
-						miapeName, projectName);
-			} else {
-				result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(), databaseManager, cvManager, userName,
-						password, miapeName, projectName);
-			}
+			// if (databaseManager == null) {
+			// result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(),
+			// cvManager,
+			// miapeName, projectName);
+			// } else {
+			// result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(),
+			// databaseManager, cvManager, userName,
+			// password, miapeName, projectName);
+			// }
 			log.info("after unmarshall");
-		} catch (SAXException e) {
-			e.printStackTrace();
-			log.info("Input file format error. Check if the input file is a well formed X!Tandem XML file");
-			throw new WrongXMLFormatException(
-					"Input file format error. Check if the input file is a well formed X!Tandem XML file");
-
+			// } catch (SAXException e) {
+			// e.printStackTrace();
+			// log.info("Input file format error. Check if the input file is a
+			// well formed X!Tandem XML file");
+			// throw new WrongXMLFormatException(
+			// "Input file format error. Check if the input file is a well
+			// formed X!Tandem XML file");
+			//
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
