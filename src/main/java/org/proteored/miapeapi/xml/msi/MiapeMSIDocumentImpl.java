@@ -11,6 +11,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
+import org.proteored.miapeapi.exceptions.MiapeDataInconsistencyException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.interfaces.MiapeDate;
@@ -166,10 +167,14 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				List<Ref> proteinRefs = peptideImpl.getProteinRefs();
 				if (proteinRefs != null) {
 					for (Ref ref : proteinRefs) {
-						if (proteinList.containsKey(ref.getId()))
+						if (proteinList.containsKey(ref.getId())) {
 							peptideImpl.addProteinRelationship(proteinList.get(ref.getId()));
-						else
-							log.info("Protein + '" + ref.getId() + "' not present");
+						} else {
+							String message = "Referenced protein + '" + ref.getId() + "' not present in dataset "
+									+ this.getName();
+							log.error(message);
+							throw new MiapeDataInconsistencyException(message);
+						}
 					}
 				}
 			}
@@ -180,10 +185,14 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
 				if (peptideRefs != null) {
 					for (Ref ref : peptideRefs) {
-						if (peptideList.containsKey(ref.getId()))
+						if (peptideList.containsKey(ref.getId())) {
 							proteinImpl.addPeptideRelationship(peptideList.get(ref.getId()));
-						else
-							log.info("Peptide '" + ref.getId() + "' not present");
+						} else {
+							String message = "Referenced peptide '" + ref.getId() + "' not present in dataset "
+									+ this.getName();
+							log.error(message);
+							throw new MiapeDataInconsistencyException(message);
+						}
 					}
 				}
 			}
