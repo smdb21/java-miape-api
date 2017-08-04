@@ -123,33 +123,35 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	private void processPeptide() {
 		String string = getMassDesviation();
 
-		if (string != null && string.contains("\n")) {
-			final String[] lines = string.split("\n");
-			for (String line : lines) {
-				if (line.contains("=")) {
-					final String[] pairNameValue = line.split("=");
+		if (string != null) {
+			if (string.contains("\n")) {
+				final String[] lines = string.split("\n");
+				for (String line : lines) {
+					if (line.contains("=")) {
+						final String[] pairNameValue = line.split("=");
 
-					if (pairNameValue[0].startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ))
-						expMass = pairNameValue[1];
-					if (pairNameValue[0].startsWith(MiapeXmlUtil.CALCULATED_MZ))
-						calcMass = pairNameValue[1];
-					if (pairNameValue[0].startsWith(MiapeXmlUtil.ERROR_MZ))
-						errorMass = pairNameValue[1];
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ))
+							expMass = pairNameValue[1];
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.CALCULATED_MZ))
+							calcMass = pairNameValue[1];
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.ERROR_MZ))
+							errorMass = pairNameValue[1];
+					}
 				}
-			}
-		} else {
-			try {
-				double errorMZ = Double.valueOf(string);
-				errorMass = String.valueOf(errorMZ);
+			} else {
+				try {
+					double errorMZ = Double.valueOf(string);
+					errorMass = String.valueOf(errorMZ);
 
-				int charge = Integer.valueOf(getCharge());
-				double calcMzDouble = ModificationMapping.getAASequenceImpl(getSequence(), getModifications())
-						.getMz(charge);
-				calcMass = String.valueOf(calcMzDouble);
-				double expMZDouble = calcMzDouble - errorMZ;
-				expMass = String.valueOf(expMZDouble);
-			} catch (NumberFormatException e) {
+					int charge = Integer.valueOf(getCharge());
+					double calcMzDouble = ModificationMapping.getAASequenceImpl(getSequence(), getModifications())
+							.getMz(charge);
+					calcMass = String.valueOf(calcMzDouble);
+					double expMZDouble = calcMzDouble - errorMZ;
+					expMass = String.valueOf(expMZDouble);
+				} catch (NumberFormatException e) {
 
+				}
 			}
 		}
 		if (errorMass == null && calcMass != null && expMass != null) {
