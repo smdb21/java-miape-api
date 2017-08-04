@@ -93,7 +93,7 @@ import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult;
 import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
 
 public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
-	private static final int MAX_NUMBER_PARALLEL_PROCESSES = 6;
+	private static final int MAX_NUMBER_PARALLEL_PROCESSES = Integer.MAX_VALUE;
 
 	private int msDocumentID;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -385,7 +385,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				}
 			};
 			log.info("Collapsing thread results");
-			peptides = reduciblePeptides.reduce(peptideListReduction);
+			peptides.addAll(reduciblePeptides.reduce(peptideListReduction));
 			proteinHash = reducibleProteinHash.reduce(proteinHashReduction);
 
 			for (String spectraDataRef : syncInputDataHash.keySet()) {
