@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
+import org.proteored.miapeapi.exceptions.InterruptedMIAPEThreadException;
 import org.proteored.miapeapi.experiment.model.Experiment;
 import org.proteored.miapeapi.experiment.model.ExperimentList;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -347,6 +348,7 @@ public abstract class DataManager {
 	 * Extracts proteins and peptides from MIAPE MSI
 	 *
 	 * @param experimentName
+	 * @throws InterruptedException
 	 *
 	 */
 	private void collectDataFromMSIs(List<MiapeMSIDocument> miapeMSIs) {
@@ -380,9 +382,12 @@ public abstract class DataManager {
 							Map<String, IdentifiedProtein> identifiedProteins2 = identifiedProteinSet
 									.getIdentifiedProteins();
 							if (identifiedProteins2 != null) {
-								log.info(identifiedProteins2.size() + " proteins in MIAPE MSI "
-										+ miapeMSIDocument.getId());
+								log.info(identifiedProteins2.size() + " proteins in dataset " + miapeMSIDocument.getId()
+										+ " " + miapeMSIDocument.getName());
 								for (IdentifiedProtein protein : identifiedProteins2.values()) {
+									if (Thread.currentThread().isInterrupted()) {
+										throw new InterruptedMIAPEThreadException("Task cancelled");
+									}
 									// Allow proteins without peptides
 									// if (!hasOnePeptideGreaterOrEqualThan(
 									// protein, minPepLength))
@@ -432,10 +437,7 @@ public abstract class DataManager {
 								// continue;
 							}
 							if (peptide.getSequence() != null && peptide.getSequence().length() >= minPepLength) {
-								// NOT ADD PEPTIDES THAT
-								// WERE
-								// ADDED
-								// BEFORE!
+								// NOT ADD PEPTIDES THAT WERE ADDED BEFORE!
 								if (peptidesIds.contains(peptide.getId())) {
 									log.info("Peptide is already processed");
 									continue;
@@ -903,8 +905,7 @@ public abstract class DataManager {
 				IdentificationSet previousLevelIdentificationSet = idSet.getPreviousLevelIdentificationSet();
 				if (previousLevelIdentificationSet != null)
 					previousLevelIdentificationSet.setFiltered(false);
-				else
-					log.info("asdf");
+
 			} catch (UnsupportedOperationException e) {
 				// do nothing
 			}
