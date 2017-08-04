@@ -251,8 +251,7 @@ public class ComparatorManager {
 					score2 = Float.MIN_VALUE;
 				if (score2 == null && order == Order.ASCENDANT)
 					score2 = Float.MAX_VALUE;
-				if (score1 == score2)
-					System.out.println("asdf");
+
 				if (order == Order.ASCENDANT)
 					return score1.compareTo(score2);
 				else
@@ -512,7 +511,8 @@ public class ComparatorManager {
 	 * Gets a comparator that sorts the Filters in the following order (from
 	 * first to last): {@link PeptideLengthFilter} < {@link FDRFilter} <
 	 * {@link ScoreFilter} < {@link OccurrenceFilter} <
-	 * {@link ModificationFilter} < {@link ProteinACCFilterByProteinComparatorKey}
+	 * {@link ModificationFilter} <
+	 * {@link ProteinACCFilterByProteinComparatorKey}
 	 *
 	 * @return
 	 */
