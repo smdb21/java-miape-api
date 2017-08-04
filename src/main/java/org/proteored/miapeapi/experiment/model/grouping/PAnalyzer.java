@@ -16,7 +16,6 @@ import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedProtein;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
-import org.proteored.miapeapi.experiment.model.Replicate;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
@@ -386,12 +385,13 @@ public class PAnalyzer {
 	private static String miapePath = "/home/gorka/MyProjects/Salva/MIAPE_MSI_4619.xml";
 	private static ControlVocabularyManager cvManager = new LocalOboTestControlVocabularyManager();
 
-	public static void main(String[] args) {
-		File miapeFile = new File(miapePath);
-
-		Replicate replicate = new Replicate("rep", "exp", null, getMiapeMSI(miapeFile), null, null, cvManager, true);
-		checkGroups(replicate.getIdentifiedProteinGroups());
-	}
+	// public static void main(String[] args) {
+	// File miapeFile = new File(miapePath);
+	//
+	// Replicate replicate = new Replicate("rep", "exp", null,
+	// getMiapeMSI(miapeFile), null, null, cvManager, true);
+	// checkGroups(replicate.getIdentifiedProteinGroups());
+	// }
 
 	private static List<MiapeMSIDocument> getMiapeMSI(File miapeMSI) {
 		List<MiapeMSIDocument> miapeMSIs = new ArrayList<MiapeMSIDocument>();
