@@ -36,6 +36,8 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	private SortingParameters sortingParameters;
 
+	private Double proteinMass;
+
 	public ExtendedIdentifiedProtein(Replicate replicate, IdentifiedProtein identifiedProtein,
 			MiapeMSIDocument miapeMSI) {
 		this(replicate, identifiedProtein, miapeMSI, ProteinEvidence.NONCONCLUSIVE);
@@ -439,16 +441,22 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	}
 
 	public Double getProteinMass() {
-		try {
-			String proteinSequence = getProteinSequence();
-			if (proteinSequence != null) {
-				Protein prot = new Protein(new AASequenceImpl(proteinSequence));
-				return prot.getMass();
-			}
-		} catch (Exception e) {
+		if (proteinMass == null) {
+			try {
+				String proteinSequence = getProteinSequence();
+				if (proteinSequence != null) {
+					Protein prot = new Protein(new AASequenceImpl(proteinSequence));
+					proteinMass = prot.getMass();
+				}
+			} catch (Exception e) {
 
+			}
 		}
-		return null;
+		return proteinMass;
+	}
+
+	public void setProteinMass(Double proteinMass) {
+		this.proteinMass = proteinMass;
 	}
 
 }
