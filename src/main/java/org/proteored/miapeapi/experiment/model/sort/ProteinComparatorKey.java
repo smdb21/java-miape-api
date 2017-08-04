@@ -31,9 +31,7 @@ public class ProteinComparatorKey {
 		}
 		accList.addAll(accs);
 		this.comparationType = comparationType;
-		if (comparationType == null) {
-			System.out.println("ASDF");
-		}
+
 	}
 
 	@Override
