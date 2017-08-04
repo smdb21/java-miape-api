@@ -29,6 +29,8 @@ import edu.scripps.yates.annotations.uniprot.UniprotEntryUtil;
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
 import edu.scripps.yates.annotations.uniprot.xml.Entry;
 import edu.scripps.yates.utilities.fasta.FastaParser;
+import edu.scripps.yates.utilities.ipi.IPI2UniprotACCMap;
+import edu.scripps.yates.utilities.ipi.UniprotEntry;
 import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DatabaseInfo;
 import uk.ac.ebi.www.ws.services.WSDbfetchDoclit.DbfConnException;
@@ -77,7 +79,7 @@ public class ProteinSequenceRetrieval {
 			boolean retrieveFromInternetIfNotCached, UniprotProteinLocalRetriever upr) {
 		Map<String, String> ret = new THashMap<String, String>();
 		try {
-			System.out.println("asdf");
+
 			List<String> uniprotAccs = new ArrayList<String>();
 			List<String> ncbiAccs = new ArrayList<String>();
 
@@ -99,6 +101,21 @@ public class ProteinSequenceRetrieval {
 					String ncbiacc = FastaParser.getNCBIACC(proteinAcc);
 					if (ncbiacc != null) {
 						ncbiAccs.add(ncbiacc);
+					} else if (FastaParser.getIPIACC(proteinAcc) != null) {
+						String ipi = FastaParser.getIPIACC(proteinAcc);
+						List<UniprotEntry> map2Uniprot = IPI2UniprotACCMap.getInstance().map2Uniprot(ipi);
+						if (map2Uniprot != null && !map2Uniprot.isEmpty()) {
+							String uniprotAcc = map2Uniprot.get(0).getAcc();
+							List<String> list = new ArrayList<String>();
+							list.add(uniprotAcc);
+							Map<String, String> proteinSequence = getProteinSequence(list,
+									retrieveFromInternetIfNotCached, upr);
+							if (proteinSequence != null) {
+								for (String acc : proteinSequence.keySet()) {
+									ret.put(ipi, proteinSequence.get(acc));
+								}
+							}
+						}
 					}
 				}
 
