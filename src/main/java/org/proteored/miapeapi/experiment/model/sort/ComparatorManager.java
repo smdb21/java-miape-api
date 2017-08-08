@@ -569,9 +569,11 @@ public class ComparatorManager {
 				if (ret != 0) {
 					return ret;
 				}
-				ret = o2.getPeptideNumber().compareTo(o1.getPeptideNumber());
-				if (ret != 0) {
-					return ret;
+				if (o2.getPeptideNumber() != null) {
+					ret = o2.getPeptideNumber().compareTo(o1.getPeptideNumber());
+					if (ret != 0) {
+						return ret;
+					}
 				}
 				ret = Integer.compare(o2.getPeptides().size(), o1.getPeptides().size());
 				if (ret != 0) {
