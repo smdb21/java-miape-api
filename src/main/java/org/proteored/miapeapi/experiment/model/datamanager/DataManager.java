@@ -269,10 +269,16 @@ public abstract class DataManager {
 		}
 
 		for (ExtendedIdentifiedProtein protein : nonFilteredIdentifiedProteins) {
+			if (Thread.currentThread().isInterrupted()) {
+				throw new InterruptedMIAPEThreadException("Task cancelled");
+			}
 			List<IdentifiedPeptide> peptidesFromProtein = protein.getIdentifiedPeptides();
 			if (peptidesFromProtein != null && !peptidesFromProtein.isEmpty()) {
 				boolean peptideFound = false;
 				for (IdentifiedPeptide peptideFromProtein : peptidesFromProtein) {
+					if (Thread.currentThread().isInterrupted()) {
+						throw new InterruptedMIAPEThreadException("Task cancelled");
+					}
 					if (peptideFromProtein != null && peptideFromProtein.getSequence() != null
 							&& peptideFromProtein.getSequence().length() >= minPeptideLength
 							&& peptideMap.containsKey(peptideFromProtein.getId())) {
@@ -432,6 +438,9 @@ public abstract class DataManager {
 					log.info("There are " + identifiedPeptides2.size() + " peptides in the MSI document");
 					if (identifiedPeptides2 != null) {
 						for (IdentifiedPeptide peptide : identifiedPeptides2) {
+							if (Thread.currentThread().isInterrupted()) {
+								throw new InterruptedMIAPEThreadException("Task cancelled");
+							}
 							if (peptide.getIdentifiedProteins().isEmpty()) {
 								peptideWithoutProteins++;
 								// continue;
