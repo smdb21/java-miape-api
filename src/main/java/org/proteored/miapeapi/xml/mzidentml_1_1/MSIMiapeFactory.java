@@ -12,6 +12,7 @@ import org.proteored.miapeapi.exceptions.WrongXMLFormatException;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 
+import edu.scripps.yates.utilities.dates.DatesUtil;
 import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
 
 public class MSIMiapeFactory {
@@ -41,12 +42,12 @@ public class MSIMiapeFactory {
 			long t1 = System.currentTimeMillis();
 
 			MzIdentMLUnmarshaller unmarshaller = new MzIdentMLUnmarshaller(file);
-			log.info("after unmarshall: it took: " + (System.currentTimeMillis() - t1) + " milliseconds");
+			log.info("after unmarshall: it took: "
+					+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
 			final String miapeName = FilenameUtils.getBaseName(file.getAbsolutePath());
 			if (databaseManager == null) {
 
-				result = new MiapeMSIDocumentImpl(unmarshaller, cvManager,
-						miapeName, projectName, processInParallel);
+				result = new MiapeMSIDocumentImpl(unmarshaller, cvManager, miapeName, projectName, processInParallel);
 
 			} else {
 
