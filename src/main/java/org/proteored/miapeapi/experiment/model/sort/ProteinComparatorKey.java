@@ -7,20 +7,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+
+import gnu.trove.set.hash.THashSet;
 
 /**
  * @author Salva
  *
  */
 public class ProteinComparatorKey {
-	private final List<String> accList = new ArrayList<String>();
+	private final Set<String> accList;
+	private final String uniqueAcc;
 	private final ProteinGroupComparisonType comparationType;
 
 	public ProteinComparatorKey(String acc, ProteinGroupComparisonType comparationType) {
 		if (acc == null) {
 			throw new IllegalArgumentException("acc cannot be null");
 		}
-		accList.add(acc);
+		uniqueAcc = acc;
+		accList = null;
 		this.comparationType = comparationType;
 
 	}
@@ -29,7 +34,9 @@ public class ProteinComparatorKey {
 		if (accs.isEmpty()) {
 			throw new IllegalArgumentException("asdf");
 		}
+		accList = new THashSet<String>();
 		accList.addAll(accs);
+		uniqueAcc = null;
 		this.comparationType = comparationType;
 
 	}
@@ -48,13 +55,26 @@ public class ProteinComparatorKey {
 				return this.getAccessionString().equals(key.getAccessionString());
 			case BEST_PROTEIN:
 			case HIGHER_EVIDENCE_PROTEIN:
-				return this.accList.get(0).equals(key.accList.get(0));
+				return this.getFirstElement().equals(key.getFirstElement());
 			case SHARE_ONE_PROTEIN:
-				for (String acc : accList) {
-					if (key.accList.contains(acc)) {
-						return true;
+				if (this.uniqueAcc != null) {
+					if (key.uniqueAcc != null) {
+						return this.uniqueAcc.equals(key.uniqueAcc);
+					} else {
+						return key.accList.contains(uniqueAcc);
+					}
+				} else {
+					if (key.uniqueAcc != null) {
+						return this.accList.contains(key.uniqueAcc);
+					} else {
+						for (String acc : accList) {
+							if (key.accList.contains(acc)) {
+								return true;
+							}
+						}
 					}
 				}
+
 				return false;
 			default:
 				break;
@@ -63,16 +83,29 @@ public class ProteinComparatorKey {
 		return super.equals(obj);
 	}
 
+	private String getFirstElement() {
+		if (uniqueAcc != null) {
+			return uniqueAcc;
+		} else {
+			return accList.iterator().next();
+		}
+	}
+
 	/**
 	 * @return
 	 */
 	public String getAccessionString() {
-		if (accList != null && !accList.isEmpty() && accList.size() == 1) {
-			return accList.get(0);
+		if (uniqueAcc != null) {
+			return uniqueAcc;
 		}
-		Collections.sort(accList);
+		if (accList != null && !accList.isEmpty() && accList.size() == 1) {
+			return accList.iterator().next();
+		}
+		List<String> list = new ArrayList<String>();
+		list.addAll(accList);
+		Collections.sort(list);
 		StringBuilder sb = new StringBuilder();
-		for (String acc : accList) {
+		for (String acc : list) {
 			sb.append(acc).append(",");
 		}
 		return sb.toString();

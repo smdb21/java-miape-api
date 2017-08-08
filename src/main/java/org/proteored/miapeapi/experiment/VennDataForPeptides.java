@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.PeptideOccurrence;
 
-public class VennDataForPeptides extends VennData<String> {
+public class VennDataForPeptides extends VennData {
 	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 
 	public VennDataForPeptides(Collection col1, Collection col2, Collection col3) {

@@ -7,7 +7,7 @@ import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
 import org.proteored.miapeapi.experiment.model.sort.ProteinGroupComparisonType;
 
-public class VennDataForProteins extends VennData<ProteinComparatorKey> {
+public class VennDataForProteins extends VennData {
 
 	private final ProteinGroupComparisonType proteinComparisonType;
 
@@ -22,11 +22,11 @@ public class VennDataForProteins extends VennData<ProteinComparatorKey> {
 	}
 
 	@Override
-	protected ProteinComparatorKey getKeyFromObject(Object obj) {
+	protected Object getKeyFromObject(Object obj) {
 		if (obj instanceof ProteinGroupOccurrence) {
 			ProteinGroupOccurrence pgo = (ProteinGroupOccurrence) obj;
 
-			ProteinComparatorKey pgoKey = pgo.getKey(this.proteinComparisonType);
+			Object pgoKey = pgo.getKey(this.proteinComparisonType);
 			return pgoKey;
 		}
 		return new ProteinComparatorKey(obj.toString(), this.proteinComparisonType);

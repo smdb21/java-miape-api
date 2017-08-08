@@ -59,18 +59,22 @@ public class ProteinGroupOccurrence
 	 * @param proteinSelection
 	 * @return
 	 */
-	public ProteinComparatorKey getKey(ProteinGroupComparisonType proteinSelection) {
+	public Object getKey(ProteinGroupComparisonType proteinSelection) {
 
 		switch (proteinSelection) {
 		case ALL_PROTEINS:
-			return new ProteinComparatorKey(getAccessions(), proteinSelection);
+			return getAccessionsString();
 		case BEST_PROTEIN:
-			return new ProteinComparatorKey(this.getBestProtein().getAccession(), proteinSelection);
+			return this.getBestProtein().getAccession();
 		case HIGHER_EVIDENCE_PROTEIN:
 			String acc = getAccessionsByEvidence().get(0);
-			return new ProteinComparatorKey(acc, proteinSelection);
+			return acc;
 		case SHARE_ONE_PROTEIN:
-			return new ProteinComparatorKey(getAccessions(), proteinSelection);
+			if (getAccessions().size() == 1) {
+				return new ProteinComparatorKey(getAccessions().get(0), proteinSelection);
+			} else {
+				return new ProteinComparatorKey(getAccessions(), proteinSelection);
+			}
 
 		default:
 			return null;
