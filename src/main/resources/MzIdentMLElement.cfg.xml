@@ -723,10 +723,11 @@ Configurations for various properties of model classes.
 		<autoRefResolving>false</autoRefResolving>
 		<!-- <autoRefResolving>true</autoRefResolving>-->
 <!-- changed at 23-May-2013 -->
-		<cached>true</cached>
+		<cached>false</cached>
 <!-- 		<cached>false</cached> -->
 		<clazz>uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult</clazz>
 		<cvParamClass>uk.ac.ebi.jmzidml.model.mzidml.params.SpectrumIdentificationResultCvParam</cvParamClass>
+		<!-- change on 4 ago 2017 -->
 		<idMapped>false</idMapped>
 		<indexed>true</indexed>
 		<refResolverClass>uk.ac.ebi.jmzidml.xml.jaxb.resolver.SpectrumIdentificationResultRefResolver</refResolverClass>
