@@ -9,6 +9,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
+import org.proteored.miapeapi.exceptions.InterruptedMIAPEThreadException;
+import org.proteored.miapeapi.exceptions.MiapeDataInconsistencyException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -33,6 +35,7 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
@@ -85,6 +88,9 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			int total = validProteinGroups.size();
 			log.info("Filtering " + total + " protein groups");
 			for (int proteinId : miapeProteinIds._set) {
+				if (Thread.currentThread().isInterrupted()) {
+					throw new InterruptedMIAPEThreadException("Task cancelled");
+				}
 				if (validProteinMap.containsKey(proteinId)) {
 					ExtendedIdentifiedProtein validProtein = validProteinMap.get(proteinId);
 					List<ExtendedIdentifiedPeptide> peptides2 = validProtein.getPeptides();
@@ -103,6 +109,9 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			total = validPeptides.size();
 			log.info("Filtering " + total + " peptides");
 			for (int peptideId : miapePeptideIds._set) {
+				if (Thread.currentThread().isInterrupted()) {
+					throw new InterruptedMIAPEThreadException("Task cancelled");
+				}
 				if (validPeptideMap.containsKey(peptideId)) {
 					ExtendedIdentifiedPeptide validPeptide = validPeptideMap.get(peptideId);
 					List<ExtendedIdentifiedProtein> proteins = validPeptide.getProteins();
@@ -165,17 +174,22 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			log.info("Linking " + proteinMap.size() + " with " + peptideMap.size() + " peptides");
 			// ITERATE OVER PROTEINS
 			for (IdentifiedProtein identifiedProtein : identifiedProteins.values()) {
+				if (Thread.currentThread().isInterrupted()) {
+					throw new InterruptedMIAPEThreadException("Task cancelled");
+				}
 				IdentifiedProteinFiltered filteredProtein = (IdentifiedProteinFiltered) identifiedProtein;
 				TIntHashSet peptidesFromProteinIds = filteredProtein.getFilteredPeptideIds();
 				if (peptidesFromProteinIds != null) {
-					for (int identifiedPeptideID : peptidesFromProteinIds._set) {
+					TIntIterator iterator = peptidesFromProteinIds.iterator();
+					while (iterator.hasNext()) {
+						int identifiedPeptideID = iterator.next();
 						if (peptideMap.containsKey(identifiedPeptideID)) {
 							IdentifiedPeptideFiltered peptideInMap = (IdentifiedPeptideFiltered) peptideMap
 									.get(identifiedPeptideID);
 							filteredProtein.addPeptide(peptideInMap);
 							peptideInMap.addProtein(identifiedProtein);
 						} else {
-							log.warn("NO PUEDE SER, " + identifiedPeptideID + ", a peptide from protein "
+							throw new MiapeDataInconsistencyException(identifiedPeptideID + ", a peptide from protein "
 									+ identifiedProtein.getId() + " is not found");
 						}
 					}
@@ -188,14 +202,16 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 				IdentifiedPeptideFiltered filteredPeptide = (IdentifiedPeptideFiltered) identifiedPeptide;
 				TIntHashSet proteinsFromPeptideIds = filteredPeptide.getFilteredProteinIds();
 				if (proteinsFromPeptideIds != null) {
-					for (int identifiedProteinID : proteinsFromPeptideIds._set) {
+					TIntIterator iterator = proteinsFromPeptideIds.iterator();
+					while (iterator.hasNext()) {
+						int identifiedProteinID = iterator.next();
 						if (proteinMap.containsKey(identifiedProteinID)) {
 							IdentifiedProteinFiltered proteinInMap = (IdentifiedProteinFiltered) proteinMap
 									.get(identifiedProteinID);
 							filteredPeptide.addProtein(proteinInMap);
 							proteinInMap.addPeptide(identifiedPeptide);
 						} else {
-							log.warn("NO PUEDE SER, " + identifiedProteinID + ", a protein from peptide "
+							throw new MiapeDataInconsistencyException(identifiedProteinID + ", a protein from peptide "
 									+ identifiedPeptide.getId() + " is not found");
 						}
 					}
