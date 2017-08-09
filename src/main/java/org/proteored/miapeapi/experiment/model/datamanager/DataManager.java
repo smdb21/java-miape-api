@@ -858,13 +858,10 @@ public abstract class DataManager {
 			}
 			identifiedProteinGroups = applyFilters(toFilter, filters);
 			if (processInParallel) {
-				if (!identifiedProteinGroups.isEmpty()) {
-					identifiedPeptides = getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
-				}
+				identifiedPeptides = getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
 			} else {
-				if (!identifiedProteinGroups.isEmpty()) {
-					identifiedPeptides = getPeptidesFromProteinGroups(identifiedProteinGroups);
-				}
+				identifiedPeptides = getPeptidesFromProteinGroups(identifiedProteinGroups);
+
 			}
 			PanalyzerStats panalyzerStats = new PanalyzerStats(identifiedProteinGroups);
 			numNonConclusiveGroups = panalyzerStats.nonConclusiveCount;
