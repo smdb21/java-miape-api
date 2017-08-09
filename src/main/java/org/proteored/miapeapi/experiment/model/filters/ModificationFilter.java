@@ -144,8 +144,9 @@ public class ModificationFilter implements Filter {
 			if (!filterItem.isContain() && !containsThisModification)
 				return true;
 		} else {
-			if (filterItem.getModifName().equals(ModificationFilter.NOT_MODIFIED))
+			if (ModificationFilter.NOT_MODIFIED.equals(filterItem.getModifName())) {
 				return true;
+			}
 		}
 		return false;
 
