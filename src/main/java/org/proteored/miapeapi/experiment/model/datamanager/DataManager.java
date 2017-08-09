@@ -2446,13 +2446,13 @@ public abstract class DataManager {
 	 * PAnalyzer is run just before to return the proteinGroups
 	 *
 	 * @param proteinGroups
-	 * @param filteredPeptideIDs
+	 * @param validPeptideIDs
 	 * @return
 	 */
 	public static List<ProteinGroup> filterProteinGroupsByPeptides(List<ProteinGroup> proteinGroups,
-			TIntHashSet filteredPeptideIDs, ControlVocabularyManager cvManager) {
+			TIntHashSet validPeptideIDs, ControlVocabularyManager cvManager) {
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
-		if (filteredPeptideIDs == null) {
+		if (validPeptideIDs == null) {
 
 			return proteinGroups;
 		}
@@ -2471,9 +2471,11 @@ public abstract class DataManager {
 					while (peptideIterator.hasNext()) {
 						ExtendedIdentifiedPeptide peptide = peptideIterator.next();
 
-						if (peptide == null || !filteredPeptideIDs.contains(peptide.getId())) {
-
+						if (peptide == null || !validPeptideIDs.contains(peptide.getId())) {
+							// remove peptide from protein
 							peptideIterator.remove();
+							// also, remove protein from peptide
+							peptide.getProteins().remove(protein);
 							numPeptidesRejected++;
 						} else {
 							numPeptideAccepted++;
