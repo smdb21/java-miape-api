@@ -431,34 +431,52 @@ public abstract class VennData {
 		return ret;
 	}
 
-	public int getSize1() {
+	public Integer getSize1() {
 		processCollections();
-		return this.keys1.size();
+		if (this.col1 != null) {
+			return this.keys1.size();
+		}
+		return null;
 	}
 
-	public int getSize2() {
+	public Integer getSize2() {
 		processCollections();
-		return this.keys2.size();
+		if (this.col2 != null) {
+			return this.keys2.size();
+		}
+		return null;
 	}
 
-	public int getSize3() {
+	public Integer getSize3() {
 		processCollections();
-		return this.keys3.size();
+		if (this.col3 != null) {
+			return this.keys3.size();
+		}
+		return null;
 	}
 
 	public Collection getCollection1() {
 		processCollections();
-		return this.hash1.values();
+		if (this.col1 != null) {
+			return this.hash1.values();
+		}
+		return null;
 	}
 
 	public Collection getCollection2() {
 		processCollections();
-		return this.hash2.values();
+		if (this.col2 != null) {
+			return this.hash2.values();
+		}
+		return null;
 	}
 
 	public Collection getCollection3() {
 		processCollections();
-		return this.hash3.values();
+		if (this.col3 != null) {
+			return this.hash3.values();
+		}
+		return null;
 	}
 
 	/**
