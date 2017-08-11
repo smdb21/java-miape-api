@@ -70,11 +70,8 @@ public class ProteinGroupOccurrence
 			String acc = getAccessionsByEvidence().get(0);
 			return acc;
 		case SHARE_ONE_PROTEIN:
-			if (getAccessions().size() == 1) {
-				return new ProteinComparatorKey(getAccessions().get(0), proteinSelection);
-			} else {
-				return new ProteinComparatorKey(getAccessions(), proteinSelection);
-			}
+
+			return new ProteinComparatorKey(getAccessions(), proteinSelection);
 
 		default:
 			return null;

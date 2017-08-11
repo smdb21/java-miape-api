@@ -16,8 +16,8 @@ import gnu.trove.set.hash.THashSet;
  *
  */
 public class ProteinComparatorKey {
-	private final Set<String> accList;
-	private final String uniqueAcc;
+	private Set<String> accSet;
+	private String uniqueAcc;
 	private final ProteinGroupComparisonType comparationType;
 
 	public ProteinComparatorKey(String acc, ProteinGroupComparisonType comparationType) {
@@ -25,7 +25,7 @@ public class ProteinComparatorKey {
 			throw new IllegalArgumentException("acc cannot be null");
 		}
 		uniqueAcc = acc;
-		accList = null;
+		accSet = null;
 		this.comparationType = comparationType;
 
 	}
@@ -34,9 +34,15 @@ public class ProteinComparatorKey {
 		if (accs.isEmpty()) {
 			throw new IllegalArgumentException("asdf");
 		}
-		accList = new THashSet<String>();
-		accList.addAll(accs);
-		uniqueAcc = null;
+
+		if (accs.size() == 1) {
+			uniqueAcc = accs.iterator().next();
+			accSet = null;
+		} else {
+			accSet = new THashSet<String>();
+			accSet.addAll(accs);
+			uniqueAcc = null;
+		}
 		this.comparationType = comparationType;
 
 	}
@@ -61,21 +67,21 @@ public class ProteinComparatorKey {
 					if (key.uniqueAcc != null) {
 						return this.uniqueAcc.equals(key.uniqueAcc);
 					} else {
-						return key.accList.contains(uniqueAcc);
+						return key.accSet.contains(this.uniqueAcc);
 					}
 				} else {
 					if (key.uniqueAcc != null) {
-						return this.accList.contains(key.uniqueAcc);
+						return this.accSet.contains(key.uniqueAcc);
 					} else {
-						for (String acc : accList) {
-							if (key.accList.contains(acc)) {
+						for (String acc : this.accSet) {
+							if (key.accSet.contains(acc)) {
 								return true;
 							}
 						}
+						return false;
 					}
 				}
 
-				return false;
 			default:
 				break;
 			}
@@ -87,7 +93,7 @@ public class ProteinComparatorKey {
 		if (uniqueAcc != null) {
 			return uniqueAcc;
 		} else {
-			return accList.iterator().next();
+			return accSet.iterator().next();
 		}
 	}
 
@@ -98,11 +104,11 @@ public class ProteinComparatorKey {
 		if (uniqueAcc != null) {
 			return uniqueAcc;
 		}
-		if (accList != null && !accList.isEmpty() && accList.size() == 1) {
-			return accList.iterator().next();
+		if (accSet != null && !accSet.isEmpty() && accSet.size() == 1) {
+			return accSet.iterator().next();
 		}
 		List<String> list = new ArrayList<String>();
-		list.addAll(accList);
+		list.addAll(accSet);
 		Collections.sort(list);
 		StringBuilder sb = new StringBuilder();
 		for (String acc : list) {

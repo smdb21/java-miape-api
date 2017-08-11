@@ -125,30 +125,43 @@ public class PAnalyzer {
 	}
 
 	private void collapseNonConclusiveGroups() {
-		final Iterator<ProteinGroupInference> iterator = mGroups.iterator();
-		while (iterator.hasNext()) {
-			ProteinGroupInference proteinGroup = iterator.next();
-			InferenceProtein protein = proteinGroup.get(0);
+		final Iterator<ProteinGroupInference> proteinGroupIterator = mGroups.iterator();
+		while (proteinGroupIterator.hasNext()) {
+			ProteinGroupInference proteinGroup = proteinGroupIterator.next();
 
 			if (proteinGroup.getEvidence() == ProteinEvidence.NONCONCLUSIVE) {
-				protein = proteinGroup.get(0);
+				InferenceProtein nonConclusiveProtein = proteinGroup.get(0);
 				// non conclusive groups only have one protein at index = 0
-				final int proteinHashCode = protein.hashCode();
-				final List<InferencePeptide> peptides = protein.getInferencePeptides();
+				final int nonConclusiveProteinHashCode = nonConclusiveProtein.hashCode();
+				final List<InferencePeptide> peptides = nonConclusiveProtein.getInferencePeptides();
+				// grab all other protein groups in which that protein is
+				// sharing non discriminating peptides
+				Set<ProteinGroupInference> otherProteinGroups = new THashSet<ProteinGroupInference>();
 				for (InferencePeptide peptide : peptides) {
 					if (peptide.getRelation() == PeptideRelation.NONDISCRIMINATING) {
 						final List<InferenceProtein> proteinsSharingThisPeptide = peptide.getInferenceProteins();
-						for (InferenceProtein proteinSharingThisPeptide : proteinsSharingThisPeptide) {
-							if (proteinSharingThisPeptide.hashCode() != proteinHashCode) {
-								if (!proteinSharingThisPeptide.getGroup().contains(protein))
-									proteinSharingThisPeptide.getGroup().add(protein);
+						for (InferenceProtein proteinSharingNonDiscriminatingPeptide : proteinsSharingThisPeptide) {
+							if (proteinSharingNonDiscriminatingPeptide.hashCode() != nonConclusiveProteinHashCode) {
+								if (!proteinSharingNonDiscriminatingPeptide.getGroup().equals(proteinGroup)
+										&& proteinSharingNonDiscriminatingPeptide.getGroup()
+												.getEvidence() != ProteinEvidence.NONCONCLUSIVE) {
+									// otherProteinGroups.add(proteinSharingNonDiscriminatingPeptide.getGroup());
+									proteinSharingNonDiscriminatingPeptide.getGroup().add(nonConclusiveProtein);
+									nonConclusiveProtein.setGroup(proteinSharingNonDiscriminatingPeptide.getGroup());
+								}
 								// protein.setEvidence(proteinSharingThisPeptide
 								// .getGroup().getEvidence());
 							}
 						}
 					}
 				}
-				iterator.remove();
+				// // if there is a conclusive protein group, add the non
+				// ProteinGroup conclusiveProteinGroup =
+				// proteinSharingThisPeptide.getGroup().add(nonConclusiveProtein);
+				// nonConclusiveProtein.setGroup(proteinSharingThisPeptide.getGroup());
+				// break;
+
+				proteinGroupIterator.remove();
 			}
 		}
 	}
