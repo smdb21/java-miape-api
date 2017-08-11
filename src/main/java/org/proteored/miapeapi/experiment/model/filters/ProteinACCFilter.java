@@ -12,7 +12,6 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedProtein;
 import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
-import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.util.UniprotId2AccMapping;
 
@@ -192,7 +191,7 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 	 */
 	@Override
 	public boolean canCheck(Object obj) {
-		return obj instanceof ProteinComparatorKey;
+		return obj instanceof String;
 	}
 
 }
