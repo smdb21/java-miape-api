@@ -63,6 +63,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	public MiapeMsiDocumentImpl(DTASelectParser parser, ControlVocabularyManager cvManager, String xtandemXMLFileName,
 			String projectName) {
+		log.debug("Creating miape msi document");
 		this.parser = parser;
 		owner = null;
 		this.projectName = projectName;
@@ -74,6 +75,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	public MiapeMsiDocumentImpl(DTASelectParser parser, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String user, String password, String xtandemXMLFileName,
 			String projectName) throws MiapeDatabaseException, MiapeSecurityException {
+		log.debug("Creating miape msi document");
 
 		this.parser = parser;
 		if (databaseManager != null) {

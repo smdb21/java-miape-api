@@ -68,7 +68,7 @@ public class MiapeDTASelectFile extends MiapeXmlFile<MiapeMSIDocument> {
 	}
 
 	public DTASelectParser toDTASelectFile() throws SAXException, MalformedURLException, IOException {
-		return new DTASelectParser(file.toURL());
+		return new DTASelectParser(file);
 	}
 
 }
