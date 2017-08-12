@@ -33,12 +33,16 @@ public class MSIMiapeFactory {
 			throw new IllegalMiapeArgumentException("ControlVocabularyManager is not set");
 		MiapeMSIDocument result = null;
 		try {
-			log.info("toDocument  " + xmlFile.toFile().getAbsolutePath());
+			String filePath = xmlFile.toFile().getAbsolutePath();
+			log.info("toDocument  " + filePath);
 
-			final String miapeName = FilenameUtils.getBaseName(xmlFile.toFile().getAbsolutePath());
+			final String miapeName = FilenameUtils.getBaseName(filePath);
+			log.info("name  " + miapeName);
 			if (databaseManager == null) {
+				log.info("before miapemsiDocumentimpl  ");
 				result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(), cvManager, miapeName, projectName);
 			} else {
+				log.info("before miapemsiDocumentimpl2  ");
 				result = new MiapeMsiDocumentImpl(xmlFile.toDTASelectFile(), databaseManager, cvManager, userName,
 						password, miapeName, projectName);
 			}
