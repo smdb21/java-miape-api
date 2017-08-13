@@ -1,10 +1,10 @@
 package org.proteored.miapeapi.cv;
 
 public class UnitOntology {
-	private static final String UNIT_ONTOLOGY_ADDRESS = "https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo";
+	private static final String UNIT_ONTOLOGY_ADDRESS = "http://ontologies.berkeleybop.org/uo.obo";
 	private static final String UNIT_ONTOLOGY_FULLNAME = "Unit Ontology";
 	private static final String UNIT_ONTOLOGY_CVLABEL = "UO";
-	private static final String UNIT_ONTOLOGY_VERSION = "27:06:2013 17:08";
+	private static final String UNIT_ONTOLOGY_VERSION = "09:04:2014 13:37";
 
 	public static String getAddress() {
 

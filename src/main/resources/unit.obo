@@ -1,7 +1,8 @@
 format-version: 1.2
-date: 27:06:2013 17:08
+data-version: releases/2017-06-27
+date: 09:04:2014 13:37
 saved-by: gkoutos
-auto-generated-by: OBO-Edit 2.3
+auto-generated-by: OBO-Edit 2.1-beta19
 subsetdef: abnormal_slim "Abnormal/normal slim"
 subsetdef: absent_slim "Absent/present slim"
 subsetdef: attribute_slim "Attribute slim"
@@ -16,11 +17,8 @@ subsetdef: unit_slim "unit slim"
 subsetdef: value_slim "Value slim"
 default-namespace: quality
 namespace-id-rule: * UO:$sequence(7,0,9999999)$
-remark: Filtered by Ancestor ID equals "UO:0000000"
+remark: Filtered by Ancestor ID equals \"UO:0000000\"
 ontology: uo
-ontology: pato
-ontology: pato
-ontology: pato
 
 [Term]
 id: UO:0000000
@@ -36,7 +34,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the distance between two points." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001708 ! 1-D extent
+relationship: is_unit_of PATO:0001708
 created_by: george gkoutos
 
 [Term]
@@ -46,8 +44,8 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the amount of matter/energy of a physical object." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000125 ! mass
-relationship: is_unit_of PATO:0000128 ! weight
+relationship: is_unit_of PATO:0000125
+relationship: is_unit_of PATO:0000128
 created_by: george gkoutos
 
 [Term]
@@ -59,8 +57,8 @@ def: "A unit which is a standard measure of the dimension in which events occur 
 subset: unit_group_slim
 synonym: "time derived unit" EXACT []
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000165 ! time
-relationship: is_unit_of PATO:0001309 ! duration quality of a process
+relationship: is_unit_of PATO:0000165
+relationship: is_unit_of PATO:0001309
 created_by: george gkoutos
 
 [Term]
@@ -81,7 +79,7 @@ def: "A unit which is a standard measure of the average kinetic energy of the pa
 subset: unit_group_slim
 synonym: "temperature derived unit" EXACT []
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000146 ! temperature
+relationship: is_unit_of PATO:0000146
 created_by: george gkoutos
 
 [Term]
@@ -231,7 +229,7 @@ name: angstrom
 namespace: unit.ontology
 def: "A length unit which is equal to 10 [-10] m." [NIST:NIST]
 subset: unit_slim
-synonym: "A" EXACT []
+synonym: "Å" EXACT []
 is_a: UO:0000001 ! length unit
 created_by: george gkoutos
 
@@ -496,7 +494,7 @@ id: UO:0000046
 name: prefix
 namespace: unit.ontology
 created_by: gkoutos
-creation_date: 2012-06-13T13:09:05Z
+creation_date: 2012-06-13T01:09:05Z
 
 [Term]
 id: UO:0000047
@@ -505,7 +503,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the amount of a 2-dimensional flat surface." [UOC:GVG]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001709 ! 2-D extent
+relationship: is_unit_of PATO:0001709
 created_by: george gkoutos
 
 [Term]
@@ -515,7 +513,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the rate of change of velocity in either speed or direction." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001028 ! acceleration
+relationship: is_unit_of PATO:0001028
 created_by: george gkoutos
 
 [Term]
@@ -525,7 +523,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the rate of angular movement about an axis; the angle rotated in a given time." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001413 ! angular velocity
+relationship: is_unit_of PATO:0001413
 created_by: george gkoutos
 
 [Term]
@@ -535,7 +533,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the rate of change of angular velocity." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001350 ! angular acceleration
+relationship: is_unit_of PATO:0001350
 created_by: george gkoutos
 
 [Term]
@@ -545,7 +543,7 @@ namespace: unit.ontology
 def: "A unit which represents a standard measurement of how much of a given substance there is mixed with another substance." [UOC:GVG]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000033 ! concentration of
+relationship: is_unit_of PATO:0000033
 created_by: george gkoutos
 
 [Term]
@@ -556,7 +554,7 @@ def: "A density unit which is a standard measure of the mass of a substance in a
 subset: unit_group_slim
 synonym: "mass per unit volume" EXACT []
 is_a: UO:0000182 ! density unit
-relationship: is_unit_of PATO:0001353 ! volumetric density
+relationship: is_unit_of PATO:0001353
 created_by: george gkoutos
 
 [Term]
@@ -566,7 +564,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the luminous intensity impinging on a given area." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000157 ! light unit
-relationship: is_unit_of PATO:0001718 ! luminance
+relationship: is_unit_of PATO:0001718
 created_by: george gkoutos
 
 [Term]
@@ -577,7 +575,7 @@ def: "A density unit which is a standard measure of the mass exerting an influen
 subset: unit_group_slim
 synonym: "mass per unit area unit" EXACT []
 is_a: UO:0000182 ! density unit
-relationship: is_unit_of PATO:0001351 ! area density
+relationship: is_unit_of PATO:0001351
 created_by: george gkoutos
 
 [Term]
@@ -587,7 +585,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the mass of a homogeneous substance containing 6.02 x 1023 atoms or molecules." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000002 ! mass unit
-relationship: is_unit_of PATO:0001681 ! molar mass
+relationship: is_unit_of PATO:0001681
 created_by: george gkoutos
 
 [Term]
@@ -597,7 +595,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the volume of a homogeneous substance containing 6.02 x 1023 atoms or molecules." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000095 ! volume unit
-relationship: is_unit_of PATO:0001680 ! molar volume
+relationship: is_unit_of PATO:0001680
 created_by: george gkoutos
 
 [Term]
@@ -607,8 +605,8 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the quantity of motion measured by the product of mass and velocity." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001022 ! impulse
-relationship: is_unit_of PATO:0001023 ! momentum
+relationship: is_unit_of PATO:0001022
+relationship: is_unit_of PATO:0001023
 created_by: george gkoutos
 
 [Term]
@@ -636,7 +634,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the rate of movement. Speed is measured in the same physical units of measurement as velocity, but does not contain the element of direction that velocity has. Speed is thus the magnitude component of velocity." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000008 ! speed
+relationship: is_unit_of PATO:0000008
 created_by: george gkoutos
 
 [Term]
@@ -845,7 +843,7 @@ created_by: george gkoutos
 id: UO:0000081
 name: square centimeter
 namespace: unit.ontology
-def: "An area unit which is equal to one thousand of square meter or 10^[-3] m^[2]." [NIST:NIST]
+def: "An area unit which is equal to one ten thousandth of a square meter or 10^[-4] m^[2]." [NIST:NIST]
 subset: unit_slim
 synonym: "cm^[2]" EXACT []
 synonym: "square centimetre" EXACT []
@@ -1001,7 +999,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the amount of space occupied by any substance, whether solid, liquid, or gas." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001710 ! 3-D extent
+relationship: is_unit_of PATO:0001710
 created_by: george gkoutos
 
 [Term]
@@ -1044,8 +1042,8 @@ name: liter
 namespace: unit.ontology
 def: "A volume unit which is equal to one thousandth of a cubic meter or 10^[-3] m^[3], or to 1 decimeter." [NIST:NIST]
 subset: unit_slim
-synonym: "l" EXACT []
 synonym: "L" EXACT []
+synonym: "l" EXACT []
 synonym: "litre" EXACT []
 is_a: UO:0000095 ! volume unit
 created_by: george gkoutos
@@ -1112,7 +1110,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the number of repetitive actions in a particular time." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000044 ! frequency
+relationship: is_unit_of PATO:0000044
 created_by: george gkoutos
 
 [Term]
@@ -1133,7 +1131,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the force is applied when a mass is accelerated." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001035 ! force
+relationship: is_unit_of PATO:0001035
 created_by: george gkoutos
 
 [Term]
@@ -1153,7 +1151,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the force applied to a given area." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001025 ! pressure
+relationship: is_unit_of PATO:0001025
 created_by: george gkoutos
 
 [Term]
@@ -1173,8 +1171,8 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the work done by a certain force (gravitational, electric, magnetic, force of inertia, etc)." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001021 ! energy
-relationship: is_unit_of PATO:0001026 ! work
+relationship: is_unit_of PATO:0001021
+relationship: is_unit_of PATO:0001026
 created_by: george gkoutos
 
 [Term]
@@ -1194,7 +1192,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure power or the rate of doing work." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001024 ! power
+relationship: is_unit_of PATO:0001024
 created_by: george gkoutos
 
 [Term]
@@ -1233,7 +1231,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the flow of radiant energy." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000157 ! light unit
-relationship: is_unit_of PATO:0001296 ! luminous flux
+relationship: is_unit_of PATO:0001296
 created_by: george gkoutos
 
 [Term]
@@ -1253,7 +1251,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the amount of the action of a catalyst." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001414 ! catalytic activity
+relationship: is_unit_of PATO:0001414
 created_by: george gkoutos
 
 [Term]
@@ -1273,7 +1271,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the figure or space formed by the junction of two lines or planes." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000133 ! orientation
+relationship: is_unit_of PATO:0000133
 created_by: george gkoutos
 
 [Term]
@@ -1330,7 +1328,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the transformation (disintegration) rate of a radioactive substance." [DEFRA:DEFRA]
 subset: unit_group_slim
 is_a: UO:0000127 ! radiation unit
-relationship: is_unit_of PATO:0001740 ! activity (of a radionuclide)
+relationship: is_unit_of PATO:0001740
 created_by: george gkoutos
 
 [Term]
@@ -1340,7 +1338,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the energy imparted by ionizing radiation to unit mass of matter such as tissue." [DEFRA:DEFRA]
 subset: unit_group_slim
 is_a: UO:0000127 ! radiation unit
-relationship: is_unit_of PATO:0001745 ! radiation absorbed dose
+relationship: is_unit_of PATO:0001745
 created_by: george gkoutos
 
 [Term]
@@ -1350,7 +1348,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the expression of dose in terms of its biological effect." [ORCBS:ORCBS]
 subset: unit_group_slim
 is_a: UO:0000127 ! radiation unit
-relationship: is_unit_of PATO:0001746 ! radiation equivalent dose
+relationship: is_unit_of PATO:0001746
 created_by: george gkoutos
 
 [Term]
@@ -1360,7 +1358,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the quantity that expresses the ability of radiation to ionize air and thereby create electric charges which can be collected and measured." [ORCBS:ORCBS]
 subset: unit_group_slim
 is_a: UO:0000127 ! radiation unit
-relationship: is_unit_of PATO:0001744 ! radiation exposure
+relationship: is_unit_of PATO:0001744
 created_by: george gkoutos
 
 [Term]
@@ -1631,7 +1629,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the intensity of electromagnetic radiation." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000157 ! light unit
-relationship: is_unit_of PATO:0001717 ! radiation emitting intensity quality
+relationship: is_unit_of PATO:0001717
 created_by: george gkoutos
 
 [Term]
@@ -1653,7 +1651,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the power of electromagnetic radiation through space or through a material medium in the form of electromagnetic waves." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000157 ! light unit
-relationship: is_unit_of PATO:0001299 ! radiation emitting quality
+relationship: is_unit_of PATO:0001299
 created_by: george gkoutos
 
 [Term]
@@ -1878,7 +1876,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the influence exerted by some mass." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001019 ! mass density
+relationship: is_unit_of PATO:0001019
 created_by: george gkoutos
 
 [Term]
@@ -1888,7 +1886,7 @@ namespace: unit.ontology
 def: "A density unit which is a standard measure of the mass exerting an influence on a one-dimensional object." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000182 ! density unit
-relationship: is_unit_of PATO:0001352 ! linear density
+relationship: is_unit_of PATO:0001352
 created_by: george gkoutos
 
 [Term]
@@ -2014,7 +2012,7 @@ def: "A dimensionless concentration notation which denotes the acidity of a solu
 subset: unit_slim
 is_a: UO:0000051 ! concentration unit
 is_a: UO:0000186 ! dimensionless unit
-relationship: is_unit_of PATO:0001428 ! medium acidity
+relationship: is_unit_of PATO:0001428
 created_by: george gkoutos
 
 [Term]
@@ -2077,7 +2075,7 @@ namespace: unit.ontology
 def: "A concentration unit which is a standard measure of the amount of the action of a catalyst in a given volume." [UOC:GVG]
 subset: unit_group_slim
 is_a: UO:0000051 ! concentration unit
-relationship: is_unit_of PATO:0001674 ! catalytic (activity) concentration
+relationship: is_unit_of PATO:0001674
 created_by: george gkoutos
 
 [Term]
@@ -2232,7 +2230,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the work done per unit charge as a charge is moved between two points in an electric field." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001464 ! electric potential
+relationship: is_unit_of PATO:0001464
 created_by: george gkoutos
 
 [Term]
@@ -2313,7 +2311,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of quantity of magnetism, taking account of the strength and the extent of a magnetic field." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001682 ! magnetism
+relationship: is_unit_of PATO:0001682
 created_by: george gkoutos
 
 [Term]
@@ -2591,7 +2589,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the ability of a liguid to attraction of molecules at its surface as a result of unbalanced molecular cohesive forces." [NIST:NIST]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0001461 ! surface tension
+relationship: is_unit_of PATO:0001461
 created_by: george gkoutos
 
 [Term]
@@ -2622,7 +2620,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the internal resistance of fluids to flow." [UOC:GVG]
 subset: unit_group_slim
 is_a: UO:0000000 ! unit
-relationship: is_unit_of PATO:0000992 ! viscosity
+relationship: is_unit_of PATO:0000992
 created_by: george gkoutos
 
 [Term]
@@ -2654,7 +2652,7 @@ def: "A ratio unit which is an indicator of sound power per unit area." [techtar
 subset: unit_slim
 synonym: "dB" EXACT []
 is_a: UO:0000190 ! ratio
-relationship: is_unit_of PATO:0001521 ! sound amplitude
+relationship: is_unit_of PATO:0001521
 created_by: george gkoutos
 
 [Term]
@@ -2664,7 +2662,7 @@ namespace: unit.ontology
 def: "A unit which is a standard measure of the estimate of the stochastic effect that a non-uniform radiation dose has on a human." [Wikipedia:Wikipedia]
 subset: unit_slim
 is_a: UO:0000127 ! radiation unit
-relationship: is_unit_of PATO:0001747 ! radiation effective dose
+relationship: is_unit_of PATO:0001747
 created_by: george gkoutos
 
 [Term]
@@ -2683,7 +2681,7 @@ namespace: unit.ontology
 def: "A unit which represents a standard measurement of the movement of electrically charged particles through a transmission medium (electrical conductor)." [UOC:GVG]
 subset: unit_group_slim
 is_a: UO:0000261 ! conduction unit
-relationship: is_unit_of PATO:0001757 ! electrical conductivity
+relationship: is_unit_of PATO:0001757
 created_by: george gkoutos
 
 [Term]
@@ -2693,7 +2691,7 @@ namespace: unit.ontology
 def: "A unit which represents a standard measurement of the spontaneous transfer of thermal energy through matter, from a region of higher temperature to a region of lower temperature." [Wikipedia:Wikipedia]
 subset: unit_group_slim
 is_a: UO:0000261 ! conduction unit
-relationship: is_unit_of PATO:0001756 ! heat conductivity
+relationship: is_unit_of PATO:0001756
 created_by: george gkoutos
 
 [Term]
@@ -2782,7 +2780,7 @@ subset: unit_slim
 synonym: "microlitres per minute" EXACT []
 synonym: "uL/min" EXACT []
 is_a: UO:0000270 ! volumetric flow rate unit
-relationship: is_unit_of PATO:0001574 ! flow rate
+relationship: is_unit_of PATO:0001574
 created_by: george gkoutos
 
 [Term]
@@ -2939,7 +2937,7 @@ synonym: "10^[24]" EXACT []
 synonym: "Y" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:09:16Z
+creation_date: 2012-06-13T01:09:16Z
 
 [Term]
 id: UO:0000287
@@ -2951,7 +2949,7 @@ synonym: "10^[2]" EXACT []
 synonym: "h" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:30:59Z
+creation_date: 2012-06-13T01:30:59Z
 
 [Term]
 id: UO:0000288
@@ -2963,7 +2961,7 @@ synonym: "10^[21]" EXACT []
 synonym: "Z" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:32:19Z
+creation_date: 2012-06-13T01:32:19Z
 
 [Term]
 id: UO:0000289
@@ -2975,7 +2973,7 @@ synonym: "10^[18]" EXACT []
 synonym: "E" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:33:26Z
+creation_date: 2012-06-13T01:33:26Z
 
 [Term]
 id: UO:0000290
@@ -2987,7 +2985,7 @@ synonym: "10^[15]" EXACT []
 synonym: "P" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:34:04Z
+creation_date: 2012-06-13T01:34:04Z
 
 [Term]
 id: UO:0000291
@@ -2999,7 +2997,7 @@ synonym: "10^[12]" RELATED []
 synonym: "T" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:34:51Z
+creation_date: 2012-06-13T01:34:51Z
 
 [Term]
 id: UO:0000292
@@ -3011,7 +3009,7 @@ synonym: "10^[9]" EXACT []
 synonym: "G" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:35:28Z
+creation_date: 2012-06-13T01:35:28Z
 
 [Term]
 id: UO:0000293
@@ -3023,7 +3021,7 @@ synonym: "10^[6]" EXACT []
 synonym: "M" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:35:59Z
+creation_date: 2012-06-13T01:35:59Z
 
 [Term]
 id: UO:0000294
@@ -3035,7 +3033,7 @@ synonym: "10^[3]" EXACT []
 synonym: "k" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:36:58Z
+creation_date: 2012-06-13T01:36:58Z
 
 [Term]
 id: UO:0000295
@@ -3047,7 +3045,7 @@ synonym: "10^[1]" EXACT []
 synonym: "da" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:38:11Z
+creation_date: 2012-06-13T01:38:11Z
 
 [Term]
 id: UO:0000296
@@ -3059,7 +3057,7 @@ synonym: "10^[-1]" EXACT []
 synonym: "d" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:43:00Z
+creation_date: 2012-06-13T01:43:00Z
 
 [Term]
 id: UO:0000297
@@ -3071,7 +3069,7 @@ synonym: "10^[-3]" EXACT []
 synonym: "m" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:44:22Z
+creation_date: 2012-06-13T01:44:22Z
 
 [Term]
 id: UO:0000298
@@ -3083,7 +3081,7 @@ synonym: "10^[-2]" EXACT []
 synonym: "c" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:45:30Z
+creation_date: 2012-06-13T01:45:30Z
 
 [Term]
 id: UO:0000299
@@ -3094,7 +3092,7 @@ subset: prefix_slim
 synonym: "10^[-6]" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:46:34Z
+creation_date: 2012-06-13T01:46:34Z
 
 [Term]
 id: UO:0000300
@@ -3106,7 +3104,7 @@ synonym: "10^[-9]" EXACT []
 synonym: "n" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:47:23Z
+creation_date: 2012-06-13T01:47:23Z
 
 [Term]
 id: UO:0000301
@@ -3129,7 +3127,7 @@ synonym: "10^[-12]" EXACT []
 synonym: "n" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:48:04Z
+creation_date: 2012-06-13T01:48:04Z
 
 [Term]
 id: UO:0000303
@@ -3141,7 +3139,7 @@ synonym: "10^[-15]" EXACT []
 synonym: "f" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:48:57Z
+creation_date: 2012-06-13T01:48:57Z
 
 [Term]
 id: UO:0000304
@@ -3153,7 +3151,7 @@ synonym: "10^[-18]" RELATED []
 synonym: "a" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:50:09Z
+creation_date: 2012-06-13T01:50:09Z
 
 [Term]
 id: UO:0000305
@@ -3165,7 +3163,7 @@ synonym: "10^[-21]" RELATED []
 synonym: "z" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:50:50Z
+creation_date: 2012-06-13T01:50:50Z
 
 [Term]
 id: UO:0000306
@@ -3177,7 +3175,7 @@ synonym: "10^[-24]" RELATED []
 synonym: "y" EXACT []
 is_a: UO:0000046 ! prefix
 created_by: gkoutos
-creation_date: 2012-06-13T13:51:39Z
+creation_date: 2012-06-13T01:51:39Z
 
 [Term]
 id: UO:0000307
@@ -3187,7 +3185,7 @@ def: "A concentration unit which is a standard measure of the amount of a toxic 
 subset: unit_group_slim
 is_a: UO:0000051 ! concentration unit
 created_by: gkoutos
-creation_date: 2012-08-24T16:49:51Z
+creation_date: 2012-08-24T04:49:51Z
 
 [Term]
 id: UO:0000308
@@ -3197,7 +3195,7 @@ def: "A dose unit which is equal to 1 milligram of a toxic or pharmaceutical sub
 subset: unit_slim
 is_a: UO:0000307 ! dose unit
 created_by: gkoutos
-creation_date: 2012-08-24T16:51:55Z
+creation_date: 2012-08-24T04:51:55Z
 
 [Term]
 id: UO:0000309
@@ -3207,7 +3205,7 @@ def: "A dose unit which is equal to 1 milligram of a toxic or pharmaceutical sub
 subset: unit_slim
 is_a: UO:0000307 ! dose unit
 created_by: gkoutos
-creation_date: 2012-08-24T16:52:24Z
+creation_date: 2012-08-24T04:52:24Z
 
 [Term]
 id: UO:0000310
@@ -3217,7 +3215,7 @@ def: "A concentration unit which is a standard measure of the amount of a toxic 
 subset: unit_slim
 is_a: UO:0000051 ! concentration unit
 created_by: gkoutos
-creation_date: 2012-08-24T16:52:42Z
+creation_date: 2012-08-24T04:52:42Z
 
 [Term]
 id: UO:0000311
@@ -3227,7 +3225,7 @@ def: "A dosage unit which is equal to 1 milligram per day of a toxic or pharmace
 subset: unit_slim
 is_a: UO:0000310 ! dosage unit
 created_by: gkoutos
-creation_date: 2012-08-24T17:13:36Z
+creation_date: 2012-08-24T05:13:36Z
 
 [Term]
 id: UO:0000312
@@ -3237,7 +3235,7 @@ def: "A derived unit which is a measure of relative light intensity, as typicall
 subset: unit_slim
 is_a: UO:0000157 ! light unit
 created_by: gkoutos
-creation_date: 2012-08-24T17:14:17Z
+creation_date: 2012-08-24T05:14:17Z
 
 [Term]
 id: UO:0000313
@@ -3247,7 +3245,7 @@ def: "A relative light unit which is a measure of relative luminescence intensit
 subset: unit_slim
 is_a: UO:0000312 ! relative light unit
 created_by: gkoutos
-creation_date: 2012-08-24T17:14:46Z
+creation_date: 2012-08-24T05:14:46Z
 
 [Term]
 id: UO:0000314
@@ -3257,7 +3255,7 @@ def: "A relative light unit which is a measure of relative fluorescence intensit
 subset: unit_slim
 is_a: UO:0000312 ! relative light unit
 created_by: gkoutos
-creation_date: 2012-08-24T17:15:13Z
+creation_date: 2012-08-24T05:15:13Z
 
 [Term]
 id: UO:0000315
@@ -3305,7 +3303,7 @@ namespace: unit.ontology
 def: "A concentration unit which is a standard measure of the amount of radioactivity in a given volume." [UO:GVG]
 is_a: UO:0000051 ! concentration unit
 created_by: gkoutos
-creation_date: 2013-03-12T14:40:36Z
+creation_date: 2013-03-12T02:40:36Z
 
 [Term]
 id: UO:0000320
@@ -3315,7 +3313,7 @@ def: "A unit of radioactivity concentration which is equal to one curie in a vol
 synonym: "curie per litre" EXACT []
 is_a: UO:0000319 ! radioactivity concentration
 created_by: gkoutos
-creation_date: 2013-03-12T14:44:56Z
+creation_date: 2013-03-12T02:44:56Z
 
 [Term]
 id: UO:0000321
@@ -3325,7 +3323,7 @@ def: "A unit of radioactivity concentration which is equal to one micro curie in
 synonym: "microcurie per millilitre" EXACT []
 is_a: UO:0000319 ! radioactivity concentration
 created_by: gkoutos
-creation_date: 2013-03-12T15:26:04Z
+creation_date: 2013-03-12T03:26:04Z
 
 [Term]
 id: UO:0000322
@@ -3334,7 +3332,7 @@ namespace: unit.ontology
 def: "A unit that is the ratio of concentration of two solutions of interest, typically with one solution derived from the other by the addition of solvent." [UO:PC]
 is_a: UO:0000186 ! dimensionless unit
 created_by: gkoutos
-creation_date: 2013-03-12T15:29:30Z
+creation_date: 2013-03-12T03:29:30Z
 
 [Term]
 id: UO:0000323
@@ -3353,5 +3351,90 @@ def: "An area unit which is equal to an area enclosed by a square with sides eac
 synonym: "A^[2]" RELATED []
 is_a: UO:0000047 ! area unit
 created_by: gkoutos
-creation_date: 2013-06-27T17:06:40Z
+creation_date: 2013-06-27T05:06:40Z
+
+[Term]
+id: UO:0000325
+name: megaHertz
+namespace: unit.ontology
+def: "A frequency unit which is equal to one million hertz or 10^[6] V." [UOC:GVG]
+subset: unit_slim
+synonym: "mH" RELATED []
+is_a: UO:0000106 ! hertz
+created_by: gkoutos
+creation_date: 2013-12-06T12:17:48Z
+
+[Term]
+id: UO:0000326
+name: centiMorgan
+namespace: unit.ontology
+def: "A unit used to express distances on a genetic map. In genetic mapping, distances between markers are determined by measuring the rate of meoitic recombination between them, which increases proportionately with the distance separating them. A cM is defined as the length of an interval in which there is a 1% probability of recombination. On the average, 1 cM is roughly equivalent to 1 megabase (Mb) of DNA, although this can vary widely due to hot and cold spots of recombination." [NCBI:http\://www.ncbi.nlm.nih.gov/SCIENCE96/Glossary.html]
+subset: unit_slim
+synonym: "cM" EXACT []
+is_a: UO:0000001 ! length unit
+created_by: gkoutos
+creation_date: 2013-12-06T12:25:17Z
+
+[Term]
+id: UO:0000327
+name: centiRay
+namespace: unit.ontology
+def: "A unit of genetic map distance defined corresponding to an interval in which there is a 1% probability of X-irradiation induced breakage. To be completely specified, the unit must be qualified by the radiation in dosage in rads (e.g. cR8000), because this determines the actual breakage probability." [NCBI:http\://www.ncbi.nlm.nih.gov/SCIENCE96/Glossary.html]
+subset: unit_slim
+synonym: "cR" EXACT []
+is_a: UO:0000001 ! length unit
+created_by: gkoutos
+creation_date: 2013-12-06T12:26:29Z
+
+[Term]
+id: UO:0000328
+name: kilobasepair
+namespace: unit.ontology
+def: "A unit equal to one thousand base pairs." [UOC:GVG]
+synonym: "kbp" EXACT []
+is_a: UO:0000244 ! base pair
+created_by: gkoutos
+creation_date: 2013-12-11T09:39:31Z
+
+[Term]
+id: UO:0000329
+name: megabasepair
+namespace: unit.ontology
+def: "A unit equal to one million base pairs" [UOC:GVG]
+subset: unit_slim
+synonym: "Mb" EXACT []
+is_a: UO:0000244 ! base pair
+created_by: gkoutos
+creation_date: 2013-12-11T09:44:29Z
+
+[Term]
+id: UO:0000330
+name: gigabasepair
+namespace: unit.ontology
+def: "A unit equal to one billion base pairs." [UOC:GVG]
+subset: unit_slim
+synonym: "Gb" EXACT []
+is_a: UO:0000244 ! base pair
+created_by: gkoutos
+creation_date: 2013-12-11T09:44:52Z
+
+[Term]
+id: UO:0000331
+name: gigabyte
+namespace: unit.ontology
+def: "An information unit which is equal to 1000000000 bytes." [UO:GVG]
+synonym: "GB" EXACT []
+is_a: UO:0000231 ! information unit
+created_by: gkoutos
+creation_date: 2014-04-09T01:33:44Z
+
+[Term]
+id: UO:0000332
+name: terabyte
+namespace: unit.ontology
+def: "An information unit which is equal to 1000 gigabytes." [UO:GVG]
+synonym: "TB" EXACT []
+is_a: UO:0000231 ! information unit
+created_by: gkoutos
+creation_date: 2014-04-09T01:35:23Z
 
