@@ -18,7 +18,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
 import gnu.trove.map.hash.THashMap;
-import sun.net.www.protocol.ftp.FtpURLConnection;
 
 public class URLValidator {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -94,10 +93,11 @@ public class URLValidator {
 				responseCode = huc.getResponseCode();
 				if (responseCode != 200)
 					return false;
-			} else if (uc instanceof FtpURLConnection) {
-				return checkFTPConnection(url);
-
 			}
+			// else if (uc instanceof FtpURLConnection) {
+			// return checkFTPConnection(url);
+			//
+			// }
 			log.info("Response code: " + responseCode);
 			if (responseCode != HttpURLConnection.HTTP_OK)
 				return false;
