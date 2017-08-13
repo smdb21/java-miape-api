@@ -472,17 +472,17 @@
 		       	<version>2.3.2</version>
 		       	<!-- In order to also create a jar with the test classes -->
 		       	<executions>
-		        	<execution>
-		        		<id>create test jar</id>
-		        		<phase>package</phase>
-		        		<goals>
-			            	<goal>test-jar</goal>
-			           	</goals>
-			           	<configuration>
-			           		<skip>false</skip>
-			           		<testClassesDirectory>${basedir}\src\test\java</testClassesDirectory>
-			           	</configuration>
-		         	</execution>
+<!-- 		        	<execution> -->
+<!-- 		        		<id>create test jar</id> -->
+<!-- 		        		<phase>package</phase> -->
+<!-- 		        		<goals> -->
+<!-- 			            	<goal>test-jar</goal> -->
+<!-- 			           	</goals> -->
+<!-- 			           	<configuration> -->
+<!-- 			           		<skip>false</skip> -->
+<!-- 			           		<testClassesDirectory>${basedir}\src\test\java</testClassesDirectory> -->
+<!-- 			           	</configuration> -->
+<!-- 		         	</execution> -->
 		         	<execution>
 		         		<id>create jar</id>
 		        		<goals>
