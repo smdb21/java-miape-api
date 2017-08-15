@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.datamanager.StaticPeptideStorage;
+import org.proteored.miapeapi.experiment.model.datamanager.StaticProteinStorage;
 import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
@@ -257,8 +258,21 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 			for (IdentifiedPeptide peptide : identifiedPeptides) {
 				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSI, peptide.getId());
 				if (peptide2 != null) {
+					// add it to the protein
 					peptides.add(peptide2);
 					peptide2.setDecoy(false, false);
+
+					// check that it has all the proteins that should have
+					List<IdentifiedProtein> identifiedProteins = peptide2.getIdentifiedProteins();
+					for (IdentifiedProtein identifiedProtein : identifiedProteins) {
+						ExtendedIdentifiedProtein protein2 = StaticProteinStorage.getProtein(miapeMSI,
+								identifiedProtein.getId());
+						if (protein2 != null) {
+							peptide2.addProtein(protein2);
+						}
+
+					}
+
 				}
 			}
 		}
