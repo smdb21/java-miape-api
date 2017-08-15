@@ -55,7 +55,7 @@ import gnu.trove.set.hash.TIntHashSet;
 
 public abstract class DataManager {
 	// Peptides less than this length, will be discarded
-	public final static int DEFAULT_MIN_PEPTIDE_LENGTH = 7;
+	public final static int DEFAULT_MIN_PEPTIDE_LENGTH = 6;
 
 	// private final static TIntObjectHashMap< ExtendedIdentifiedProtein>
 	// staticProteins = new TIntObjectHashMap< ExtendedIdentifiedProtein>();
@@ -403,6 +403,9 @@ public abstract class DataManager {
 									// .getId())) {
 									extendedIdentifiedProtein = new ExtendedIdentifiedProtein((Replicate) idSet,
 											protein, miapeMSIDocument);
+									if (useStaticCollections) {
+										StaticProteinStorage.addProtein(miapeMSIDocument, extendedIdentifiedProtein);
+									}
 									// if (useStaticCollections)
 									// staticProteins.put(
 									// extendedIdentifiedProtein
@@ -461,8 +464,7 @@ public abstract class DataManager {
 										miapeMSIDocument);
 								if (useStaticCollections) {
 									StaticPeptideStorage.addPeptide(miapeMSIDocument, extendedIdentifiedPeptide);
-									// staticPeptides.put(extendedIdentifiedPeptide.getId(),
-									// extendedIdentifiedPeptide);
+
 								}
 								// } else {
 								// extendedIdentifiedPeptide =
@@ -959,12 +961,16 @@ public abstract class DataManager {
 	private void resetPeptidesFromProteins(List<ExtendedIdentifiedProtein> proteins) {
 		// if (!this.isReseted) {
 		log.info("RESETING PROTEINS");
+
 		for (ExtendedIdentifiedProtein protein : proteins) {
-			// if (protein.getPeptides().size() !=
-			// protein.getIdentifiedPeptides()
-			// .size())
 			protein.setDecoy(false, false);
 			protein.resetPeptides();
+			// check that it has all the peptides
+			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
+				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSI(),
+						peptide.getId());
+				protein.addPeptide(peptide2);
+			}
 		}
 		log.info("END RESETING PROTEINS");
 
@@ -2322,6 +2328,9 @@ public abstract class DataManager {
 				final List<ExtendedIdentifiedPeptide> peptidesFromProteins = proteinGroup.getPeptides();
 				if (peptidesFromProteins != null && !peptidesFromProteins.isEmpty()) {
 					for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptidesFromProteins) {
+						if (extendedIdentifiedPeptide.getProteins().isEmpty()) {
+							log.info(extendedIdentifiedPeptide);
+						}
 						// Do not take the same peptide several times ->
 						// This
 						// happens when a peptide is shared by several
@@ -2504,6 +2513,7 @@ public abstract class DataManager {
 
 	public static void clearStaticInfo() {
 		StaticPeptideStorage.clear();
+		StaticProteinStorage.clear();
 	}
 
 	public int getNumDifferentPeptidesPlusCharge(boolean distiguishModificatedPeptides) {
