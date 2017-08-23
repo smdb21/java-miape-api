@@ -22,9 +22,11 @@ public class PeptideSequenceFilter implements Filter, Filters<String> {
 	private final List<String> sortedSequences = new ArrayList<String>();
 	private final boolean distinguisModificatedPeptides;
 	private final Software software;
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 
 	public PeptideSequenceFilter(Collection<String> sequences, boolean distinguisModificatedPeptides,
-			Software software) {
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
 		this.distinguisModificatedPeptides = distinguisModificatedPeptides;
 		this.software = software;
 
@@ -32,6 +34,8 @@ public class PeptideSequenceFilter implements Filter, Filters<String> {
 			this.sequences.add(sequence);
 			this.sortedSequences.add(sequence);
 		}
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	@Override
@@ -44,7 +48,8 @@ public class PeptideSequenceFilter implements Filter, Filters<String> {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides, currentIdSet.getCvManager());
+		return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 	}
 
 	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,

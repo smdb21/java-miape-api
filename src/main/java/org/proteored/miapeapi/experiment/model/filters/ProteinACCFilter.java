@@ -26,10 +26,13 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 	private final Software software;
 	private final List<String> sortedAccessions = new ArrayList<String>();
 	private File fastaFile;
-	private boolean filterReady;;
+	private boolean filterReady;
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	public ProteinACCFilter(Collection<String> proteinComparatorKeys) {
+	public ProteinACCFilter(Collection<String> proteinComparatorKeys, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins) {
 		// check if some accession is an ID
 		this.accessions.addAll(proteinComparatorKeys);
 		for (String proteinComparatorKey : proteinComparatorKeys) {
@@ -38,9 +41,14 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 
 		this.software = null;
 		filterReady = true;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
-	public ProteinACCFilter(Collection<String> accessions, Software software) {
+	public ProteinACCFilter(Collection<String> accessions, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Software software) {
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 		// check if some accession is an ID
 		for (String acc : accessions) {
 			// ProteinComparatorKey pck = new ProteinComparatorKey(acc,
@@ -69,8 +77,11 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 		this.software = software;
 	}
 
-	public ProteinACCFilter(File fastaFile, Software software) throws IOException {
+	public ProteinACCFilter(File fastaFile, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Software software) throws IOException {
 		this.fastaFile = fastaFile;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 		if (!fastaFile.exists()) {
 			throw new IOException("File " + fastaFile.getAbsolutePath() + " not found");
 		}
@@ -182,7 +193,7 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 				log.info(ret.size() + " proteins groups remain untouched");
 				log.info("Running PAnalyzer to group " + proteins.size()
 						+ " before to return the groups in the protein acc filter");
-				PAnalyzer panalyzer = new PAnalyzer(false);
+				PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 				ret.addAll(panalyzer.run(proteins));
 				log.info("Filtered from " + proteinGroups.size() + " to " + ret.size() + " protein groups");
 			}

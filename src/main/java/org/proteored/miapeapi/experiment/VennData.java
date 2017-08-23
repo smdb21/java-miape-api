@@ -3,23 +3,26 @@ package org.proteored.miapeapi.experiment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.proteored.miapeapi.experiment.model.ProteinGroupOccurrence;
+import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
+
 import edu.scripps.yates.utilities.dates.DatesUtil;
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 public abstract class VennData {
 	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private static int count = 0;
 
-	private final Map<Object, Set<Object>> hash1 = new THashMap<Object, Set<Object>>();
-	private final Map<Object, Set<Object>> hash2 = new THashMap<Object, Set<Object>>();
-	private final Map<Object, Set<Object>> hash3 = new THashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash1 = new HashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash2 = new HashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash3 = new HashMap<Object, Set<Object>>();
 
 	private Set<Object> keys1 = new THashSet<Object>();
 	private Set<Object> keys2 = new THashSet<Object>();
@@ -54,16 +57,22 @@ public abstract class VennData {
 			log.debug("Collection 1 contains " + col1.size() + " elements");
 		} else {
 			log.debug("Collection 1 is empty!");
+			hash1 = null;
+			keys1 = null;
 		}
 		if (col2 != null) {
 			log.debug("Collection 2 contains " + col2.size() + " elements");
 		} else {
 			log.debug("Collection 2 is empty!");
+			hash2 = null;
+			keys2 = null;
 		}
 		if (col3 != null) {
 			log.debug("Collection 3 contains " + col3.size() + " elements");
 		} else {
 			log.debug("Collection 3 is empty!");
+			hash3 = null;
+			keys3 = null;
 		}
 		this.col1 = col1;
 		this.col2 = col2;
@@ -78,7 +87,23 @@ public abstract class VennData {
 			processCollections(col2, keys2, hash2);
 			log.info("Processing collection 3");
 			processCollections(col3, keys3, hash3);
-			log.info("keys1=" + keys1.size() + "keys2=" + keys2.size() + "keys3=" + keys3.size());
+			StringBuilder logmessage = new StringBuilder();
+			if (keys1 != null) {
+				logmessage.append("keys1=" + keys1.size());
+			} else {
+				logmessage.append("keys1=0");
+			}
+			if (keys2 != null) {
+				logmessage.append(", keys2=" + keys2.size());
+			} else {
+				logmessage.append(", keys2=0");
+			}
+			if (keys3 != null) {
+				logmessage.append(", keys3=" + keys3.size());
+			} else {
+				logmessage.append(", keys3=0");
+			}
+			log.info(logmessage);
 		}
 		this.collectionProcessed = true;
 	}
@@ -90,6 +115,9 @@ public abstract class VennData {
 		// 1 VS (2 and 3)
 		if (referenceCollection != null)
 			for (Object obj1 : referenceCollection) {
+				if (((ProteinGroupOccurrence) obj1).getAccessionsString().contains("P68363")) {
+					log.info(obj1);
+				}
 				if (isObjectValid(obj1)) {
 					Object key = getKeyFromObject(obj1);
 					addTo123UnionKeys(key);
@@ -264,12 +292,32 @@ public abstract class VennData {
 			Collection<Object> hash3) {
 		long t1 = System.currentTimeMillis();
 		List<Object> ret = new ArrayList<Object>();
+		if (hash2 == null) {
+			ret.addAll(hashToIsolate);
+			return ret;
+		}
 		log.info("Unique to isolate size = " + hashToIsolate.size());
 		if (hashToIsolate != null) {
 			Iterator<Object> toIsolateIterator = hashToIsolate.iterator();
 
 			while (toIsolateIterator.hasNext()) {
 				Object item = toIsolateIterator.next();
+				if (item instanceof ProteinComparatorKey) {
+					if (((ProteinComparatorKey) item).getAccessionString().contains("P68363")) {
+						log.info(item);
+						for (Object obj2 : hash2) {
+							ProteinComparatorKey prot2 = (ProteinComparatorKey) obj2;
+							if (item.equals(obj2)) {
+								log.info(obj2);
+							} else {
+								if (prot2.getAccessionString().contains("P68363")) {
+									log.info(obj2);
+								}
+							}
+
+						}
+					}
+				}
 				if (hash2 != null && hash2.contains(item)) {
 					continue;
 				} else if (hash3 != null && hash3.contains(item)) {

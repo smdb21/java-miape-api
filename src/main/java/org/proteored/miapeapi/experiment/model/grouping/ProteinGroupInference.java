@@ -20,7 +20,19 @@ public class ProteinGroupInference extends ArrayList<InferenceProtein> {
 
 	@Override
 	public String toString() {
-		return this.getKey();
+		String ret = "";
+
+		int i = 0;
+		for (InferenceProtein prot : this) {
+			if (i > 0) {
+				ret = ret + ", ";
+			}
+			ret = ret + prot.getAccession();
+			ret = ret + "(" + prot.getEvidence() + ")";
+			i++;
+		}
+
+		return ret;
 	}
 
 	public String getKey() {

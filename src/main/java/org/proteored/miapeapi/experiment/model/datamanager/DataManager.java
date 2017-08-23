@@ -139,6 +139,8 @@ public abstract class DataManager {
 
 	private boolean groupingAtExperimentListLevel = false;
 	private final boolean processInParallel;
+	private final boolean doNotGroupNonConclusiveProteins;
+	private final boolean separateNonConclusiveProteins;
 	/**
 	 * Create an identification set from the data extracted from a replicate
 	 *
@@ -167,10 +169,13 @@ public abstract class DataManager {
 	 * @param groupingAtExperimentListLevel
 	 *            perform PAnalyzer grouping at experiment list level
 	 */
-	public DataManager(IdentificationSet idSet, List<DataManager> dataManagers, boolean groupingAtExperimentListLevel,
-			List<Filter> filters, Integer minPeptideLength, boolean processInParallel) {
+	public DataManager(IdentificationSet idSet, List<DataManager> dataManagers, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, boolean groupingAtExperimentListLevel, List<Filter> filters,
+			Integer minPeptideLength, boolean processInParallel) {
 		this.processInParallel = processInParallel;
 		this.idSet = idSet;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
 		if (idSet != null && idSet.getCvManager() != null)
 			cvManager = idSet.getCvManager();
 		else
@@ -198,13 +203,18 @@ public abstract class DataManager {
 	 * @param dataManagers
 	 *            that comes from the replicates of the experiment
 	 */
-	public DataManager(IdentificationSet idSet, List<DataManager> dataManagers, Integer minPeptideLength,
-			List<Filter> filters, boolean processInParallel) {
-		this(idSet, dataManagers, false, filters, minPeptideLength, processInParallel);
+	public DataManager(IdentificationSet idSet, List<DataManager> dataManagers, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Integer minPeptideLength, List<Filter> filters,
+			boolean processInParallel) {
+		this(idSet, dataManagers, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, false, filters,
+				minPeptideLength, processInParallel);
 	}
 
 	public DataManager(IdentificationSet idSet, List<MiapeMSIDocument> miapeMSIs, List<Filter> filters,
-			Integer minPeptideLength, boolean processInParallel) {
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Integer minPeptideLength,
+			boolean processInParallel) {
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
 		this.idSet = idSet;
 		this.processInParallel = processInParallel;
 		if (idSet != null && idSet.getCvManager() != null)
@@ -772,7 +782,7 @@ public abstract class DataManager {
 			// in case of not having next level, reset protein groups and return
 			if (getFilters().isEmpty()) {
 				resetPeptidesFromProteins(nonFilteredIdentifiedProteins);
-				PAnalyzer panalyzer = new PAnalyzer(false);
+				PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 				identifiedProteinGroups = panalyzer.run(nonFilteredIdentifiedProteins);
 				return identifiedProteinGroups;
 			}
@@ -828,7 +838,8 @@ public abstract class DataManager {
 						List<ExtendedIdentifiedProtein> nextLevelProteins = getNextLevelIdentifiedProteins();
 
 						// Run panalyzer
-						PAnalyzer panalyzer = new PAnalyzer(false);
+						PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins,
+								separateNonConclusiveProteins);
 						toFilter = panalyzer.run(nextLevelProteins);
 					} else {
 						// if there is only one replicate, get all directly
@@ -843,7 +854,7 @@ public abstract class DataManager {
 					List<ExtendedIdentifiedProtein> nextLevelProteins = getNextLevelIdentifiedProteins();
 
 					// Run panalyzer
-					PAnalyzer panalyzer = new PAnalyzer(false);
+					PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 					toFilter = panalyzer.run(nextLevelProteins);
 				} else {
 					// if there is only one replicate, get all directly
@@ -945,7 +956,7 @@ public abstract class DataManager {
 	public List<ProteinGroup> getNonFilteredIdentifiedProteinGroups() {
 		resetPeptidesFromProteins(nonFilteredIdentifiedProteins);
 
-		PAnalyzer pAnalyzer = new PAnalyzer(false);
+		PAnalyzer pAnalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 		List<ProteinGroup> groups = pAnalyzer.run(nonFilteredIdentifiedProteins);
 		return groups;
 	}
@@ -2459,7 +2470,8 @@ public abstract class DataManager {
 	 * @return
 	 */
 	public static List<ProteinGroup> filterProteinGroupsByPeptides(List<ProteinGroup> proteinGroups,
-			TIntHashSet validPeptideIDs, ControlVocabularyManager cvManager) {
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, TIntHashSet validPeptideIDs,
+			ControlVocabularyManager cvManager) {
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 		if (validPeptideIDs == null) {
 
@@ -2505,7 +2517,7 @@ public abstract class DataManager {
 		log.info("Peptides accepted=" + numPeptideAccepted + "  Peptides rejected=" + numPeptidesRejected
 				+ "   Proteins accepted=" + numProteinsAccepted + "  Proteins rejected=" + numProteinsRejected);
 		// run panalyzer
-		PAnalyzer panalyzer = new PAnalyzer(false);
+		PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 		ret = panalyzer.run(totalProteins);
 		log.info("Filtering protein groups by peptides: from " + proteinGroups.size() + " to " + ret.size());
 		return ret;

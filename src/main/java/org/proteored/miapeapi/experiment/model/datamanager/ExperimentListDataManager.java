@@ -15,9 +15,10 @@ import org.proteored.miapeapi.experiment.model.filters.Filter;
 public class ExperimentListDataManager extends DataManager {
 
 	public ExperimentListDataManager(IdentificationSet idSet, List<DataManager> dataManagers,
-			boolean groupingAtExperimentListLevel, List<Filter> filters, Integer minPeptideLength,
-			boolean processInParallel) {
-		super(idSet, dataManagers, groupingAtExperimentListLevel, filters, minPeptideLength, processInParallel);
+			boolean groupingAtExperimentListLevel, List<Filter> filters, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Integer minPeptideLength, boolean processInParallel) {
+		super(idSet, dataManagers, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins,
+				groupingAtExperimentListLevel, filters, minPeptideLength, processInParallel);
 
 	}
 

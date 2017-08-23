@@ -20,8 +20,10 @@ public class ExperimentDataManager extends DataManager {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	public ExperimentDataManager(IdentificationSet idSet, List<DataManager> dataManagers, List<Filter> filters,
-			Integer minPeptideLength, boolean processInParallel) {
-		super(idSet, dataManagers, minPeptideLength, filters, processInParallel);
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Integer minPeptideLength,
+			boolean processInParallel) {
+		super(idSet, dataManagers, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, minPeptideLength,
+				filters, processInParallel);
 
 	}
 

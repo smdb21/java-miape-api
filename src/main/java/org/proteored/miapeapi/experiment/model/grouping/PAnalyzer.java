@@ -40,7 +40,7 @@ public class PAnalyzer {
 	private final List<ProteinGroupInference> mGroups;
 	private PanalyzerStats mStats;
 	private final boolean separateNonConclusiveProteins;
-
+	private final boolean doNotGroupNonConclusiveProteins;
 	private boolean ignoreProteinId;
 
 	/**
@@ -48,8 +48,8 @@ public class PAnalyzer {
 	 * 
 	 * @param separateNonConclusiveProteins
 	 */
-	public PAnalyzer(boolean separateNonConclusiveProteins) {
-		this(separateNonConclusiveProteins, true);
+	public PAnalyzer(boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins) {
+		this(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, true);
 	}
 
 	/**
@@ -60,12 +60,16 @@ public class PAnalyzer {
 	 *            happens that the id may be repeated and we want them to be
 	 *            separated
 	 */
-	public PAnalyzer(boolean separateNonConclusiveProteins, boolean ignoreProteinId) {
+	public PAnalyzer(boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
+			boolean ignoreProteinId) {
 		mProts = new THashMap<String, InferenceProtein>();
 		mPepts = new THashMap<String, InferencePeptide>();
 		mGroups = new ArrayList<ProteinGroupInference>();
 		this.ignoreProteinId = ignoreProteinId;
 		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
+		log.info("New PANalyzer: separateNONCONCLUSIVE=" + separateNonConclusiveProteins + ", removeNONCONCLUSIVE="
+				+ doNotGroupNonConclusiveProteins);
 	}
 
 	public List<ProteinGroup> run(Collection<ExtendedIdentifiedProtein> proteins) {
@@ -88,12 +92,17 @@ public class PAnalyzer {
 		markIndistinguishable();
 		// long t6 = System.currentTimeMillis();
 
-		if (!separateNonConclusiveProteins) {
+		if (doNotGroupNonConclusiveProteins || !separateNonConclusiveProteins) {
 			log.info("Returning " + mGroups.size() + " protein groups from " + proteins.size() + " proteins, in "
 					+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
-			log.info("Collapsing Non conclusive groups");
+			if (!separateNonConclusiveProteins) {
+				log.info("Collapsing Non conclusive proteins with proteins sharing their peptides");
+			} else if (doNotGroupNonConclusiveProteins) {
+				log.info("removing non conclusive proteins");
+			}
 			collapseNonConclusiveGroups();
-
+			log.info("Returning " + mGroups.size() + " protein groups from " + proteins.size() + " proteins, in "
+					+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
 		}
 
 		log.debug("Extracting groups");
@@ -110,15 +119,7 @@ public class PAnalyzer {
 		// + (t7 - t6) + ", " + (t8 - t7));
 
 		// check test
-		for (ProteinGroup proteinGroup : resultingGroups) {
-			if (proteinGroup.getEvidence() == ProteinEvidence.INDISTINGUISHABLE) {
-				for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinGroup) {
-					if (extendedIdentifiedProtein.getEvidence() == ProteinEvidence.CONCLUSIVE) {
-						log.info(proteinGroup);
-					}
-				}
-			}
-		}
+
 		log.info("Returning " + mGroups.size() + " protein groups from " + proteins.size() + " proteins, in "
 				+ (System.currentTimeMillis() - t1) + " milliseconds");
 		return resultingGroups;
@@ -131,9 +132,28 @@ public class PAnalyzer {
 
 			if (proteinGroup.getEvidence() == ProteinEvidence.NONCONCLUSIVE) {
 				InferenceProtein nonConclusiveProtein = proteinGroup.get(0);
+
+				List<InferencePeptide> inferencePeptides = nonConclusiveProtein.getInferencePeptides();
+				if (doNotGroupNonConclusiveProteins) {
+					// remove the group and remove the protein from the dataset
+					// by removing
+					// the nonConclusive protein from all its peptides
+					for (InferencePeptide inferencePeptide : inferencePeptides) {
+						int size = inferencePeptide.getInferenceProteins().size();
+						if (size < 2) {
+							throw new IllegalArgumentException(
+									"Peptides of a non conclusive protein are always shared by another protein");
+						}
+						inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
+
+					}
+					System.out.println(proteinGroup);
+					proteinGroupIterator.remove();
+					continue;
+				}
 				// non conclusive groups only have one protein at index = 0
 				final int nonConclusiveProteinHashCode = nonConclusiveProtein.hashCode();
-				final List<InferencePeptide> peptides = nonConclusiveProtein.getInferencePeptides();
+				final List<InferencePeptide> peptides = inferencePeptides;
 				// grab all other protein groups in which that protein is
 				// sharing non discriminating peptides
 				Set<ProteinGroupInference> otherProteinGroups = new THashSet<ProteinGroupInference>();

@@ -121,7 +121,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	@Override
 	public String toString() {
-		return getAccession() + "(" + getPeptides().size() + ")";
+		return getAccession() + "-" + getEvidence() + ",(" + getPeptides().size() + ")";
 		// String accession = this.getAccession();
 		// List<ExtendedIdentifiedPeptide> peptides2 = this.getPeptides();
 		// String peptideString = "";

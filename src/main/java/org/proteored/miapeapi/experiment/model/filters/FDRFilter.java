@@ -38,6 +38,8 @@ public class FDRFilter implements Filter {
 	private final String replicateName;
 	private final String experimentName;
 	private final Software software;
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	/**
@@ -55,7 +57,8 @@ public class FDRFilter implements Filter {
 	 *            concatenated database or not
 	 */
 	public FDRFilter(float threshold, String prefix, boolean concatenatedDecoy, SortingParameters sortingParameters,
-			IdentificationItemEnum item, String experimentName, String replicateName, Software software) {
+			IdentificationItemEnum item, String experimentName, String replicateName,
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
 		if (threshold < 0 || threshold > 100)
 			throw new IllegalMiapeArgumentException("Threshold has to be a number between 0 and 100");
 		this.threshold = threshold;
@@ -72,6 +75,8 @@ public class FDRFilter implements Filter {
 		this.replicateName = replicateName;
 		this.experimentName = experimentName;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 
 	}
 
@@ -90,7 +95,8 @@ public class FDRFilter implements Filter {
 	 *            PEPTIDE (peptide FDR) or PROTEIN (protein FDR)
 	 */
 	public FDRFilter(float threshold, Pattern pattern, boolean concatenatedDecoy, SortingParameters sortingParameters,
-			IdentificationItemEnum item, String experimentName, String replicateName, Software software) {
+			IdentificationItemEnum item, String experimentName, String replicateName,
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
 		if (threshold < 0 || threshold > 100)
 			throw new IllegalMiapeArgumentException("Threshold has to be a number between 0 and 100");
 		this.threshold = threshold;
@@ -106,6 +112,8 @@ public class FDRFilter implements Filter {
 		this.experimentName = experimentName;
 		this.replicateName = replicateName;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	public float getThreshold() {
@@ -219,12 +227,14 @@ public class FDRFilter implements Filter {
 				List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 						.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 				TIntHashSet filteredPeptideIDs = filterPeptides(identifiedPeptides);
-				return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptideIDs, cvManager);
+				return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+						separateNonConclusiveProteins, filteredPeptideIDs, cvManager);
 			} else if (this.identificationItem.equals(IdentificationItemEnum.PSM)) {
 				List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 						.getPeptidesFromProteinGroups(proteinGroups);
 				TIntHashSet filteredPeptideIDs = filterPSMs(identifiedPeptides);
-				return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptideIDs, cvManager);
+				return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+						separateNonConclusiveProteins, filteredPeptideIDs, cvManager);
 			}
 
 		} else if (appliedToProteins) {
@@ -308,7 +318,8 @@ public class FDRFilter implements Filter {
 						.addAll(getPeptideIdsThatPassScoreThreshold(proteinGroups, null, sortingParameters));
 			}
 
-			return DataManager.filterProteinGroupsByPeptides(proteinGroups, peptidesToIncludeAfterFilter, cvManager);
+			return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+					separateNonConclusiveProteins, peptidesToIncludeAfterFilter, cvManager);
 		}
 		return null;
 	}

@@ -22,10 +22,12 @@ public class PeptidesForMRMFilter implements Filter {
 	private final Integer maxLength;
 	private final boolean requireUnique;
 	private final Software software;
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 
 	public PeptidesForMRMFilter(boolean ignoreM, boolean ignoreW, boolean ignoreQAtBeginning,
 			boolean ignoreMissedCleavages, Integer minLength, Integer maxLength, boolean requireUnique,
-			Software software) {
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
 		this.ignoreM = ignoreM;
 		this.ignoreMissedCleavages = ignoreMissedCleavages;
 		this.ignoreQAtBeginning = ignoreQAtBeginning;
@@ -34,6 +36,8 @@ public class PeptidesForMRMFilter implements Filter {
 		this.maxLength = maxLength;
 		this.requireUnique = requireUnique;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	@Override
@@ -46,8 +50,8 @@ public class PeptidesForMRMFilter implements Filter {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(identifiedProteins);
 		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(identifiedProteins, filteredPeptides,
-				currentIdSet.getCvManager());
+		return DataManager.filterProteinGroupsByPeptides(identifiedProteins, doNotGroupNonConclusiveProteins,
+				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 	}
 
 	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,

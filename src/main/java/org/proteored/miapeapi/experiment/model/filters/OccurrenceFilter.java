@@ -20,6 +20,8 @@ public class OccurrenceFilter implements Filter {
 	private final boolean distinguishModificatedPeptides;
 	private final boolean byReplicates;
 	private final Software software;
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 
 	public boolean isDistinguishModificatedPeptides() {
 		return distinguishModificatedPeptides;
@@ -58,7 +60,8 @@ public class OccurrenceFilter implements Filter {
 	 *            number of times that the item appears over the replicates
 	 */
 	public OccurrenceFilter(int minOccurrence, IdentificationItemEnum item, boolean distinguisModificatedPeptides,
-			boolean minNumReplicates, Software software) {
+			boolean minNumReplicates, boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
+			Software software) {
 		this.minOccurrence = minOccurrence;
 		if (IdentificationItemEnum.PEPTIDE.equals(item))
 			this.appliedToPeptides = true;
@@ -67,6 +70,8 @@ public class OccurrenceFilter implements Filter {
 		this.distinguishModificatedPeptides = distinguisModificatedPeptides;
 		this.byReplicates = minNumReplicates;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	@Override
@@ -149,8 +154,8 @@ public class OccurrenceFilter implements Filter {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
-			return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides,
-					currentIdSet.getCvManager());
+			return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 		} else {
 			if (nextLevelIdentificationSetList == null)
 				return proteinGroups;
@@ -178,7 +183,8 @@ public class OccurrenceFilter implements Filter {
 				// log.info("This protein has not the enough occurrence");
 			}
 			log.info("Running PAnalyzer before to return the groups in the occurrence filter");
-			ret = DataManager.filterProteinGroupsByPeptides(ret, null, currentIdSet.getCvManager());
+			ret = DataManager.filterProteinGroupsByPeptides(ret, doNotGroupNonConclusiveProteins,
+					separateNonConclusiveProteins, null, currentIdSet.getCvManager());
 			log.info("Resulting " + ret.size() + " protein groups after filtering " + proteinGroups.size()
 					+ " protein groups");
 			return ret;

@@ -25,20 +25,31 @@ import gnu.trove.set.hash.THashSet;
 public class ProteinACCFilterByProteinComparatorKey implements Filter, Filters<ProteinComparatorKey> {
 	private final Set<ProteinComparatorKey> accessions = new THashSet<ProteinComparatorKey>();
 	private final Software software;
-	private final List<String> sortedAccessions = new ArrayList<String>();;
+	private final List<String> sortedAccessions = new ArrayList<String>();
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	public ProteinACCFilterByProteinComparatorKey(Collection<ProteinComparatorKey> proteinComparatorKeys) {
+	public ProteinACCFilterByProteinComparatorKey(Collection<ProteinComparatorKey> proteinComparatorKeys,
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins) {
 		// check if some accession is an ID
+		for (ProteinComparatorKey proteinComparatorKey : proteinComparatorKeys) {
+			if (proteinComparatorKey.getAccessionString().contains("P68363")) {
+				log.info(proteinComparatorKey);
+			}
+		}
 		this.accessions.addAll(proteinComparatorKeys);
 		for (ProteinComparatorKey proteinComparatorKey : proteinComparatorKeys) {
 			this.sortedAccessions.add(proteinComparatorKey.getAccessionString());
 		}
 
 		this.software = null;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
-	public ProteinACCFilterByProteinComparatorKey(Collection<String> accessions, Software software) {
+	public ProteinACCFilterByProteinComparatorKey(Collection<String> accessions,
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
 		// check if some accession is an ID
 		for (String acc : accessions) {
 			ProteinComparatorKey pck = new ProteinComparatorKey(acc, ProteinGroupComparisonType.BEST_PROTEIN);
@@ -63,11 +74,13 @@ public class ProteinACCFilterByProteinComparatorKey implements Filter, Filters<P
 				sortedAccessions.addAll(accessions);
 			}
 		}
-
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 		this.software = software;
 	}
 
-	public ProteinACCFilterByProteinComparatorKey(File fastaFile, Software software) throws IOException {
+	public ProteinACCFilterByProteinComparatorKey(File fastaFile, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Software software) throws IOException {
 
 		FASTADBLoader fastaLoader = new FASTADBLoader();
 		fastaLoader.load(fastaFile.getAbsolutePath());
@@ -90,6 +103,8 @@ public class ProteinACCFilterByProteinComparatorKey implements Filter, Filters<P
 			accessions.add(new ProteinComparatorKey(accession, ProteinGroupComparisonType.BEST_PROTEIN));
 			sortedAccessions.add(accession);
 		}
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 		this.software = software;
 		log.info("Loaded " + accessions.size() + " proteins from " + fastaFile.getAbsolutePath());
 	}
@@ -129,7 +144,7 @@ public class ProteinACCFilterByProteinComparatorKey implements Filter, Filters<P
 					}
 				}
 				log.info("Running PAnalyzer before to return the groups in the protein acc filter");
-				PAnalyzer panalyzer = new PAnalyzer(false);
+				PAnalyzer panalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 				ret = panalyzer.run(proteins);
 				log.info("Filtered from " + proteinGroups.size() + " to " + ret.size() + " protein groups");
 			}

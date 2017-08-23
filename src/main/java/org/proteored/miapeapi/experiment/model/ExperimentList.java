@@ -35,8 +35,8 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	private final ControlVocabularyManager cvManager;
 
 	public ExperimentList(String name, List<Experiment> experimentList, boolean groupingAtExperimentListLevel,
-			List<Filter> filters, Integer minPeptideLength, ControlVocabularyManager cvManager,
-			boolean processInParallel) {
+			List<Filter> filters, boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
+			Integer minPeptideLength, ControlVocabularyManager cvManager, boolean processInParallel) {
 		if (experimentList != null) {
 			experiments = experimentList;
 			for (Experiment experiment : experiments) {
@@ -49,7 +49,8 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 			this.cvManager = SpringHandler.getInstance().getCVManager();
 		this.name = name;
 		dataManager = new ExperimentListDataManager(this, getDataManagers(experimentList),
-				groupingAtExperimentListLevel, filters, minPeptideLength, processInParallel);
+				groupingAtExperimentListLevel, filters, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins,
+				minPeptideLength, processInParallel);
 	}
 
 	private List<DataManager> getDataManagers(List<Experiment> expList) {

@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
 import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
 import org.proteored.miapeapi.experiment.model.grouping.InferenceProtein;
-import org.proteored.miapeapi.experiment.model.grouping.PAnalyzer;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinGroupInference;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
@@ -21,6 +20,10 @@ import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
 import gnu.trove.set.hash.TIntHashSet;
 
 public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2979064683814192733L;
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	private ProteinEvidence evidence;
 	private ExtendedIdentifiedPeptide bestPeptide;
@@ -117,23 +120,6 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 		// return shareOneProtein(object);
 		return shareAllProteins(object);
 		// return theyformJustOneGroup(object);
-	}
-
-	private boolean theyformJustOneGroup(Object object) {
-		if (object instanceof ProteinGroup) {
-			if (shareOneProtein(object)) {
-
-				List<ExtendedIdentifiedProtein> proteins = new ArrayList<ExtendedIdentifiedProtein>();
-				proteins.addAll(this);
-				proteins.addAll((ProteinGroup) object);
-				PAnalyzer pa = new PAnalyzer(false);
-				List<ProteinGroup> groups = pa.run(proteins);
-				if (groups.size() == 1)
-					return true;
-			}
-			return false;
-		}
-		return super.equals(object);
 	}
 
 	public boolean shareAllProteins(Object object) {

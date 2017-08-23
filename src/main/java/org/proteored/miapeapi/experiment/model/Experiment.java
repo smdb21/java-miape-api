@@ -47,8 +47,11 @@ public class Experiment implements IdentificationSet<Replicate> {
 	private ExperimentList previousLevelIdentificationSet;
 	private final Integer minPeptideLength;
 	private final boolean processInParallel;
+	private final boolean doNotGroupNonConclusiveProteins;
+	private final boolean separateNonConclusiveProteins;
 
-	public Experiment(String experimentName, List<Replicate> replicates, List<Filter> filters, Integer minPeptideLength,
+	public Experiment(String experimentName, List<Replicate> replicates, List<Filter> filters,
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Integer minPeptideLength,
 			ControlVocabularyManager cvManager, boolean processInParallel) {
 		this.replicates = replicates;
 		if (replicates != null)
@@ -60,10 +63,12 @@ public class Experiment implements IdentificationSet<Replicate> {
 			this.cvManager = cvManager;
 		else
 			this.cvManager = SpringHandler.getInstance().getCVManager();
-		dataManager = new ExperimentDataManager(this, getNextLevelDataManagers(), filters, minPeptideLength,
-				processInParallel);
+		dataManager = new ExperimentDataManager(this, getNextLevelDataManagers(), filters,
+				doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, minPeptideLength, processInParallel);
 		this.minPeptideLength = minPeptideLength;
 		this.processInParallel = processInParallel;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
 	}
 
 	/**
@@ -81,7 +86,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 		if (replicate != null) {
 			replicates.add(replicate);
 			replicate.setPreviousLevelIdentificationSet(this);
-			dataManager = new ExperimentDataManager(this, getNextLevelDataManagers(), filters, minPeptideLength,
+			dataManager = new ExperimentDataManager(this, getNextLevelDataManagers(), filters,
+					doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, minPeptideLength,
 					processInParallel);
 		}
 	}

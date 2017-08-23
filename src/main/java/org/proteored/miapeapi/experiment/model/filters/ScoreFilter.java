@@ -27,6 +27,9 @@ public class ScoreFilter implements Filter {
 
 	private final Software software;
 
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
+
 	/**
 	 * 
 	 * @param threshold
@@ -37,7 +40,8 @@ public class ScoreFilter implements Filter {
 	 * @param item
 	 */
 	public ScoreFilter(float threshold, String scoreName, ComparatorOperator includeOperator,
-			IdentificationItemEnum item, Software software) {
+			IdentificationItemEnum item, boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
+			Software software) {
 		this.operator = includeOperator;
 		this.threshold = threshold;
 		if (IdentificationItemEnum.PEPTIDE.equals(item))
@@ -46,6 +50,8 @@ public class ScoreFilter implements Filter {
 			this.appliedToProteins = true;
 		this.scoreName = scoreName;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	@Override
@@ -79,8 +85,8 @@ public class ScoreFilter implements Filter {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides);
-			return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides,
-					currentIdSet.getCvManager());
+			return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 
 		} else {
 			log.info("Filtering " + proteinGroups.size() + " protein groups by " + this.scoreName + " " + operator + " "
@@ -98,7 +104,7 @@ public class ScoreFilter implements Filter {
 				}
 			}
 			log.info("Running PAnalyzer before to return the groups in the Score filter");
-			PAnalyzer pAnalyzer = new PAnalyzer(false);
+			PAnalyzer pAnalyzer = new PAnalyzer(doNotGroupNonConclusiveProteins, separateNonConclusiveProteins);
 			List<ProteinGroup> ret = pAnalyzer.run(proteins);
 			log.info("Resulting " + ret.size() + " after filtering " + proteinGroups.size() + " protein groups");
 			return ret;

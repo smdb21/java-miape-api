@@ -73,8 +73,9 @@ public class Replicate implements IdentificationSet<Void> {
 	 *            associated MIAPE MSI
 	 */
 	public Replicate(String name, String experimentName, List<MiapeMSDocument> miapeMSs,
-			List<MiapeMSIDocument> miapeMSIs, List<Filter> filters, Integer minPeptideLength,
-			ControlVocabularyManager cvManager, boolean processInParallel) {
+			List<MiapeMSIDocument> miapeMSIs, List<Filter> filters, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Integer minPeptideLength, ControlVocabularyManager cvManager,
+			boolean processInParallel) {
 		this.experimentName = experimentName;
 		replicateName = name;
 		this.minPeptideLength = minPeptideLength;
@@ -86,7 +87,8 @@ public class Replicate implements IdentificationSet<Void> {
 			this.cvManager = SpringHandler.getInstance().getCVManager();
 		this.miapeMSs = miapeMSs;
 		this.miapeMSIs = miapeMSIs;
-		dataManager = new ReplicateDataManager(this, miapeMSIs, filters, minPeptideLength, processInParallel);
+		dataManager = new ReplicateDataManager(this, miapeMSIs, filters, doNotGroupNonConclusiveProteins,
+				separateNonConclusiveProteins, minPeptideLength, processInParallel);
 	}
 
 	@Override

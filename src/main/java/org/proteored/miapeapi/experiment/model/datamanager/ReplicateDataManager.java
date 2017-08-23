@@ -24,9 +24,11 @@ public class ReplicateDataManager extends DataManager {
 	 * @param miapeMSIs
 	 */
 	public ReplicateDataManager(IdentificationSet idSet, List<MiapeMSIDocument> miapeMSIs, List<Filter> filters,
-			Integer minPeptideLength, boolean processInParallel) {
+			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Integer minPeptideLength,
+			boolean processInParallel) {
 
-		super(idSet, miapeMSIs, filters, minPeptideLength, processInParallel);
+		super(idSet, miapeMSIs, filters, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins,
+				minPeptideLength, processInParallel);
 
 	}
 

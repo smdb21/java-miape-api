@@ -19,21 +19,29 @@ public class PeptideLengthFilter implements Filter {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
 	public static final String NOT_MODIFIED = "NOT MODIFIED";
+	private final boolean separateNonConclusiveProteins;
+	private final boolean doNotGroupNonConclusiveProteins;
 
 	public void ModificationFilterItem() {
 
 	}
 
-	public PeptideLengthFilter(int min, int max, Software sofware) {
+	public PeptideLengthFilter(int min, int max, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Software sofware) {
 		this.minLenth = min;
 		this.maxLenth = max;
 		this.software = sofware;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
-	public PeptideLengthFilter(int min, Software software) {
+	public PeptideLengthFilter(int min, boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
+			Software software) {
 		this.minLenth = min;
 		this.maxLenth = Integer.MAX_VALUE;
 		this.software = software;
+		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
+		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 	}
 
 	@Override
@@ -85,7 +93,8 @@ public class PeptideLengthFilter implements Filter {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
 		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
-		return DataManager.filterProteinGroupsByPeptides(proteinGroups, filteredPeptides, currentIdSet.getCvManager());
+		return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
+				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 	}
 
 	@Override
