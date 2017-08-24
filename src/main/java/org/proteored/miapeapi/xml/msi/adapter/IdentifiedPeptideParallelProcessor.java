@@ -22,10 +22,9 @@ public class IdentifiedPeptideParallelProcessor extends Thread {
 
 	private final int numThread;
 
-	public IdentifiedPeptideParallelProcessor(int numCore,
-			ParIterator<IdentifiedPeptide> iterator,
-			Reducible<List<MSIIdentifiedPeptide>> localPeptides,
-			ObjectFactory factory, MSIControlVocabularyXmlFactory cvFactory) {
+	public IdentifiedPeptideParallelProcessor(int numCore, ParIterator<IdentifiedPeptide> iterator,
+			Reducible<List<MSIIdentifiedPeptide>> localPeptides, ObjectFactory factory,
+			MSIControlVocabularyXmlFactory cvFactory) {
 		numThread = numCore;
 		this.iterator = iterator;
 		this.localPeptides = localPeptides;
@@ -35,22 +34,20 @@ public class IdentifiedPeptideParallelProcessor extends Thread {
 
 	@Override
 	public void run() {
-		log.info("Starting parallel processing of peptides from thread "
-				+ numThread);
+		log.info("Starting parallel processing of peptides from thread " + numThread);
 		List<MSIIdentifiedPeptide> xmlPeptides = new ArrayList<MSIIdentifiedPeptide>();
 		localPeptides.set(xmlPeptides);
 		while (iterator.hasNext()) {
 			try {
 				final IdentifiedPeptide peptide = iterator.next();
-				xmlPeptides.add(new IdentifiedPeptideAdapter(peptide, factory,
-						cvFactory).adapt());
+				xmlPeptides.add(new IdentifiedPeptideAdapter(peptide, factory, cvFactory).adapt());
 			} catch (Exception e) {
+				log.warn(e);
 				iterator.register(e);
 			}
 
 		}
-		log.info("Thread " + numThread + " processed " + xmlPeptides.size()
-				+ " peptides");
+		log.info("Thread " + numThread + " processed " + xmlPeptides.size() + " peptides");
 	}
 
 }
