@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.proteored.miapeapi.experiment.model.ProteinGroupOccurrence;
 import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
 
 import edu.scripps.yates.utilities.dates.DatesUtil;
@@ -115,9 +114,7 @@ public abstract class VennData {
 		// 1 VS (2 and 3)
 		if (referenceCollection != null)
 			for (Object obj1 : referenceCollection) {
-				if (((ProteinGroupOccurrence) obj1).getAccessionsString().contains("P68363")) {
-					log.info(obj1);
-				}
+
 				if (isObjectValid(obj1)) {
 					Object key = getKeyFromObject(obj1);
 					addTo123UnionKeys(key);
@@ -274,6 +271,8 @@ public abstract class VennData {
 	}
 
 	private List<Object> getUniqueTo3Keys() {
+		processCollections();
+
 		if (uniqueTo3Keys == null) {
 			uniqueTo3Keys = getUniqueToFirstSet(keys3, keys1, keys2);
 		}
@@ -339,6 +338,8 @@ public abstract class VennData {
 	}
 
 	private Set<Object> getUnion123Keys() {
+		processCollections();
+
 		if (union123Keys == null) {
 			union123Keys = getUnion(keys1, keys2, keys3);
 		}
@@ -359,6 +360,8 @@ public abstract class VennData {
 	}
 
 	private Set<Object> getUnion12Keys() {
+		processCollections();
+
 		if (union12Keys == null) {
 			union12Keys = getUnion(keys1, keys2, null);
 		}
@@ -380,6 +383,8 @@ public abstract class VennData {
 	}
 
 	private Set<Object> getUnion13Keys() {
+		processCollections();
+
 		if (union13Keys == null) {
 			union13Keys = getUnion(keys1, null, keys3);
 		}
@@ -401,6 +406,8 @@ public abstract class VennData {
 	}
 
 	private Set<Object> getUnion23Keys() {
+		processCollections();
+
 		if (union23Keys == null) {
 			union23Keys = getUnion(null, keys2, keys3);
 		}
@@ -421,15 +428,15 @@ public abstract class VennData {
 		List<Object> ret = new ArrayList<Object>();
 
 		for (Object key : keys) {
-			if (from1 && this.hash1.containsKey(key)) {
+			if (from1 && this.hash1 != null && this.hash1.containsKey(key)) {
 				ret.addAll(this.hash1.get(key));
 
 			}
-			if (from2 && this.hash2.containsKey(key)) {
+			if (from2 && this.hash2 != null && this.hash2.containsKey(key)) {
 				ret.addAll(this.hash2.get(key));
 
 			}
-			if (from3 && this.hash3.containsKey(key)) {
+			if (from3 && this.hash3 != null && this.hash3.containsKey(key)) {
 				ret.addAll(this.hash3.get(key));
 
 			}
@@ -515,11 +522,14 @@ public abstract class VennData {
 	 * @param list3
 	 * @return
 	 */
-	private static Set<Object> getUnion(Collection<Object> list1, Collection<Object> list2, Collection<Object> list3) {
+	private static Set<Object> getUnion(Set<Object> list1, Set<Object> list2, Set<Object> list3) {
 
 		// Since the HashSet doesn't allow to add repeated elements, add all to
 		// the set
 		Set<Object> ret = new THashSet<Object>();
+		if (list1 != null && list2 == null && list3 == null) {
+			return list1;
+		}
 		if (list1 != null) {
 			ret.addAll(list1);
 		}
