@@ -237,6 +237,9 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	}
 
 	public void addPeptide(ExtendedIdentifiedPeptide peptide) {
+		if (peptide == null) {
+			return;
+		}
 		if (peptides == null)
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 
