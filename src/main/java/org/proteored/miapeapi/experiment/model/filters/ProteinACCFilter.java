@@ -31,18 +31,9 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 	private final boolean doNotGroupNonConclusiveProteins;
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 
-	public ProteinACCFilter(Collection<String> proteinComparatorKeys, boolean doNotGroupNonConclusiveProteins,
+	public ProteinACCFilter(Collection<String> accessions, boolean doNotGroupNonConclusiveProteins,
 			boolean separateNonConclusiveProteins) {
-		// check if some accession is an ID
-		this.accessions.addAll(proteinComparatorKeys);
-		for (String proteinComparatorKey : proteinComparatorKeys) {
-			this.sortedAccessions.add(proteinComparatorKey);
-		}
-
-		this.software = null;
-		filterReady = true;
-		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
-		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
+		this(accessions, doNotGroupNonConclusiveProteins, separateNonConclusiveProteins, null);
 	}
 
 	public ProteinACCFilter(Collection<String> accessions, boolean doNotGroupNonConclusiveProteins,
@@ -51,21 +42,16 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
 		// check if some accession is an ID
 		for (String acc : accessions) {
-			// ProteinComparatorKey pck = new ProteinComparatorKey(acc,
-			// ProteinGroupComparisonType.BEST_PROTEIN);
+
 			try {
 				final UniprotId2AccMapping instance = UniprotId2AccMapping.getInstance();
 				if (instance != null) {
 					String accFromID = instance.getAccFromID(acc);
 					if (accFromID != null) {
-						// pck = new ProteinComparatorKey(accFromID,
-						// ProteinGroupComparisonType.BEST_PROTEIN);
-						// this.accessions.add(pck);
 						this.accessions.add(accFromID);
 						sortedAccessions.add(accFromID);
 					} else {
-						// this.accessions.add(pck);
-						this.accessions.add(accFromID);
+						this.accessions.add(acc);
 						sortedAccessions.add(acc);
 					}
 				}
@@ -173,9 +159,9 @@ public class ProteinACCFilter implements Filter, Filters<String> {
 							List<ExtendedIdentifiedPeptide> peptides = protein.getPeptides();
 							for (ExtendedIdentifiedPeptide peptide : peptides) {
 								peptide.getProteins().remove(protein);
-								if (peptide.getProteins().isEmpty()) {
-									log.info(peptide + " has no peptides");
-								}
+								// if (peptide.getProteins().isEmpty()) {
+								// log.info(peptide + " has no peptides");
+								// }
 							}
 						}
 					}
