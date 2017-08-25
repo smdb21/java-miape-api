@@ -147,7 +147,7 @@ public class PAnalyzer {
 						inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
 
 					}
-					System.out.println(proteinGroup);
+					// System.out.println(proteinGroup);
 					proteinGroupIterator.remove();
 					continue;
 				}
