@@ -165,7 +165,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 				IdentifiedPeptideImpl peptideImpl = (IdentifiedPeptideImpl) peptide;
 				List<Ref> proteinRefs = peptideImpl.getProteinRefs();
-				if (proteinRefs != null) {
+				if (proteinRefs != null && !proteinRefs.isEmpty()) {
 					for (Ref ref : proteinRefs) {
 						if (proteinList.containsKey(ref.getId())) {
 							peptideImpl.addProteinRelationship(proteinList.get(ref.getId()));
@@ -176,6 +176,10 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 							throw new MiapeDataInconsistencyException(message);
 						}
 					}
+				} else {
+					String message = "Peptide " + peptide.getId() + " with no proteins";
+					log.error(message);
+					throw new MiapeDataInconsistencyException(message);
 				}
 			}
 		}
@@ -183,7 +187,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			for (IdentifiedProtein protein : proteinList.values()) {
 				IdentifiedProteinImpl proteinImpl = (IdentifiedProteinImpl) protein;
 				List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
-				if (peptideRefs != null) {
+				if (peptideRefs != null && !peptideRefs.isEmpty()) {
 					for (Ref ref : peptideRefs) {
 						if (peptideList.containsKey(ref.getId())) {
 							proteinImpl.addPeptideRelationship(peptideList.get(ref.getId()));
@@ -194,14 +198,19 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 							throw new MiapeDataInconsistencyException(message);
 						}
 					}
+				} else {
+					String message = "Protein " + protein.getId() + " with no peptides";
+					log.error(message);
+					throw new MiapeDataInconsistencyException(message);
 				}
 			}
 		}
 
 		TIntHashSet peptideIds = new TIntHashSet();
 		for (IdentifiedProtein prot : proteinList.values()) {
-			if (prot.getIdentifiedPeptides().isEmpty())
+			if (prot.getIdentifiedPeptides().isEmpty()) {
 				log.info("Protein with no peptides: ID=" + prot.getId() + " in " + xmlMSIMiape.getName());
+			}
 			for (IdentifiedPeptide pep : prot.getIdentifiedPeptides()) {
 				peptideIds.add(pep.getId());
 			}
@@ -210,8 +219,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		TIntHashSet proteinIds = new TIntHashSet();
 		for (IdentifiedPeptide pept : peptideList.values()) {
 
-			if (pept.getIdentifiedProteins().isEmpty())
+			if (pept.getIdentifiedProteins().isEmpty()) {
 				log.info("Peptide with no proteins: ID=" + pept.getId() + " in " + xmlMSIMiape.getName());
+			}
 			for (IdentifiedProtein prot : pept.getIdentifiedProteins()) {
 				proteinIds.add(prot.getId());
 			}
