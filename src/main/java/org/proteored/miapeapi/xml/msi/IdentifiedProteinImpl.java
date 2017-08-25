@@ -130,6 +130,9 @@ public class IdentifiedProteinImpl implements IdentifiedProtein {
 	}
 
 	public void addPeptideRelationship(IdentifiedPeptide identifiedPeptide) {
+		if (identifiedPeptide == null) {
+			return;
+		}
 		for (IdentifiedPeptide peptide : peptides) {
 			if (peptide.getId() == identifiedPeptide.getId())
 				return;
