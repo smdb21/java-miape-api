@@ -980,7 +980,9 @@ public abstract class DataManager {
 			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
 				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSI(),
 						peptide.getId());
-				protein.addPeptide(peptide2);
+				if (peptide2 != null) {
+					protein.addPeptide(peptide2);
+				}
 			}
 		}
 		log.info("END RESETING PROTEINS");
