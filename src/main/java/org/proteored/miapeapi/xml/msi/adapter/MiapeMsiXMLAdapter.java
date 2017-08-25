@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
+import org.proteored.miapeapi.exceptions.InterruptedMIAPEThreadException;
 import org.proteored.miapeapi.interfaces.Adapter;
 import org.proteored.miapeapi.interfaces.DateAdapter;
 import org.proteored.miapeapi.interfaces.MiapeDate;
@@ -100,6 +101,9 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 		if (identifiedProteinSets == null)
 			return;
 		for (IdentifiedProteinSet proteinSet : identifiedProteinSets) {
+			if (Thread.currentThread().isInterrupted()) {
+				throw new InterruptedMIAPEThreadException("Task cancelled");
+			}
 			// MSIIdentifiedProteinSet adapt = new
 			// IdentifiedProteinSetParallelAdapter(proteinSet,
 			// factory, cvFactory).adapt();
