@@ -264,7 +264,7 @@ public abstract class DataManager {
 	private void linkProteinsAndPeptides() {
 		int minPeptideLength = getMinPeptideLength();
 		if (nonFilteredIdentifiedPeptides.isEmpty() || nonFilteredIdentifiedProteins.isEmpty()) {
-			log.info("No peptides  or proteins!!");
+			log.warn("No peptides  or proteins!!");
 			return;
 		}
 		log.info("Linking " + nonFilteredIdentifiedProteins.size() + " proteins with "
@@ -305,7 +305,7 @@ public abstract class DataManager {
 				}
 			} else {
 				if (getMinPeptideLength() != Integer.MAX_VALUE)
-					log.warn("The protein " + protein.getAccession() + " has not peptides");
+					log.debug("The protein " + protein.getAccession() + " has not peptides");
 			}
 		}
 		for (ExtendedIdentifiedPeptide peptide : nonFilteredIdentifiedPeptides) {
@@ -321,9 +321,9 @@ public abstract class DataManager {
 						}
 					}
 					if (!proteinFound)
-						log.warn("The peptide " + peptide.getId() + " has not proteins");
+						log.debug("The peptide " + peptide.getId() + " has not proteins");
 				} else {
-					log.warn("The peptide " + peptide.getId() + " has not proteins");
+					log.debug("The peptide " + peptide.getId() + " has not proteins");
 				}
 			}
 		}

@@ -76,6 +76,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private Map<String, IdentifiedProtein> proteinList = new THashMap<String, IdentifiedProtein>();
 
 	private int id = -1;
+	private boolean throwInconsistencies = true;
 	// private final List<IdentifiedProtein> identifiedProteins;
 	// private final List<IdentifiedPeptide> peptidesWithoutProtein = new
 	// ArrayList<IdentifiedPeptide>();
@@ -84,13 +85,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	public MiapeMSIDocumentImpl(MSIMIAPEMSI xmlMsiMiape, User owner, ControlVocabularyManager controlVocabularyUtil,
 			String userName, String password, boolean processInParallel) {
 		xmlMSIMiape = xmlMsiMiape;
-		if (owner != null)
+		if (owner != null) {
 			user = owner;
-		else {
-			if (xmlMsiMiape != null && xmlMsiMiape.getMIAPEProject() != null)
+		} else {
+			if (xmlMsiMiape != null && xmlMsiMiape.getMIAPEProject() != null) {
+				if ("ProteoRed Multicentric Experiment 6".equals(xmlMsiMiape.getMIAPEProject().getName())) {
+					throwInconsistencies = false;
+				}
 				user = new UserImpl(xmlMsiMiape.getMIAPEProject().getOwnerName(), userName, password);
-			else
+			} else {
 				user = null;
+			}
 		}
 
 		xmlFactory = MiapeMSIXmlFactory.getFactory();
@@ -172,14 +177,18 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						} else {
 							String message = "Referenced protein + '" + ref.getId() + "' not present in dataset "
 									+ this.getName();
-							log.error(message);
-							throw new MiapeDataInconsistencyException(message);
+							log.debug(message);
+							if (throwInconsistencies) {
+								throw new MiapeDataInconsistencyException(message);
+							}
 						}
 					}
 				} else {
 					String message = "Peptide " + peptide.getId() + " with no proteins";
-					log.error(message);
-					throw new MiapeDataInconsistencyException(message);
+					log.debug(message);
+					if (throwInconsistencies) {
+						throw new MiapeDataInconsistencyException(message);
+					}
 				}
 			}
 		}
@@ -194,14 +203,18 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						} else {
 							String message = "Referenced peptide '" + ref.getId() + "' not present in dataset "
 									+ this.getName();
-							log.error(message);
-							throw new MiapeDataInconsistencyException(message);
+							log.debug(message);
+							if (throwInconsistencies) {
+								throw new MiapeDataInconsistencyException(message);
+							}
 						}
 					}
 				} else {
 					String message = "Protein " + protein.getId() + " with no peptides";
-					log.error(message);
-					throw new MiapeDataInconsistencyException(message);
+					log.debug(message);
+					if (throwInconsistencies) {
+						throw new MiapeDataInconsistencyException(message);
+					}
 				}
 			}
 		}
@@ -209,7 +222,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		TIntHashSet peptideIds = new TIntHashSet();
 		for (IdentifiedProtein prot : proteinList.values()) {
 			if (prot.getIdentifiedPeptides().isEmpty()) {
-				log.info("Protein with no peptides: ID=" + prot.getId() + " in " + xmlMSIMiape.getName());
+				log.debug("Protein with no peptides: ID=" + prot.getId() + " in " + xmlMSIMiape.getName());
 			}
 			for (IdentifiedPeptide pep : prot.getIdentifiedPeptides()) {
 				peptideIds.add(pep.getId());
@@ -220,7 +233,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		for (IdentifiedPeptide pept : peptideList.values()) {
 
 			if (pept.getIdentifiedProteins().isEmpty()) {
-				log.info("Peptide with no proteins: ID=" + pept.getId() + " in " + xmlMSIMiape.getName());
+				log.debug("Peptide with no proteins: ID=" + pept.getId() + " in " + xmlMSIMiape.getName());
 			}
 			for (IdentifiedProtein prot : pept.getIdentifiedProteins()) {
 				proteinIds.add(prot.getId());
