@@ -290,7 +290,11 @@ public abstract class VennData {
 	private static List<Object> getUniqueToFirstSet(Collection<Object> hashToIsolate, Collection<Object> hash2,
 			Collection<Object> hash3) {
 		long t1 = System.currentTimeMillis();
+
 		List<Object> ret = new ArrayList<Object>();
+		if (hashToIsolate == null) {
+			return ret;
+		}
 		if (hash2 == null) {
 			ret.addAll(hashToIsolate);
 			return ret;
