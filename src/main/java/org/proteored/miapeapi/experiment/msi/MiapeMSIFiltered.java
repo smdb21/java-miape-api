@@ -53,6 +53,8 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 
 	private final ControlVocabularyManager cvManager;
 
+	private boolean throwIncosistencies = true;
+
 	public MiapeMSIFiltered(MiapeMSIDocument miapeMSI, IdentificationSet idSet, ControlVocabularyManager cvManager) {
 		this.miapeMSI = miapeMSI;
 		if (miapeMSI == null)
@@ -60,6 +62,10 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		this.idSet = idSet;
 		xmlFactory = MiapeMSIXmlFactory.getFactory();
 		this.cvManager = cvManager;
+		if (miapeMSI.getProject() != null
+				&& "ProteoRed Multicentric Experiment 6".equals(miapeMSI.getProject().getName())) {
+			throwIncosistencies = false;
+		}
 		filterOutProteinsAndPeptidesNEW();
 	}
 
@@ -189,8 +195,10 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 							filteredProtein.addPeptide(peptideInMap);
 							peptideInMap.addProtein(identifiedProtein);
 						} else {
-							throw new MiapeDataInconsistencyException(identifiedPeptideID + ", a peptide from protein "
-									+ identifiedProtein.getId() + " is not found");
+							if (throwIncosistencies) {
+								throw new MiapeDataInconsistencyException(identifiedPeptideID
+										+ ", a peptide from protein " + identifiedProtein.getId() + " is not found");
+							}
 						}
 					}
 				} else {
@@ -211,8 +219,10 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 							filteredPeptide.addProtein(proteinInMap);
 							proteinInMap.addPeptide(identifiedPeptide);
 						} else {
-							throw new MiapeDataInconsistencyException(identifiedProteinID + ", a protein from peptide "
-									+ identifiedPeptide.getId() + " is not found");
+							if (throwIncosistencies) {
+								throw new MiapeDataInconsistencyException(identifiedProteinID
+										+ ", a protein from peptide " + identifiedPeptide.getId() + " is not found");
+							}
 						}
 					}
 				} else {
