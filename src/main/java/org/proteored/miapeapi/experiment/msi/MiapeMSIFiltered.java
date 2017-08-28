@@ -178,7 +178,7 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 					throw new InterruptedMIAPEThreadException("Task cancelled");
 				}
 				IdentifiedProteinFiltered filteredProtein = (IdentifiedProteinFiltered) identifiedProtein;
-				TIntHashSet peptidesFromProteinIds = filteredProtein.getFilteredPeptideIds();
+				TIntHashSet peptidesFromProteinIds = filteredProtein.getValidPeptideIds();
 				if (peptidesFromProteinIds != null) {
 					TIntIterator iterator = peptidesFromProteinIds.iterator();
 					while (iterator.hasNext()) {
@@ -200,7 +200,7 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 			// ITERATE OVER PEPTIDES
 			for (IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 				IdentifiedPeptideFiltered filteredPeptide = (IdentifiedPeptideFiltered) identifiedPeptide;
-				TIntHashSet proteinsFromPeptideIds = filteredPeptide.getFilteredProteinIds();
+				TIntHashSet proteinsFromPeptideIds = filteredPeptide.getValidProteinIds();
 				if (proteinsFromPeptideIds != null) {
 					TIntIterator iterator = proteinsFromPeptideIds.iterator();
 					while (iterator.hasNext()) {

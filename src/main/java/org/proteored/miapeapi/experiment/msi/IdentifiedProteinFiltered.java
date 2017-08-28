@@ -28,7 +28,7 @@ public class IdentifiedProteinFiltered implements IdentifiedProtein {
 	private final String description;
 	private final String accession;
 	private final int id;
-	private final TIntHashSet filteredPeptideIds = new TIntHashSet();
+	private final TIntHashSet validPeptideIds = new TIntHashSet();
 
 	public IdentifiedProteinFiltered(ExtendedIdentifiedProtein protein) {
 		this.id = protein.getId();
@@ -51,13 +51,14 @@ public class IdentifiedProteinFiltered implements IdentifiedProtein {
 		List<ExtendedIdentifiedPeptide> peptides = protein.getPeptides();
 		if (peptides != null) {
 			for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
-				filteredPeptideIds.add(extendedIdentifiedPeptide.getId());
+				int id2 = extendedIdentifiedPeptide.getId();
+				validPeptideIds.add(id2);
 			}
 		}
 	}
 
-	public TIntHashSet getFilteredPeptideIds() {
-		return filteredPeptideIds;
+	public TIntHashSet getValidPeptideIds() {
+		return validPeptideIds;
 	}
 
 	public void addPeptide(IdentifiedPeptide peptideToAdd) {

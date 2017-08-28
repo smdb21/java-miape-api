@@ -28,7 +28,7 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 	private final String sequence;
 	private final int id;
 	private final String retentionTimeInSeconds;
-	private final TIntHashSet filteredProteinIds = new TIntHashSet();
+	private final TIntHashSet validProteinIds = new TIntHashSet();
 
 	public IdentifiedPeptideFiltered(ExtendedIdentifiedPeptide peptide) {
 		this.charge = peptide.getCharge();
@@ -55,13 +55,14 @@ public class IdentifiedPeptideFiltered implements IdentifiedPeptide {
 		List<ExtendedIdentifiedProtein> proteins = peptide.getProteins();
 		if (proteins != null) {
 			for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteins) {
-				filteredProteinIds.add(extendedIdentifiedProtein.getId());
+				int id2 = extendedIdentifiedProtein.getId();
+				validProteinIds.add(id2);
 			}
 		}
 	}
 
-	public TIntHashSet getFilteredProteinIds() {
-		return filteredProteinIds;
+	public TIntHashSet getValidProteinIds() {
+		return validProteinIds;
 	}
 
 	public void addProtein(IdentifiedProtein proteinToAdd) {
