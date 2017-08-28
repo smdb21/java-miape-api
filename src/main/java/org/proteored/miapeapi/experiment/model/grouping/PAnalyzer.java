@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.cv.LocalOboTestControlVocabularyManager;
+import org.proteored.miapeapi.exceptions.MiapeDataInconsistencyException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -141,10 +142,28 @@ public class PAnalyzer {
 					for (InferencePeptide inferencePeptide : inferencePeptides) {
 						int size = inferencePeptide.getInferenceProteins().size();
 						if (size < 2) {
-							throw new IllegalArgumentException(
+							throw new MiapeDataInconsistencyException(
 									"Peptides of a non conclusive protein are always shared by another protein");
 						}
-						inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
+						if (nonConclusiveProtein.getAccession().equals("P01774")) {
+							log.info(nonConclusiveProtein);
+						}
+						// remove the non conclusive protein from their peptides
+						// (those peptide could be linked to any other protein)
+						boolean remove = inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
+						//// do the same for the actual
+						//// ExtendedIdentifiedProteins that are behind the
+						//// inferenceProteins
+						List<ExtendedIdentifiedProtein> proteinsMerged = nonConclusiveProtein.getProteinsMerged();
+						for (ExtendedIdentifiedPeptide peptide : inferencePeptide.getMergedPeptides()) {
+							for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
+								boolean removed = peptide.getProteins().remove(extendedIdentifiedProtein);
+								if (removed && nonConclusiveProtein.getAccession().equals("P01774")) {
+									System.out.println(extendedIdentifiedProtein.getId() + " " + peptide.getId());
+								}
+							}
+
+						}
 
 					}
 					// System.out.println(proteinGroup);
