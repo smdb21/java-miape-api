@@ -36,7 +36,7 @@ The Java MIAPE API is designed in 4 different modules:
 <dependency>
     <groupId>org.proteored.miape.api</groupId>
     <artifactId>miape-api</artifactId>
-    <version>1.9.1-SNAPSHOT</version> <!-- or the latest version available -->
+    <version>1.9.2-SNAPSHOT</version> <!-- or the latest version available -->
 </dependency>
 ```
 
