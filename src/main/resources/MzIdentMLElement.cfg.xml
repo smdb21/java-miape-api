@@ -720,10 +720,10 @@ Configurations for various properties of model classes.
 	</configurations>
 	<configurations>
 		<!--  changed on 22-May-2013 -->
-		<autoRefResolving>false</autoRefResolving>
+		<autoRefResolving>true</autoRefResolving>
 		<!-- <autoRefResolving>true</autoRefResolving>-->
 <!-- changed at 23-May-2013 -->
-		<cached>false</cached>
+		<cached>true</cached>
 <!-- 		<cached>false</cached> -->
 		<clazz>uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult</clazz>
 		<cvParamClass>uk.ac.ebi.jmzidml.model.mzidml.params.SpectrumIdentificationResultCvParam</cvParamClass>
