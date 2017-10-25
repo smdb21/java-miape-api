@@ -58,9 +58,7 @@ public class MiapePepXMLFile extends MiapeXmlFile<MiapeMSIDocument> {
 
 	@Override
 	public MiapeMSIDocument toDocument() throws MiapeDatabaseException, MiapeSecurityException {
-		// return MSIMiapeFactory.getFactory().toDocument(this, dbManager,
-		// cvUtil, userName, password, projectName);
-		return null;
+		return MSIMiapeFactory.getFactory().toDocument(this, dbManager, cvUtil, userName, password, projectName);
 
 	}
 
