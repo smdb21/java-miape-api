@@ -133,13 +133,13 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.4</version>
 		</dependency>
-		<!-- XML module -->
-		<!-- JAXB -->
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-xjc</artifactId>
-			<version>2.2.4-1</version>
-		</dependency>
+		<!-- XML module --> 
+<!-- JAXB --> 
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.sun.xml.bind</groupId> -->
+<!-- 			<artifactId>jaxb-xjc</artifactId> -->
+<!-- 			<version>2.2.4-1</version> -->
+<!-- 		</dependency> -->
 		<!-- XMLunit -->
 		<dependency>
 			<groupId>xmlunit</groupId>
@@ -387,9 +387,9 @@
 		<dependency>
   			<groupId>com.github.chhh</groupId>
   			<artifactId>msftbx</artifactId>
-  			<version>1.3.1</version>
+  			<version>1.6.0</version>
   		</dependency>
-
+		
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
