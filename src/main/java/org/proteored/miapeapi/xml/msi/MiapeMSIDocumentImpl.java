@@ -135,6 +135,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			MSIIdentifiedPeptideSet msiIdentifiedPeptideSet = xmlMSIMiape.getMSIIdentifiedPeptideSet();
 			if (msiIdentifiedPeptideSet != null) {
 				List<MSIIdentifiedPeptide> msiIdentifiedPeptides = msiIdentifiedPeptideSet.getMSIIdentifiedPeptide();
+				log.info(msiIdentifiedPeptides.size() + " peptides in dataset");
 				if (msiIdentifiedPeptides != null) {
 					for (MSIIdentifiedPeptide msiIdentifiedPeptide : msiIdentifiedPeptides) {
 						// Just include peptides that have been linked to any
@@ -148,6 +149,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			}
 			List<MSIIdentifiedProteinSet> msiIdentifiedProteinSets = xmlMSIMiape.getMSIIdentifiedProteinSet();
 			if (msiIdentifiedProteinSets != null) {
+				log.info(msiIdentifiedProteinSets.size() + " proteins in dataset");
 				for (MSIIdentifiedProteinSet msiIdentifiedProteinSet : msiIdentifiedProteinSets) {
 					List<MSIIdentifiedProtein> msiIdentifiedProteins = msiIdentifiedProteinSet
 							.getMSIIdentifiedProtein();
