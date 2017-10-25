@@ -9,6 +9,7 @@ import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.exceptions.WrongXMLFormatException;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
+import org.proteored.miapeapi.xml.xtandem.MiapeXTandemFile;
 import org.xml.sax.SAXException;
 
 public class MSIMiapeFactory {
