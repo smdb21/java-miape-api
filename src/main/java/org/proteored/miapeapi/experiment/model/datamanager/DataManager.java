@@ -370,6 +370,8 @@ public abstract class DataManager {
 	private void collectDataFromMSIs(List<MiapeMSIDocument> miapeMSIs) {
 		int minPepLength = getMinPeptideLength();
 		int peptideWithoutProteins = 0;
+		int psmsSkippedByRank = 0;
+
 		// reset collections
 		resetIdentificationSet();
 		TIntHashSet peptidesIds = new TIntHashSet();
@@ -451,6 +453,11 @@ public abstract class DataManager {
 					log.info("There are " + identifiedPeptides2.size() + " peptides in the MSI document");
 					if (identifiedPeptides2 != null) {
 						for (IdentifiedPeptide peptide : identifiedPeptides2) {
+							// only take the first in the rank
+							if (peptide.getRank() > 1) {
+								psmsSkippedByRank++;
+								continue;
+							}
 							if (Thread.currentThread().isInterrupted()) {
 								throw new InterruptedMIAPEThreadException("Task cancelled");
 							}
@@ -511,6 +518,9 @@ public abstract class DataManager {
 				}
 			}
 
+		}
+		if (psmsSkippedByRank > 0) {
+			log.info(psmsSkippedByRank + "PSMs skipped for being a rank > than 1");
 		}
 		if (peptideWithoutProteins > 0)
 			log.warn("There are " + peptideWithoutProteins + " peptides without proteins");
