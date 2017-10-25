@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.xtandem.msi;
+package org.proteored.miapeapi.xml.xtandem;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.spring.SpringHandler;
+import org.proteored.miapeapi.xml.xtandem.msi.MSIMiapeFactory;
 import org.xml.sax.SAXException;
 
 import de.proteinms.xtandemparser.xtandem.XTandemFile;
