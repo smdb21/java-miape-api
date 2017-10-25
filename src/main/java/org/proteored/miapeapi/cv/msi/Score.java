@@ -115,6 +115,7 @@ public class Score extends ControlVocabularySet {
 	 * "PRIDE"), PRIDE_XTANDEM_HYPERSCORE("PRIDE:0000176", "X!Tandem Hyperscore"
 	 * , "PRIDE");
 	 */
+	private static final Accession EXPECT_VALUE = new Accession("MS:1001192");
 	private static final Accession XTANDEM_EVALUE_ACC = new Accession("MS:1001330");
 	private static final Accession XTANDEM_HYPERSWCORE = new Accession("MS:1001331");
 	private static final Accession LOCAL_FDR_ACC = new Accession("MS:1001250");
@@ -122,6 +123,14 @@ public class Score extends ControlVocabularySet {
 	private static final Accession PROLUCID_DELTA_CN = new Accession("MS:1002535");
 	private static final Accession SEQUEST_XCORR = new Accession("MS:1001155");
 	private static final Accession PROLUCID_XCORR = new Accession("MS:1002534");
+	private static final Accession SEQUEST_DELTACNSTAR = new Accession("MS:1002250");
+	private static final Accession SEQUEST_SPSCORE = new Accession("MS:1002248");
+	private static final Accession SEQUEST_SPRANK = new Accession("MS:1002249");
+	private static final Accession COMET_XCORR = new Accession("MS:1002252");
+	private static final Accession COMET_DELTACN = new Accession("MS:1002253");
+	private static final Accession COMET_DELTACNSTAR = new Accession("MS:1002254");
+	private static final Accession COMET_SPSCORE = new Accession("MS:1002255");
+	private static final Accession COMET_SPRANK = new Accession("MS:1002256");
 	private static Score instance;
 
 	public static Score getInstance(ControlVocabularyManager cvManager) {
@@ -169,6 +178,10 @@ public class Score extends ControlVocabularySet {
 		return getInstance(cvManager).getCVTermByAccession(SEQUEST_DELTA_CN);
 	}
 
+	public static ControlVocabularyTerm getCometDeltaCNTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(COMET_DELTACN);
+	}
+
 	public static ControlVocabularyTerm getProLuCIDDeltaCNTerm(ControlVocabularyManager cvManager) {
 		return getInstance(cvManager).getCVTermByAccession(PROLUCID_DELTA_CN);
 	}
@@ -179,5 +192,43 @@ public class Score extends ControlVocabularySet {
 
 	public static ControlVocabularyTerm getProLuCIDXCorrCNTerm(ControlVocabularyManager cvManager) {
 		return getInstance(cvManager).getCVTermByAccession(PROLUCID_XCORR);
+	}
+
+	public static ControlVocabularyTerm getCometXCorrTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(COMET_XCORR);
+	}
+
+	public static ControlVocabularyTerm getSequestDeltaCNStarTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(SEQUEST_DELTACNSTAR);
+
+	}
+
+	public static ControlVocabularyTerm getSequestSPScoreTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(SEQUEST_SPSCORE);
+
+	}
+
+	public static ControlVocabularyTerm getSequestSPRankTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(SEQUEST_SPRANK);
+
+	}
+
+	public static ControlVocabularyTerm getCometDeltaCNStarTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(COMET_DELTACNSTAR);
+
+	}
+
+	public static ControlVocabularyTerm getCometSPScoreTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(COMET_SPSCORE);
+
+	}
+
+	public static ControlVocabularyTerm getCometSPRankTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(COMET_SPRANK);
+
+	}
+
+	public static ControlVocabularyTerm getExpectValueTerm(ControlVocabularyManager cvManager) {
+		return getInstance(cvManager).getCVTermByAccession(EXPECT_VALUE);
 	}
 }
