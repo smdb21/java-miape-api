@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.dtaselect.msi;
+package org.proteored.miapeapi.xml.dtaselect;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -9,7 +9,6 @@ import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.exceptions.WrongXMLFormatException;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
-import org.proteored.miapeapi.xml.dtaselect.MiapeDTASelectFile;
 import org.xml.sax.SAXException;
 
 public class MSIMiapeFactory {

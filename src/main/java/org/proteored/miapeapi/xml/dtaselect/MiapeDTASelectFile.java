@@ -11,7 +11,6 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.spring.SpringHandler;
-import org.proteored.miapeapi.xml.dtaselect.msi.MSIMiapeFactory;
 import org.xml.sax.SAXException;
 
 import edu.scripps.yates.dtaselectparser.DTASelectParser;

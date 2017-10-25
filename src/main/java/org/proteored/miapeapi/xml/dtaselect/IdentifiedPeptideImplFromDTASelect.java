@@ -1,8 +1,7 @@
-package org.proteored.miapeapi.xml.dtaselect.msi;
+package org.proteored.miapeapi.xml.dtaselect;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -21,7 +20,6 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import edu.scripps.yates.dtaselectparser.util.DTASelectModification;
 import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.utilities.masses.MassesUtil;
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
@@ -30,7 +28,6 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	private final List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
 	private final int id;
 	private static Integer seed;
-	public final static Map<String, IdentifiedPeptide> map = new THashMap<String, IdentifiedPeptide>();
 
 	public IdentifiedPeptideImplFromDTASelect(DTASelectPSM dtaSelectPSM, ControlVocabularyManager cvManager) {
 		this.cvManager = cvManager;

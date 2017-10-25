@@ -1,7 +1,9 @@
-package org.proteored.miapeapi.xml.dtaselect.msi;
+package org.proteored.miapeapi.xml.dtaselect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -22,6 +24,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	private Set<ProteinScore> proteinScores;
 	private List<IdentifiedPeptide> peptides;
 	private final ControlVocabularyManager cvManager;
+	public static final Map<String, IdentifiedPeptide> psmMapByPSMId = new HashMap<String, IdentifiedPeptide>();
 
 	public IdentifiedProteinImplFromDTASelectProtein(DTASelectProtein dtaSelectProtein,
 			ControlVocabularyManager cvManager) {
@@ -148,15 +151,14 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 			final List<DTASelectPSM> psMs = dtaSelectProtein.getPSMs();
 			if (psMs != null) {
 				for (DTASelectPSM dtaSelectPSM : psMs) {
-					if (IdentifiedPeptideImplFromDTASelect.map.containsKey(dtaSelectPSM.getPsmIdentifier())) {
-						final IdentifiedPeptide pep = IdentifiedPeptideImplFromDTASelect.map
-								.get(dtaSelectPSM.getPsmIdentifier());
+					if (psmMapByPSMId.containsKey(dtaSelectPSM.getPsmIdentifier())) {
+						final IdentifiedPeptide pep = psmMapByPSMId.get(dtaSelectPSM.getPsmIdentifier());
 						pep.getIdentifiedProteins().add(this);
 						peptides.add(pep);
 					} else {
 						final IdentifiedPeptideImplFromDTASelect pep = new IdentifiedPeptideImplFromDTASelect(
 								dtaSelectPSM, cvManager);
-						IdentifiedPeptideImplFromDTASelect.map.put(dtaSelectPSM.getPsmIdentifier(), pep);
+						psmMapByPSMId.put(dtaSelectPSM.getPsmIdentifier(), pep);
 						pep.getIdentifiedProteins().add(this);
 						peptides.add(pep);
 					}

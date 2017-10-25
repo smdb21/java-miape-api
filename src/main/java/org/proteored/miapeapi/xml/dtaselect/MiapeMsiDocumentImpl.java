@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.dtaselect.msi;
+package org.proteored.miapeapi.xml.dtaselect;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,8 +96,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	public static MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(DTASelectParser parser, String idSetName,
 			ControlVocabularyManager cvManager, User owner, String projectName) throws IOException {
-		// clear map
-		IdentifiedPeptideImplFromDTASelect.map.clear();
+		IdentifiedProteinImplFromDTASelectProtein.psmMapByPSMId.clear();
 
 		final Map<String, DTASelectProtein> dtaSelectProteins = parser.getDTASelectProteins();
 		Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();

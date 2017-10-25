@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.dtaselect.msi;
+package org.proteored.miapeapi.xml.dtaselect;
 
 import java.net.URL;
 import java.util.Set;
