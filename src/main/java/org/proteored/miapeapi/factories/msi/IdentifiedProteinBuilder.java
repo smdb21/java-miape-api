@@ -82,13 +82,15 @@ public class IdentifiedProteinBuilder {
 		return this;
 	}
 
-	public IdentifiedProteinBuilder identifiedPeptides(
-			List<IdentifiedPeptide> value) {
+	public IdentifiedProteinBuilder identifiedPeptides(List<IdentifiedPeptide> value) {
 		identifiedPeptides = value;
 		return this;
 	}
 
 	public IdentifiedProteinBuilder identifiedPeptide(IdentifiedPeptide value) {
+		if (value == null) {
+			return this;
+		}
 		if (identifiedPeptides == null)
 			identifiedPeptides = new ArrayList<IdentifiedPeptide>();
 		identifiedPeptides.add(value);

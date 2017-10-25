@@ -1,5 +1,6 @@
 package org.proteored.miapeapi.factories.msi;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +43,14 @@ public class IdentifiedProteinSetBuilder {
 
 	public IdentifiedProteinSet build() {
 		return new IdentifiedProteinSetImpl(this);
+	}
+
+	public IdentifiedProteinSetBuilder identifiedProtein(IdentifiedProtein protein) {
+		if (identifiedProteins == null) {
+			identifiedProteins = new HashMap<String, IdentifiedProtein>();
+		}
+		identifiedProteins.put(protein.getAccession(), protein);
+		return this;
 	}
 
 }

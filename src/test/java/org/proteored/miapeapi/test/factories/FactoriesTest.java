@@ -37,7 +37,7 @@ import org.proteored.miapeapi.xml.ms.MiapeMSXmlFactory;
 import org.proteored.miapeapi.xml.mzidentml_1_1.MiapeMzIdentMLFile;
 import org.proteored.miapeapi.xml.mzml.MiapeMzMLFile;
 import org.proteored.miapeapi.xml.pride.MiapeFullPrideXMLFile;
-import org.proteored.miapeapi.xml.xtandem.msi.MiapeXTandemFile;
+import org.proteored.miapeapi.xml.xtandem.MiapeXTandemFile;
 
 public class FactoriesTest {
 

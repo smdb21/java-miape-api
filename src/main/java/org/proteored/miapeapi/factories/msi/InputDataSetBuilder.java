@@ -1,5 +1,6 @@
 package org.proteored.miapeapi.factories.msi;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.InputData;
@@ -27,6 +28,17 @@ public class InputDataSetBuilder {
 
 	public InputDataSet build() {
 		return new InputDataSetImpl(this);
+	}
+
+	public InputDataSetBuilder inputData(InputData inputData) {
+		if (inputData == null) {
+			return this;
+		}
+		if (this.inputDatas == null) {
+			this.inputDatas = new HashSet<InputData>();
+		}
+		this.inputDatas.add(inputData);
+		return this;
 	}
 
 }
