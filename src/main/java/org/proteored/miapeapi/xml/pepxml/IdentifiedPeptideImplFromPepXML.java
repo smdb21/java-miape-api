@@ -150,31 +150,31 @@ public class IdentifiedPeptideImplFromPepXML implements IdentifiedPeptide {
 			for (NameValueType nameValue : searchHit.getSearchScore()) {
 				String scoreName = nameValue.getName();
 				if ("xcorr".equalsIgnoreCase(scoreName)) {
-					if (searchEngine.equalsIgnoreCase("comet")) {
+					if ("comet".equalsIgnoreCase(searchEngine)) {
 						scoreName = Score.getCometXCorrTerm(cvManager).getPreferredName();
 					} else {
 						scoreName = Score.getSequestXCorrTerm(cvManager).getPreferredName();
 					}
 				} else if ("deltacn".equalsIgnoreCase(scoreName)) {
-					if (searchEngine.equalsIgnoreCase("comet")) {
+					if ("comet".equalsIgnoreCase(searchEngine)) {
 						scoreName = Score.getCometDeltaCNTerm(cvManager).getPreferredName();
 					} else {
 						scoreName = Score.getSequestDeltaCNTerm(cvManager).getPreferredName();
 					}
 				} else if ("deltacnstar".equals(scoreName)) {
-					if (searchEngine.equalsIgnoreCase("comet")) {
+					if ("comet".equalsIgnoreCase(searchEngine)) {
 						scoreName = Score.getCometDeltaCNStarTerm(cvManager).getPreferredName();
 					} else {
 						scoreName = Score.getSequestDeltaCNStarTerm(cvManager).getPreferredName();
 					}
 				} else if ("spscore".equals(scoreName)) {
-					if (searchEngine.equalsIgnoreCase("comet")) {
+					if ("comet".equalsIgnoreCase(searchEngine)) {
 						scoreName = Score.getCometSPScoreTerm(cvManager).getPreferredName();
 					} else {
 						scoreName = Score.getSequestSPScoreTerm(cvManager).getPreferredName();
 					}
 				} else if ("sprank".equals(scoreName)) {
-					if (searchEngine.equalsIgnoreCase("comet")) {
+					if ("comet".equalsIgnoreCase(searchEngine)) {
 						scoreName = Score.getCometSPRankTerm(cvManager).getPreferredName();
 					} else {
 						scoreName = Score.getSequestSPRankTerm(cvManager).getPreferredName();
