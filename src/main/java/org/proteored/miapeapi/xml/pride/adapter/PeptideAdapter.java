@@ -16,6 +16,7 @@ import org.proteored.miapeapi.cv.UNIMODOntology;
 import org.proteored.miapeapi.cv.ms.ChargeState;
 import org.proteored.miapeapi.cv.ms.MOverZ;
 import org.proteored.miapeapi.cv.ms.RetentionTime;
+import org.proteored.miapeapi.cv.ms.SpectrumAttribute;
 import org.proteored.miapeapi.cv.msi.PeptideModificationName;
 import org.proteored.miapeapi.cv.msi.Score;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
@@ -99,8 +100,21 @@ public class PeptideAdapter implements Adapter<Peptide> {
 					spectrumReference = BigInteger.valueOf(Long.valueOf(identifiedPeptide.getSpectrumRef()));
 					xmlPeptide.setSpectrumReference(spectrumReference);
 				} catch (NumberFormatException e) {
-					if (includeSpectra)
+					if (includeSpectra) {
 						throw e;
+					}
+					// if no spectrum reference has included, add an Additional
+					// cvParam with the spectrum title
+					if (xmlPeptide.getAdditional() == null) {
+						xmlPeptide.setAdditional(factory.createParamType());
+					}
+					ControlVocabularyTerm spectrumTitleTerm = SpectrumAttribute.getInstance(cvManager)
+							.getCVTermByAccession(SpectrumAttribute.SPECTRUM_TITLE_ACC);
+					if (spectrumTitleTerm != null) {
+						prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(),
+								spectrumTitleTerm.getTermAccession(), spectrumTitleTerm.getPreferredName(),
+								identifiedPeptide.getSpectrumRef(), spectrumTitleTerm.getCVRef());
+					}
 				}
 			}
 		}
@@ -110,10 +124,22 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			throw new IllegalMiapeArgumentException("Referenced Spectrum not found");
 
 		final String charge = identifiedPeptide.getCharge();
-		if (charge != null && xmlPeptide.getSpectrumReference() != null) {
-			recalibrateChargeAndPrecursorMass(xmlPeptide, charge);
-
+		if (charge != null) {
+			if (xmlPeptide.getSpectrumReference() != null) {
+				recalibrateChargeAndPrecursorMass(xmlPeptide, charge);
+			}
+			// set the charge
+			if (xmlPeptide.getAdditional() == null) {
+				xmlPeptide.setAdditional(factory.createParamType());
+			}
+			ControlVocabularyTerm chargeTerm = ChargeState.getInstance(cvManager)
+					.getCVTermByAccession(ChargeState.CHARGE_STATE_ACCESSION);
+			if (chargeTerm != null) {
+				prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(), chargeTerm.getTermAccession(),
+						chargeTerm.getPreferredName(), charge, chargeTerm.getCVRef());
+			}
 		}
+
 		// try {
 		// final String spectrumRef = identifiedPeptide.getSpectrumRef();
 		// final long longValue = Long.valueOf(spectrumRef) + offset;
