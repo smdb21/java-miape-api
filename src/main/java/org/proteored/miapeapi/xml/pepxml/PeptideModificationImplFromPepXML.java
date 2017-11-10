@@ -96,7 +96,14 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 
 	@Override
 	public String getResidues() {
-		return String.valueOf(peptideSequence.charAt(getPosition() - 1));
+
+		if (position == 0) {
+			return "NTerm";
+		} else if (position == peptideSequence.length() + 1) {
+			return "CTerm";
+		} else {
+			return String.valueOf(peptideSequence.charAt(getPosition() - 1));
+		}
 	}
 
 	@Override
