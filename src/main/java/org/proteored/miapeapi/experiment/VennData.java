@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.proteored.miapeapi.experiment.model.sort.ProteinComparatorKey;
-
 import edu.scripps.yates.utilities.dates.DatesUtil;
 import gnu.trove.set.hash.THashSet;
 
@@ -80,11 +78,11 @@ public abstract class VennData {
 
 	private final void processCollections() {
 		if (!collectionProcessed) {
-			log.info("Processing collection 1 ");
+			log.debug("Processing collection 1 ");
 			processCollections(col1, keys1, hash1);
-			log.info("Processing collection 2");
+			log.debug("Processing collection 2");
 			processCollections(col2, keys2, hash2);
-			log.info("Processing collection 3");
+			log.debug("Processing collection 3");
 			processCollections(col3, keys3, hash3);
 			StringBuilder logmessage = new StringBuilder();
 			if (keys1 != null) {
@@ -102,7 +100,7 @@ public abstract class VennData {
 			} else {
 				logmessage.append(", keys3=0");
 			}
-			log.info(logmessage);
+			log.debug(logmessage);
 		}
 		this.collectionProcessed = true;
 	}
@@ -129,14 +127,14 @@ public abstract class VennData {
 				}
 			}
 		if (keys != null && referenceCollection != null) {
-			log.info("data collection with " + referenceCollection.size() + " now has " + keys.size()
+			log.debug("data collection with " + referenceCollection.size() + " now has " + keys.size()
 					+ " keys in a hash of " + hash.size() + " size. ");
 			if (keys.size() != referenceCollection.size()) {
-				log.info(keys.size() + " " + referenceCollection.size());
+				log.debug(keys.size() + " " + referenceCollection.size());
 			}
 		}
 
-		log.info(DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1)
+		log.debug(DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1)
 				+ " for processing collection");
 	}
 
@@ -299,28 +297,12 @@ public abstract class VennData {
 			ret.addAll(hashToIsolate);
 			return ret;
 		}
-		log.info("Unique to isolate size = " + hashToIsolate.size());
+		log.debug("Unique to isolate size = " + hashToIsolate.size());
 		if (hashToIsolate != null) {
 			Iterator<Object> toIsolateIterator = hashToIsolate.iterator();
 
 			while (toIsolateIterator.hasNext()) {
 				Object item = toIsolateIterator.next();
-				if (item instanceof ProteinComparatorKey) {
-					if (((ProteinComparatorKey) item).getAccessionString().contains("P68363")) {
-						log.info(item);
-						for (Object obj2 : hash2) {
-							ProteinComparatorKey prot2 = (ProteinComparatorKey) obj2;
-							if (item.equals(obj2)) {
-								log.info(obj2);
-							} else {
-								if (prot2.getAccessionString().contains("P68363")) {
-									log.info(obj2);
-								}
-							}
-
-						}
-					}
-				}
 				if (hash2 != null && hash2.contains(item)) {
 					continue;
 				} else if (hash3 != null && hash3.contains(item)) {
@@ -330,7 +312,7 @@ public abstract class VennData {
 
 			}
 		}
-		log.info(
+		log.debug(
 				DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1) + " getting unique objects");
 		return ret;
 	}
