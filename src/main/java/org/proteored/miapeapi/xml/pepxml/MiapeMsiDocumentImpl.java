@@ -51,6 +51,7 @@ import umich.ms.fileio.exceptions.FileParsingException;
 import umich.ms.fileio.filetypes.pepxml.PepXmlParser;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.AminoacidModification;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.AnalysisTimestamp;
+import umich.ms.fileio.filetypes.pepxml.jaxb.standard.EngineType;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.MsmsPipelineAnalysis;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.MsmsRunSummary;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.NameValueType;
@@ -307,11 +308,15 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
 		String missedcleavages = null;
 		if (searchEngine == null) {
-			searchEngine = searchSummary.getSearchEngine().value();
-			if ("X! Tandem".equals(searchEngine)) {
-				// this is to be able to be recognized by a CV term in the MIAPE
-				// XML
-				searchEngine = "X!Tandem";
+			final EngineType searchEnginePepXML = searchSummary.getSearchEngine();
+			if (searchEnginePepXML != null) {
+				searchEngine = searchEnginePepXML.value();
+				if ("X! Tandem".equals(searchEngine)) {
+					// this is to be able to be recognized by a CV term in the
+					// MIAPE
+					// XML
+					searchEngine = "X!Tandem";
+				}
 			}
 			search_engine_version = searchSummary.getSearchEngineVersion();
 
