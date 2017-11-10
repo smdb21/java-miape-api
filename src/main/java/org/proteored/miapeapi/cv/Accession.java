@@ -132,4 +132,8 @@ public class Accession {
 		}
 		return null;
 	}
+
+	public String getAccession() {
+		return this.accession;
+	}
 }
