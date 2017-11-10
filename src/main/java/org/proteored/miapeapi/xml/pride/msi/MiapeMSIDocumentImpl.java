@@ -1,6 +1,7 @@
 package org.proteored.miapeapi.xml.pride.msi;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -274,18 +275,23 @@ public class MiapeMSIDocumentImpl extends AbstractDocumentFromPride implements M
 		// retrieve the
 		// peptides, we can iterate the proteins to get the peptides from each
 		// protein
-		List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
+
+		// because they can be repeated, lets store them in a set first
+
+		Set<IdentifiedPeptide> set = new HashSet<IdentifiedPeptide>();
 		final Set<IdentifiedProteinSet> identifiedProteinSets = getIdentifiedProteinSets();
 		if (identifiedProteinSets != null) {
 			for (IdentifiedProteinSet proteinSet : identifiedProteinSets) {
 				if (proteinSet.getIdentifiedProteins() != null) {
 					for (String proteinAcc : proteinSet.getIdentifiedProteins().keySet()) {
 						IdentifiedProtein protein = proteinSet.getIdentifiedProteins().get(proteinAcc);
-						ret.addAll(protein.getIdentifiedPeptides());
+						set.addAll(protein.getIdentifiedPeptides());
 					}
 				}
 			}
 		}
+		List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
+		ret.addAll(set);
 		return ret;
 	}
 

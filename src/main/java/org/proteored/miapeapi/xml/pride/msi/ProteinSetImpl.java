@@ -22,6 +22,7 @@ public class ProteinSetImpl implements IdentifiedProteinSet {
 	private final InputParameterImpl inputParameter;
 	private final Set<InputDataSet> inputDataSets;
 	private final ControlVocabularyManager cvManager;
+	private THashMap<String, IdentifiedProtein> identifiedProteins;
 
 	public ProteinSetImpl(ExperimentType experiment, Set<InputDataSet> inputDataSets, InputParameterImpl inputParameter,
 			ControlVocabularyManager cvManager) {
@@ -40,23 +41,30 @@ public class ProteinSetImpl implements IdentifiedProteinSet {
 
 	@Override
 	public Map<String, IdentifiedProtein> getIdentifiedProteins() {
-		Map<String, IdentifiedProtein> proteinList = new THashMap<String, IdentifiedProtein>();
-		if (gelFreeIdentificationList != null) {
-			for (GelFreeIdentificationType gelFreeIdentifitation : gelFreeIdentificationList) {
-				final IdentifedProteinImpl proteinImpl = new IdentifedProteinImpl(gelFreeIdentifitation, inputDataSets,
-						MiapeXmlUtil.ProteinCounter.increaseCounter(), cvManager);
-				proteinList.put(proteinImpl.getAccession(), proteinImpl);
+		if (identifiedProteins == null || identifiedProteins.isEmpty()) {
+			identifiedProteins = new THashMap<String, IdentifiedProtein>();
+			if (gelFreeIdentificationList != null) {
+				for (GelFreeIdentificationType gelFreeIdentifitation : gelFreeIdentificationList) {
+					int proteinID = MiapeXmlUtil.ProteinCounter.increaseCounter();
+					final IdentifedProteinImpl proteinImpl = new IdentifedProteinImpl(gelFreeIdentifitation,
+							inputDataSets, proteinID, cvManager);
+					if (identifiedProteins.containsKey(proteinImpl.getAccession())) {
+						System.out.println("sadfasdf");
+					}
+					identifiedProteins.put(proteinImpl.getAccession(), proteinImpl);
+				}
+			}
+			if (twoDimensionalIdentificationList != null) {
+				for (TwoDimensionalIdentificationType twoDimensionalIdentifitation : twoDimensionalIdentificationList) {
+					int proteinID = MiapeXmlUtil.ProteinCounter.increaseCounter();
+					final IdentifedProteinImpl proteinImpl = new IdentifedProteinImpl(twoDimensionalIdentifitation,
+							inputDataSets, proteinID, cvManager);
+					identifiedProteins.put(proteinImpl.getAccession(), proteinImpl);
+				}
 			}
 		}
-		if (twoDimensionalIdentificationList != null) {
-			for (TwoDimensionalIdentificationType twoDimensionalIdentifitation : twoDimensionalIdentificationList) {
-				final IdentifedProteinImpl proteinImpl = new IdentifedProteinImpl(twoDimensionalIdentifitation,
-						inputDataSets, MiapeXmlUtil.ProteinCounter.increaseCounter(), cvManager);
-				proteinList.put(proteinImpl.getAccession(), proteinImpl);
-			}
-		}
-		if (!proteinList.isEmpty())
-			return proteinList;
+		if (!identifiedProteins.isEmpty())
+			return identifiedProteins;
 		return null;
 	}
 
