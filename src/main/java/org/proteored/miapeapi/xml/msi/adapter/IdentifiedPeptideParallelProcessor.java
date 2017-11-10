@@ -42,6 +42,7 @@ public class IdentifiedPeptideParallelProcessor extends Thread {
 				final IdentifiedPeptide peptide = iterator.next();
 				xmlPeptides.add(new IdentifiedPeptideAdapter(peptide, factory, cvFactory).adapt());
 			} catch (Exception e) {
+				e.printStackTrace();
 				log.warn(e);
 				iterator.register(e);
 			}
