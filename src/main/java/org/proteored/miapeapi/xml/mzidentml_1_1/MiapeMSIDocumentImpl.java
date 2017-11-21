@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +129,10 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private int sourceFilesCount;
 
 	private final Map<ProteinDetectionHypothesis, DBSequence> pdhDBSeqMap = new THashMap<ProteinDetectionHypothesis, DBSequence>();
+
+	private Map<String, SpectrumIdentificationList> spectrumIdentificationListMap = new HashMap<String, SpectrumIdentificationList>();
+
+	private Iterator<SpectrumIdentificationList> silIterator;
 
 	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, ControlVocabularyManager cvManager,
 			String mzIdentMLFileName, String projectName, boolean processInParallel) throws JAXBException {
@@ -454,10 +459,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private SpectrumIdentificationList getSpectrumIdentificationList(String spectrumIdentificationListId) {
-		Iterator<SpectrumIdentificationList> iterator = mzIdentMLUnmarshaller
-				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentificationList);
-		while (iterator.hasNext()) {
-			SpectrumIdentificationList sil = iterator.next();
+		if (spectrumIdentificationListMap.containsKey(spectrumIdentificationListId)) {
+			return spectrumIdentificationListMap.get(spectrumIdentificationListId);
+		}
+		if (silIterator == null) {
+			silIterator = mzIdentMLUnmarshaller
+					.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentificationList);
+		}
+		while (silIterator.hasNext()) {
+			log.info("Reading next SpectrumIdentificationList");
+			SpectrumIdentificationList sil = silIterator.next();
+			spectrumIdentificationListMap.put(sil.getId(), sil);
 			if (sil.getId().equals(spectrumIdentificationListId)) {
 				return sil;
 			}
@@ -1142,7 +1154,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		};
 		proteinDetectionHypotesisWithPeptideEvidence = reducibleProteinHash.reduce(pdhReduction);
 
-		log.info("Finished keeping relationships between ProteinDetectionHypothesis and peptideEvidences in "
+		log.info("Finished keeping relationships between ProteinDetectionHypothesis and "
+				+ proteinDetectionHypotesisWithPeptideEvidence.size() + " peptideEvidences in "
 				+ (System.currentTimeMillis() - t1) + " milliseconds");
 
 	}
