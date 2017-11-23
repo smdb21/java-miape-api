@@ -263,11 +263,12 @@ public interface IdentificationSet<T> {
 
 	/**
 	 *
+	 * @param cleavageAminoacids
 	 * @param modifs
 	 * @return hashmap <number of missedclavage sites in the peptide, number of
 	 *         peptides with that number of missedcleavages>
 	 */
-	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution();
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution(String cleavageAminoacids);
 
 	/**
 	 * Gets the {@link DataManager} of this {@link IdentificationSet}

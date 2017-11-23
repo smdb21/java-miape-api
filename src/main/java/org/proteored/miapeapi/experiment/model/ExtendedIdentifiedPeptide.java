@@ -26,6 +26,7 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.Atom;
 
+import edu.scripps.yates.utilities.strings.StringUtils;
 import gnu.trove.map.hash.THashMap;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
@@ -45,7 +46,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	private Float peptideLocalFDR;
 	private Float psmQValue;
 	private Float peptideQValue;
-	private int numMissedClieavages;
+	private int numMissedCleavages;
 
 	private final Integer miapeMSReference;
 	private final MiapeMSIDocument miapeMSI;
@@ -104,7 +105,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		miapeMSI = p.miapeMSI;
 		miapeMSReference = p.miapeMSReference;
 		modificationString = p.modificationString;
-		numMissedClieavages = p.numMissedClieavages;
+		numMissedCleavages = p.numMissedCleavages;
 		peptide = p.peptide;
 		proteins = p.proteins;
 		relation = p.relation;
@@ -177,7 +178,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		// log.info("The sequence " + seq + " has " + numMiss +
 		// " misscleavages");
 
-		numMissedClieavages = numMiss;
+		numMissedCleavages = numMiss;
 
 		// if (this.peptide.getIdentifiedProteins() != null) {
 		// TIntHashSet proteinIDs = new TIntHashSet();
@@ -518,7 +519,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	}
 
 	public int getNumMissedcleavages() {
-		return numMissedClieavages;
+		return numMissedCleavages;
 	}
 
 	public Float getBestProteinScore() {
@@ -687,6 +688,16 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	public void setPeptideQValue(Float peptideQValue) {
 		this.peptideQValue = peptideQValue;
+	}
+
+	public int getNumMissedcleavages(String cleavageAminoacids) {
+		int ret = 0;
+		final String sequence = getSequence().substring(0, getSequence().length() - 1);
+		for (int i = 0; i < cleavageAminoacids.length(); i++) {
+			final List<Integer> allPositionsOf = StringUtils.allPositionsOf(sequence, cleavageAminoacids.charAt(i));
+			ret += allPositionsOf.size();
+		}
+		return ret;
 	}
 
 }

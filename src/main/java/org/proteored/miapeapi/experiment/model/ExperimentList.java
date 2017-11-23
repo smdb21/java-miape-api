@@ -419,8 +419,8 @@ public class ExperimentList implements IdentificationSet<Experiment> {
 	}
 
 	@Override
-	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
-		return dataManager.getMissedCleavagesOccurrenceDistribution();
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution(String cleavageAminoacids) {
+		return dataManager.getMissedCleavagesOccurrenceDistribution(cleavageAminoacids);
 	}
 
 	@Override

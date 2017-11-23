@@ -368,8 +368,8 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	@Override
-	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
-		return dataManager.getMissedCleavagesOccurrenceDistribution();
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution(String cleavageAminoacids) {
+		return dataManager.getMissedCleavagesOccurrenceDistribution(cleavageAminoacids);
 	}
 
 	@Override
