@@ -1329,6 +1329,9 @@ public abstract class DataManager {
 			final List<ExtendedIdentifiedPeptide> itemList = peptideOccurrence.getItemList();
 			for (ExtendedIdentifiedPeptide peptide : itemList) {
 				String sequenceChargeKey = peptide.getSequence();
+				if (distinguishModPep) {
+					sequenceChargeKey = peptide.getModificationString();
+				}
 				if (peptide.getCharge() != null) {
 					sequenceChargeKey += "_" + peptide.getCharge();
 				}
@@ -1863,17 +1866,16 @@ public abstract class DataManager {
 		return count;
 	}
 
-	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution() {
+	public TIntIntHashMap getMissedCleavagesOccurrenceDistribution(String cleavageAminoacids) {
 
 		TIntIntHashMap ret = new TIntIntHashMap();
 		final List<ExtendedIdentifiedPeptide> peptides = getIdentifiedPeptides();
 		for (ExtendedIdentifiedPeptide peptide : peptides) {
-			int missedCleavages = peptide.getNumMissedcleavages();
+			int missedCleavages = peptide.getNumMissedcleavages(cleavageAminoacids);
 
 			if (ret.containsKey(missedCleavages)) {
 				Integer integer = ret.get(missedCleavages);
 				integer++;
-				ret.remove(missedCleavages);
 				ret.put(missedCleavages, integer);
 			} else {
 				ret.put(missedCleavages, new Integer(1));
