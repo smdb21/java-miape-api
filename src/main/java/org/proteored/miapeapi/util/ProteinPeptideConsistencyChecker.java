@@ -29,7 +29,7 @@ public class ProteinPeptideConsistencyChecker {
 						throw new MiapeDataInconsistencyException("Error, proteinSet is empty or null");
 					}
 					ProgressCounter counter = new ProgressCounter(proteinMap.size(),
-							ProgressPrintingType.PERCENTAGE_STEPS, 1);
+							ProgressPrintingType.PERCENTAGE_STEPS, 0);
 					for (String acc : proteinMap.keySet()) {
 						counter.increment();
 						final String printIfNecessary = counter.printIfNecessary();
@@ -47,7 +47,7 @@ public class ProteinPeptideConsistencyChecker {
 					}
 				}
 			}
-			ProgressCounter counter = new ProgressCounter(peptides.size(), ProgressPrintingType.PERCENTAGE_STEPS, 1);
+			ProgressCounter counter = new ProgressCounter(peptides.size(), ProgressPrintingType.PERCENTAGE_STEPS, 0);
 			for (IdentifiedPeptide peptide : peptides) {
 				counter.increment();
 				final String printIfNecessary = counter.printIfNecessary();
