@@ -269,9 +269,6 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						runners.add(runner);
 						runner.start();
 					}
-					if (iterator.getAllExceptions().length > 0) {
-						throw new IllegalArgumentException(iterator.getAllExceptions()[0].getException());
-					}
 					// Main thread waits for worker threads to complete
 					for (int k = 0; k < threadCount; k++) {
 						try {
@@ -280,7 +277,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 							e.printStackTrace();
 						}
 					}
-
+					if (iterator.getAllExceptions().length > 0) {
+						throw new IllegalArgumentException(iterator.getAllExceptions()[0].getException());
+					}
 					Reduction<Map<String, IdentifiedPeptide>> peptideReduction = new Reduction<Map<String, IdentifiedPeptide>>() {
 						@Override
 						public Map<String, IdentifiedPeptide> reduce(Map<String, IdentifiedPeptide> first,
