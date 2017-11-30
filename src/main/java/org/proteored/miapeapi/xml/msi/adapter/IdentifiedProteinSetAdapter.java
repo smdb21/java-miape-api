@@ -52,10 +52,12 @@ public class IdentifiedProteinSetAdapter implements Adapter<MSIIdentifiedProtein
 			proteinSetXML
 					.setParametersRef(MiapeXmlUtil.IdentifierPrefixes.PARAMETERS.getPrefix() + inputParameter.getId());
 		}
-
 		Map<String, IdentifiedProtein> identifiedProteins = proteinSet.getIdentifiedProteins();
 		if (identifiedProteins != null) {
+
 			int total = identifiedProteins.size();
+			log.info("Adapting protein set with " + total + " proteins");
+
 			int i = 0;
 			for (String proteinAcc : identifiedProteins.keySet()) {
 				i++;
