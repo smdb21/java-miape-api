@@ -58,7 +58,7 @@ public class MSIMiapeFactory {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info(e.getMessage());
+			log.error(e.getMessage());
 			throw new WrongXMLFormatException(e);
 		}
 
