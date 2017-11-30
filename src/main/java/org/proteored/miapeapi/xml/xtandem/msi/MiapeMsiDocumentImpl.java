@@ -104,6 +104,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private void processXTandemFile(XTandemFile xfile) {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		XTandemParser parser = null;
 		PerformParams performParameters = null;
 		InputParams xmlInputParameters = null;

@@ -36,6 +36,7 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.ms.MiapeMSXmlFactory;
 import org.proteored.miapeapi.xml.mzml.util.MzMLControlVocabularyXmlFactory;
+import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -164,6 +165,8 @@ public class MiapeMSDocumentImpl implements MiapeMSDocument {
 	}
 
 	private void processMzML() {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		log.info("processing elements");
 		if (mzMLUnmarshaller != null)
 			parseMzMLElementsByUnmarshaller();

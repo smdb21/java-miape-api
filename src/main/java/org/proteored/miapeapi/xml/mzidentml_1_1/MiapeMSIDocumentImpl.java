@@ -183,6 +183,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 *
 	 */
 	private void processMzIdentMLInParallel() throws JAXBException {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 
 		String spectrumIdentificationSoftwareID = "";
@@ -529,7 +531,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 *
 	 */
 	private void processMzIdentML() {
-
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		String spectrumIdentificationSoftwareID = "";
 		log.info("unmarshalling sourceFiles");
 		sourceFiles = mzIdentMLUnmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SourceFile);

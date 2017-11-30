@@ -45,6 +45,7 @@ import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
+import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import gnu.trove.map.hash.THashMap;
 import umich.ms.fileio.exceptions.FileParsingException;
@@ -125,6 +126,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private MiapeMSIDocumentBuilder processPepXMLFile(MsmsPipelineAnalysis pipelineAnalysis)
 			throws FileParsingException {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		if (pipelineAnalysis == null
 				|| ((pipelineAnalysis.getSummaryXml() == null || pipelineAnalysis.getSummaryXml().isEmpty())
 						&& pipelineAnalysis.getAnalysisSummary() == null
@@ -138,7 +141,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	}
 
-	public MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(MsmsPipelineAnalysis pipelineAnalysis, String idSetName,
+	private MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(MsmsPipelineAnalysis pipelineAnalysis, String idSetName,
 			ControlVocabularyManager cvManager, PersistenceManager dbManager, User owner, String projectName)
 			throws FileParsingException {
 

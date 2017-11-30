@@ -63,8 +63,9 @@ public class MiapeMSIDocumentImpl extends AbstractDocumentFromPride implements M
 	}
 
 	private void processPRIDEFile(ExperimentType experiment) {
-		// clear static caches and counters:
+		// clear static caches
 		IdentifedProteinImpl.peptidesBySpectrumTitle.clearCache();
+		// clear static identifier counters
 		MiapeXmlUtil.clearIdentifierCounters();
 
 		// InputDataSet

@@ -161,6 +161,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 * @param mzIdentMLUnmarshaller
 	 */
 	private void processMzIdentMLInParallel() {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
+
 		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 
 		String spectrumIdentificationSoftwareID = "";
@@ -383,6 +386,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 * @param mzIdentMLUnmarshaller
 	 */
 	private void processMzIdentML() {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
 		String spectrumIdentificationSoftwareID = "";
 		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 		// Main loop over SpectrumIdentifications elements
