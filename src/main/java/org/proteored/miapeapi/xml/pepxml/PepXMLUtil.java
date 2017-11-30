@@ -22,7 +22,7 @@ public class PepXMLUtil {
 	}
 
 	public static String getSearchEngineFromSummaryXml(String summaryXml) {
-		if (summaryXml != null) {
+		if (summaryXml != null && !"".equals(summaryXml)) {
 			final String str = "search_engine=\"";
 			final int searchEngineIndex = summaryXml.indexOf(str);
 			if (searchEngineIndex > -1) {
