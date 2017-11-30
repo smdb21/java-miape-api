@@ -32,16 +32,16 @@ public class IdentifedProteinImpl implements IdentifiedProtein {
 	private final Set<InputDataSet> inputDataSets;
 	private final ControlVocabularyManager cvManager;
 	private ArrayList<IdentifiedPeptide> peptides;
-	private static final PeptideCacheBySpectrumTitle peptidesBySpectrumTitle = new PeptideCacheBySpectrumTitle();
+	public static final PeptideCacheBySpectrumTitle peptidesBySpectrumTitle = new PeptideCacheBySpectrumTitle();
 
 	public IdentifedProteinImpl(IdentificationType protein, Set<InputDataSet> inputDataSets, Integer identifier,
 			ControlVocabularyManager cvManager) {
-		System.out.println("Creating a protein with id: " + identifier);
 		this.protein = protein;
 		this.identifier = identifier;
 		this.inputDataSets = inputDataSets;
 		additional = protein.getAdditional();
 		this.cvManager = cvManager;
+
 	}
 
 	@Override
