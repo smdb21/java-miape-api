@@ -40,12 +40,11 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 
 	private final ControlVocabularyManager cvManager;
 
-	public ProtocolAdapterFromExperiment(ObjectFactory factory,
-			ControlVocabularyManager cvManager, Experiment experiment) {
+	public ProtocolAdapterFromExperiment(ObjectFactory factory, ControlVocabularyManager cvManager,
+			Experiment experiment) {
 		this.factory = factory;
 		this.experiment = experiment;
-		this.prideCvUtil = new PrideControlVocabularyXmlFactory(factory,
-				cvManager);
+		this.prideCvUtil = new PrideControlVocabularyXmlFactory(factory, cvManager);
 		this.cvManager = cvManager;
 		// unify MIAPE MSs
 		final List<MiapeMSDocument> miapeMSs = this.experiment.getMiapeMSs();
@@ -55,13 +54,11 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 	@Override
 	public Protocol adapt() {
 		Protocol protocol = factory.createExperimentTypeProtocol();
-		ProtocolSteps protocolSteps = factory
-				.createExperimentTypeProtocolProtocolSteps();
+		ProtocolSteps protocolSteps = factory.createExperimentTypeProtocolProtocolSteps();
 
 		// SampleProcessingSteps from additional informations
 		if (this.mergedMIAPEMS != null) {
-			List<MSAdditionalInformation> addInfos = this.mergedMIAPEMS
-					.getAdditionalInformations();
+			List<MSAdditionalInformation> addInfos = this.mergedMIAPEMS.getAdditionalInformations();
 			for (MSAdditionalInformation msAdditionalInformation : addInfos) {
 				String value = msAdditionalInformation.getValue();
 				String name = msAdditionalInformation.getName();
@@ -73,17 +70,15 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 					ParamType cvParamList = factory.createParamType();
 					cvParamList.getCvParamOrUserParam().add(cvParam);
 					protocolSteps.getStepDescription().add(cvParamList);
-					log.info("Added '" + cvParam.getName() + "'='"
-							+ cvParam.getValue() + "' '"
-							+ cvParam.getAccession() + "' as a protocol step");
+					log.info("Added '" + cvParam.getName() + "'='" + cvParam.getValue() + "' '" + cvParam.getAccession()
+							+ "' as a protocol step");
 				}
 			}
 
 		}
 
 		if (this.experiment != null) {
-			if (this.experiment.getReplicates() != null
-					&& this.experiment.getReplicates().size() > 1) {
+			if (this.experiment.getReplicates() != null && this.experiment.getReplicates().size() > 1) {
 				String replicateNames = "";
 				for (Replicate replicate : experiment.getReplicates()) {
 					if (!"".equals(replicateNames))
@@ -92,20 +87,15 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 				}
 				// Data processing integration
 				ParamType paramList = factory.createParamType();
-				prideCvUtil
-						.addCvParamOrUserParamToParamType(
-								paramList,
-								"data processing",
-								"This dataset is resulting from the data integration of "
-										+ experiment.getReplicates().size()
-										+ " different datasets, using the ProteoRed MIAPE Extractor and the PAnalyzer algorithm",
-								DataTransformation.getInstance(cvManager));
+				prideCvUtil.addCvParamOrUserParamToParamType(paramList, "data processing",
+						"This dataset is resulting from the data integration of " + experiment.getReplicates().size()
+								+ " different datasets, using the ProteoRed MIAPE Extractor and the PAnalyzer algorithm",
+						DataTransformation.getInstance(cvManager));
 				protocolSteps.getStepDescription().add(paramList);
 
 			} else if (this.experiment.getReplicates().size() == 1) {
 				ParamType userParamList = factory.createParamType();
-				prideCvUtil.addUserParamToParamType(userParamList,
-						"Experiment composed by one identification set",
+				prideCvUtil.addUserParamToParamType(userParamList, "Experiment composed by one identification set",
 						this.experiment.getReplicates().get(0).getName());
 				protocolSteps.getStepDescription().add(userParamList);
 			}
@@ -123,8 +113,7 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 					sb.append(filter.toString());
 				}
 				ParamType paramList = factory.createParamType();
-				prideCvUtil.addCvParamOrUserParamToParamType(paramList,
-						"data filtering",
+				prideCvUtil.addCvParamOrUserParamToParamType(paramList, "data filtering",
 						"The following filters were applied: " + sb.toString(),
 						DataTransformation.getInstance(cvManager));
 				protocolSteps.getStepDescription().add(paramList);
@@ -132,7 +121,7 @@ public class ProtocolAdapterFromExperiment implements Adapter<Protocol> {
 		}
 		if (protocolSteps.getStepDescription().size() > 0) {
 			protocol.setProtocolSteps(protocolSteps);
-			protocol.setProtocolName("PRIDE XML created using the ProteoRed MIAPE Extractor");
+			protocol.setProtocolName("PRIDE XML created using the Java MIAPE API");
 		} else {
 			protocol.setProtocolName("no protocols captured");
 		}
