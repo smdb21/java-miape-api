@@ -95,7 +95,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		this.dbManager = null;
 		log.info("Starting parsing of pepXML file: " + pepXMLFile.getAbsolutePath());
 		MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(pepXMLFile.getAbsolutePath()));
-		log.info("PepXML loaded. Now processing it...");
+
 		searchEngine = PepXMLUtil.getSearchEngineFromSummaryXml(pipelineAnalysis.getSummaryXml());
 
 		// to process the file
@@ -118,12 +118,21 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		this.projectName = projectName;
 		this.cvManager = cvManager;
 		final MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(pepXMLFile.getAbsolutePath()));
+
 		// to process the file
 		miapeMSI = processPepXMLFile(pipelineAnalysis).build();
 	}
 
 	private MiapeMSIDocumentBuilder processPepXMLFile(MsmsPipelineAnalysis pipelineAnalysis)
 			throws FileParsingException {
+		if (pipelineAnalysis == null
+				|| ((pipelineAnalysis.getSummaryXml() == null || pipelineAnalysis.getSummaryXml().isEmpty())
+						&& pipelineAnalysis.getAnalysisSummary() == null
+						|| pipelineAnalysis.getAnalysisSummary().isEmpty())) {
+			throw new FileParsingException("It was not possible to parse this file as a pepXML file");
+		}
+		log.info("PepXML loaded. Now processing it...");
+
 		return getMIAPEMSIDocumentBuilder(pipelineAnalysis, FilenameUtils.getBaseName(pepXMLFile.getAbsolutePath()),
 				cvManager, dbManager, owner, projectName);
 
