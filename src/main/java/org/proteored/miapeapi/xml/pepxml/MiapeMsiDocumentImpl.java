@@ -209,9 +209,12 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 					}
 				}
 			}
-			// build protein set
-			proteinSets.add(proteinSetBuilder.build());
-
+			if (!proteins.isEmpty()) {
+				// build protein set
+				proteinSets.add(proteinSetBuilder.build());
+			} else {
+				log.warn("there is no proteins or peptides in the msmsRunSummary " + msmsRunSummary.getBaseName());
+			}
 			inputDatasets.add(inputDataSetBuilder.build());
 			// other sofware steps
 			if (msmsRunSummary.getAnalysisTimestamp() != null) {
