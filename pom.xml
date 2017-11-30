@@ -475,6 +475,11 @@
 		    	<groupId>org.apache.maven.plugins</groupId>
 		       	<artifactId>maven-jar-plugin</artifactId>
 		       	<version>2.3.2</version>
+		       	<configuration>
+		        	<manifest>
+		         		<useUniqueVersions>false</useUniqueVersions>
+                	</manifest>
+		        </configuration>
 		       	<!-- In order to also create a jar with the test classes -->
 		       	<executions>
 <!-- 		        	<execution> -->
@@ -497,6 +502,8 @@
 			           		<classesDirectory>${basedir}\src\main\java</classesDirectory>
 			           	</configuration>
 		         	</execution>
+		         	
+		         	
 		       	</executions>
 			</plugin>
 		</plugins>
