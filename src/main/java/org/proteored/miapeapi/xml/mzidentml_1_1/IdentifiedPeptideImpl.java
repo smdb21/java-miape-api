@@ -239,6 +239,10 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 	}
 
 	private List<IdentifiedProtein> getProteinsFromThisPeptide(SpectrumIdentificationItem spectrumItemXML) {
+		if (spectrumItemXML.getId().equals(
+				"Hsilam-fmrKO1P17-ctx-p2-03_Spec_Hsilam-fmrKO1P17-ctx-p2-03-9493-TELEDTLDSTAAQQELR-2_TELEDTLDSTAAQQELR")) {
+			log.info(spectrumItemXML);
+		}
 		List<IdentifiedProtein> ret = new ArrayList<IdentifiedProtein>();
 		for (PeptideEvidenceRef peptideEvidenceRef : spectrumItemXML.getPeptideEvidenceRef()) {
 			final PeptideEvidence peptideEvidence = peptideEvidenceRef.getPeptideEvidence();
@@ -260,7 +264,7 @@ public class IdentifiedPeptideImpl implements IdentifiedPeptide {
 					// +
 					// protein.getId()
 					// + " to the hash from peptide " + getSequence());
-					proteinHash.put(protein.getAccession(), protein);
+					proteinHash.put(dbSequenceXML.getAccession(), protein);
 				} else {
 					protein = proteinHash.get(dbSequenceXML.getAccession());
 				}
