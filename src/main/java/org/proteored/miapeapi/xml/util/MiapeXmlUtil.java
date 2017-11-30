@@ -212,4 +212,21 @@ public class MiapeXmlUtil {
 		return null;
 	}
 
+	public static void clearIdentifierCounters() {
+		DirectDetectionCounter.clearCounter();
+		EquipmentCounter.clearCounter();
+		gelmatrixcounter.clearCounter();
+		ImageCounter.clearCounter();
+		IndirectDetectionCounter.clearCounter();
+		InputDataCounter.clearCounter();
+		InputDataSetCounter.clearCounter();
+		LaneCounter.clearCounter();
+		ParameterCounter.clearCounter();
+		PeptideCounter.clearCounter();
+		ProteinCounter.clearCounter();
+		SampleCounter.clearCounter();
+		SoftwareCounter.clearCounter();
+		SpectrumCounter.clearCounter();
+		SubstanceCounter.clearCounter();
+	}
 }
