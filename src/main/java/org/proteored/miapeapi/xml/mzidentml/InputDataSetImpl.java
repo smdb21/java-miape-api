@@ -37,7 +37,19 @@ public class InputDataSetImpl implements InputDataSet {
 	public String getName() {
 		if (this.name != null)
 			return name;
-		return "Input data set " + identifier;
+		StringBuilder sb = new StringBuilder();
+		for (InputData inputData : inputDatas) {
+			if (!"".equals(sb.toString())) {
+				sb.append(", ");
+			}
+			sb.append(inputData.getName());
+		}
+		if (!"".equals(sb.toString())) {
+			name = sb.toString();
+			return name;
+		}
+		name = "Input data set " + identifier;
+		return name;
 	}
 
 	public void addInputData(InputData inputData) {
