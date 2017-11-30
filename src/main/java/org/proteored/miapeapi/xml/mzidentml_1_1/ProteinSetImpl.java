@@ -1,5 +1,7 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,12 +14,21 @@ import gnu.trove.map.hash.THashMap;
 
 public class ProteinSetImpl implements IdentifiedProteinSet {
 	private final InputParameter inputParameter;
-	private final Set<InputDataSet> inputDataSets;
+	private final Set<InputDataSet> inputDataSets = new HashSet<InputDataSet>();
 	private final Map<String, IdentifiedProtein> identifiedProteinList = new THashMap<String, IdentifiedProtein>();
 
-	public ProteinSetImpl(InputParameter inputParameter, Set<InputDataSet> inputDataSets) {
+	public ProteinSetImpl(InputParameter inputParameter, Collection<InputDataSet> inputDataSets) {
 		this.inputParameter = inputParameter;
-		this.inputDataSets = inputDataSets;
+		if (inputDataSets != null) {
+			this.inputDataSets.addAll(inputDataSets);
+		}
+	}
+
+	public ProteinSetImpl(InputParameter inputParameter, InputDataSet inputDataSet) {
+		this.inputParameter = inputParameter;
+		if (inputDataSet != null) {
+			this.inputDataSets.add(inputDataSet);
+		}
 	}
 
 	@Override
