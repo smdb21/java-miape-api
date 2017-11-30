@@ -46,7 +46,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 	private final ControlVocabularyManager cvManager;
 	private final Reducible<List<IdentifiedPeptide>> peptideListLocal;
 	private final MapSync<String, ProteinDetectionHypothesis> pdhWithPeptideEvidence;
-	private final Reducible<Map<String, IdentifiedProtein>> proteinHashLocal;
+	private final Reducible<Map<String, IdentifiedProtein>> reducibleProteinHashLocal;
 	private final MapSync<String, InputData> syncInputDataHash;
 
 	public SpectrumIdentificationResultParallelProcesser(
@@ -54,15 +54,14 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 			ControlVocabularyManager cvManager, MzIdentMLUnmarshaller mzIdentMLUnmarshaller,
 			MapSync<String, InputData> syncInputDataHash, Reducible<List<IdentifiedPeptide>> peptides,
 			MapSync<String, ProteinDetectionHypothesis> proteinDetectionHypotesisWithPeptideEvidence,
-
-			Reducible<Map<String, IdentifiedProtein>> proteinHash) {
+			Reducible<Map<String, IdentifiedProtein>> reducibleProteinHash) {
 		sirParallelIterator = spectrumIdentificationResultParallelIterator;
 		threadNumber = processID;
 		this.mzIdentMLUnmarshaller = mzIdentMLUnmarshaller;
 		this.cvManager = cvManager;
 		peptideListLocal = peptides;
 		pdhWithPeptideEvidence = proteinDetectionHypotesisWithPeptideEvidence;
-		proteinHashLocal = proteinHash;
+		reducibleProteinHashLocal = reducibleProteinHash;
 		this.syncInputDataHash = syncInputDataHash;
 	}
 
@@ -73,7 +72,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 		peptideListLocal.set(peptideList);
 
 		Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
-		proteinHashLocal.set(proteinHash);
+		reducibleProteinHashLocal.set(proteinHash);
 
 		log.debug("Starting SIR processing from thread " + threadNumber);
 
@@ -356,7 +355,7 @@ public class SpectrumIdentificationResultParallelProcesser extends Thread {
 
 		if (specRefInt != 0)
 			return specRefInt.toString();
-		return null;
+		return spectrumID;
 	}
 
 	/**
