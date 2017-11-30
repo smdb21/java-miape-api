@@ -11,4 +11,8 @@ public abstract class MiapeIdentifierCounter {
 	public static synchronized int getCounter() {
 		return counter;
 	}
+
+	public static synchronized void clearCounter() {
+		counter = 0;
+	}
 }
