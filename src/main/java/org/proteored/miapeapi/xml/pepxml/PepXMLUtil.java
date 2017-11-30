@@ -22,15 +22,16 @@ public class PepXMLUtil {
 	}
 
 	public static String getSearchEngineFromSummaryXml(String summaryXml) {
-		final String str = "search_engine=\"";
-		final int searchEngineIndex = summaryXml.indexOf(str);
-		if (searchEngineIndex > -1) {
-			summaryXml = summaryXml.substring(searchEngineIndex) + str.length();
-			final int indexOfQuote = summaryXml.indexOf("\"");
-			if (indexOfQuote > -1) {
-				return summaryXml.substring(0, indexOfQuote);
+		if (summaryXml != null) {
+			final String str = "search_engine=\"";
+			final int searchEngineIndex = summaryXml.indexOf(str);
+			if (searchEngineIndex > -1) {
+				summaryXml = summaryXml.substring(searchEngineIndex) + str.length();
+				final int indexOfQuote = summaryXml.indexOf("\"");
+				if (indexOfQuote > -1) {
+					return summaryXml.substring(0, indexOfQuote);
+				}
 			}
-
 		}
 		return null;
 	}
