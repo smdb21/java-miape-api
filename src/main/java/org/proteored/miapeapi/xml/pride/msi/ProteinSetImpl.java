@@ -48,9 +48,6 @@ public class ProteinSetImpl implements IdentifiedProteinSet {
 					int proteinID = MiapeXmlUtil.ProteinCounter.increaseCounter();
 					final IdentifedProteinImpl proteinImpl = new IdentifedProteinImpl(gelFreeIdentifitation,
 							inputDataSets, proteinID, cvManager);
-					if (identifiedProteins.containsKey(proteinImpl.getAccession())) {
-						System.out.println("sadfasdf");
-					}
 					identifiedProteins.put(proteinImpl.getAccession(), proteinImpl);
 				}
 			}
