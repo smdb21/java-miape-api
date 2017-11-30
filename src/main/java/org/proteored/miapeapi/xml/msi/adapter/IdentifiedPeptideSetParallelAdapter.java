@@ -42,7 +42,8 @@ public class IdentifiedPeptideSetParallelAdapter implements Adapter<MSIIdentifie
 		if (identifiedPeptides != null && !identifiedPeptides.isEmpty()) {
 
 			int threadCount = SystemCoreManager.getAvailableNumSystemCores();
-			log.info("Preparing parallel processor of peptides using " + threadCount + " threads");
+			log.info("Preparing parallel processor of " + identifiedPeptides.size() + " peptides using " + threadCount
+					+ " threads");
 			final ParIterator<IdentifiedPeptide> iterator = ParIteratorFactory.createParIterator(identifiedPeptides,
 					threadCount, Schedule.GUIDED);
 
@@ -94,6 +95,7 @@ public class IdentifiedPeptideSetParallelAdapter implements Adapter<MSIIdentifie
 				}
 			};
 			final List<MSIIdentifiedPeptide> peptides = reduciblePeptides.reduce(peptideListReduction);
+			log.info(peptides.size() + " peptides processed");
 			ret.getMSIIdentifiedPeptide().addAll(peptides);
 
 		}
