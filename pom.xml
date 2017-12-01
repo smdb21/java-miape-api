@@ -568,36 +568,7 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>proteored-internal</id>
-			<name>ProteoRed Internal Repository</name>
-			<url>http://proteo.cnb.csic.es/archiva/repository/internal/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>proteored-snapshots</id>
-			<name>ProteoRed snapshots maven repository</name>
-			<url>http://proteo.cnb.csic.es/archiva/repository/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<!-- UGent Genesis Maven 1 repository -->
-<!--         <repository> -->
-<!--             <id>genesis-maven-repository</id> -->
-<!--             <name>Genesis repository</name> -->
-<!--             <url>http://genesis.UGent.be/maven</url> -->
-<!--             <layout>legacy</layout> -->
-<!--         </repository> -->
-        <!-- UGent Genesis Maven 2 repository -->
+		
         <repository>
             <id>genesis-maven2-repository</id>
             <name>Genesis maven2 repository</name>
