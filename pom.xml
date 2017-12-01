@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   
     <groupId>org.proteored.miape.api</groupId>
-    <version>1.9.2-SNAPSHOT</version>
+    <version>1.9.3</version>
     
   	<artifactId>miape-api</artifactId>
   	<distributionManagement>
@@ -22,14 +22,14 @@
 		</snapshotRepository>
 		
 	</distributionManagement>
-	<description>This Java API allows to manage MIAPE information in a programatic way. It can extract MIAPE information from different standard sources and provides a set of webservice functions in order to interact with the ProteoRed? MIAPE repository.	</description>
-	<url>http://code.google.com/p/proteored-java-miape-api/</url>
+	<description>This Java API allows to manage MIAPE information in a programmatic way. It can extract MIAPE information from different standard sources and provides a set of webservice functions in order to interact with the ProteoRed? MIAPE repository.	</description>
+	<url>https://github.com/smdb21/java-miape-api</url>
 	<developers>
 		<developer>
 			<id>smartinez</id>
 			<name>Salvador Martínez-Bartolomé</name>
-			<email>smartinez@proteored.org</email>
-			<organization>ProteoRed - National Center for Biotechnology - CSIC</organization>
+			<email>smartinez@scripps.edu</email>
+			<organization>ProteoRed - National Center for Biotechnology - CSIC / The Scripps Research Institute</organization>
 		</developer>
 		<developer>
 			<id>jamedina</id>
