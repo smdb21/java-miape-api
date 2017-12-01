@@ -481,7 +481,7 @@
 	                  <manifest>
 	                     <addClasspath>true</addClasspath>
 	                     <classpathPrefix>lib</classpathPrefix>
-	                     <useUniqueVersions>true</useUniqueVersions>
+	                     <useUniqueVersions>false</useUniqueVersions>
 	                  </manifest>
 	               </archive>
 		        </configuration>
