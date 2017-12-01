@@ -37,17 +37,19 @@ public class IdentifiedPeptideParallelProcessor extends Thread {
 		log.info("Starting parallel processing of peptides from thread " + numThread);
 		List<MSIIdentifiedPeptide> xmlPeptides = new ArrayList<MSIIdentifiedPeptide>();
 		localPeptides.set(xmlPeptides);
-		while (iterator.hasNext()) {
-			try {
+		try {
+			while (iterator.hasNext()) {
+
 				final IdentifiedPeptide peptide = iterator.next();
 				xmlPeptides.add(new IdentifiedPeptideAdapter(peptide, factory, cvFactory).adapt());
-			} catch (Exception e) {
-				e.printStackTrace();
-				log.warn(e);
-				iterator.register(e);
-			}
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.warn(e);
+			iterator.register(e);
 		}
+
 		log.info("Thread " + numThread + " processed " + xmlPeptides.size() + " peptides");
 	}
 

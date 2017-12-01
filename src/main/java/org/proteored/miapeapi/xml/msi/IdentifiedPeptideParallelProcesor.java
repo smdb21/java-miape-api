@@ -28,8 +28,9 @@ public class IdentifiedPeptideParallelProcesor extends Thread {
 	public void run() {
 		Map<String, IdentifiedPeptide> peptideMap = new THashMap<String, IdentifiedPeptide>();
 		reduciblePeptideMap.set(peptideMap);
-		while (iterator.hasNext()) {
-			try {
+		try {
+			while (iterator.hasNext()) {
+
 				final MSIIdentifiedPeptide msiIdentifiedPeptide = iterator.next();
 				int id = MiapeXmlUtil.getIdFromXMLId(msiIdentifiedPeptide.getId());
 				if (id == -1) {
@@ -38,10 +39,12 @@ public class IdentifiedPeptideParallelProcesor extends Thread {
 				}
 				peptideMap.put(msiIdentifiedPeptide.getId(),
 						new IdentifiedPeptideImpl(msiIdentifiedPeptide, mapInputData));
-			} catch (Exception e) {
-				iterator.register(e);
-			}
-		}
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.warn(e);
+			iterator.register(e);
+		}
 	}
 }
