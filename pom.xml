@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   
     <groupId>org.proteored.miape.api</groupId>
-    <version>1.9.5-SNAPSHOT</version>
+    <version>1.9.6</version>
     
   	<artifactId>miape-api</artifactId>
   	<distributionManagement>
@@ -51,9 +51,8 @@
 		</developer>
 	</developers>
 	<properties>
-		 <assembly.output.folder>java-miape-api</assembly.output.folder>
 	      <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-	      <assembly.dir>java-miape-api_v${project.version}</assembly.dir>
+	      <project.finalName>miape-api-${project.version}</project.finalName>
 	</properties>
 	<dependencies>
 		<!-- MODEL MODULE -->
@@ -454,7 +453,7 @@
 		       	<artifactId>maven-jar-plugin</artifactId>
 		       	<version>3.0.2</version>
 			<configuration>
-               <finalName>java-miape-api</finalName>
+               <finalName>${project.finalName}</finalName>
                <archive>
                	  <manifest>
                      <addClasspath>true</addClasspath>
