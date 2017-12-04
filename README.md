@@ -15,7 +15,7 @@ The Java MIAPE API is designed in 4 different modules:
  
  ### How to get the API
  
- **Latest build** available at: [to update]()
+ **Latest build** available at: [http://sealion.scripps.edu/miape-api/](http://sealion.scripps.edu/miape-api/)
  
  **Using MAVEN**:
  Add this to your pom.xml: 
@@ -36,7 +36,7 @@ The Java MIAPE API is designed in 4 different modules:
 <dependency>
     <groupId>org.proteored.miape.api</groupId>
     <artifactId>miape-api</artifactId>
-    <version>1.9.2-SNAPSHOT</version> <!-- or the latest version available -->
+    <version>1.9.6</version> <!-- or the latest version available -->
 </dependency>
 ```
 
