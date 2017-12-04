@@ -26,7 +26,7 @@
 	<url>https://github.com/smdb21/java-miape-api</url>
 	<developers>
 		<developer>
-			<id>smartinez</id>
+			<id>smdb21</id>
 			<name>Salvador Martínez-Bartolomé</name>
 			<email>smartinez@scripps.edu</email>
 			<organization>ProteoRed - National Center for Biotechnology - CSIC / The Scripps Research Institute</organization>
@@ -50,6 +50,11 @@
 			<organization>ProteoRed - National Center for Biotechnology - CSIC</organization>
 		</developer>
 	</developers>
+	<properties>
+		 <assembly.output.folder>java-miape-api</assembly.output.folder>
+	      <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+	      <assembly.dir>java-miape-api_v${project.version}</assembly.dir>
+	</properties>
 	<dependencies>
 		<!-- MODEL MODULE -->
 		<dependency>
@@ -397,17 +402,10 @@
 		</dependency>
 	</dependencies>
 	<organization>
-		<name>ProteoRed - National Center for Biotechnology - CSIC</name>
+		<name>ProteoRed - National Center for Biotechnology - CSIC &amp; The Scripps Research Institute (TSRI)</name>
 		<url>http://www.proteored.org</url>
 	</organization>
 	<build>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav</artifactId>
-				<version>1.0-beta-2</version>
-			</extension>
-		</extensions>
 		<plugins>
 <!--  			This plugin creates a javadoc jar for pride-web.  -->
 <!--  			<plugin>  -->
@@ -436,31 +434,11 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-				<executions>
-			    	<execution>
-			    		<id>compileTests</id>
-			    		<goals>
-			    			<goal>testCompile</goal>
-			    		</goals>
-			    		<configuration>
-			    			 <skip>false</skip>
-			    		</configuration>
-			    	</execution>
-			    	<execution>
-			    		<id>compileMain</id>
-			    		<goals>
-			    			<goal>compile</goal>
-			    		</goals>
-			    		<configuration>
-			    			 <skip>false</skip>
-			    		</configuration>
-			    	</execution>
-			    </executions>
 			</plugin>
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-source-plugin</artifactId>
-		        <version>2.1.2</version>
+		        <version>3.0.1</version>
 		        <executions>
 		          <execution>
 		            <id>attach-sources</id>
@@ -474,55 +452,22 @@
 			<plugin>
 		    	<groupId>org.apache.maven.plugins</groupId>
 		       	<artifactId>maven-jar-plugin</artifactId>
-		       	<version>2.3.2</version>
-<!-- 		       	<configuration> -->
-<!-- 		        	<archive> -->
-<!-- 	               	  <index>true</index> -->
-<!-- 	                  <manifest> -->
-<!-- 	                     <addClasspath>true</addClasspath> -->
-<!-- 	                     <classpathPrefix>lib/</classpathPrefix> -->
-<!-- 	                     <useUniqueVersions>true</useUniqueVersions> -->
-<!-- 	                  </manifest> -->
-<!-- 	               </archive> -->
-<!-- 		        </configuration> -->
-		       	<!-- In order to also create a jar with the test classes -->
-		       	<executions>
-<!-- 		        	<execution> -->
-<!-- 		        		<id>create test jar</id> -->
-<!-- 		        		<phase>package</phase> -->
-<!-- 		        		<goals> -->
-<!-- 			            	<goal>test-jar</goal> -->
-<!-- 			           	</goals> -->
-<!-- 			           	<configuration> -->
-<!-- 			           		<skip>false</skip> -->
-<!-- 			           		<testClassesDirectory>${basedir}\src\test\java</testClassesDirectory> -->
-<!-- 			           	</configuration> -->
-<!-- 		         	</execution> -->
-		         	<execution>
-		         		<id>create jar</id>
-		        		<goals>
-			            	<goal>jar</goal>
-			           	</goals>
-			           	<configuration>
-			           		<classesDirectory>${basedir}\src\main\java</classesDirectory>
-			           	</configuration>
-		         	</execution>
-		         	
-		         	
-		       	</executions>
+		       	<version>3.0.2</version>
+			<configuration>
+               <finalName>java-miape-api</finalName>
+               <archive>
+               	  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <classpathPrefix>lib/</classpathPrefix>
+                     <useUniqueVersions>false</useUniqueVersions>
+                  </manifest>
+               </archive>
+               <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
 			</plugin>
 		</plugins>
-		<testResources>
-	    	<!-- Test resources -->
-	      	<testResource>
-	      		<targetPath>${project.build.directory}\test-classes</targetPath>
-	        	<directory>${basedir}\src\test\resources</directory>
-	      	</testResource>
-	    </testResources>
 	</build>
-	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-	</properties>
+	
 	<repositories>
 		<repository>
 			<id>ebi-repo</id>
@@ -586,4 +531,10 @@
                 <url>http://www.mvnrepository.com</url>
             </repository>
 	</repositories>
+	<name>Java MIAPE API</name>
+	<scm>
+		<url>https://github.com/smdb21/java-miape-api</url>
+		<developerConnection>@smdb21</developerConnection>
+	</scm>
+	
 </project>
