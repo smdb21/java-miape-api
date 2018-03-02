@@ -307,6 +307,10 @@
 					<groupId>umontreal.iro.lecuyer.gof</groupId>
 					<artifactId>ssj</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>jfree</groupId>
+					<artifactId>jfreechart</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -398,6 +402,12 @@
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.5.0</version>
 		</dependency>
 	</dependencies>
 	<organization>
