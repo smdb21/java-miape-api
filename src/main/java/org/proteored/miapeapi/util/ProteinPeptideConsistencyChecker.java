@@ -1,5 +1,6 @@
 package org.proteored.miapeapi.util;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,12 @@ public class ProteinPeptideConsistencyChecker {
 	public static void checkProteinPeptideConsistency(MiapeMSIDocument miapeMSI) {
 		log.info("Checking protein-peptide consistency");
 		final List<IdentifiedPeptide> peptides = miapeMSI.getIdentifiedPeptides();
+
 		if (peptides != null && !peptides.isEmpty()) {
+			// store them in a set, which is going to be much faster to check
+			// whether a peptide is in there or not
+			Set<IdentifiedPeptide> peptideSet = new HashSet<IdentifiedPeptide>();
+			peptideSet.addAll(peptides);
 			final Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSI.getIdentifiedProteinSets();
 			if (identifiedProteinSets != null) {
 				for (IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
@@ -38,7 +44,7 @@ public class ProteinPeptideConsistencyChecker {
 						}
 						final IdentifiedProtein protein = proteinMap.get(acc);
 						try {
-							checkProtein(protein, peptides);
+							checkProtein(protein, peptideSet);
 						} catch (MiapeDataInconsistencyException e) {
 							e.printStackTrace();
 							log.error(e.getMessage());
@@ -81,7 +87,7 @@ public class ProteinPeptideConsistencyChecker {
 		}
 	}
 
-	private static void checkProtein(IdentifiedProtein protein, List<IdentifiedPeptide> totalPeptides) {
+	private static void checkProtein(IdentifiedProtein protein, Set<IdentifiedPeptide> totalPeptides) {
 		final List<IdentifiedPeptide> peptides = protein.getIdentifiedPeptides();
 		if (peptides != null && !peptides.isEmpty()) {
 			for (IdentifiedPeptide peptide : peptides) {
