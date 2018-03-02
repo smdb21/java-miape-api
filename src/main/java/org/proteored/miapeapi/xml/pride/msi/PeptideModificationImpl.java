@@ -19,8 +19,7 @@ public class PeptideModificationImpl implements PeptideModification {
 	private final String sequence;
 	private final ControlVocabularyManager cvManager;
 
-	public PeptideModificationImpl(Modification modificationItem, String sequence,
-			ControlVocabularyManager cvManager) {
+	public PeptideModificationImpl(Modification modificationItem, String sequence, ControlVocabularyManager cvManager) {
 		this.modificationItem = modificationItem;
 		this.sequence = sequence;
 		this.cvManager = cvManager;
@@ -30,8 +29,8 @@ public class PeptideModificationImpl implements PeptideModification {
 	public String getName() {
 		String modAccession = modificationItem.getModAccession();
 		if (modAccession != null) {
-			ControlVocabularyTerm cvTermByAccession = PeptideModificationName
-					.getInstance(cvManager).getCVTermByAccession(new Accession(modAccession));
+			ControlVocabularyTerm cvTermByAccession = PeptideModificationName.getInstance(cvManager)
+					.getCVTermByAccession(new Accession(modAccession));
 			String cvDescription = null;
 			if (cvTermByAccession != null)
 				cvDescription = cvTermByAccession.getPreferredName();
@@ -56,8 +55,7 @@ public class PeptideModificationImpl implements PeptideModification {
 					for (Object cvOrUserParam : additional.getCvParamOrUserParam()) {
 						if (cvOrUserParam instanceof UserParamType) {
 							UserParamType userParam = (UserParamType) cvOrUserParam;
-							if (userParam.getName() != null
-									&& userParam.getName().equalsIgnoreCase("unimod")
+							if (userParam.getName() != null && userParam.getName().equalsIgnoreCase("unimod")
 									&& userParam.getValue() != null) {
 								String accession = userParam.getValue();
 								cvTermByAccession = PeptideModificationName.getInstance(cvManager)
@@ -90,8 +88,9 @@ public class PeptideModificationImpl implements PeptideModification {
 	@Override
 	public String getResidues() {
 		int position = getPosition();
-		if (position > -1 && sequence != null && sequence.length() >= position)
-			return sequence.substring(position - 1, position);
+		int index = position - 1;
+		if (index >= 0 && sequence != null && sequence.length() > index)
+			return sequence.substring(index, index);
 		return null;
 	}
 
