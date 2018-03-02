@@ -129,9 +129,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		// clear static identifier counters
 		MiapeXmlUtil.clearIdentifierCounters();
 		if (pipelineAnalysis == null
-				|| ((pipelineAnalysis.getSummaryXml() == null || pipelineAnalysis.getSummaryXml().isEmpty())
-						&& pipelineAnalysis.getAnalysisSummary() == null
-						|| pipelineAnalysis.getAnalysisSummary().isEmpty())) {
+				|| (pipelineAnalysis.getMsmsRunSummary() == null || pipelineAnalysis.getMsmsRunSummary().isEmpty())) {
 			throw new FileParsingException("It was not possible to parse this file as a pepXML file");
 		}
 		log.info("PepXML loaded. Now processing it...");
