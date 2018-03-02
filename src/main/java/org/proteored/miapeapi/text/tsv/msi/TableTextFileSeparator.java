@@ -26,4 +26,13 @@ public enum TableTextFileSeparator {
 		}
 		return sb.toString();
 	}
+
+	public static TableTextFileSeparator[] valuesWithBlank() {
+		TableTextFileSeparator[] ret = new TableTextFileSeparator[values().length + 1];
+		ret[0] = null;
+		for (int i = 0; i < values().length; i++) {
+			ret[i + 1] = values()[i];
+		}
+		return ret;
+	}
 }
