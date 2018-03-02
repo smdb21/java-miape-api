@@ -510,9 +510,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			log.info("SpectrumIdentificationList iterator unmarshalled");
 		}
 		while (silIterator.hasNext()) {
-			log.info("Unmarshalling next SpectrumIdentificationList");
+			log.debug("Unmarshalling next SpectrumIdentificationList");
 			SpectrumIdentificationList sil = silIterator.next();
-			log.info("SpectrumIdentificationList " + sil.getId() + " unmarshalled");
+			log.debug("SpectrumIdentificationList " + sil.getId() + " unmarshalled");
 			spectrumIdentificationListMap.put(sil.getId(), sil);
 			if (sil.getId().equals(spectrumIdentificationListId)) {
 				return sil;
@@ -534,26 +534,26 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// clear static identifier counters
 		MiapeXmlUtil.clearIdentifierCounters();
 		String spectrumIdentificationSoftwareID = "";
-		log.info("unmarshalling sourceFiles");
+		log.debug("unmarshalling sourceFiles");
 		sourceFiles = mzIdentMLUnmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SourceFile);
 		if (sourceFiles.hasNext())
 			sourceFilesCount = mzIdentMLUnmarshaller.getObjectCountForXpath(MzIdentMLElement.SourceFile.getXpath());
-		log.info("unmarshalling searchDatbases");
+		log.debug("unmarshalling searchDatbases");
 		searchDataBases = mzIdentMLUnmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SearchDatabase);
 		log.info("unmarshalling analysisSoftwareList");
 		analysisSoftwareList = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSoftwareList);
-		log.info("unmarshalling auditCollection");
+		log.debug("unmarshalling auditCollection");
 		auditCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AuditCollection);
 		if (auditCollection != null) {
 			mzIdentContactList = auditCollection.getPersonOrOrganization();
 
 		}
 
-		log.info("unmarshalling analysisProtocolCollection");
+		log.debug("unmarshalling analysisProtocolCollection");
 		analysisProtocolCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisProtocolCollection);
-		log.info("unmarshalling analysisSampleCollection");
+		log.debug("unmarshalling analysisSampleCollection");
 		analysisSampleCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSampleCollection);
-		log.info("unmarshalling spectrumIdentification");
+		log.debug("unmarshalling spectrumIdentification");
 
 		// Set<String> spectrumIdentificationIDs = new THashSet<String>();
 		// try {
