@@ -133,7 +133,7 @@ public class ControlVocabularySet {
 				ControlVocabularyTerm cvTermByAccession = cvManager.getCVTermByAccession(accession, this);
 				if (cvTermByAccession != null) {
 					// Add to cache
-					log.info("Accession: " + accession + " added to cache");
+					log.debug("Accession: " + accession + " added to cache");
 					termCacheByAccession.put(accession.toString(), cvTermByAccession);
 				} else {
 					log.debug("Accession: " + accession + " not found ontology for " + this.getClass().getSimpleName());

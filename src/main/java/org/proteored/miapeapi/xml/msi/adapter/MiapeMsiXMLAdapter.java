@@ -58,37 +58,37 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 		// check data consistency first
 		ProteinPeptideConsistencyChecker.checkProteinPeptideConsistency(document);
 
-		// log.info("Before Adapting MSI document to XML");
+		// log.debug("Before Adapting MSI document to XML");
 		MSIMIAPEMSI xmlMiape = factory.createMSIMIAPEMSI();
-		log.info("Adding MiapeData");
+		log.debug("Adding MiapeData");
 
 		addMiapeData(xmlMiape);
-		log.info("Adding IdentifiedProteins");
+		log.debug("Adding IdentifiedProteins");
 		Set<IdentifiedProteinSet> identifiedProteinSets = document.getIdentifiedProteinSets();
 		if (identifiedProteinSets != null)
 			addProteinSets(xmlMiape, identifiedProteinSets);
 
-		log.info("Adding IdentifiedPeptides");
+		log.debug("Adding IdentifiedPeptides");
 		List<IdentifiedPeptide> identifiedPeptides = document.getIdentifiedPeptides();
 		if (identifiedPeptides != null)
 			addPeptideSet(xmlMiape, identifiedPeptides);
 
-		log.info("Adding getInputDataSets");
+		log.debug("Adding getInputDataSets");
 		Set<InputDataSet> inputDataSets = document.getInputDataSets();
 		if (inputDataSets != null)
 			addInputDataSets(xmlMiape, inputDataSets);
-		log.info("Adding getInputParameters");
+		log.debug("Adding getInputParameters");
 
 		Set<InputParameter> inputParameters = document.getInputParameters();
 		if (inputParameters != null)
 			addInputParameters(xmlMiape, inputParameters);
 
-		log.info("Adding getMsiSoftwares");
+		log.debug("Adding getMsiSoftwares");
 
 		Set<Software> msiSoftwares = document.getSoftwares();
 		if (msiSoftwares != null)
 			addMsiSoftwares(xmlMiape, msiSoftwares);
-		log.info("Adding Validations");
+		log.debug("Adding Validations");
 
 		Set<Validation> validations = document.getValidations();
 		if (validations != null)
@@ -121,7 +121,7 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 	private void addPeptideSet(MSIMIAPEMSI xmlMiape, List<IdentifiedPeptide> identifiedPeptides) {
 		if (identifiedPeptides == null || identifiedPeptides.isEmpty())
 			return;
-		log.info("Adapting " + identifiedPeptides.size() + " peptides");
+		log.debug("Adapting " + identifiedPeptides.size() + " peptides");
 		if (processPeptidesInParallel) {
 			xmlMiape.setMSIIdentifiedPeptideSet(
 					new IdentifiedPeptideSetParallelAdapter(identifiedPeptides, factory, cvFactory).adapt());
@@ -129,7 +129,7 @@ public class MiapeMsiXMLAdapter implements Adapter<MSIMIAPEMSI> {
 			xmlMiape.setMSIIdentifiedPeptideSet(
 					new IdentifiedPeptideSetAdapter(identifiedPeptides, factory, cvFactory).adapt());
 		}
-		log.info(xmlMiape.getMSIIdentifiedPeptideSet().getMSIIdentifiedPeptide().size() + " peptides adapted to XML");
+		log.debug(xmlMiape.getMSIIdentifiedPeptideSet().getMSIIdentifiedPeptide().size() + " peptides adapted to XML");
 	}
 
 	private void addAdditionalInformations(List<ParamType> xmlAddInfos, Set<MSIAdditionalInformation> addInfos) {

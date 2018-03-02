@@ -26,9 +26,7 @@ public class MiapeFile {
 
 	public MiapeFile() {
 		try {
-			this.file = File.createTempFile(
-					this.getClass().getName() + System.currentTimeMillis(),
-					"temp");
+			this.file = File.createTempFile(this.getClass().getName() + System.currentTimeMillis(), "temp");
 			this.isTempFile = true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -54,7 +52,7 @@ public class MiapeFile {
 	}
 
 	public File saveAs(String path) throws IOException {
-		log.info("Trying to save MIAPE file to: " + path);
+		log.debug("Trying to save MIAPE file to: " + path);
 		// if (file.exists() == false)
 		// throw new IOException("The file in " + file.getPath() +
 		// " does not exist");
@@ -66,12 +64,11 @@ public class MiapeFile {
 		MiapeFile.copy(file, newFile);
 		File oldFile = file;
 		this.file = newFile;
-		log.info("File renamed from " + oldPath + " to "
-				+ this.file.getAbsolutePath() + " - "
+		log.debug("File renamed from " + oldPath + " to " + this.file.getAbsolutePath() + " - "
 				+ newFile.getAbsolutePath());
 		if (this.isTempFile) {
 			oldFile.delete();
-			log.info("Temp file deleted: " + oldFile.getAbsolutePath());
+			log.debug("Temp file deleted: " + oldFile.getAbsolutePath());
 		}
 		return newFile;
 	}
@@ -114,16 +111,14 @@ public class MiapeFile {
 		// Read in the bytes
 		int offset = 0;
 		int numRead = 0;
-		while (offset < bytes.length
-				&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+		while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
 			offset += numRead;
 		}
 
 		// Ensure all the bytes have been read in
 		if (offset < bytes.length) {
 			is.close();
-			throw new IOException("Could not completely read file "
-					+ file.getName());
+			throw new IOException("Could not completely read file " + file.getName());
 		}
 
 		// Close the input stream and return bytes
@@ -146,14 +141,11 @@ public class MiapeFile {
 	public static void copy(File fromFile, File toFile) throws IOException {
 
 		if (!fromFile.exists())
-			throw new IOException("FileCopy: " + "no such source file: "
-					+ fromFile.getName());
+			throw new IOException("FileCopy: " + "no such source file: " + fromFile.getName());
 		if (!fromFile.isFile())
-			throw new IOException("FileCopy: " + "can't copy directory: "
-					+ fromFile.getName());
+			throw new IOException("FileCopy: " + "can't copy directory: " + fromFile.getName());
 		if (!fromFile.canRead())
-			throw new IOException("FileCopy: " + "source file is unreadable: "
-					+ fromFile.getName());
+			throw new IOException("FileCopy: " + "source file is unreadable: " + fromFile.getName());
 
 		if (toFile.isDirectory())
 			toFile = new File(toFile, fromFile.getName());
@@ -163,14 +155,11 @@ public class MiapeFile {
 			parent = System.getProperty("user.dir");
 		File dir = new File(parent);
 		if (!dir.exists())
-			throw new IOException("FileCopy: "
-					+ "destination directory doesn't exist: " + parent);
+			throw new IOException("FileCopy: " + "destination directory doesn't exist: " + parent);
 		if (dir.isFile())
-			throw new IOException("FileCopy: "
-					+ "destination is not a directory: " + parent);
+			throw new IOException("FileCopy: " + "destination is not a directory: " + parent);
 		if (!dir.canWrite())
-			throw new IOException("FileCopy: "
-					+ "destination directory is unwriteable: " + parent);
+			throw new IOException("FileCopy: " + "destination directory is unwriteable: " + parent);
 
 		FileInputStream from = null;
 		FileOutputStream to = null;
@@ -198,8 +187,7 @@ public class MiapeFile {
 		}
 	}
 
-	private static String readFileAsString(File file)
-			throws java.io.IOException {
+	private static String readFileAsString(File file) throws java.io.IOException {
 
 		InputStream is = new FileInputStream(file);
 		InputStreamReader reader = new InputStreamReader(is, "UTF-8");
