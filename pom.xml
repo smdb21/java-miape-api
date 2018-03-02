@@ -199,7 +199,15 @@
                     <groupId>org.jboss.jsfunit</groupId>
                     <artifactId>jboss-jsfunit-microdeployer</artifactId>
                 </exclusion>
-            </exclusions>
+                <exclusion>
+                	<groupId>ch.qos.logback</groupId>
+                	<artifactId>logback-core</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>ch.qos.logback</groupId>
+                	<artifactId>logback-classic</artifactId>
+                </exclusion>
+			</exclusions>
 		</dependency>
  		<dependency> 
  			<groupId>de.proteinms.xtandemparser</groupId> 
@@ -389,6 +397,16 @@
 			<groupId>edu.scripps.yates</groupId>
 			<artifactId>dtaselectparser</artifactId>
 			<version>1.1.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<!-- MSFTBX MS File Tool Box for pepXML parser -->
