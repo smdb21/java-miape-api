@@ -13,6 +13,7 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 
 import edu.scripps.yates.utilities.dates.DatesUtil;
+import edu.scripps.yates.utilities.files.ZipManager;
 import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
 
 public class MSIMiapeFactory {
@@ -32,16 +33,17 @@ public class MSIMiapeFactory {
 	public MiapeMSIDocument toDocument(MiapeMzIdentMLFile xmlFile, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String userName, String password, String projectName,
 			boolean processInParallel)
-			throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
+					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		MiapeMSIDocument result = null;
 		if (cvManager == null)
 			throw new IllegalMiapeArgumentException("ControlVocabularyManager is not set");
 		try {
 			log.info("before unmarshall");
-			final File file = xmlFile.toFile();
+			File file = xmlFile.toFile();
 			long t1 = System.currentTimeMillis();
+			file = ZipManager.decompressFileIfNeccessary(file);
+			MzIdentMLUnmarshaller unmarshaller = new MzIdentMLUnmarshaller(file, true);
 
-			MzIdentMLUnmarshaller unmarshaller = new MzIdentMLUnmarshaller(file);
 			log.info("after unmarshall: it took: "
 					+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
 			final String miapeName = FilenameUtils.getBaseName(file.getAbsolutePath());
