@@ -1,26 +1,26 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" >
-  <modelVersion>4.0.0</modelVersion>
-  
-    <groupId>org.proteored.miape.api</groupId>
-    <version>1.9.7-SNAPSHOT</version>
-    
-  	<artifactId>miape-api</artifactId>
-  	<distributionManagement>
-  		<repository>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.proteored.miape.api</groupId>
+	<version>1.9.7-SNAPSHOT</version>
+
+	<artifactId>miape-api</artifactId>
+	<distributionManagement>
+		<repository>
 			<id>internal</id>
 			<name>John Yates lab Internal Repository</name>
 			<url>http://sealion.scripps.edu/archiva/repository/internal/</url>
-			
+
 		</repository>
 		<snapshotRepository>
 			<id>snapshots</id>
 			<name>John Yates lab snapshots maven repository</name>
 			<url>http://sealion.scripps.edu/archiva/repository/snapshots/</url>
-			
+
 		</snapshotRepository>
-		
+
 	</distributionManagement>
 	<description>This Java API allows to manage MIAPE information in a programmatic way. It can extract MIAPE information from different standard sources and provides a set of webservice functions in order to interact with the ProteoRed? MIAPE repository.	</description>
 	<url>https://github.com/smdb21/java-miape-api</url>
@@ -51,15 +51,15 @@
 		</developer>
 	</developers>
 	<properties>
-	      <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-	      <project.finalName>miape-api-${project.version}</project.finalName>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+		<project.finalName>miape-api-${project.version}</project.finalName>
 	</properties>
 	<dependencies>
 		<!-- MODEL MODULE -->
 		<dependency>
 			<groupId>psidev.psi.tools</groupId>
 			<artifactId>cv-rule-reader</artifactId>
- 			<version>2.0.5</version>
+			<version>2.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>psidev.psi.tools</groupId>
@@ -71,15 +71,15 @@
 			<artifactId>ontology-manager</artifactId>
 			<version>2.0.5</version>
 			<exclusions>
-                <exclusion>
-                    <groupId>axis</groupId>
-                    <artifactId>axis</artifactId>
-                </exclusion>
-                <exclusion>
+				<exclusion>
+					<groupId>axis</groupId>
+					<artifactId>axis</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>umontreal.iro.lecuyer.gof</groupId>
 					<artifactId>ssj</artifactId>
 				</exclusion>
-            </exclusions>
+			</exclusions>
 		</dependency>
 		<!-- 3rd party -->
 		<dependency>
@@ -89,11 +89,11 @@
 		</dependency>
 		<!--  spring  -->
 		<!-- removed to solve problems on XmlBeanFactory on Feb 23 2015 -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.springframework</groupId> -->
-<!-- 			<artifactId>spring-hibernate3</artifactId> -->
-<!-- 			<version>2.0.8</version> -->
-<!-- 		</dependency> -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>org.springframework</groupId> -->
+		<!-- 			<artifactId>spring-hibernate3</artifactId> -->
+		<!-- 			<version>2.0.8</version> -->
+		<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
@@ -104,7 +104,7 @@
 			<artifactId>spring-core</artifactId>
 			<version>4.1.4.RELEASE</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -117,7 +117,7 @@
 		</dependency>
 
 
-		
+
 		<!-- mockito -->
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -130,7 +130,7 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 		</dependency>
-		
+
 		<!-- java mail -->
 		<dependency>
 			<groupId>javax.mail</groupId>
@@ -138,37 +138,37 @@
 			<version>1.4.4</version>
 		</dependency>
 		<!-- XML module --> 
-<!-- JAXB --> 
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.sun.xml.bind</groupId> -->
-<!-- 			<artifactId>jaxb-xjc</artifactId> -->
-<!-- 			<version>2.2.4-1</version> -->
-<!-- 		</dependency> -->
+		<!-- JAXB --> 
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>com.sun.xml.bind</groupId> -->
+		<!-- 			<artifactId>jaxb-xjc</artifactId> -->
+		<!-- 			<version>2.2.4-1</version> -->
+		<!-- 		</dependency> -->
 		<!-- XMLunit -->
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
 			<version>1.3</version>
 		</dependency>
-		
+
 		<!-- removed since now are in the source code 7 March 2015 -->
 		<!-- SAX -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
-<!-- 			<artifactId>saxdomix</artifactId> -->
-<!-- 			<version>1.0</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
-<!-- 			<artifactId>xml-apis</artifactId> -->
-<!-- 			<version>1.0</version> -->
-<!-- 		</dependency> -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
+		<!-- 			<artifactId>saxdomix</artifactId> -->
+		<!-- 			<version>1.0</version> -->
+		<!-- 		</dependency> -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
+		<!-- 			<artifactId>xml-apis</artifactId> -->
+		<!-- 			<version>1.0</version> -->
+		<!-- 		</dependency> -->
 		<!-- PeakList2MIAPETranslator -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
-<!-- 			<artifactId>peakList2MIAPETranslator</artifactId> -->
-<!-- 			<version>1.0</version> -->
-<!-- 		</dependency> -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>org.proteored.miape.api.thirdparty</groupId> -->
+		<!-- 			<artifactId>peakList2MIAPETranslator</artifactId> -->
+		<!-- 			<version>1.0</version> -->
+		<!-- 		</dependency> -->
 		<dependency>
 			<groupId>soap</groupId>
 			<artifactId>soap</artifactId>
@@ -179,50 +179,31 @@
 		<dependency>
 			<groupId>uk.ac.ebi.jmzml</groupId>
 			<artifactId>jmzml</artifactId>
-<!-- 			<type>jar</type> -->
-<!-- 			<scope>compile</scope> -->
+			<!-- 			<type>jar</type> -->
+			<!-- 			<scope>compile</scope> -->
 			<version>1.7.4</version>
 			<exclusions>
-                <exclusion>
-                    <groupId>lennart</groupId>
-                    <artifactId>lmjunit</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
-		<!--  jmzIdentML -->
-		<dependency>
-			<groupId>uk.ac.ebi.jmzidml</groupId>
-			<artifactId>jmzidentml</artifactId>
-			<version>1.2.7</version>
-			<exclusions>
-                <exclusion>
-                    <groupId>org.jboss.jsfunit</groupId>
-                    <artifactId>jboss-jsfunit-microdeployer</artifactId>
-                </exclusion>
-                <exclusion>
-                	<groupId>ch.qos.logback</groupId>
-                	<artifactId>logback-core</artifactId>
-                </exclusion>
-                <exclusion>
-                	<groupId>ch.qos.logback</groupId>
-                	<artifactId>logback-classic</artifactId>
-                </exclusion>
+				<exclusion>
+					<groupId>lennart</groupId>
+					<artifactId>lmjunit</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
- 		<dependency> 
- 			<groupId>de.proteinms.xtandemparser</groupId> 
- 			<artifactId>xtandem-parser</artifactId> 
- 			<version>1.13.0</version> 
- 			<exclusions> 
- 				<exclusion>
+		<!--  jmzIdentML -->
+		<dependency> 
+			<groupId>de.proteinms.xtandemparser</groupId> 
+			<artifactId>xtandem-parser</artifactId> 
+			<version>1.13.0</version> 
+			<exclusions> 
+				<exclusion>
 					<groupId>batik</groupId>
 					<artifactId>batik-all</artifactId>
 				</exclusion>
-				 <exclusion>
-                    <artifactId>pdf-transcoder</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
+				<exclusion>
+					<artifactId>pdf-transcoder</artifactId>
+					<groupId>batik</groupId>
+				</exclusion>
+				<exclusion>
 					<groupId>itext</groupId>
 					<artifactId>iText</artifactId>
 				</exclusion>
@@ -246,30 +227,30 @@
 					<groupId>lennart</groupId>
 					<artifactId>xxindex</artifactId>
 				</exclusion> 
-				
- 			</exclusions> 
- 		</dependency> 
+
+			</exclusions> 
+		</dependency> 
 		<!-- OMSSA PARSER -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>de.proteinms.omxparser</groupId> -->
-<!-- 			<artifactId>omssa-parser</artifactId> -->
-<!-- 			<version>1.4.6</version> -->
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<groupId>batik</groupId> -->
-<!-- 					<artifactId>batik-all</artifactId> -->
-<!-- 				</exclusion> -->
-<!-- 				 <exclusion> -->
-<!--                     <artifactId>pdf-transcoder</artifactId> -->
-<!--                     <groupId>batik</groupId> -->
-<!--                 </exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>utilities</artifactId> -->
-<!-- 					<groupId>com.compomics</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
-<!-- 		</dependency> -->
-		
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>de.proteinms.omxparser</groupId> -->
+		<!-- 			<artifactId>omssa-parser</artifactId> -->
+		<!-- 			<version>1.4.6</version> -->
+		<!-- 			<exclusions> -->
+		<!-- 				<exclusion> -->
+		<!-- 					<groupId>batik</groupId> -->
+		<!-- 					<artifactId>batik-all</artifactId> -->
+		<!-- 				</exclusion> -->
+		<!-- 				 <exclusion> -->
+		<!--                     <artifactId>pdf-transcoder</artifactId> -->
+		<!--                     <groupId>batik</groupId> -->
+		<!--                 </exclusion> -->
+		<!-- 				<exclusion> -->
+		<!-- 					<artifactId>utilities</artifactId> -->
+		<!-- 					<groupId>com.compomics</groupId> -->
+		<!-- 				</exclusion> -->
+		<!-- 			</exclusions> -->
+		<!-- 		</dependency> -->
+
 		<dependency>
 			<groupId>com.compomics</groupId>
 			<artifactId>utilities</artifactId>
@@ -277,17 +258,17 @@
 			<exclusions>
 				<exclusion>
 					<groupId>de.proteinms.xtandemparser</groupId> 
- 					<artifactId>xtandem-parser</artifactId> 
+					<artifactId>xtandem-parser</artifactId> 
 				</exclusion>
 				<exclusion>
 					<groupId>batik</groupId>
 					<artifactId>batik-all</artifactId>
 				</exclusion>
-				 <exclusion>
-                    <artifactId>pdf-transcoder</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
+				<exclusion>
+					<artifactId>pdf-transcoder</artifactId>
+					<groupId>batik</groupId>
+				</exclusion>
+				<exclusion>
 					<groupId>itext</groupId>
 					<artifactId>iText</artifactId>
 				</exclusion>
@@ -322,59 +303,59 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-	      <groupId>com.compomics</groupId>
-	      <artifactId>dbtoolkit</artifactId>
-	      <version>4.2.4</version>
-	      <exclusions>
-	        <exclusion>
-	          <artifactId>batik-all</artifactId>
-	          <groupId>batik</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>pdf-transcoder</artifactId>
-	          <groupId>batik</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>iText</artifactId>
-	          <groupId>itext</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>jcommon</artifactId>
-	          <groupId>jfree</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>lmjunit</artifactId>
-	          <groupId>lennart</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>cpdetector</artifactId>
-	          <groupId>lennart</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>statlib</artifactId>
-	          <groupId>lennart</groupId>
-	        </exclusion>
-	        <exclusion>
-	          <artifactId>xxindex</artifactId>
-	          <groupId>lennart</groupId>
-	        </exclusion>
-	      </exclusions>
-	    </dependency>
-	    <!--  mapeo de modificaciones -->
-	    <dependency>
-           <groupId>uk.ac.ebi.pride-mod</groupId>
-           <artifactId>pride-mod</artifactId>
-           <version>1.0.1-SNAPSHOT</version>
-       	</dependency>
-	    <!--  Create PDFs -->
-	    <dependency>
-		    <groupId>org.apache.pdfbox</groupId>
-		    <artifactId>pdfbox</artifactId>
-		    <version>1.8.2</version>
+			<groupId>com.compomics</groupId>
+			<artifactId>dbtoolkit</artifactId>
+			<version>4.2.4</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>batik-all</artifactId>
+					<groupId>batik</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>pdf-transcoder</artifactId>
+					<groupId>batik</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>iText</artifactId>
+					<groupId>itext</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jcommon</artifactId>
+					<groupId>jfree</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>lmjunit</artifactId>
+					<groupId>lennart</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>cpdetector</artifactId>
+					<groupId>lennart</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>statlib</artifactId>
+					<groupId>lennart</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xxindex</artifactId>
+					<groupId>lennart</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		
-	    <!-- FTP CLIENT -->
-	    <dependency>
+		<!--  mapeo de modificaciones -->
+		<dependency>
+			<groupId>uk.ac.ebi.pride-mod</groupId>
+			<artifactId>pride-mod</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+		</dependency>
+		<!--  Create PDFs -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+
+		<!-- FTP CLIENT -->
+		<dependency>
 			<groupId>commons-net</groupId>
 			<artifactId>commons-net</artifactId>
 			<version>3.3</version>
@@ -384,15 +365,15 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.9</version>
-<!-- 			<scope>test</scope> -->
+			<!-- 			<scope>test</scope> -->
 		</dependency>
-		
+
 		<!--  Parallel hadoop -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.apache.hadoop</groupId> -->
-<!-- 			<artifactId>hadoop-client</artifactId> -->
-<!-- 			<version>1.2.0</version> -->
-<!-- 		</dependency> -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>org.apache.hadoop</groupId> -->
+		<!-- 			<artifactId>hadoop-client</artifactId> -->
+		<!-- 			<version>1.2.0</version> -->
+		<!-- 		</dependency> -->
 		<dependency>
 			<groupId>edu.scripps.yates</groupId>
 			<artifactId>dtaselectparser</artifactId>
@@ -408,24 +389,44 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- MSFTBX MS File Tool Box for pepXML parser -->
 		<dependency>
-  			<groupId>com.github.chhh</groupId>
-  			<artifactId>msftbx</artifactId>
-  			<version>1.6.0</version>
-  		</dependency>
-		
+			<groupId>com.github.chhh</groupId>
+			<artifactId>msftbx</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
 			<version>1.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.ac.ebi.jmzidml</groupId>
+			<artifactId>jmzidentml</artifactId>
+			<version>1.2.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jboss.jsfunit</groupId>
+					<artifactId>jboss-jsfunit-microdeployer</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
+
 		</dependency>
 	</dependencies>
 	<organization>
@@ -434,26 +435,26 @@
 	</organization>
 	<build>
 		<plugins>
-<!--  			This plugin creates a javadoc jar for pride-web.  -->
-<!--  			<plugin>  -->
-<!--  				<groupId>org.apache.maven.plugins</groupId>  -->
-<!--  				<artifactId>maven-javadoc-plugin</artifactId>  -->
-<!--  				<version>2.8</version>  -->
-<!--  				<executions>  -->
-<!--  desactivado  -->
-<!--  					<execution>  -->
-<!--  						<id>java-miape-api-javadoc</id>  -->
-<!--  						<phase>compile</phase>  -->
-<!--  						<goals>  -->
-<!--  							<goal>jar</goal>  -->
-<!--  						</goals>  -->
-<!--  						<configuration>  -->
-<!--  							<outputDirectory>javadoc</outputDirectory>  -->
-<!--  							<reportOutputDirectory>javadoc</reportOutputDirectory>  -->
-<!--  						</configuration>  -->
-<!--  					</execution>  -->
-<!--  				</executions>  -->
-<!--  			</plugin>  -->
+			<!--  			This plugin creates a javadoc jar for pride-web.  -->
+			<!--  			<plugin>  -->
+			<!--  				<groupId>org.apache.maven.plugins</groupId>  -->
+			<!--  				<artifactId>maven-javadoc-plugin</artifactId>  -->
+			<!--  				<version>2.8</version>  -->
+			<!--  				<executions>  -->
+			<!--  desactivado  -->
+			<!--  					<execution>  -->
+			<!--  						<id>java-miape-api-javadoc</id>  -->
+			<!--  						<phase>compile</phase>  -->
+			<!--  						<goals>  -->
+			<!--  							<goal>jar</goal>  -->
+			<!--  						</goals>  -->
+			<!--  						<configuration>  -->
+			<!--  							<outputDirectory>javadoc</outputDirectory>  -->
+			<!--  							<reportOutputDirectory>javadoc</reportOutputDirectory>  -->
+			<!--  						</configuration>  -->
+			<!--  					</execution>  -->
+			<!--  				</executions>  -->
+			<!--  			</plugin>  -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
@@ -463,38 +464,38 @@
 				</configuration>
 			</plugin>
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-source-plugin</artifactId>
-		        <version>3.0.1</version>
-		        <executions>
-		          <execution>
-		            <id>attach-sources</id>
-		            <phase>verify</phase>
-		            <goals>
-		              <goal>jar-no-fork</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		      </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
-		    	<groupId>org.apache.maven.plugins</groupId>
-		       	<artifactId>maven-jar-plugin</artifactId>
-		       	<version>3.0.2</version>
-			<configuration>
-               <finalName>${project.finalName}</finalName>
-               <archive>
-               	  <manifest>
-                     <addClasspath>true</addClasspath>
-                     <classpathPrefix>lib/</classpathPrefix>
-                     <useUniqueVersions>false</useUniqueVersions>
-                  </manifest>
-               </archive>
-               <outputDirectory>${project.build.directory}</outputDirectory>
-            </configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<finalName>${project.finalName}</finalName>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<useUniqueVersions>false</useUniqueVersions>
+						</manifest>
+					</archive>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<repositories>
 		<repository>
 			<id>ebi-repo</id>
@@ -540,28 +541,28 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		
-        <repository>
-            <id>genesis-maven2-repository</id>
-            <name>Genesis maven2 repository</name>
-            <url>http://genesis.UGent.be/maven2</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>JBoss</id>
-            <name>JBoss repository</name>
-            <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-        </repository>
-       <repository>
-                <id>mvnrepository</id>
-                <name>mvnrepository</name>
-                <url>http://www.mvnrepository.com</url>
-            </repository>
+
+		<repository>
+			<id>genesis-maven2-repository</id>
+			<name>Genesis maven2 repository</name>
+			<url>http://genesis.UGent.be/maven2</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>JBoss</id>
+			<name>JBoss repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>mvnrepository</id>
+			<name>mvnrepository</name>
+			<url>http://www.mvnrepository.com</url>
+		</repository>
 	</repositories>
 	<name>Java MIAPE API</name>
 	<scm>
 		<url>https://github.com/smdb21/java-miape-api</url>
 		<developerConnection>@smdb21</developerConnection>
 	</scm>
-	
+
 </project>
