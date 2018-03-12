@@ -155,7 +155,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String user, String password, String mzIdentMLFileName,
 			String projectName, boolean processInParallel)
-			throws MiapeDatabaseException, MiapeSecurityException, JAXBException {
+					throws MiapeDatabaseException, MiapeSecurityException, JAXBException {
 		mzIdentMLUnmarshaller = unmarshaller;
 		this.user = databaseManager.getUser(user, password);
 		this.cvManager = cvManager;
@@ -504,13 +504,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			return spectrumIdentificationListMap.get(spectrumIdentificationListId);
 		}
 		if (silIterator == null) {
-			log.info("Unmarshalling the spectrumIdentificationList iterator");
+			log.info("Unmarshalling  the spectrumIdentificationList iterator");
 			silIterator = mzIdentMLUnmarshaller
 					.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentificationList);
 			log.info("SpectrumIdentificationList iterator unmarshalled");
 		}
 		while (silIterator.hasNext()) {
-			log.debug("Unmarshalling next SpectrumIdentificationList");
+			log.debug("Unmarshalling  next SpectrumIdentificationList");
 			SpectrumIdentificationList sil = silIterator.next();
 			log.debug("SpectrumIdentificationList " + sil.getId() + " unmarshalled");
 			spectrumIdentificationListMap.put(sil.getId(), sil);
