@@ -1,6 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 
@@ -9,6 +10,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
@@ -18,8 +20,10 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.spring.SpringHandler;
 import org.xml.sax.SAXException;
 
-public class MiapeMzMLFile extends MiapeXmlFile<MiapeMSDocument> {
+import edu.scripps.yates.utilities.files.FileUtils;
 
+public class MiapeMzMLFile extends MiapeXmlFile<MiapeMSDocument> {
+	private final static Logger log = Logger.getLogger(MiapeMzMLFile.class);
 	private String userName;
 	private String password;
 	private PersistenceManager dbManager;
@@ -66,8 +70,7 @@ public class MiapeMzMLFile extends MiapeXmlFile<MiapeMSDocument> {
 
 	@Override
 	public MiapeMSDocument toDocument() throws MiapeDatabaseException, MiapeSecurityException {
-		return MSMiapeFactory.getFactory().toDocument(this, dbManager, cvUtil, userName, password,
-				projectName);
+		return MSMiapeFactory.getFactory().toDocument(this, dbManager, cvUtil, userName, password, projectName);
 
 	}
 
@@ -111,21 +114,25 @@ public class MiapeMzMLFile extends MiapeXmlFile<MiapeMSDocument> {
 		Validator validator = schema.newValidator();
 
 		// 4. Parse the document you want to check.
-		Source source = new StreamSource(file);
+		Source source;
 
 		// 5. Check the document (throws an Exception if not valid)
 		try {
+			source = new StreamSource(FileUtils.getInputStream(file));
 			validator.validate(source);
 			retval = true;
 		} catch (SAXException ex) {
-			System.out.println(file.getName() + " is not valid because ");
-			System.out.println(ex.getMessage());
+			log.info(file.getName() + " is not valid because ");
+			log.info(ex.getMessage());
 			retval = false;
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+			throw new IllegalStateException(
+					"Could not validate file because it doesn't exist or is not readable: " + file.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new IllegalStateException(
-					"Could not validate file because of file read problems for source: "
-							+ file.getAbsolutePath());
+					"Could not validate file because of file read problems for source: " + file.getAbsolutePath());
 		}
 
 		return retval;
