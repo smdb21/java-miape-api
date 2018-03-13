@@ -1,5 +1,7 @@
 package org.proteored.miapeapi.xml.mzml;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
@@ -9,6 +11,7 @@ import org.proteored.miapeapi.exceptions.WrongXMLFormatException;
 import org.proteored.miapeapi.interfaces.ms.MiapeMSDocument;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 
+import edu.scripps.yates.utilities.files.ZipManager;
 import uk.ac.ebi.jmzml.model.mzml.MzML;
 import uk.ac.ebi.jmzml.xml.io.MzMLUnmarshaller;
 
@@ -48,23 +51,22 @@ public class MSMiapeFactory {
 	 * @throws MiapeSecurityException
 	 * @throws IllegalMiapeArgumentException
 	 */
-	public MiapeMSDocument toDocument(MiapeMzMLFile miapeMzMLFile,
-			PersistenceManager databaseManager, ControlVocabularyManager cvManager,
-			String userName, String password, String projectName) throws MiapeDatabaseException,
-			MiapeSecurityException, IllegalMiapeArgumentException {
+	public MiapeMSDocument toDocument(MiapeMzMLFile miapeMzMLFile, PersistenceManager databaseManager,
+			ControlVocabularyManager cvManager, String userName, String password, String projectName)
+					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		if (cvManager == null)
 			throw new IllegalMiapeArgumentException("ControlVocabularyManager is not set");
 		MiapeMSDocument result = null;
 		try {
 			log.info("before unmarshall");
-			MzMLUnmarshaller mzUnmarshaller = new MzMLUnmarshaller(miapeMzMLFile.toFile());
+			File file = ZipManager.decompressFileIfNeccessary(miapeMzMLFile.toFile());
+			MzMLUnmarshaller mzUnmarshaller = new MzMLUnmarshaller(file);
 			log.info("after unmarshall");
 			if (databaseManager == null) {
-				result = new MiapeMSDocumentImpl(mzUnmarshaller, cvManager, miapeMzMLFile.toFile()
-						.getName(), projectName);
+				result = new MiapeMSDocumentImpl(mzUnmarshaller, cvManager, file.getName(), projectName);
 			} else {
-				result = new MiapeMSDocumentImpl(mzUnmarshaller, databaseManager, cvManager,
-						userName, password, miapeMzMLFile.toFile().getName(), projectName);
+				result = new MiapeMSDocumentImpl(mzUnmarshaller, databaseManager, cvManager, userName, password,
+						file.getName(), projectName);
 			}
 
 		} catch (IllegalStateException e) {
@@ -89,18 +91,17 @@ public class MSMiapeFactory {
 	 * @throws MiapeSecurityException
 	 * @throws IllegalMiapeArgumentException
 	 */
-	public MiapeMSDocument toDocument(MzML mzML, PersistenceManager databaseManager,
-			ControlVocabularyManager cvManager, String userName, String password,
-			String mzMLFileName, String projectName) throws MiapeDatabaseException,
-			MiapeSecurityException, IllegalMiapeArgumentException {
+	public MiapeMSDocument toDocument(MzML mzML, PersistenceManager databaseManager, ControlVocabularyManager cvManager,
+			String userName, String password, String mzMLFileName, String projectName)
+					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		MiapeMSDocument result = null;
 		try {
 
 			if (databaseManager == null) {
 				result = new MiapeMSDocumentImpl(mzML, cvManager, mzMLFileName, projectName);
 			} else {
-				result = new MiapeMSDocumentImpl(mzML, databaseManager, cvManager, userName,
-						password, mzMLFileName, projectName);
+				result = new MiapeMSDocumentImpl(mzML, databaseManager, cvManager, userName, password, mzMLFileName,
+						projectName);
 			}
 
 		} catch (IllegalStateException e) {

@@ -47,6 +47,7 @@ import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import edu.scripps.yates.utilities.files.ZipManager;
 import gnu.trove.map.hash.THashMap;
 import umich.ms.fileio.exceptions.FileParsingException;
 import umich.ms.fileio.filetypes.pepxml.PepXmlParser;
@@ -95,7 +96,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		this.cvManager = cvManager;
 		this.dbManager = null;
 		log.info("Starting parsing of pepXML file: " + pepXMLFile.getAbsolutePath());
-		MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(pepXMLFile.getAbsolutePath()));
+		File file = ZipManager.decompressFileIfNeccessary(pepXMLFile);
+		MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(file.getAbsolutePath()));
 
 		searchEngine = PepXMLUtil.getSearchEngineFromSummaryXml(pipelineAnalysis.getSummaryXml());
 
@@ -106,7 +108,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	public MiapeMsiDocumentImpl(File pepXMLFile, PersistenceManager databaseManager, ControlVocabularyManager cvManager,
 			String user, String password, String projectName)
-			throws MiapeDatabaseException, MiapeSecurityException, FileParsingException {
+					throws MiapeDatabaseException, MiapeSecurityException, FileParsingException {
 
 		this.pepXMLFile = pepXMLFile;
 		if (databaseManager != null) {
@@ -118,7 +120,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		}
 		this.projectName = projectName;
 		this.cvManager = cvManager;
-		final MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(pepXMLFile.getAbsolutePath()));
+		File file = ZipManager.decompressFileIfNeccessary(pepXMLFile);
+		final MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(file.getAbsolutePath()));
 
 		// to process the file
 		miapeMSI = processPepXMLFile(pipelineAnalysis).build();
@@ -141,7 +144,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(MsmsPipelineAnalysis pipelineAnalysis, String idSetName,
 			ControlVocabularyManager cvManager, PersistenceManager dbManager, User owner, String projectName)
-			throws FileParsingException {
+					throws FileParsingException {
 
 		Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
 		MiapeMSIDocumentBuilder miapeBuilder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project, idSetName,
