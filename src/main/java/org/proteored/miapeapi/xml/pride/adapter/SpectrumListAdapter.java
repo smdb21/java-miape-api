@@ -175,7 +175,8 @@ public class SpectrumListAdapter implements Adapter<SpectrumList> {
 		if (spectrumList.getSpectrum().isEmpty())
 			log.info("No spectra was readed");
 		if (spectrumList.getSpectrum().isEmpty() && addPeakList)
-			throw new IllegalMiapeArgumentException("No spectra has been captured");
+			throw new IllegalMiapeArgumentException(
+					"No spectra has been captured. Unselect 'include spectra' and try again.");
 
 		spectrumList.setCount(spectrumList.getSpectrum().size());
 		log.info(spectrumList.getCount() + " spectra readed from " + miapeMSs.size() + " MIAPE MSs");
