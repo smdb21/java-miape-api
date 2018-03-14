@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.proteored.miapeapi.experiment.model.Experiment;
+import org.proteored.miapeapi.experiment.model.ExperimentList;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.IdentificationItemEnum;
 import org.proteored.miapeapi.experiment.model.IdentificationSet;
@@ -11,6 +13,7 @@ import org.proteored.miapeapi.experiment.model.ProteinGroup;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
 
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
 public class OccurrenceFilter implements Filter {
@@ -22,6 +25,7 @@ public class OccurrenceFilter implements Filter {
 	private final Software software;
 	private final boolean separateNonConclusiveProteins;
 	private final boolean doNotGroupNonConclusiveProteins;
+	private final int level; // level 0, 1 or 2
 
 	public boolean isDistinguishModificatedPeptides() {
 		return distinguishModificatedPeptides;
@@ -59,10 +63,11 @@ public class OccurrenceFilter implements Filter {
 	 *            which the item appears, and if false the minOccurrence is the
 	 *            number of times that the item appears over the replicates
 	 */
-	public OccurrenceFilter(int minOccurrence, IdentificationItemEnum item, boolean distinguisModificatedPeptides,
-			boolean minNumReplicates, boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins,
-			Software software) {
+	public OccurrenceFilter(int minOccurrence, int level, IdentificationItemEnum item,
+			boolean distinguisModificatedPeptides, boolean minNumReplicates, boolean doNotGroupNonConclusiveProteins,
+			boolean separateNonConclusiveProteins, Software software) {
 		this.minOccurrence = minOccurrence;
+		this.level = level;
 		if (IdentificationItemEnum.PEPTIDE.equals(item))
 			this.appliedToPeptides = true;
 		else if (IdentificationItemEnum.PROTEIN.equals(item))
@@ -96,6 +101,9 @@ public class OccurrenceFilter implements Filter {
 				return false;
 			if (!filter.byReplicates && this.byReplicates)
 				return false;
+			if (filter.level != this.level) {
+				return false;
+			}
 			return true;
 
 		} else
@@ -109,42 +117,80 @@ public class OccurrenceFilter implements Filter {
 
 	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
-		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
+		List<IdentificationSet> nextLevelIdentificationSetList = null;
+		try {
+			nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
+		} catch (UnsupportedOperationException e) {
 
-		if (byReplicates)
+		}
+		if (byReplicates) {
 			log.info("filtering " + identifiedPeptides.size() + " peptides by Occurrence " + minOccurrence
 					+ " replicates");
-		else
+		} else {
 			log.info("filtering " + identifiedPeptides.size() + " peptides by Occurrence " + minOccurrence + " times");
+		}
 		TIntHashSet ret = new TIntHashSet();
-		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
-			int replicates = 0;
-			if (nextLevelIdentificationSetList == null) {
-				if (!ret.contains(peptide.getId()))
-					ret.add(peptide.getId());
-				else
-					log.info("This peptide has passed already the threshold");
-			} else {
-				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
-					final int peptideOccurrence = idSet.getPeptideOccurrenceNumber(peptide.getSequence(),
-							this.distinguishModificatedPeptides);
-					if (peptideOccurrence > 0) {
-						if (byReplicates)
-							replicates = replicates + 1;
-						else
-							replicates = replicates + peptideOccurrence;
+		if (currentIdSet instanceof ExperimentList && level == 0 || //
+				currentIdSet instanceof Experiment && level == 1) {
+			if (byReplicates) {
+				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+					int replicates = 0;
+					if (nextLevelIdentificationSetList == null) {
+						// this is because it is a Replicate
+						// everything passes
+						ret.add(peptide.getId());
+					} else {
+
+						for (IdentificationSet idSet : nextLevelIdentificationSetList) {
+							final int peptideOccurrence = idSet.getPeptideOccurrenceNumber(peptide.getSequence(),
+									this.distinguishModificatedPeptides);
+							if (peptideOccurrence > 0) {
+								replicates = replicates + 1;
+							}
+						}
+						if (replicates >= minOccurrence) {
+							ret.add(peptide.getId());
+						}
 					}
 				}
-				if (replicates >= minOccurrence) {
-					if (!ret.contains(peptide.getId()))
+			} else {
+				// by number of times
+				THashMap<String, Integer> peptideKeyMap = new THashMap<String, Integer>();
+				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+					String key = peptide.getKey(distinguishModificatedPeptides);
+					if (peptideKeyMap.contains(key)) {
+						peptideKeyMap.put(key, peptideKeyMap.get(key) + 1);
+					} else {
+						peptideKeyMap.put(key, 1);
+					}
+				}
+				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+					String key = peptide.getKey(distinguishModificatedPeptides);
+					// this is because it is a Replicate
+					if (peptideKeyMap.get(key) >= minOccurrence) {
 						ret.add(peptide.getId());
-					else
-						log.info("This peptide has passed already the threshold");
+					}
+				}
+			}
+		} else {
+			if (nextLevelIdentificationSetList != null) {
+				// get what the next level gets
+				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
+					List<ExtendedIdentifiedPeptide> peptides = idSet.getIdentifiedPeptides();
+					for (ExtendedIdentifiedPeptide peptide : peptides) {
+						ret.add(peptide.getId());
+					}
+				}
+			} else {
+				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+					ret.add(peptide.getId());
 				}
 			}
 		}
+
 		log.info("Resulting " + ret.size() + " peptides after filtering " + identifiedPeptides.size() + " peptides");
 		return ret;
+
 	}
 
 	@Override
@@ -204,17 +250,22 @@ public class OccurrenceFilter implements Filter {
 	 * @return
 	 */
 	public List<ProteinGroup> filterProteins(List<ProteinGroup> identifiedProteinGroups,
-			List<ProteinGroup> inclusionProteinGroupList) {
+			List<ProteinGroup> inclusionProteinGroupList, IdentificationSet currentIdSet) {
 
-		if (inclusionProteinGroupList == null)
-			return identifiedProteinGroups;
+		// if (inclusionProteinGroupList == null)
+		// return identifiedProteinGroups;
 
 		if (!appliedToProteins) {
 			// throw new
 			// UnsupportedOperationException("This filter cannot filter
 			// proteins");
-			log.info("This filter cannot filter peptides");
-			return identifiedProteinGroups;
+			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
+					.getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
+			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+			return DataManager.filterProteinGroupsByPeptides(identifiedProteinGroups, doNotGroupNonConclusiveProteins,
+					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
+
+			// return identifiedProteinGroups;
 
 		}
 
@@ -222,7 +273,7 @@ public class OccurrenceFilter implements Filter {
 
 		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 		for (ProteinGroup proteinGroup : identifiedProteinGroups) {
-			if (inclusionProteinGroupList.contains(proteinGroup))
+			if (inclusionProteinGroupList == null || inclusionProteinGroupList.contains(proteinGroup))
 				ret.add(proteinGroup);
 		}
 		log.info("Resulting " + ret.size() + " protein groups after filtering " + identifiedProteinGroups.size()

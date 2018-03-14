@@ -11,20 +11,28 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 public class StaticProteinStorage {
 	private final static Map<String, TIntObjectHashMap<ExtendedIdentifiedProtein>> staticProteinsByMIAPEID = new THashMap<String, TIntObjectHashMap<ExtendedIdentifiedProtein>>();
 
-	public static synchronized void addProtein(MiapeMSIDocument miapeMSI, ExtendedIdentifiedProtein Protein) {
-		if (!staticProteinsByMIAPEID.containsKey(miapeMSI.getName())) {
-			TIntObjectHashMap<ExtendedIdentifiedProtein> ProteinMap = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
-			staticProteinsByMIAPEID.put(miapeMSI.getName(), ProteinMap);
+	public static synchronized void addProtein(MiapeMSIDocument miapeMSI, String experimentFullName,
+			ExtendedIdentifiedProtein protein) {
+		String key = getKey(miapeMSI, experimentFullName);
+		if (!staticProteinsByMIAPEID.containsKey(key)) {
+			TIntObjectHashMap<ExtendedIdentifiedProtein> proteinMap = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
+			staticProteinsByMIAPEID.put(key, proteinMap);
 		}
-		final TIntObjectHashMap<ExtendedIdentifiedProtein> ProteinMap = staticProteinsByMIAPEID.get(miapeMSI.getName());
-		ProteinMap.put(Protein.getId(), Protein);
+		final TIntObjectHashMap<ExtendedIdentifiedProtein> proteinMap = staticProteinsByMIAPEID.get(key);
+		proteinMap.put(protein.getId(), protein);
 	}
 
-	public static synchronized ExtendedIdentifiedProtein getProtein(MiapeMSIDocument miapeMSI, int ProteinID) {
-		if (staticProteinsByMIAPEID.containsKey(miapeMSI.getName())) {
-			return staticProteinsByMIAPEID.get(miapeMSI.getName()).get(ProteinID);
+	public static synchronized ExtendedIdentifiedProtein getProtein(MiapeMSIDocument miapeMSI,
+			String experimentFullName, int proteinID) {
+		String key = getKey(miapeMSI, experimentFullName);
+		if (staticProteinsByMIAPEID.containsKey(key)) {
+			return staticProteinsByMIAPEID.get(key).get(proteinID);
 		}
 		return null;
+	}
+
+	private static String getKey(MiapeMSIDocument miapeMSI, String experimentFullName) {
+		return miapeMSI.getName() + "-" + experimentFullName;
 	}
 
 	public static synchronized void clear() {

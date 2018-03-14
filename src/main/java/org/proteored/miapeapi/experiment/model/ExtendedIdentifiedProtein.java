@@ -38,6 +38,8 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	private SortingParameters sortingParameters;
 
 	private Double proteinMass;
+	// private static int staticIdentifier = 0;
+	// private final int id = ++staticIdentifier;
 
 	public ExtendedIdentifiedProtein(Replicate replicate, IdentifiedProtein identifiedProtein,
 			MiapeMSIDocument miapeMSI) {
@@ -146,6 +148,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	@Override
 	public int getId() {
+
 		return protein.getId();
 	}
 
@@ -251,7 +254,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		peptides.add(peptide);
 	}
 
-	public void resetPeptides() {
+	public void resetPeptides(IdentificationSet idSet) {
 
 		final List<IdentifiedPeptide> identifiedPeptides = getIdentifiedPeptides();
 		if (peptides == null)
@@ -259,7 +262,8 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		if (identifiedPeptides != null) {
 			peptides.clear();
 			for (IdentifiedPeptide peptide : identifiedPeptides) {
-				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSI, peptide.getId());
+				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSI, idSet.getFullName(),
+						peptide.getId());
 				if (peptide2 != null) {
 					// add it to the protein
 					peptides.add(peptide2);
@@ -269,7 +273,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 					List<IdentifiedProtein> identifiedProteins = peptide2.getIdentifiedProteins();
 					for (IdentifiedProtein identifiedProtein : identifiedProteins) {
 						ExtendedIdentifiedProtein protein2 = StaticProteinStorage.getProtein(miapeMSI,
-								identifiedProtein.getId());
+								idSet.getFullName(), identifiedProtein.getId());
 						if (protein2 != null) {
 							peptide2.addProtein(protein2);
 						}

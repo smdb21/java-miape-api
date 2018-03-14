@@ -57,6 +57,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	private SortingParameters sortingParameters;
 
 	private SlimModCollection preferredModifications;
+	// private static int staticIdentifier = 0;
+	// private final int id = ++staticIdentifier;
 
 	// private boolean filtered = false;
 
@@ -435,6 +437,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	@Override
 	public int getId() {
+
 		return peptide.getId();
 	}
 

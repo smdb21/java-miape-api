@@ -11,25 +11,33 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 public class StaticPeptideStorage {
 	private final static Map<String, TIntObjectHashMap<ExtendedIdentifiedPeptide>> staticPeptidesByMIAPEID = new THashMap<String, TIntObjectHashMap<ExtendedIdentifiedPeptide>>();
 
-	public static synchronized void addPeptide(MiapeMSIDocument miapeMSI, ExtendedIdentifiedPeptide peptide) {
-		if (!staticPeptidesByMIAPEID.containsKey(miapeMSI.getName())) {
+	public static synchronized void addPeptide(MiapeMSIDocument miapeMSI, String experimentFullName,
+			ExtendedIdentifiedPeptide peptide) {
+		String key = getKey(miapeMSI, experimentFullName);
+		if (!staticPeptidesByMIAPEID.containsKey(key)) {
 			TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = new TIntObjectHashMap<ExtendedIdentifiedPeptide>();
-			staticPeptidesByMIAPEID.put(miapeMSI.getName(), peptideMap);
+			staticPeptidesByMIAPEID.put(key, peptideMap);
 		}
-		final TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = staticPeptidesByMIAPEID.get(miapeMSI.getName());
+		final TIntObjectHashMap<ExtendedIdentifiedPeptide> peptideMap = staticPeptidesByMIAPEID.get(key);
 		peptideMap.put(peptide.getId(), peptide);
 	}
 
-	public static synchronized ExtendedIdentifiedPeptide getPeptide(MiapeMSIDocument miapeMSI, int peptideID) {
-		if (staticPeptidesByMIAPEID.containsKey(miapeMSI.getName())) {
-			return staticPeptidesByMIAPEID.get(miapeMSI.getName()).get(peptideID);
+	private static String getKey(MiapeMSIDocument miapeMSI, String experimentFullName) {
+		return miapeMSI.getName() + "-" + experimentFullName;
+	}
+
+	public static synchronized ExtendedIdentifiedPeptide getPeptide(MiapeMSIDocument miapeMSI,
+			String experimentFullName, int peptideID) {
+		String key = getKey(miapeMSI, experimentFullName);
+		if (staticPeptidesByMIAPEID.containsKey(key)) {
+			return staticPeptidesByMIAPEID.get(key).get(peptideID);
 		}
 		return null;
 	}
 
 	public static synchronized void clear() {
-		for (String miapeMSIName : staticPeptidesByMIAPEID.keySet()) {
-			staticPeptidesByMIAPEID.get(miapeMSIName).clear();
+		for (String key : staticPeptidesByMIAPEID.keySet()) {
+			staticPeptidesByMIAPEID.get(key).clear();
 		}
 		staticPeptidesByMIAPEID.clear();
 

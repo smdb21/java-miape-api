@@ -111,7 +111,7 @@ public abstract class DataManager {
 	// Next level datamanagers
 	private List<DataManager> dataManagers;
 
-	private List<ProteinGroup> inclusionList = null;
+	// private List<ProteinGroup> inclusionList = null;
 
 	private final Set<String> differentSearchedDatabases = new THashSet<String>();
 
@@ -416,7 +416,8 @@ public abstract class DataManager {
 									extendedIdentifiedProtein = new ExtendedIdentifiedProtein((Replicate) idSet,
 											protein, miapeMSIDocument);
 									if (useStaticCollections) {
-										StaticProteinStorage.addProtein(miapeMSIDocument, extendedIdentifiedProtein);
+										StaticProteinStorage.addProtein(miapeMSIDocument, idSet.getFullName(),
+												extendedIdentifiedProtein);
 									}
 									// if (useStaticCollections)
 									// staticProteins.put(
@@ -468,8 +469,8 @@ public abstract class DataManager {
 							if (peptide.getSequence() != null && peptide.getSequence().length() >= minPepLength) {
 								// NOT ADD PEPTIDES THAT WERE ADDED BEFORE!
 								if (peptidesIds.contains(peptide.getId())) {
-									log.info("Peptide is already processed");
-									continue;
+									// log.info("Peptide is already processed");
+									// continue;
 								}
 								peptidesIds.add(peptide.getId());
 
@@ -480,7 +481,8 @@ public abstract class DataManager {
 								extendedIdentifiedPeptide = new ExtendedIdentifiedPeptide((Replicate) idSet, peptide,
 										miapeMSIDocument);
 								if (useStaticCollections) {
-									StaticPeptideStorage.addPeptide(miapeMSIDocument, extendedIdentifiedPeptide);
+									StaticPeptideStorage.addPeptide(miapeMSIDocument, idSet.getFullName(),
+											extendedIdentifiedPeptide);
 
 								}
 								// } else {
@@ -985,11 +987,11 @@ public abstract class DataManager {
 
 		for (ExtendedIdentifiedProtein protein : proteins) {
 			protein.setDecoy(false, false);
-			protein.resetPeptides();
+			protein.resetPeptides(this.idSet);
 			// check that it has all the peptides
 			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
 				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSI(),
-						peptide.getId());
+						idSet.getFullName(), peptide.getId());
 				if (peptide2 != null) {
 					protein.addPeptide(peptide2);
 				}
@@ -1016,7 +1018,9 @@ public abstract class DataManager {
 
 			// use the occurrence filter just in case of being an experiment to
 			// filter proteins that are not present in at least X replicates
-			if (filter instanceof OccurrenceFilter && this instanceof ExperimentDataManager) {
+			if (filter instanceof OccurrenceFilter
+			// && this instanceof ExperimentDataManager
+			) {
 				// filter
 				if (ret == null) {
 					filteredProteinGroups = filter.filter(toFilter, idSet);
@@ -1031,25 +1035,31 @@ public abstract class DataManager {
 				log.info(" (" + idSet.getName() + ") Passing from " + toFilter.size() + " to " + ret.size()
 						+ " proteins");
 				for (DataManager dataManager : dataManagers) {
-					dataManager.setInclusionList(filteredProteinGroups);
+					// dataManager.setInclusionList(filteredProteinGroups);
 					dataManager.setFiltered(false);
 				}
-			} else if (filter instanceof OccurrenceFilter && this instanceof ReplicateDataManager
-					&& !((OccurrenceFilter) filter).isByReplicates()) {
-				OccurrenceFilter occurrenceFilter = (OccurrenceFilter) filter;
-				if (ret == null) {
-					filteredProteinGroups = occurrenceFilter.filterProteins(toFilter, inclusionList);
-				} else {
-					filteredProteinGroups = occurrenceFilter.filterProteins(ret, inclusionList);
-				}
-				aFilterIsApplied = true;
-				if (ret == null)
-					ret = new ArrayList<ProteinGroup>();
-
-				ret.clear();
-				ret.addAll(filteredProteinGroups);
-				log.info(" (" + idSet.getName() + ") Passing from " + toFilter.size() + " to " + ret.size()
-						+ " proteins");
+				// } else if (filter instanceof OccurrenceFilter && this
+				// instanceof ReplicateDataManager
+				// && !((OccurrenceFilter) filter).isByReplicates()) {
+				// OccurrenceFilter occurrenceFilter = (OccurrenceFilter)
+				// filter;
+				// if (ret == null) {
+				// filteredProteinGroups =
+				// occurrenceFilter.filterProteins(toFilter, inclusionList,
+				// idSet);
+				// } else {
+				// filteredProteinGroups = occurrenceFilter.filterProteins(ret,
+				// inclusionList, idSet);
+				// }
+				// aFilterIsApplied = true;
+				// if (ret == null)
+				// ret = new ArrayList<ProteinGroup>();
+				//
+				// ret.clear();
+				// ret.addAll(filteredProteinGroups);
+				// log.info(" (" + idSet.getName() + ") Passing from " +
+				// toFilter.size() + " to " + ret.size()
+				// + " proteins");
 				// if it is not an occurrenceFilter
 			} else if (!(filter instanceof OccurrenceFilter)) {
 				boolean applyFilter = false;
@@ -1099,14 +1109,14 @@ public abstract class DataManager {
 		isDataReady = b;
 	}
 
-	private void setInclusionList(List<ProteinGroup> inclusionList) {
-		if (this.inclusionList == null)
-			this.inclusionList = new ArrayList<ProteinGroup>();
-		this.inclusionList.clear();
-
-		this.inclusionList.addAll(inclusionList);
-
-	}
+	// private void setInclusionList(List<ProteinGroup> inclusionList) {
+	// if (this.inclusionList == null)
+	// this.inclusionList = new ArrayList<ProteinGroup>();
+	// this.inclusionList.clear();
+	//
+	// this.inclusionList.addAll(inclusionList);
+	//
+	// }
 
 	/**
 	 * Gets the total list of proteins identified, not considering any filter,
@@ -2564,5 +2574,10 @@ public abstract class DataManager {
 			return peptideOccurrence.getPeptides().size();
 		}
 		return 0;
+	}
+
+	@Override
+	public String toString() {
+		return "DatasetManager (" + this.getClass().getCanonicalName() + ") " + this.idSet.getName();
 	}
 }
