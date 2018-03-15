@@ -13,8 +13,6 @@ import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.Database;
-import org.proteored.miapeapi.interfaces.msi.InputParameter;
-import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -178,19 +176,6 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 		return false;
 	}
 
-	public List<MiapeMSIDocument> getMiapeMSIs() {
-		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		List<Integer> ids = new ArrayList<Integer>();
-		for (ExtendedIdentifiedPeptide identificationItem : peptideList) {
-			MiapeMSIDocument miapeMSI = identificationItem.getMiapeMSI();
-			if (!ids.contains(miapeMSI.getId())) {
-				ret.add(miapeMSI);
-				ids.add(miapeMSI.getId());
-			}
-		}
-		return ret;
-	}
-
 	/**
 	 * Gets the different protein databases in which the
 	 * {@link ExtendedIdentifiedPeptide} were searched
@@ -199,36 +184,31 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 	 */
 	public List<Database> getProteinDatabases() {
 		List<Database> ret = new ArrayList<Database>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<InputParameter> inputParameters = miapeMSIDocument.getInputParameters();
-			if (inputParameters != null) {
-				for (InputParameter inputParameter : inputParameters) {
-					Set<Database> databases = inputParameter.getDatabases();
-					if (databases != null) {
-						for (Database database : databases) {
-							boolean found = false;
-							for (Database selectedDatabase : ret) {
-								String selectedDatabaseName = selectedDatabase.getName();
-								if (selectedDatabase != null)
-									if (selectedDatabaseName.equals(database.getName())) {
-										String selectedDatabaseVersion = selectedDatabase.getNumVersion();
-										if (selectedDatabaseVersion != null) {
-											if (selectedDatabaseVersion.equals(database.getNumVersion()))
-												found = true;
-										} else if (selectedDatabaseVersion == null
-												&& database.getNumVersion() == null) {
-											found = true;
-										}
-									}
+		for (ExtendedIdentifiedPeptide peptide : this.peptideList) {
+
+			Set<Database> databases = peptide.getDatabases();
+			if (databases != null) {
+				for (Database database : databases) {
+					boolean found = false;
+					for (Database selectedDatabase : ret) {
+						String selectedDatabaseName = selectedDatabase.getName();
+						if (selectedDatabase != null)
+							if (selectedDatabaseName.equals(database.getName())) {
+								String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+								if (selectedDatabaseVersion != null) {
+									if (selectedDatabaseVersion.equals(database.getNumVersion()))
+										found = true;
+								} else if (selectedDatabaseVersion == null && database.getNumVersion() == null) {
+									found = true;
+								}
 							}
-							if (!found)
-								ret.add(database);
-						}
 					}
+					if (!found)
+						ret.add(database);
 				}
 			}
 		}
+
 		return ret;
 	}
 
@@ -240,9 +220,8 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 	 */
 	public List<Software> getSoftwares() {
 		List<Software> ret = new ArrayList<Software>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<Software> softwares = miapeMSIDocument.getSoftwares();
+		for (ExtendedIdentifiedPeptide peptide : this.peptideList) {
+			Set<Software> softwares = peptide.getSoftwares();
 			if (softwares != null) {
 				for (Software software : softwares) {
 					boolean found = false;
@@ -263,6 +242,7 @@ public class PeptideOccurrence implements Occurrence<ExtendedIdentifiedPeptide>,
 						ret.add(software);
 				}
 			}
+
 		}
 		return ret;
 	}

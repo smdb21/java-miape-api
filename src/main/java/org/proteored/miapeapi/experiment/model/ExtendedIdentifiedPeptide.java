@@ -4,9 +4,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
@@ -14,9 +16,12 @@ import org.proteored.miapeapi.experiment.model.grouping.PeptideRelation;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingManager;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
+import org.proteored.miapeapi.interfaces.Software;
+import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.InputData;
+import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.proteored.miapeapi.interfaces.msi.PeptideScore;
@@ -28,12 +33,12 @@ import com.compomics.util.experiment.biology.Atom;
 
 import edu.scripps.yates.utilities.strings.StringUtils;
 import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
 public class ExtendedIdentifiedPeptide extends IdentificationItem implements IdentifiedPeptide {
 	private static Map<String, List<String>> sequenceConversion = new THashMap<String, List<String>>();
 
-	private final IdentifiedPeptide peptide;
 	private final String modificationString;
 	private boolean decoy;
 	private String expMass;
@@ -49,7 +54,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	private int numMissedCleavages;
 
 	private final Integer miapeMSReference;
-	private final MiapeMSIDocument miapeMSI;
+	private final String miapeMSIName;
 	private List<ExtendedIdentifiedProtein> proteins = new ArrayList<ExtendedIdentifiedProtein>();
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
 	protected PeptideRelation relation;
@@ -59,6 +64,32 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	private SlimModCollection preferredModifications;
 	// private static int staticIdentifier = 0;
 	// private final int id = ++staticIdentifier;
+
+	private String charge;
+
+	private int id;
+
+	private String sequence;
+
+	private Set<PeptideScore> scores;
+
+	private Set<PeptideModification> modifications;
+
+	private String massDeviation;
+
+	private String spectrumRef;
+
+	private InputData inputData;
+
+	private int rank;
+
+	private String retentionTimeInSeconds;
+
+	private Set<Database> databases;
+
+	private HashSet<Software> softwares;
+
+	private List<Integer> identifiedProteinIDs;
 
 	// private boolean filtered = false;
 
@@ -87,32 +118,14 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		this.replicateName = replicateName;
 		this.experimentName = experimentName;
 
-		this.peptide = peptide;
-		modificationString = createModificationString();
+		modificationString = createModificationString(peptide);
 		if (miapeMSI != null)
 			miapeMSReference = miapeMSI.getMSDocumentReference();
 		else
 			miapeMSReference = -1;
-		this.miapeMSI = miapeMSI;
+		this.miapeMSIName = miapeMSI.getName();
 		this.relation = relation;
-		processPeptide();
-	}
-
-	public ExtendedIdentifiedPeptide(ExtendedIdentifiedPeptide p) {
-		calcMass = p.calcMass;
-		decoy = p.decoy;
-		errorMass = p.errorMass;
-		experimentName = p.experimentName;
-		expMass = p.expMass;
-		miapeMSI = p.miapeMSI;
-		miapeMSReference = p.miapeMSReference;
-		modificationString = p.modificationString;
-		numMissedCleavages = p.numMissedCleavages;
-		peptide = p.peptide;
-		proteins = p.proteins;
-		relation = p.relation;
-		replicateName = p.replicateName;
-
+		processPeptide(peptide, miapeMSI);
 	}
 
 	public FDRFilter getFdrFilter() {
@@ -123,8 +136,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		this.fdrFilter = fdrFilter;
 	}
 
-	private void processPeptide() {
-		String string = getMassDesviation();
+	private void processPeptide(IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI) {
+		String string = peptide.getMassDesviation();
 
 		if (string != null) {
 			if (string.contains("\n")) {
@@ -167,7 +180,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 			}
 		}
-		String seq = getSequence();
+		String seq = peptide.getSequence();
 		int numMiss = 0;
 		if (seq.contains("K")) {
 			final String[] split = seq.split("K");
@@ -195,6 +208,73 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		// }
 		// }
 		// }
+		// TODO add all parameters
+		charge = peptide.getCharge();
+		id = peptide.getId();
+		sequence = peptide.getSequence();
+		scores = new THashSet<PeptideScore>();
+		scores.addAll(peptide.getScores());
+		modifications = new THashSet<PeptideModification>();
+		modifications.addAll(peptide.getModifications());
+		massDeviation = peptide.getMassDesviation();
+		spectrumRef = peptide.getSpectrumRef();
+		inputData = peptide.getInputData();
+		rank = peptide.getRank();
+		retentionTimeInSeconds = peptide.getRetentionTimeInSeconds();
+		// databases
+		this.databases = new HashSet<Database>();
+		Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
+		if (inputParameters != null) {
+			for (InputParameter inputParameter : inputParameters) {
+				Set<Database> databases2 = inputParameter.getDatabases();
+				if (databases2 != null) {
+					for (Database database : databases2) {
+						boolean found = false;
+						for (Database selectedDatabase : databases) {
+							String selectedDatabaseName = selectedDatabase.getName();
+							if (selectedDatabase != null)
+								if (selectedDatabaseName.equals(database.getName())) {
+									String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+									if (selectedDatabaseVersion != null) {
+										if (selectedDatabaseVersion.equals(database.getNumVersion()))
+											found = true;
+									} else if (selectedDatabaseVersion == null && database.getNumVersion() == null) {
+										found = true;
+									}
+								}
+						}
+						if (!found)
+							databases.add(database);
+					}
+				}
+			}
+		}
+		// softwares
+		this.softwares = new HashSet<Software>();
+		Set<Software> softwares2 = miapeMSI.getSoftwares();
+		if (softwares2 != null) {
+			for (Software software : softwares2) {
+				boolean found = false;
+				for (Software selectedSoftware : softwares) {
+					String selectedDatabaseName = selectedSoftware.getName();
+					if (selectedSoftware != null)
+						if (selectedDatabaseName.equals(software.getName())) {
+							String selectedSoftwareVersion = selectedSoftware.getVersion();
+							if (selectedSoftwareVersion != null) {
+								if (selectedSoftwareVersion.equals(software.getVersion()))
+									found = true;
+							} else if (selectedSoftwareVersion == null && software.getVersion() == null) {
+								found = true;
+							}
+						}
+				}
+				if (!found)
+					softwares.add(software);
+			}
+		}
+		// protein ids
+		identifiedProteinIDs = peptide.getIdentifiedProteins().stream().map(p -> p.getId())
+				.collect(Collectors.toList());
 
 	}
 
@@ -219,14 +299,14 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		return this.getModificationString();
 	}
 
-	private String createModificationString() {
-		Set<PeptideModification> modificationSet = getModifications();
+	private String createModificationString(IdentifiedPeptide peptide) {
+		Set<PeptideModification> modificationSet = peptide.getModifications();
 		if (modificationSet != null) {
 			List<PeptideModification> modificationList = new ArrayList<PeptideModification>();
 			for (PeptideModification peptideModification : modificationSet) {
 				modificationList.add(peptideModification);
 			}
-			String sequence = getSequence();
+			String sequence = peptide.getSequence();
 			if (modificationList != null && !modificationList.isEmpty()) {
 
 				// sort modifications by position
@@ -303,13 +383,13 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 						sb.append("(->" + subtitution + ")");
 					}
 				}
-				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(getSequence())) {
+				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(peptide.getSequence())) {
 					List<String> list = new ArrayList<String>();
 					list.add(sb.toString());
-					ExtendedIdentifiedPeptide.sequenceConversion.put(getSequence(), list);
+					ExtendedIdentifiedPeptide.sequenceConversion.put(peptide.getSequence(), list);
 				} else {
 
-					final List<String> list = ExtendedIdentifiedPeptide.sequenceConversion.get(getSequence());
+					final List<String> list = ExtendedIdentifiedPeptide.sequenceConversion.get(peptide.getSequence());
 					if (list != null) {
 						try {
 							if (!list.contains(sb.toString()))
@@ -331,7 +411,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 				}
 			}
 		}
-		return getSequence();
+		return peptide.getSequence();
 	}
 
 	public static List<String> getModifiedSequences(String sequence) {
@@ -375,48 +455,44 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 				+ peptideModification.getNeutralLoss();
 	}
 
-	public IdentifiedPeptide getPeptide() {
-		return peptide;
-	}
-
 	@Override
 	public String getSequence() {
-		return peptide.getSequence();
+		return sequence;
 	}
 
 	@Override
 	public Set<PeptideScore> getScores() {
-		return peptide.getScores();
+		return scores;
 	}
 
 	@Override
 	public Set<PeptideModification> getModifications() {
-		return peptide.getModifications();
+		return modifications;
 	}
 
 	@Override
 	public String getCharge() {
-		return peptide.getCharge();
+		return charge;
 	}
 
 	@Override
 	public String getMassDesviation() {
-		return peptide.getMassDesviation();
+		return massDeviation;
 	}
 
 	@Override
 	public String getSpectrumRef() {
-		return peptide.getSpectrumRef();
+		return spectrumRef;
 	}
 
 	@Override
 	public InputData getInputData() {
-		return peptide.getInputData();
+		return inputData;
 	}
 
 	@Override
 	public int getRank() {
-		return peptide.getRank();
+		return rank;
 	}
 
 	/**
@@ -438,31 +514,21 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	@Override
 	public int getId() {
 
-		return peptide.getId();
+		return id;
 	}
 
 	@Override
 	public List<IdentifiedProtein> getIdentifiedProteins() {
 
-		return peptide.getIdentifiedProteins();
-		// List<IdentifiedProtein> ret = new ArrayList<IdentifiedProtein>();
-		// List<ExtendedIdentifiedProtein> filteredProteins = getProteins();
-		// List<Integer> filteredProteinIds = new ArrayList<Integer>();
-		// for (ExtendedIdentifiedProtein extendedIdentifiedProtein :
-		// filteredProteins) {
-		// filteredProteinIds.add(extendedIdentifiedProtein.getId());
-		// }
-		// for (IdentifiedProtein protein :
-		// this.peptide.getIdentifiedProteins()) {
-		// if (filteredProteinIds.contains(protein.getId()))
-		// ret.add(protein);
-		// }
-		// return ret;
+		// return peptide.getIdentifiedProteins();
+		throw new UnsupportedOperationException();
 	}
 
-	// public void setAsFiltered(boolean b) {
-	// this.filtered = b;
-	// }
+	public List<Integer> getIdentifiedProteinIDs() {
+
+		return identifiedProteinIDs;
+
+	}
 
 	public List<ExtendedIdentifiedProtein> getProteins() {
 		return proteins;
@@ -607,8 +673,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	 * @return
 	 */
 	@Override
-	public MiapeMSIDocument getMiapeMSI() {
-		return miapeMSI;
+	public String getMiapeMSIName() {
+		return miapeMSIName;
 	}
 
 	@Override
@@ -658,7 +724,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	@Override
 	public String getRetentionTimeInSeconds() {
-		return peptide.getRetentionTimeInSeconds();
+		return retentionTimeInSeconds;
 	}
 
 	public Float getPSMLocalFDR() {
@@ -701,6 +767,14 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			ret += allPositionsOf.size();
 		}
 		return ret;
+	}
+
+	public Set<Database> getDatabases() {
+		return databases;
+	}
+
+	public Set<Software> getSoftwares() {
+		return this.softwares;
 	}
 
 }

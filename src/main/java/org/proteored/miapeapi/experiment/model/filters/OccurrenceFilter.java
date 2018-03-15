@@ -10,6 +10,7 @@ import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
 import org.proteored.miapeapi.experiment.model.IdentificationItemEnum;
 import org.proteored.miapeapi.experiment.model.IdentificationSet;
 import org.proteored.miapeapi.experiment.model.ProteinGroup;
+import org.proteored.miapeapi.experiment.model.Replicate;
 import org.proteored.miapeapi.experiment.model.datamanager.DataManager;
 import org.proteored.miapeapi.interfaces.Software;
 
@@ -131,7 +132,8 @@ public class OccurrenceFilter implements Filter {
 		}
 		TIntHashSet ret = new TIntHashSet();
 		if (currentIdSet instanceof ExperimentList && level == 0 || //
-				currentIdSet instanceof Experiment && level == 1) {
+				currentIdSet instanceof Experiment && level == 1 || //
+				currentIdSet instanceof Replicate && level == 2) {
 			if (byReplicates) {
 				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 					int replicates = 0;
@@ -140,7 +142,6 @@ public class OccurrenceFilter implements Filter {
 						// everything passes
 						ret.add(peptide.getId());
 					} else {
-
 						for (IdentificationSet idSet : nextLevelIdentificationSetList) {
 							final int peptideOccurrence = idSet.getPeptideOccurrenceNumber(peptide.getSequence(),
 									this.distinguishModificatedPeptides);
@@ -167,12 +168,15 @@ public class OccurrenceFilter implements Filter {
 				for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 					String key = peptide.getKey(distinguishModificatedPeptides);
 					// this is because it is a Replicate
-					if (peptideKeyMap.get(key) >= minOccurrence) {
+					int integer = peptideKeyMap.get(key);
+					if (integer >= minOccurrence) {
 						ret.add(peptide.getId());
 					}
 				}
 			}
 		} else {
+			// we are not filtering by this level
+			// so take them all
 			if (nextLevelIdentificationSetList != null) {
 				// get what the next level gets
 				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
@@ -195,38 +199,83 @@ public class OccurrenceFilter implements Filter {
 
 	@Override
 	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
-		List<IdentificationSet> nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
+		List<IdentificationSet> nextLevelIdentificationSetList = null;
+		try {
+			nextLevelIdentificationSetList = currentIdSet.getNextLevelIdentificationSetList();
+		} catch (UnsupportedOperationException e) {
+
+		}
 		if (appliedToPeptides) {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
+					.getPeptidesFromProteinGroups(proteinGroups);
 			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
 			return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 		} else {
-			if (nextLevelIdentificationSetList == null)
-				return proteinGroups;
-			if (byReplicates)
+			if (byReplicates) {
 				log.info("filtering " + proteinGroups.size() + " protein groups by Occurrence " + minOccurrence
-						+ " replicates");
-			else
+						+ " replicates in level " + level);
+			} else {
 				log.info("filtering " + proteinGroups.size() + " protein groups by Occurrence " + minOccurrence
-						+ " times");
+						+ " times in level " + level);
+			}
+
 			List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
-			for (ProteinGroup proteinGroup : proteinGroups) {
-				int replicates = 0;
-				for (IdentificationSet idSet : nextLevelIdentificationSetList) {
-					final int proteinGroupOccurrence = idSet.getProteinGroupOccurrenceNumber(proteinGroup);
-					if (proteinGroupOccurrence > 0) {
-						if (byReplicates)
-							replicates = replicates + 1;
-						else
-							replicates = replicates + proteinGroupOccurrence;
+			if (currentIdSet instanceof ExperimentList && level == 0 || //
+					currentIdSet instanceof Experiment && level == 1 || //
+					currentIdSet instanceof Replicate && level == 2) {
+				if (byReplicates) {
+					for (ProteinGroup proteinGroup : proteinGroups) {
+						int replicates = 0;
+
+						if (nextLevelIdentificationSetList != null) {
+							for (IdentificationSet idSet : nextLevelIdentificationSetList) {
+								final int proteinGroupOccurrence = idSet.getProteinGroupOccurrenceNumber(proteinGroup);
+								if (proteinGroupOccurrence > 0) {
+									replicates = replicates + 1;
+								}
+							}
+							if (replicates >= minOccurrence) {
+								ret.add(proteinGroup);
+							}
+						} else {
+							// we are in Replicate, so takem all of them
+							ret.add(proteinGroup);
+						}
+					}
+				} else {
+					// by times, check in the currentIdSet
+					THashMap<String, Integer> proteinKeyMap = new THashMap<String, Integer>();
+					for (ProteinGroup proteinGroup : proteinGroups) {
+						String key = proteinGroup.getKey();
+						if (proteinKeyMap.contains(key)) {
+							proteinKeyMap.put(key, proteinKeyMap.get(key) + 1);
+						} else {
+							proteinKeyMap.put(key, 1);
+						}
+					}
+					for (ProteinGroup proteinGroup : proteinGroups) {
+						String key = proteinGroup.getKey();
+						// this is because it is a Replicate
+						int integer = proteinKeyMap.get(key);
+						if (integer >= minOccurrence) {
+							ret.add(proteinGroup);
+						}
 					}
 				}
-				if (replicates >= minOccurrence)
-					ret.add(proteinGroup);
-				// else
-				// log.info("This protein has not the enough occurrence");
+
+			} else {
+				// we are not filtering by this level
+				// so take all of them
+				if (nextLevelIdentificationSetList != null) {
+					// get what the next level gets
+					for (IdentificationSet idSet : nextLevelIdentificationSetList) {
+						List<ProteinGroup> proteinGroups2 = idSet.getIdentifiedProteinGroups();
+						ret.addAll(proteinGroups2);
+					}
+				} else {
+					ret.addAll(proteinGroups);
+				}
 			}
 			log.info("Running PAnalyzer before to return the groups in the occurrence filter");
 			ret = DataManager.filterProteinGroupsByPeptides(ret, doNotGroupNonConclusiveProteins,
@@ -235,50 +284,11 @@ public class OccurrenceFilter implements Filter {
 					+ " protein groups");
 			return ret;
 		}
+
 	}
 
 	public boolean isByReplicates() {
 		return byReplicates;
-	}
-
-	/**
-	 * Gets the proteins from identifiedProteins that are present in
-	 * inclusionProteinList
-	 * 
-	 * @param identifiedProteinGroups
-	 * @param inclusionProteinList
-	 * @return
-	 */
-	public List<ProteinGroup> filterProteins(List<ProteinGroup> identifiedProteinGroups,
-			List<ProteinGroup> inclusionProteinGroupList, IdentificationSet currentIdSet) {
-
-		// if (inclusionProteinGroupList == null)
-		// return identifiedProteinGroups;
-
-		if (!appliedToProteins) {
-			// throw new
-			// UnsupportedOperationException("This filter cannot filter
-			// proteins");
-			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-					.getPeptidesFromProteinGroupsInParallel(identifiedProteinGroups);
-			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
-			return DataManager.filterProteinGroupsByPeptides(identifiedProteinGroups, doNotGroupNonConclusiveProteins,
-					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
-
-			// return identifiedProteinGroups;
-
-		}
-
-		log.info("filtering " + identifiedProteinGroups.size() + " protein groups by Occurrence of the experiment.");
-
-		List<ProteinGroup> ret = new ArrayList<ProteinGroup>();
-		for (ProteinGroup proteinGroup : identifiedProteinGroups) {
-			if (inclusionProteinGroupList == null || inclusionProteinGroupList.contains(proteinGroup))
-				ret.add(proteinGroup);
-		}
-		log.info("Resulting " + ret.size() + " protein groups after filtering " + identifiedProteinGroups.size()
-				+ " protein groups");
-		return ret;
 	}
 
 	public int getMinOccurrence() {

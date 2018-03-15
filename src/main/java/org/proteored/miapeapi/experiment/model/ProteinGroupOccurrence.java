@@ -2,6 +2,7 @@ package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,8 +22,6 @@ import org.proteored.miapeapi.experiment.model.sort.SortingManager;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.Database;
-import org.proteored.miapeapi.interfaces.msi.InputParameter;
-import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
@@ -375,22 +374,6 @@ public class ProteinGroupOccurrence
 		}
 	}
 
-	public List<MiapeMSIDocument> getMiapeMSIs() {
-		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		List<Integer> ids = new ArrayList<Integer>();
-		for (ProteinGroup proteinGroup : proteinGroups) {
-			List<MiapeMSIDocument> miapeMSIs = proteinGroup.getMiapeMSIs();
-			for (MiapeMSIDocument miapeMSI : miapeMSIs) {
-				if (!ids.contains(miapeMSI.getId())) {
-					ret.add(miapeMSI);
-					ids.add(miapeMSI.getId());
-				}
-			}
-
-		}
-		return ret;
-	}
-
 	/**
 	 * Gets the different protein databases in which the
 	 * {@link IdentificationItem} were searched
@@ -399,35 +382,31 @@ public class ProteinGroupOccurrence
 	 */
 	public List<Database> getProteinDatabases() {
 		List<Database> ret = new ArrayList<Database>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<InputParameter> inputParameters = miapeMSIDocument.getInputParameters();
-			if (inputParameters != null) {
-				for (InputParameter inputParameter : inputParameters) {
-					Set<Database> databases = inputParameter.getDatabases();
-					if (databases != null) {
-						for (Database database : databases) {
-							boolean found = false;
-							for (Database selectedDatabase : ret) {
-								String selectedDatabaseName = selectedDatabase.getName();
-								if (selectedDatabase != null)
-									if (selectedDatabaseName.equals(database.getName())) {
-										String selectedDatabaseVersion = selectedDatabase.getNumVersion();
-										if (selectedDatabaseVersion != null) {
-											if (selectedDatabaseVersion.equals(database.getNumVersion()))
-												found = true;
-										} else if (selectedDatabaseVersion == null
-												&& database.getNumVersion() == null) {
-											found = true;
-										}
-									}
+
+		for (ProteinGroup proteinGroup : proteinGroups) {
+
+			Set<Database> databases = proteinGroup.getDatabases();
+			if (databases != null) {
+				for (Database database : databases) {
+					boolean found = false;
+					for (Database selectedDatabase : ret) {
+						String selectedDatabaseName = selectedDatabase.getName();
+						if (selectedDatabase != null)
+							if (selectedDatabaseName.equals(database.getName())) {
+								String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+								if (selectedDatabaseVersion != null) {
+									if (selectedDatabaseVersion.equals(database.getNumVersion()))
+										found = true;
+								} else if (selectedDatabaseVersion == null && database.getNumVersion() == null) {
+									found = true;
+								}
 							}
-							if (!found)
-								ret.add(database);
-						}
 					}
+					if (!found)
+						ret.add(database);
 				}
 			}
+
 		}
 		return ret;
 	}
@@ -438,11 +417,10 @@ public class ProteinGroupOccurrence
 	 * 
 	 * @return
 	 */
-	public List<Software> getSoftwares() {
-		List<Software> ret = new ArrayList<Software>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<Software> softwares = miapeMSIDocument.getSoftwares();
+	public Set<Software> getSoftwares() {
+		Set<Software> ret = new HashSet<Software>();
+		for (ProteinGroup proteinGroup : this.proteinGroups) {
+			Set<Software> softwares = proteinGroup.getSoftwares();
 			if (softwares != null) {
 				for (Software software : softwares) {
 					boolean found = false;

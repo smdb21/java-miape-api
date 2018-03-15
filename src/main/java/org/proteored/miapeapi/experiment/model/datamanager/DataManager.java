@@ -282,19 +282,19 @@ public abstract class DataManager {
 			if (Thread.currentThread().isInterrupted()) {
 				throw new InterruptedMIAPEThreadException("Task cancelled");
 			}
-			List<IdentifiedPeptide> peptidesFromProtein = protein.getIdentifiedPeptides();
-			if (peptidesFromProtein != null && !peptidesFromProtein.isEmpty()) {
+			List<Integer> peptidesFromProteinIDs = protein.getIdentifiedPeptideIDs();
+			if (peptidesFromProteinIDs != null && !peptidesFromProteinIDs.isEmpty()) {
 				boolean peptideFound = false;
-				for (IdentifiedPeptide peptideFromProtein : peptidesFromProtein) {
+				for (Integer peptideFromProteinID : peptidesFromProteinIDs) {
 					if (Thread.currentThread().isInterrupted()) {
 						throw new InterruptedMIAPEThreadException("Task cancelled");
 					}
-					if (peptideFromProtein != null && peptideFromProtein.getSequence() != null
-							&& peptideFromProtein.getSequence().length() >= minPeptideLength
-							&& peptideMap.containsKey(peptideFromProtein.getId())) {
+					if (peptideFromProteinID != null && protein.getPeptideSequenceByID(peptideFromProteinID) != null
+							&& protein.getPeptideSequenceByID(peptideFromProteinID).length() >= minPeptideLength
+							&& peptideMap.containsKey(peptideFromProteinID)) {
 
-						protein.addPeptide(peptideMap.get(peptideFromProtein.getId()));
-						peptideMap.get(peptideFromProtein.getId()).addProtein(protein);
+						protein.addPeptide(peptideMap.get(peptideFromProteinID));
+						peptideMap.get(peptideFromProteinID).addProtein(protein);
 						peptideFound = true;
 					}
 				}
@@ -310,14 +310,14 @@ public abstract class DataManager {
 		}
 		for (ExtendedIdentifiedPeptide peptide : nonFilteredIdentifiedPeptides) {
 			if (peptide.getSequence() != null && peptide.getSequence().length() >= minPeptideLength) {
-				List<IdentifiedProtein> proteinsFromPeptide = peptide.getIdentifiedProteins();
+				List<Integer> proteinsFromPeptide = peptide.getIdentifiedProteinIDs();
 				if (proteinsFromPeptide != null && !proteinsFromPeptide.isEmpty()) {
 					boolean proteinFound = false;
-					for (IdentifiedProtein proteinFromPeptide : proteinsFromPeptide) {
-						if (proteinFromPeptide != null && proteinMap.containsKey(proteinFromPeptide.getId())) {
+					for (Integer proteinFromPeptideID : proteinsFromPeptide) {
+						if (proteinFromPeptideID != null && proteinMap.containsKey(proteinFromPeptideID)) {
 							proteinFound = true;
-							peptide.addProtein(proteinMap.get(proteinFromPeptide.getId()));
-							proteinMap.get(proteinFromPeptide.getId()).addPeptide(peptide);
+							peptide.addProtein(proteinMap.get(proteinFromPeptideID));
+							proteinMap.get(proteinFromPeptideID).addPeptide(peptide);
 						}
 					}
 					if (!proteinFound)
@@ -416,7 +416,7 @@ public abstract class DataManager {
 									extendedIdentifiedProtein = new ExtendedIdentifiedProtein((Replicate) idSet,
 											protein, miapeMSIDocument);
 									if (useStaticCollections) {
-										StaticProteinStorage.addProtein(miapeMSIDocument, idSet.getFullName(),
+										StaticProteinStorage.addProtein(miapeMSIDocument.getName(), idSet.getFullName(),
 												extendedIdentifiedProtein);
 									}
 									// if (useStaticCollections)
@@ -481,7 +481,7 @@ public abstract class DataManager {
 								extendedIdentifiedPeptide = new ExtendedIdentifiedPeptide((Replicate) idSet, peptide,
 										miapeMSIDocument);
 								if (useStaticCollections) {
-									StaticPeptideStorage.addPeptide(miapeMSIDocument, idSet.getFullName(),
+									StaticPeptideStorage.addPeptide(miapeMSIDocument.getName(), idSet.getFullName(),
 											extendedIdentifiedPeptide);
 
 								}
@@ -987,11 +987,11 @@ public abstract class DataManager {
 
 		for (ExtendedIdentifiedProtein protein : proteins) {
 			protein.setDecoy(false, false);
-			protein.resetPeptides(this.idSet);
+			protein.resetPeptides(this.idSet.getFullName());
 			// check that it has all the peptides
-			for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
-				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSI(),
-						idSet.getFullName(), peptide.getId());
+			for (Integer peptideID : protein.getIdentifiedPeptideIDs()) {
+				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSIName(),
+						idSet.getFullName(), peptideID);
 				if (peptide2 != null) {
 					protein.addPeptide(peptide2);
 				}
@@ -1034,9 +1034,11 @@ public abstract class DataManager {
 				ret.addAll(filteredProteinGroups);
 				log.info(" (" + idSet.getName() + ") Passing from " + toFilter.size() + " to " + ret.size()
 						+ " proteins");
-				for (DataManager dataManager : dataManagers) {
-					// dataManager.setInclusionList(filteredProteinGroups);
-					dataManager.setFiltered(false);
+				if (dataManagers != null) {
+					for (DataManager dataManager : dataManagers) {
+						// dataManager.setInclusionList(filteredProteinGroups);
+						// dataManager.setFiltered(false);
+					}
 				}
 				// } else if (filter instanceof OccurrenceFilter && this
 				// instanceof ReplicateDataManager

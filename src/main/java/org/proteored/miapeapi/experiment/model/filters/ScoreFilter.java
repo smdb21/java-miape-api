@@ -83,7 +83,7 @@ public class ScoreFilter implements Filter {
 	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
 		if (appliedToPeptides) {
 			List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-					.getPeptidesFromProteinGroupsInParallel(proteinGroups);
+					.getPeptidesFromProteinGroups(proteinGroups);
 			TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides);
 			return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 					separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());

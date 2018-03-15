@@ -14,8 +14,6 @@ import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.Database;
-import org.proteored.miapeapi.interfaces.msi.InputParameter;
-import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -282,19 +280,6 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 
 	}
 
-	public List<MiapeMSIDocument> getMiapeMSIs() {
-		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		List<Integer> ids = new ArrayList<Integer>();
-		for (ExtendedIdentifiedProtein protein : proteinList) {
-			MiapeMSIDocument miapeMSI = protein.getMiapeMSI();
-			if (!ids.contains(miapeMSI.getId())) {
-				ret.add(miapeMSI);
-				ids.add(miapeMSI.getId());
-			}
-		}
-		return ret;
-	}
-
 	/**
 	 * Gets the different protein databases in which the
 	 * {@link IdentificationItem} were searched
@@ -303,36 +288,31 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 */
 	public List<Database> getProteinDatabases() {
 		List<Database> ret = new ArrayList<Database>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<InputParameter> inputParameters = miapeMSIDocument.getInputParameters();
-			if (inputParameters != null) {
-				for (InputParameter inputParameter : inputParameters) {
-					Set<Database> databases = inputParameter.getDatabases();
-					if (databases != null) {
-						for (Database database : databases) {
-							boolean found = false;
-							for (Database selectedDatabase : ret) {
-								String selectedDatabaseName = selectedDatabase.getName();
-								if (selectedDatabase != null)
-									if (selectedDatabaseName.equals(database.getName())) {
-										String selectedDatabaseVersion = selectedDatabase.getNumVersion();
-										if (selectedDatabaseVersion != null) {
-											if (selectedDatabaseVersion.equals(database.getNumVersion()))
-												found = true;
-										} else if (selectedDatabaseVersion == null
-												&& database.getNumVersion() == null) {
-											found = true;
-										}
-									}
+		for (ExtendedIdentifiedProtein protein : proteinList) {
+
+			Set<Database> databases = protein.getDatabases();
+			if (databases != null) {
+				for (Database database : databases) {
+					boolean found = false;
+					for (Database selectedDatabase : ret) {
+						String selectedDatabaseName = selectedDatabase.getName();
+						if (selectedDatabase != null)
+							if (selectedDatabaseName.equals(database.getName())) {
+								String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+								if (selectedDatabaseVersion != null) {
+									if (selectedDatabaseVersion.equals(database.getNumVersion()))
+										found = true;
+								} else if (selectedDatabaseVersion == null && database.getNumVersion() == null) {
+									found = true;
+								}
 							}
-							if (!found)
-								ret.add(database);
-						}
 					}
+					if (!found)
+						ret.add(database);
 				}
 			}
 		}
+
 		return ret;
 	}
 
@@ -344,9 +324,8 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 */
 	public List<Software> getSoftwares() {
 		List<Software> ret = new ArrayList<Software>();
-		List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
-			Set<Software> softwares = miapeMSIDocument.getSoftwares();
+		for (ExtendedIdentifiedProtein protein : this.proteinList) {
+			Set<Software> softwares = protein.getSoftwares();
 			if (softwares != null) {
 				for (Software software : softwares) {
 					boolean found = false;
@@ -368,6 +347,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 				}
 			}
 		}
+
 		return ret;
 	}
 

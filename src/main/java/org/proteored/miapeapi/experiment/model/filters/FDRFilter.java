@@ -225,7 +225,7 @@ public class FDRFilter implements Filter {
 		if (appliedToPeptides) {
 			if (this.identificationItem.equals(IdentificationItemEnum.PEPTIDE)) {
 				List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-						.getPeptidesFromProteinGroupsInParallel(proteinGroups);
+						.getPeptidesFromProteinGroups(proteinGroups);
 				TIntHashSet filteredPeptideIDs = filterPeptides(identifiedPeptides);
 				return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 						separateNonConclusiveProteins, filteredPeptideIDs, cvManager);

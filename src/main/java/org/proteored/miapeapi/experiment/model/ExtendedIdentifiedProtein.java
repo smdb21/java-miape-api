@@ -1,8 +1,12 @@
 package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.experiment.model.datamanager.StaticPeptideStorage;
@@ -12,8 +16,11 @@ import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingManager;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
+import org.proteored.miapeapi.interfaces.Software;
+import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
+import org.proteored.miapeapi.interfaces.msi.InputParameter;
 import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
@@ -25,10 +32,9 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	private String replicateName;
 	private String experimentName;
-	private final IdentifiedProtein protein;
 	private List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 	private final Integer miapeMSReference;
-	private final MiapeMSIDocument miapeMSI;
+	private final String miapeMSIName;
 	protected ProteinGroup group;
 	protected ProteinEvidence evidence;
 	private String sequence;
@@ -41,23 +47,41 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	// private static int staticIdentifier = 0;
 	// private final int id = ++staticIdentifier;
 
+	private Set<Database> databases;
+
+	private Set<Software> softwares;
+
+	private List<Integer> identifiedPeptideIDs;
+
+	private Map<Integer, String> peptideSequencesByID = new HashMap<Integer, String>();
+
+	private int id;
+
+	private String parsedAccession;
+
+	private String description;
+
+	private Set<ProteinScore> scores;
+
+	private String peptideNumber;
+
+	private String coverage;
+
+	private String peaksMatchedNumber;
+
+	private String unmatchedSignals;
+
+	private String additionalInformation;
+
+	private Boolean validationStatus;
+
+	private String validationType;
+
+	private String validationValue;
+
 	public ExtendedIdentifiedProtein(Replicate replicate, IdentifiedProtein identifiedProtein,
 			MiapeMSIDocument miapeMSI) {
 		this(replicate, identifiedProtein, miapeMSI, ProteinEvidence.NONCONCLUSIVE);
-	}
-
-	public ExtendedIdentifiedProtein(ExtendedIdentifiedProtein p) {
-		evidence = p.evidence;
-		experimentName = p.experimentName;
-		group = p.group;
-		isDecoy = p.isDecoy;
-		miapeMSI = p.miapeMSI;
-		miapeMSReference = p.miapeMSReference;
-		peptides = p.peptides;
-		protein = p.protein;
-		replicateName = p.replicateName;
-		sequence = p.sequence;
-		sortingParameters = p.sortingParameters;
 	}
 
 	public ExtendedIdentifiedProtein(Replicate replicate, IdentifiedProtein identifiedProtein,
@@ -76,19 +100,90 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		this(replicateName, experimentName, identifiedProtein, miapeMSI, ProteinEvidence.NONCONCLUSIVE);
 	}
 
-	public ExtendedIdentifiedProtein(String replicateName, String experimentName, IdentifiedProtein identifiedProtein,
+	public ExtendedIdentifiedProtein(String replicateName, String experimentName, IdentifiedProtein protein,
 			MiapeMSIDocument miapeMSI, ProteinEvidence pe) {
 
 		this.replicateName = replicateName;
 		this.experimentName = experimentName;
-		protein = identifiedProtein;
+
 		if (miapeMSI != null)
 			miapeMSReference = miapeMSI.getMSDocumentReference();
 		else
 			miapeMSReference = -1;
-		this.miapeMSI = miapeMSI;
+		this.miapeMSIName = miapeMSI.getName();
 		evidence = pe;
 		group = null;
+		// databases
+		this.databases = new HashSet<Database>();
+		Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
+		if (inputParameters != null) {
+			for (InputParameter inputParameter : inputParameters) {
+				Set<Database> databases2 = inputParameter.getDatabases();
+				if (databases2 != null) {
+					for (Database database : databases2) {
+						boolean found = false;
+						for (Database selectedDatabase : databases) {
+							String selectedDatabaseName = selectedDatabase.getName();
+							if (selectedDatabase != null)
+								if (selectedDatabaseName.equals(database.getName())) {
+									String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+									if (selectedDatabaseVersion != null) {
+										if (selectedDatabaseVersion.equals(database.getNumVersion()))
+											found = true;
+									} else if (selectedDatabaseVersion == null && database.getNumVersion() == null) {
+										found = true;
+									}
+								}
+						}
+						if (!found)
+							databases.add(database);
+					}
+				}
+			}
+		}
+		// softwares
+		this.softwares = new HashSet<Software>();
+		Set<Software> softwares2 = miapeMSI.getSoftwares();
+		if (softwares2 != null) {
+			for (Software software : softwares2) {
+				boolean found = false;
+				for (Software selectedSoftware : softwares) {
+					String selectedDatabaseName = selectedSoftware.getName();
+					if (selectedSoftware != null)
+						if (selectedDatabaseName.equals(software.getName())) {
+							String selectedSoftwareVersion = selectedSoftware.getVersion();
+							if (selectedSoftwareVersion != null) {
+								if (selectedSoftwareVersion.equals(software.getVersion()))
+									found = true;
+							} else if (selectedSoftwareVersion == null && software.getVersion() == null) {
+								found = true;
+							}
+						}
+				}
+				if (!found)
+					softwares.add(software);
+			}
+		}
+		this.identifiedPeptideIDs = protein.getIdentifiedPeptides().stream().map(p -> p.getId())
+				.collect(Collectors.toList());
+		protein.getIdentifiedPeptides().stream()
+				.forEach(pep -> this.peptideSequencesByID.put(pep.getId(), pep.getSequence()));
+		this.id = protein.getId();
+
+		String accession = protein.getAccession();
+		IdentifierParser.setRemove_acc_version(false);
+		parsedAccession = IdentifierParser.parseACC(accession);
+		description = protein.getDescription();
+		scores = new HashSet<ProteinScore>();
+		scores.addAll(protein.getScores());
+		peptideNumber = protein.getPeptideNumber();
+		coverage = protein.getCoverage();
+		this.peaksMatchedNumber = protein.getPeaksMatchedNumber();
+		this.unmatchedSignals = protein.getUnmatchedSignals();
+		this.additionalInformation = protein.getAdditionalInformation();
+		this.validationStatus = protein.getValidationStatus();
+		validationType = protein.getValidationType();
+		validationValue = protein.getValidationValue();
 	}
 
 	// private void processProtein() {
@@ -108,10 +203,6 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	// }
 	// }
 	// }
-
-	public IdentifiedProtein getProtein() {
-		return protein;
-	}
 
 	public String getExperimentName() {
 		return experimentName;
@@ -149,7 +240,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	@Override
 	public int getId() {
 
-		return protein.getId();
+		return id;
 	}
 
 	@Override
@@ -158,80 +249,73 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	}
 
 	public String getParsedAccession() {
-		String accession = protein.getAccession();
-		IdentifierParser.setRemove_acc_version(false);
-		accession = IdentifierParser.parseACC(accession);
+		return parsedAccession;
 
-		return accession;
 	}
 
 	@Override
 	public String getDescription() {
-		return protein.getDescription();
+		return description;
 	}
 
 	@Override
 	public Set<ProteinScore> getScores() {
-		return protein.getScores();
+		return scores;
 	}
 
 	@Override
 	public String getPeptideNumber() {
-		return protein.getPeptideNumber();
+		return peptideNumber;
 	}
 
 	@Override
 	public String getCoverage() {
-		return protein.getCoverage();
+		return coverage;
 	}
 
 	@Override
 	public String getPeaksMatchedNumber() {
-		return protein.getPeaksMatchedNumber();
+		return peaksMatchedNumber;
 	}
 
 	@Override
 	public String getUnmatchedSignals() {
-		return protein.getUnmatchedSignals();
+
+		return unmatchedSignals;
 	}
 
 	@Override
 	public String getAdditionalInformation() {
-		return protein.getAdditionalInformation();
+		return additionalInformation;
 	}
 
 	@Override
 	public Boolean getValidationStatus() {
-		return protein.getValidationStatus();
+		return validationStatus;
 	}
 
 	@Override
 	public String getValidationType() {
-		return protein.getValidationType();
+
+		return validationType;
 	}
 
 	@Override
 	public String getValidationValue() {
-		return protein.getValidationValue();
+
+		return validationValue;
 	}
 
 	@Override
 	public List<IdentifiedPeptide> getIdentifiedPeptides() {
-		return protein.getIdentifiedPeptides();
+		// return protein.getIdentifiedPeptides();
 
-		// List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
-		// List<ExtendedIdentifiedPeptide> filteredPeptides = getPeptides();
-		// List<Integer> filteredPeptidesIds = new ArrayList<Integer>();
-		// for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide :
-		// filteredPeptides) {
-		// filteredPeptidesIds.add(extendedIdentifiedPeptide.getId());
-		// }
-		// for (IdentifiedPeptide peptide : identifiedPeptides) {
-		// if (filteredPeptidesIds.contains(peptide.getId()))
-		// ret.add(peptide);
-		// }
-		// return ret;
+		throw new UnsupportedOperationException();
 
+	}
+
+	public List<Integer> getIdentifiedPeptideIDs() {
+		return this.identifiedPeptideIDs;
 	}
 
 	public List<ExtendedIdentifiedPeptide> getPeptides() {
@@ -254,26 +338,26 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		peptides.add(peptide);
 	}
 
-	public void resetPeptides(IdentificationSet idSet) {
+	public void resetPeptides(String idSetFullName) {
 
-		final List<IdentifiedPeptide> identifiedPeptides = getIdentifiedPeptides();
+		final List<Integer> identifiedPeptideIDs = getIdentifiedPeptideIDs();
 		if (peptides == null)
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
-		if (identifiedPeptides != null) {
+		if (identifiedPeptideIDs != null) {
 			peptides.clear();
-			for (IdentifiedPeptide peptide : identifiedPeptides) {
-				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSI, idSet.getFullName(),
-						peptide.getId());
+			for (Integer peptideID : identifiedPeptideIDs) {
+				ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSIName, idSetFullName,
+						peptideID);
 				if (peptide2 != null) {
 					// add it to the protein
 					peptides.add(peptide2);
 					peptide2.setDecoy(false, false);
 
 					// check that it has all the proteins that should have
-					List<IdentifiedProtein> identifiedProteins = peptide2.getIdentifiedProteins();
-					for (IdentifiedProtein identifiedProtein : identifiedProteins) {
-						ExtendedIdentifiedProtein protein2 = StaticProteinStorage.getProtein(miapeMSI,
-								idSet.getFullName(), identifiedProtein.getId());
+					List<Integer> identifiedProteinIDs = peptide2.getIdentifiedProteinIDs();
+					for (Integer identifiedProteinID : identifiedProteinIDs) {
+						ExtendedIdentifiedProtein protein2 = StaticProteinStorage.getProtein(miapeMSIName,
+								idSetFullName, identifiedProteinID);
 						if (protein2 != null) {
 							peptide2.addProtein(protein2);
 						}
@@ -400,13 +484,13 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	}
 
 	/**
-	 * Gets the MIAPE MSI document in which the protein was reported
+	 * Gets the MIAPE MSI document name in which the protein was reported
 	 *
 	 * @return
 	 */
 	@Override
-	public MiapeMSIDocument getMiapeMSI() {
-		return miapeMSI;
+	public String getMiapeMSIName() {
+		return miapeMSIName;
 	}
 
 	@Override
@@ -478,6 +562,18 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	public void setProteinMass(Double proteinMass) {
 		this.proteinMass = proteinMass;
+	}
+
+	public Set<Database> getDatabases() {
+		return databases;
+	}
+
+	public Set<Software> getSoftwares() {
+		return softwares;
+	}
+
+	public String getPeptideSequenceByID(int peptideID) {
+		return this.peptideSequencesByID.get(peptideID);
 	}
 
 }

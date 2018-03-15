@@ -45,8 +45,7 @@ public class PeptideSequenceFilter implements Filter, Filters<String> {
 
 	@Override
 	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
-		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-				.getPeptidesFromProteinGroupsInParallel(proteinGroups);
+		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager.getPeptidesFromProteinGroups(proteinGroups);
 		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
 		return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());

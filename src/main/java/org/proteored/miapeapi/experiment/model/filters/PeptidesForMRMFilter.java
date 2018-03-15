@@ -48,7 +48,7 @@ public class PeptidesForMRMFilter implements Filter {
 	@Override
 	public List<ProteinGroup> filter(List<ProteinGroup> identifiedProteins, IdentificationSet currentIdSet) {
 		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
-				.getPeptidesFromProteinGroupsInParallel(identifiedProteins);
+				.getPeptidesFromProteinGroups(identifiedProteins);
 		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
 		return DataManager.filterProteinGroupsByPeptides(identifiedProteins, doNotGroupNonConclusiveProteins,
 				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());

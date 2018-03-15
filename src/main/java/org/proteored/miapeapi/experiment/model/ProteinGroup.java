@@ -3,7 +3,9 @@ package org.proteored.miapeapi.experiment.model;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
@@ -12,7 +14,8 @@ import org.proteored.miapeapi.experiment.model.grouping.InferenceProtein;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinEvidence;
 import org.proteored.miapeapi.experiment.model.grouping.ProteinGroupInference;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
-import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
+import org.proteored.miapeapi.interfaces.Software;
+import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 
@@ -319,19 +322,6 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	}
 
-	public List<MiapeMSIDocument> getMiapeMSIs() {
-		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		TIntHashSet identifiers = new TIntHashSet();
-		for (ExtendedIdentifiedProtein protein : this) {
-			final MiapeMSIDocument miapeMSI = protein.getMiapeMSI();
-			if (miapeMSI != null && !identifiers.contains(miapeMSI.getId())) {
-				identifiers.add(miapeMSI.getId());
-				ret.add(miapeMSI);
-			}
-		}
-		return ret;
-	}
-
 	public List<String> getProteinScoreNames() {
 		List<String> ret = new ArrayList<String>();
 		for (ExtendedIdentifiedProtein protein : this) {
@@ -438,5 +428,23 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	public void setProteinLocalFDR(Float proteinLocalFDR) {
 		this.proteinLocalFDR = proteinLocalFDR;
+	}
+
+	public Set<Database> getDatabases() {
+		Set<Database> ret = new HashSet<Database>();
+		for (ExtendedIdentifiedProtein protein : this) {
+			Set<Database> databases = protein.getDatabases();
+			ret.addAll(databases);
+		}
+		return ret;
+	}
+
+	public Set<Software> getSoftwares() {
+		Set<Software> ret = new HashSet<Software>();
+		for (ExtendedIdentifiedProtein protein : this) {
+			Set<Software> softwares = protein.getSoftwares();
+			ret.addAll(softwares);
+		}
+		return ret;
 	}
 }

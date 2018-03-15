@@ -3,7 +3,6 @@ package org.proteored.miapeapi.experiment.model;
 import java.util.List;
 
 import org.proteored.miapeapi.experiment.model.filters.FDRFilter;
-import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
 public abstract class IdentificationItem {
 	/**
@@ -11,7 +10,7 @@ public abstract class IdentificationItem {
 	 * 
 	 * @return
 	 */
-	public abstract MiapeMSIDocument getMiapeMSI();
+	public abstract String getMiapeMSIName();
 
 	/**
 	 * Get the identifier of the MIAPE MS document were the identification item
