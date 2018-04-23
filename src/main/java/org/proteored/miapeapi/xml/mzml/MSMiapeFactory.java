@@ -53,14 +53,14 @@ public class MSMiapeFactory {
 	 */
 	public MiapeMSDocument toDocument(MiapeMzMLFile miapeMzMLFile, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String userName, String password, String projectName)
-					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
+			throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		if (cvManager == null)
 			throw new IllegalMiapeArgumentException("ControlVocabularyManager is not set");
 		MiapeMSDocument result = null;
 		try {
 			log.info("before unmarshall");
-			File file = ZipManager.decompressFileIfNeccessary(miapeMzMLFile.toFile());
-			MzMLUnmarshaller mzUnmarshaller = new MzMLUnmarshaller(file);
+			final File file = ZipManager.decompressFileIfNeccessary(miapeMzMLFile.toFile(), false);
+			final MzMLUnmarshaller mzUnmarshaller = new MzMLUnmarshaller(file);
 			log.info("after unmarshall");
 			if (databaseManager == null) {
 				result = new MiapeMSDocumentImpl(mzUnmarshaller, cvManager, file.getName(), projectName);
@@ -69,7 +69,7 @@ public class MSMiapeFactory {
 						file.getName(), projectName);
 			}
 
-		} catch (IllegalStateException e) {
+		} catch (final IllegalStateException e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
 			throw new WrongXMLFormatException(e);
@@ -93,7 +93,7 @@ public class MSMiapeFactory {
 	 */
 	public MiapeMSDocument toDocument(MzML mzML, PersistenceManager databaseManager, ControlVocabularyManager cvManager,
 			String userName, String password, String mzMLFileName, String projectName)
-					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
+			throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		MiapeMSDocument result = null;
 		try {
 
@@ -104,7 +104,7 @@ public class MSMiapeFactory {
 						projectName);
 			}
 
-		} catch (IllegalStateException e) {
+		} catch (final IllegalStateException e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
 			throw new WrongXMLFormatException(e);

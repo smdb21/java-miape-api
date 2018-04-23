@@ -73,11 +73,11 @@ public class SpectraReader {
 		TMsData tMsData;
 		if (resultingData == null)
 			throw new IllegalMiapeArgumentException("Resulting data is null. No MGF file available");
-		String mgfFileURL = parseURL(resultingData, "mgf");
+		final String mgfFileURL = parseURL(resultingData, "mgf");
 		log.info("Parsing MGF " + mgfFileURL);
 		try {
 			tMsData = new TMsData(mgfFileURL, mgfTitlesMaps);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			log.info("Error: " + e.getMessage());
 			throw new IllegalMiapeArgumentException("Error reading mgf file: " + mgfFileURL + " -> " + e.getMessage());
@@ -88,14 +88,14 @@ public class SpectraReader {
 				// algunos están comprimidos dos veces, por lo que si no salen
 				// espectros, probar a descomprimir otra vez!
 
-				File decompressGZipFile = ZipManager.decompressGZipFile(new File(new URL(mgfFileURL).toURI()));
+				final File decompressGZipFile = ZipManager.decompressGZipFile(new File(new URL(mgfFileURL).toURI()));
 				tMsData = new TMsData(decompressGZipFile.toURL().toString(), mgfTitlesMaps);
 
 				spectra = tMsData.getSpectra();
 				if (spectra == null || spectra.isEmpty()) {
 					throw new IllegalMiapeArgumentException("No spectra readed from mgf file: " + mgfFileURL);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				log.info("Error");
 				log.info(e.getMessage());
 				throw new IllegalMiapeArgumentException("Error reading mgf file: " + mgfFileURL);
@@ -113,21 +113,21 @@ public class SpectraReader {
 			MzMLSpectrumIDManager spectrumIDManager, int miapeMSid) {
 		if (resultingData == null)
 			throw new IllegalMiapeArgumentException("Resulting data is null. No mzML file available");
-		String mzMLFileURL = parseURL(resultingData, "mzML");
+		final String mzMLFileURL = parseURL(resultingData, "mzML");
 		int numSpectra = 0;
 		// Parse mzML file
 		try {
-			long initTime = System.currentTimeMillis();
+			final long initTime = System.currentTimeMillis();
 
-			MzMLUnmarshaller mzMLUnmarshaller = new MzMLUnmarshaller(new URL(mzMLFileURL));
-			long finishTime = System.currentTimeMillis();
+			final MzMLUnmarshaller mzMLUnmarshaller = new MzMLUnmarshaller(new URL(mzMLFileURL));
+			final long finishTime = System.currentTimeMillis();
 			log.info("Index created in " + (finishTime - initTime) / 1000 + " seconds");
-			MzMLObjectIterator<uk.ac.ebi.jmzml.model.mzml.Spectrum> spectrumIterator = mzMLUnmarshaller
+			final MzMLObjectIterator<uk.ac.ebi.jmzml.model.mzml.Spectrum> spectrumIterator = mzMLUnmarshaller
 					.unmarshalCollectionFromXpath("/run/spectrumList/spectrum",
 							uk.ac.ebi.jmzml.model.mzml.Spectrum.class);
 			if (spectrumIterator == null)
 				throw new IllegalMiapeArgumentException("Spectrum iterator for mzML " + mzMLFileURL + " is null");
-			ReferenceableParamGroupList referenceableParamGroupList = mzMLUnmarshaller
+			final ReferenceableParamGroupList referenceableParamGroupList = mzMLUnmarshaller
 					.unmarshalFromXpath("/referenceableParamGroupList", ReferenceableParamGroupList.class);
 			final int totalSpectra = mzMLUnmarshaller.getObjectCountForXpath("/run/spectrumList/spectrum");
 
@@ -135,7 +135,7 @@ public class SpectraReader {
 				Thread.sleep(1L);
 
 				// read next spectrum from XML file
-				uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLspectrum = spectrumIterator.next();
+				final uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLspectrum = spectrumIterator.next();
 				// add the mapping between the spectrum Identifier and the index
 				// of the spectrum
 				spectrumIDManager.addNewSpectrumMapping(miapeMSid + mzMLspectrum.getId(), numSpectra + 1 + offset);
@@ -144,7 +144,7 @@ public class SpectraReader {
 					// create the PRIDE XML spectrum object
 					prideXmlSpectrum = new SpectrumAdapter2(mzMLUnmarshaller, mzMLspectrum, referenceableParamGroupList,
 							factory, prideCvUtil, spectrumIDManager, miapeMSid).adapt();
-				} catch (IllegalMiapeArgumentException e) {
+				} catch (final IllegalMiapeArgumentException e) {
 					log.warn(e.getMessage());
 					continue;
 				}
@@ -162,7 +162,7 @@ public class SpectraReader {
 					log.info((numSpectra * 100) / totalSpectra + "% spectra processed");
 			}
 			spectrumList.setCount(numSpectra);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.info("Error");
 			log.info(e.getMessage());
 			throw new IllegalMiapeArgumentException(e.getMessage());
@@ -176,11 +176,11 @@ public class SpectraReader {
 		// Receive file
 		log.info("Receiving " + extension + " " + fileURL + " file");
 		try {
-			File file = SpectraReader.receiveFile(fileURL);
+			final File file = SpectraReader.receiveFile(fileURL);
 
 			// fileURL = mgfFile.getAbsolutePath();
 			fileURL = file.toURI().toURL().toString();
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			log.info("IOException when receiving" + extension + " file:" + ex.getMessage());
 			fileURL = resultingData.getDataFileUri();
 		}
@@ -189,7 +189,7 @@ public class SpectraReader {
 		// check if the URL is OK
 		try {
 			new URL(fileURL);
-		} catch (MalformedURLException ex) {
+		} catch (final MalformedURLException ex) {
 			log.info("MalformedURLException when trying to create an URL from " + fileURL);
 			fileURL = "file:/" + fileURL;
 			log.info("Now trying with " + fileURL);
@@ -204,12 +204,12 @@ public class SpectraReader {
 		try {
 			url = new URL(URLParamEncoder.encode(fileName));
 
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			log.info("The filename: " + fileName + " is not an URL. Trying to get from a File object");
 			url = new File(fileName).toURI().toURL();
 		}
 		if (url != null && url.getProtocol() != null && url.getProtocol().equals("file")) {
-			File ret = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+			final File ret = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
 			if (ret.exists())
 				return ret;
 
@@ -217,10 +217,10 @@ public class SpectraReader {
 		File outPutFile = File.createTempFile("temp", "." + FilenameUtils.getExtension(fileName));
 		log.info("Output file: " + outPutFile.getAbsolutePath());
 
-		BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(outPutFile));
+		final BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(outPutFile));
 
 		log.info("Retrieving File: " + url.toString());
-		URLConnection uc = url.openConnection();
+		final URLConnection uc = url.openConnection();
 		uc.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
 		uc.setRequestProperty("Accept", "[star]/[star]");
 
@@ -231,14 +231,14 @@ public class SpectraReader {
 		// // throw new IOException("This is not a binary file.");
 		// }
 
-		InputStream inputStream = uc.getInputStream();
-		BufferedInputStream is = new BufferedInputStream(inputStream);
+		final InputStream inputStream = uc.getInputStream();
+		final BufferedInputStream is = new BufferedInputStream(inputStream);
 		ZipManager.copyInputStream(is, os);
 
 		log.info("Finished Retrieving File (" + outPutFile.length() / 1024 / 1024 + " Mb): "
 				+ outPutFile.getAbsolutePath());
 
-		outPutFile = ZipManager.decompressGZipFileIfNeccessary(outPutFile, true);
+		outPutFile = ZipManager.decompressGZipFileIfNeccessary(outPutFile, true, false);
 		return outPutFile;
 	}
 
@@ -280,11 +280,11 @@ public class SpectraReader {
 	}
 
 	public static void main(String[] args) {
-		String urlToFile = "http://proteo.cnb.csic.es/downloads/sgharbi@cnb.csic.es/HPP CHAPS FR1.mgf.gz";
+		final String urlToFile = "http://proteo.cnb.csic.es/downloads/sgharbi@cnb.csic.es/HPP CHAPS FR1.mgf.gz";
 		TMsData tMsData = null;
 		String fileURLString = null;
 		try {
-			File fileReceived = receiveFile(urlToFile);
+			final File fileReceived = receiveFile(urlToFile);
 			fileURLString = fileReceived.toURI().toURL().toString();
 			tMsData = new TMsData(fileURLString, null);
 			if (!tMsData.getSpectra().isEmpty())
@@ -296,25 +296,25 @@ public class SpectraReader {
 					tMsData = new TMsData(decompressGZipFile.toURL().toString(), null);
 					if (!tMsData.getSpectra().isEmpty())
 						System.out.println("OLE");
-				} catch (FileNotFoundException e1) {
+				} catch (final FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} catch (MalformedURLException e1) {
+				} catch (final MalformedURLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
+				} catch (final URISyntaxException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 		}
 	}
@@ -332,18 +332,18 @@ public class SpectraReader {
 			if (resultingData != null) {
 				if (hasMGFFile(resultingData)) {
 					final String localFilePath = parseURL(resultingData, "mgf");
-					Spectrum spectrum = getSpectrumFromMGF(spectrumRef, localFilePath);
+					final Spectrum spectrum = getSpectrumFromMGF(spectrumRef, localFilePath);
 					return spectrum;
 				} else if (hasMzMLFile(resultingData)) {
 					final String localFilePath = parseURL(resultingData, "mzML");
-					Spectrum spectrum = getSpectrumFromMzML(spectrumRef, localFilePath);
+					final Spectrum spectrum = getSpectrumFromMzML(spectrumRef, localFilePath);
 					return spectrum;
 				} else {
 					return null;
 				}
 
 			}
-		} catch (IllegalMiapeArgumentException e) {
+		} catch (final IllegalMiapeArgumentException e) {
 			log.info(e.getMessage());
 		}
 
@@ -352,13 +352,13 @@ public class SpectraReader {
 
 	private Spectrum getSpectrumFromMzML(int spectrumRef, String mzMLFileURI) {
 		try {
-			long initTime = System.currentTimeMillis();
+			final long initTime = System.currentTimeMillis();
 
-			MzMLUnmarshaller mzMLUnmarshaller = new MzMLUnmarshaller(new URL(mzMLFileURI));
-			long finishTime = System.currentTimeMillis();
+			final MzMLUnmarshaller mzMLUnmarshaller = new MzMLUnmarshaller(new URL(mzMLFileURI));
+			final long finishTime = System.currentTimeMillis();
 			log.info("Index created in " + (finishTime - initTime) / 1000 + " seconds");
 
-			ReferenceableParamGroupList referenceableParamGroupList = mzMLUnmarshaller
+			final ReferenceableParamGroupList referenceableParamGroupList = mzMLUnmarshaller
 					.unmarshalFromXpath("/referenceableParamGroupList", ReferenceableParamGroupList.class);
 
 			final String spectrumIDFromSpectrumIndex = mzMLUnmarshaller.getSpectrumIDFromSpectrumIndex(spectrumRef);
@@ -371,7 +371,7 @@ public class SpectraReader {
 				return prideXmlSpectrum;
 			}
 
-			MzMLObjectIterator<uk.ac.ebi.jmzml.model.mzml.Spectrum> spectrumIterator = mzMLUnmarshaller
+			final MzMLObjectIterator<uk.ac.ebi.jmzml.model.mzml.Spectrum> spectrumIterator = mzMLUnmarshaller
 					.unmarshalCollectionFromXpath("/run/spectrumList/spectrum",
 							uk.ac.ebi.jmzml.model.mzml.Spectrum.class);
 			if (spectrumIterator == null)
@@ -379,7 +379,7 @@ public class SpectraReader {
 
 			while (spectrumIterator.hasNext()) {
 				// read next spectrum from XML file
-				uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLspectrum = spectrumIterator.next();
+				final uk.ac.ebi.jmzml.model.mzml.Spectrum mzMLspectrum = spectrumIterator.next();
 				if (mzMLspectrum.getIndex() == spectrumRef) {
 					prideXmlSpectrum = new SpectrumAdapter(mzMLUnmarshaller, mzMLspectrum, referenceableParamGroupList,
 							factory, prideCvUtil, 0, null).adapt();
@@ -388,7 +388,7 @@ public class SpectraReader {
 				}
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.info("Error");
 			log.info(e.getMessage());
 			throw new IllegalMiapeArgumentException(e.getMessage());
@@ -401,7 +401,7 @@ public class SpectraReader {
 		TMsData tMsData;
 		try {
 			tMsData = new TMsData(mgfFileURI, null);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.info("Error");
 			log.info(e.getMessage());
 			throw new IllegalMiapeArgumentException("Error reading mgf file: " + spectrumRef);
@@ -412,14 +412,14 @@ public class SpectraReader {
 				// algunos están comprimidos dos veces, por lo que si no salen
 				// espectros, probar a descomprimir otra vez!
 
-				File decompressGZipFile = ZipManager.decompressGZipFile(new File(new URL(mgfFileURI).toURI()));
+				final File decompressGZipFile = ZipManager.decompressGZipFile(new File(new URL(mgfFileURI).toURI()));
 				tMsData = new TMsData(decompressGZipFile.toURL().toString(), null);
 
 				spectra = tMsData.getSpectra();
 				if (spectra == null || spectra.isEmpty()) {
 					throw new IllegalMiapeArgumentException("No spectra readed from mgf file: " + mgfFileURI);
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				log.info("Error");
 				log.info(e.getMessage());
 				throw new IllegalMiapeArgumentException("Error reading mgf file: " + mgfFileURI);
@@ -430,10 +430,10 @@ public class SpectraReader {
 
 		log.info(spectra.size() + " spectra readed");
 		try {
-			Spectrum spectrum = new SpectumAdapterFromMGFSpectrum(tMsData, spectrumRef, 0, SpectraReader.factory,
+			final Spectrum spectrum = new SpectumAdapterFromMGFSpectrum(tMsData, spectrumRef, 0, SpectraReader.factory,
 					SpectraReader.cvManager).adapt();
 			return spectrum;
-		} catch (IllegalMiapeArgumentException e) {
+		} catch (final IllegalMiapeArgumentException e) {
 			log.warn(e.getMessage());
 			return null;
 		}

@@ -25,6 +25,11 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	private List<IdentifiedPeptide> peptides;
 	private final ControlVocabularyManager cvManager;
 	public static final Map<String, IdentifiedPeptide> psmMapByPSMId = new HashMap<String, IdentifiedPeptide>();
+	private final static String EMPAI_VALUE = "emPAI value";
+	private static final String NSAF = "normalized spectral abundance factor";
+	private static final String NSAF_NORM = "NSAF_norm";
+	private static final String SPC_BY_LEN_RATIO = "SPC/Length ratio";
+	private static final String PEPTIDE_PSM_COUNT = "peptide PSM count";
 
 	public IdentifiedProteinImplFromDTASelectProtein(DTASelectProtein dtaSelectProtein,
 			ControlVocabularyManager cvManager) {
@@ -34,8 +39,8 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	}
 
 	private int getRandomInt() {
-		Random generator = new Random();
-		int i = generator.nextInt(Integer.MAX_VALUE);
+		final Random generator = new Random();
+		final int i = generator.nextInt(Integer.MAX_VALUE);
 		return i;
 	}
 
@@ -67,28 +72,30 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 		if (proteinScores == null) {
 			proteinScores = new THashSet<ProteinScore>();
 			if (dtaSelectProtein.getEmpai() != null) {
-				ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl("emPAI value",
+
+				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(EMPAI_VALUE,
 						dtaSelectProtein.getEmpai());
 				proteinScores.add(score);
 			}
 			if (dtaSelectProtein.getNsaf() != null) {
-				ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(
-						"normalized spectral abundance factor", dtaSelectProtein.getNsaf());
+				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(NSAF,
+						dtaSelectProtein.getNsaf());
 				proteinScores.add(score);
 			}
 			// if (dtaSelectProtein.getNsaf_norm() != null) {
-			ProteinScore NSAF_norm = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl("NSAF_norm",
+			final ProteinScore NSAF_norm = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(NSAF_NORM,
 					dtaSelectProtein.getNsaf_norm());
 			proteinScores.add(NSAF_norm);
 			// }
 
-			ProteinScore ratio = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl("SPC/Length ratio",
+			final ProteinScore ratio = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(SPC_BY_LEN_RATIO,
 					dtaSelectProtein.getRatio());
 			proteinScores.add(ratio);
 
 			if (dtaSelectProtein.getSpectrumCount() != null) {
-				ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl("peptide PSM count",
-						dtaSelectProtein.getSpectrumCount());
+
+				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(
+						PEPTIDE_PSM_COUNT, dtaSelectProtein.getSpectrumCount());
 				proteinScores.add(score);
 			}
 		}
@@ -98,9 +105,9 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	@Override
 	public String getPeptideNumber() {
 		final List<IdentifiedPeptide> identifiedPeptides = getIdentifiedPeptides();
-		Set<String> seqs = new THashSet<String>();
+		final Set<String> seqs = new THashSet<String>();
 		if (identifiedPeptides != null) {
-			for (IdentifiedPeptide pep : identifiedPeptides) {
+			for (final IdentifiedPeptide pep : identifiedPeptides) {
 				seqs.add(pep.getSequence());
 			}
 		}
@@ -150,7 +157,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 			peptides = new ArrayList<IdentifiedPeptide>();
 			final List<DTASelectPSM> psMs = dtaSelectProtein.getPSMs();
 			if (psMs != null) {
-				for (DTASelectPSM dtaSelectPSM : psMs) {
+				for (final DTASelectPSM dtaSelectPSM : psMs) {
 					if (psmMapByPSMId.containsKey(dtaSelectPSM.getPsmIdentifier())) {
 						final IdentifiedPeptide pep = psmMapByPSMId.get(dtaSelectPSM.getPsmIdentifier());
 						pep.getIdentifiedProteins().add(this);

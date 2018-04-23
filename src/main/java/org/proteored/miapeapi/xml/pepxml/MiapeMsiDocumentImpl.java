@@ -81,7 +81,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private String fileLocation;
 
-	private MiapeMSIDocument miapeMSI;
+	private final MiapeMSIDocument miapeMSI;
 
 	private final File pepXMLFile;
 
@@ -94,10 +94,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		owner = null;
 		this.projectName = projectName;
 		this.cvManager = cvManager;
-		this.dbManager = null;
+		dbManager = null;
 		log.info("Starting parsing of pepXML file: " + pepXMLFile.getAbsolutePath());
-		File file = ZipManager.decompressFileIfNeccessary(pepXMLFile);
-		MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(file.getAbsolutePath()));
+		final File file = ZipManager.decompressFileIfNeccessary(pepXMLFile, false);
+		final MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(file.getAbsolutePath()));
 
 		searchEngine = PepXMLUtil.getSearchEngineFromSummaryXml(pipelineAnalysis.getSummaryXml());
 
@@ -108,11 +108,11 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	public MiapeMsiDocumentImpl(File pepXMLFile, PersistenceManager databaseManager, ControlVocabularyManager cvManager,
 			String user, String password, String projectName)
-					throws MiapeDatabaseException, MiapeSecurityException, FileParsingException {
+			throws MiapeDatabaseException, MiapeSecurityException, FileParsingException {
 
 		this.pepXMLFile = pepXMLFile;
 		if (databaseManager != null) {
-			this.dbManager = databaseManager;
+			dbManager = databaseManager;
 			owner = databaseManager.getUser(user, password);
 		} else {
 			owner = null;
@@ -120,7 +120,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		}
 		this.projectName = projectName;
 		this.cvManager = cvManager;
-		File file = ZipManager.decompressFileIfNeccessary(pepXMLFile);
+		final File file = ZipManager.decompressFileIfNeccessary(pepXMLFile, false);
 		final MsmsPipelineAnalysis pipelineAnalysis = PepXmlParser.parse(Paths.get(file.getAbsolutePath()));
 
 		// to process the file
@@ -144,54 +144,54 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(MsmsPipelineAnalysis pipelineAnalysis, String idSetName,
 			ControlVocabularyManager cvManager, PersistenceManager dbManager, User owner, String projectName)
-					throws FileParsingException {
+			throws FileParsingException {
 
-		Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
-		MiapeMSIDocumentBuilder miapeBuilder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project, idSetName,
-				owner, dbManager);
-		List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
-		Set<InputParameter> inputParamters = new HashSet<InputParameter>();
+		final Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
+		final MiapeMSIDocumentBuilder miapeBuilder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project,
+				idSetName, owner, dbManager);
+		final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
+		final Set<InputParameter> inputParamters = new HashSet<InputParameter>();
 		miapeBuilder.inputParameters(inputParamters);
-		Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+		final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
 		miapeBuilder.identifiedProteinSets(proteinSets);
-		Set<InputDataSet> inputDatasets = new HashSet<InputDataSet>();
-		Set<Software> softwares = new HashSet<Software>();
+		final Set<InputDataSet> inputDatasets = new HashSet<InputDataSet>();
+		final Set<Software> softwares = new HashSet<Software>();
 		int i = 0;
 		int softwareCount = 1;
 		int inputParameterID = 1;
 		int proteinID = 1;
-		for (MsmsRunSummary msmsRunSummary : pipelineAnalysis.getMsmsRunSummary()) {
+		for (final MsmsRunSummary msmsRunSummary : pipelineAnalysis.getMsmsRunSummary()) {
 			i++;
-			InputDataSetBuilder inputDataSetBuilder = MiapeMSIDocumentFactory
+			final InputDataSetBuilder inputDataSetBuilder = MiapeMSIDocumentFactory
 					.createInputDataSetBuilder("Input_dataset_" + i).id(i);
-			InputData inputData = MiapeMSIDocumentFactory.createInputDataBuilder("Input_data_" + i).id(i)
+			final InputData inputData = MiapeMSIDocumentFactory.createInputDataBuilder("Input_data_" + i).id(i)
 					.msFileType(msmsRunSummary.getRawDataType()).sourceDataUrl(msmsRunSummary.getBaseName()).build();
 			inputDataSetBuilder.inputData(inputData);
-			IdentifiedProteinSetBuilder proteinSetBuilder = MiapeMSIDocumentFactory
+			final IdentifiedProteinSetBuilder proteinSetBuilder = MiapeMSIDocumentFactory
 					.createIdentifiedProteinSetBuilder("Protein_set_" + i);
-			Set<InputDataSet> inputDatasetsforProteinSet = new HashSet<InputDataSet>();
+			final Set<InputDataSet> inputDatasetsforProteinSet = new HashSet<InputDataSet>();
 			inputDatasetsforProteinSet.add(inputDataSetBuilder.build());
 			// only one set of proteins per msmsRunSummary. It could contain
 			// several searches (several searchSummaries)
-			Map<String, IdentifiedProteinBuilder> proteins = new THashMap<String, IdentifiedProteinBuilder>();
+			final Map<String, IdentifiedProteinBuilder> proteins = new THashMap<String, IdentifiedProteinBuilder>();
 
-			for (SearchSummary searchSummary : msmsRunSummary.getSearchSummary()) {
+			for (final SearchSummary searchSummary : msmsRunSummary.getSearchSummary()) {
 				final long searchId = searchSummary.getSearchId();
 
 				final InputParameter inputParameter = createInputParameters(inputParameterID++, searchSummary,
 						softwares, msmsRunSummary.getSampleEnzyme());
 				inputParamters.add(inputParameter);
 
-				for (SpectrumQuery spectrumquery : msmsRunSummary.getSpectrumQuery()) {
+				for (final SpectrumQuery spectrumquery : msmsRunSummary.getSpectrumQuery()) {
 
-					for (SearchResult searchResult : spectrumquery.getSearchResult()) {
-						for (SearchHit searchHit : searchResult.getSearchHit()) {
+					for (final SearchResult searchResult : spectrumquery.getSearchResult()) {
+						for (final SearchHit searchHit : searchResult.getSearchHit()) {
 
-							IdentifiedPeptideImplFromPepXML peptide = new IdentifiedPeptideImplFromPepXML(spectrumquery,
-									searchHit, inputData, searchEngine, cvManager);
+							final IdentifiedPeptideImplFromPepXML peptide = new IdentifiedPeptideImplFromPepXML(
+									spectrumquery, searchHit, inputData, searchEngine, cvManager);
 							peptides.add(peptide);
 							// let see the protein
-							String proteinACC = searchHit.getProtein();
+							final String proteinACC = searchHit.getProtein();
 							IdentifiedProteinBuilder identifiedProtein = null;
 							if (proteins.containsKey(proteinACC)) {
 								identifiedProtein = proteins.get(proteinACC);
@@ -210,13 +210,13 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			proteinSetBuilder.inputDataSets(inputDatasetsforProteinSet);
 
 			// build the actual proteins
-			for (String proteinAcc : proteins.keySet()) {
-				IdentifiedProteinBuilder identifiedProteinBuilder = proteins.get(proteinAcc);
-				IdentifiedProtein protein = identifiedProteinBuilder.build();
+			for (final String proteinAcc : proteins.keySet()) {
+				final IdentifiedProteinBuilder identifiedProteinBuilder = proteins.get(proteinAcc);
+				final IdentifiedProtein protein = identifiedProteinBuilder.build();
 				// add to the protein set
 				proteinSetBuilder.identifiedProtein(protein);
 				// add proteins to their peptides
-				for (IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
+				for (final IdentifiedPeptide peptide : protein.getIdentifiedPeptides()) {
 					if (peptide instanceof IdentifiedPeptideImplFromPepXML) {
 						((IdentifiedPeptideImplFromPepXML) peptide).addProtein(protein);
 					}
@@ -231,8 +231,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			inputDatasets.add(inputDataSetBuilder.build());
 			// other sofware steps
 			if (msmsRunSummary.getAnalysisTimestamp() != null) {
-				for (AnalysisTimestamp analysisTimestamp : msmsRunSummary.getAnalysisTimestamp()) {
-					SoftwareBuilder softwareBuilder = MiapeDocumentFactory
+				for (final AnalysisTimestamp analysisTimestamp : msmsRunSummary.getAnalysisTimestamp()) {
+					final SoftwareBuilder softwareBuilder = MiapeDocumentFactory
 							.createSoftwareBuilder(analysisTimestamp.getAnalysis()).id(softwareCount++);
 					if (analysisTimestamp.getAny() != null) {
 						softwareBuilder.description(analysisTimestamp.getAny().toString());
@@ -261,8 +261,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			Set<Software> softwares, SampleEnzyme sampleEnzyme) {
 		String search_engine_version = null;
 
-		Set<Database> databases = new HashSet<Database>();
-		SearchDatabase searchDatabase = searchSummary.getSearchDatabase();
+		final Set<Database> databases = new HashSet<Database>();
+		final SearchDatabase searchDatabase = searchSummary.getSearchDatabase();
 		if (searchDatabase != null) {
 			String databaseName = searchDatabase.getDatabaseName();
 			if (databaseName == null && searchDatabase.getLocalPath() != null) {
@@ -274,7 +274,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			if (databaseName == null && searchDatabase.getURL() != null) {
 				databaseName = FilenameUtils.getName(searchDatabase.getURL());
 			}
-			DatabaseBuilder databaseBuilder = MiapeMSIDocumentFactory.createDatabaseBuilder(databaseName);
+			final DatabaseBuilder databaseBuilder = MiapeMSIDocumentFactory.createDatabaseBuilder(databaseName);
 			if (searchDatabase.getDatabaseReleaseDate() != null) {
 				databaseBuilder.date(searchDatabase.getDatabaseReleaseDate().toString());
 			}
@@ -297,10 +297,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		String precursorMassTolerance = null;
 		String precursorMassToleranceUnit = null;
 		String aaModifications = null;
-		List<AminoacidModification> aminoacidModifications = searchSummary.getAminoacidModification();
+		final List<AminoacidModification> aminoacidModifications = searchSummary.getAminoacidModification();
 		if (aminoacidModifications != null) {
-			StringBuilder sb = new StringBuilder();
-			for (AminoacidModification aminoacidModification : aminoacidModifications) {
+			final StringBuilder sb = new StringBuilder();
+			for (final AminoacidModification aminoacidModification : aminoacidModifications) {
 				if (aminoacidModification.getMassdiff() > 0) {
 					if (!"".equals(sb.toString())) {
 						sb.append(", ");
@@ -321,7 +321,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 			aaModifications = sb.toString();
 		}
-		Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
+		final Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
 		String missedcleavages = null;
 		if (searchEngine == null) {
 			final EngineType searchEnginePepXML = searchSummary.getSearchEngine();
@@ -337,7 +337,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			search_engine_version = searchSummary.getSearchEngineVersion();
 
 		}
-		for (NameValueType nameValue : searchSummary.getParameter()) {
+		for (final NameValueType nameValue : searchSummary.getParameter()) {
 			final String parameterName = nameValue.getName();
 			if (parameterName.equalsIgnoreCase("database_name")) {
 				continue;
@@ -383,8 +383,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		}
 		if (searchSummary.getSequenceSearchConstraint() != null
 				&& !searchSummary.getSequenceSearchConstraint().isEmpty()) {
-			StringBuilder sb = new StringBuilder();
-			for (SequenceSearchConstraint sequenceSearchConstraint : searchSummary.getSequenceSearchConstraint()) {
+			final StringBuilder sb = new StringBuilder();
+			for (final SequenceSearchConstraint sequenceSearchConstraint : searchSummary
+					.getSequenceSearchConstraint()) {
 				if (!"".equals(sb.toString())) {
 					sb.append(", ");
 				}
@@ -401,7 +402,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		}
 		// enzymatic_search_constraint
 		String enzimeName = null;
-		StringBuilder cleavageRules = new StringBuilder();
+		final StringBuilder cleavageRules = new StringBuilder();
 		if (searchSummary.getEnzymaticSearchConstraint() != null) {
 			enzimeName = searchSummary.getEnzymaticSearchConstraint().getEnzyme();
 			if (missedcleavages == null
@@ -424,7 +425,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 				cleavageRules.append("Fidelity: " + sampleEnzyme.getFidelity());
 			}
 			if (sampleEnzyme.getSpecificity() != null) {
-				for (Specificity specificity : sampleEnzyme.getSpecificity()) {
+				for (final Specificity specificity : sampleEnzyme.getSpecificity()) {
 					if (specificity.getCut() != null) {
 						if (!"".equals(cleavageRules.toString())) {
 							cleavageRules.append(", ");
@@ -454,7 +455,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 		}
 
-		InputParameterBuilder inputParameterBuilder = MiapeMSIDocumentFactory
+		final InputParameterBuilder inputParameterBuilder = MiapeMSIDocumentFactory
 				.createInputParameterBuilder("input_parameters_" + searchSummary.getSearchId()).databases(databases)
 				.additionalParameters(additionalParameters).misscleavages(missedcleavages).software(software)
 				.precursorMassTolerance(precursorMassTolerance).precursorMassToleranceUnit(precursorMassToleranceUnit)
@@ -473,7 +474,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (file.exists()) {
 			try {
 				fileURL = file.toURI().toURL().toString();
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 			}
 		}
 		url = fileURL;

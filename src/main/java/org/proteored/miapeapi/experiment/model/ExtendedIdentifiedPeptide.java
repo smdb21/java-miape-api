@@ -31,6 +31,7 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.Atom;
 
+import edu.scripps.yates.utilities.staticstorage.StaticStrings;
 import edu.scripps.yates.utilities.strings.StringUtils;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -41,9 +42,9 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	private final String modificationString;
 	private boolean decoy;
-	private String expMass;
-	private String calcMass;
-	private String errorMass;
+	private Float expMass;
+	private Float calcMass;
+	private Float errorMass;
 	private String experimentName;
 	private String replicateName;
 	private FDRFilter fdrFilter;
@@ -118,12 +119,12 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		this.replicateName = replicateName;
 		this.experimentName = experimentName;
 
-		modificationString = createModificationString(peptide);
+		modificationString = StaticStrings.getUniqueInstance(createModificationString(peptide));
 		if (miapeMSI != null)
 			miapeMSReference = miapeMSI.getMSDocumentReference();
 		else
 			miapeMSReference = -1;
-		this.miapeMSIName = miapeMSI.getName();
+		miapeMSIName = miapeMSI.getName();
 		this.relation = relation;
 		processPeptide(peptide, miapeMSI);
 	}
@@ -137,50 +138,56 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	}
 
 	private void processPeptide(IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI) {
-		String string = peptide.getMassDesviation();
+		final String string = peptide.getMassDesviation();
 
 		if (string != null) {
 			if (string.contains("\n")) {
 				final String[] lines = string.split("\n");
-				for (String line : lines) {
+				for (final String line : lines) {
 					if (line.contains("=")) {
 						final String[] pairNameValue = line.split("=");
 
-						if (pairNameValue[0].startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ))
-							expMass = pairNameValue[1];
-						if (pairNameValue[0].startsWith(MiapeXmlUtil.CALCULATED_MZ))
-							calcMass = pairNameValue[1];
-						if (pairNameValue[0].startsWith(MiapeXmlUtil.ERROR_MZ))
-							errorMass = pairNameValue[1];
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.EXPERIMENTAL_MZ)) {
+							try {
+								expMass = Float.valueOf(pairNameValue[1]);
+							} catch (final NumberFormatException e) {
+
+							}
+						}
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.CALCULATED_MZ)) {
+							try {
+								calcMass = Float.valueOf(pairNameValue[1]);
+							} catch (final NumberFormatException e) {
+
+							}
+						}
+						if (pairNameValue[0].startsWith(MiapeXmlUtil.ERROR_MZ)) {
+							try {
+								errorMass = Float.valueOf(pairNameValue[1]);
+							} catch (final NumberFormatException e) {
+
+							}
+						}
 					}
 				}
 			} else {
 				try {
-					double errorMZ = Double.valueOf(string);
-					errorMass = String.valueOf(errorMZ);
-
-					int charge = Integer.valueOf(getCharge());
-					double calcMzDouble = ModificationMapping.getAASequenceImpl(getSequence(), getModifications())
-							.getMz(charge);
-					calcMass = String.valueOf(calcMzDouble);
-					double expMZDouble = calcMzDouble - errorMZ;
-					expMass = String.valueOf(expMZDouble);
-				} catch (NumberFormatException e) {
+					errorMass = Float.valueOf(string);
+					final int charge = Integer.valueOf(getCharge());
+					final float calcMzDouble = Double.valueOf(
+							ModificationMapping.getAASequenceImpl(getSequence(), getModifications()).getMz(charge))
+							.floatValue();
+					calcMass = calcMzDouble;
+					expMass = calcMzDouble - errorMass;
+				} catch (final NumberFormatException e) {
 
 				}
 			}
 		}
 		if (errorMass == null && calcMass != null && expMass != null) {
-			try {
-				double calcMzDouble = Double.valueOf(calcMass);
-				double expMZDouble = Double.valueOf(expMass);
-				double errorMZ = calcMzDouble - expMZDouble;
-				errorMass = String.valueOf(errorMZ);
-			} catch (NumberFormatException e) {
-
-			}
+			errorMass = calcMass - expMass;
 		}
-		String seq = peptide.getSequence();
+		final String seq = peptide.getSequence();
 		int numMiss = 0;
 		if (seq.contains("K")) {
 			final String[] split = seq.split("K");
@@ -216,25 +223,25 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		scores.addAll(peptide.getScores());
 		modifications = new THashSet<PeptideModification>();
 		modifications.addAll(peptide.getModifications());
-		massDeviation = peptide.getMassDesviation();
+		massDeviation = StaticStrings.getUniqueInstance(peptide.getMassDesviation());
 		spectrumRef = peptide.getSpectrumRef();
 		inputData = peptide.getInputData();
 		rank = peptide.getRank();
 		retentionTimeInSeconds = peptide.getRetentionTimeInSeconds();
 		// databases
-		this.databases = new HashSet<Database>();
-		Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
+		databases = new HashSet<Database>();
+		final Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
 		if (inputParameters != null) {
-			for (InputParameter inputParameter : inputParameters) {
-				Set<Database> databases2 = inputParameter.getDatabases();
+			for (final InputParameter inputParameter : inputParameters) {
+				final Set<Database> databases2 = inputParameter.getDatabases();
 				if (databases2 != null) {
-					for (Database database : databases2) {
+					for (final Database database : databases2) {
 						boolean found = false;
-						for (Database selectedDatabase : databases) {
-							String selectedDatabaseName = selectedDatabase.getName();
+						for (final Database selectedDatabase : databases) {
+							final String selectedDatabaseName = selectedDatabase.getName();
 							if (selectedDatabase != null)
 								if (selectedDatabaseName.equals(database.getName())) {
-									String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+									final String selectedDatabaseVersion = selectedDatabase.getNumVersion();
 									if (selectedDatabaseVersion != null) {
 										if (selectedDatabaseVersion.equals(database.getNumVersion()))
 											found = true;
@@ -250,16 +257,16 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			}
 		}
 		// softwares
-		this.softwares = new HashSet<Software>();
-		Set<Software> softwares2 = miapeMSI.getSoftwares();
+		softwares = new HashSet<Software>();
+		final Set<Software> softwares2 = miapeMSI.getSoftwares();
 		if (softwares2 != null) {
-			for (Software software : softwares2) {
+			for (final Software software : softwares2) {
 				boolean found = false;
-				for (Software selectedSoftware : softwares) {
-					String selectedDatabaseName = selectedSoftware.getName();
+				for (final Software selectedSoftware : softwares) {
+					final String selectedDatabaseName = selectedSoftware.getName();
 					if (selectedSoftware != null)
 						if (selectedDatabaseName.equals(software.getName())) {
-							String selectedSoftwareVersion = selectedSoftware.getVersion();
+							final String selectedSoftwareVersion = selectedSoftware.getVersion();
 							if (selectedSoftwareVersion != null) {
 								if (selectedSoftwareVersion.equals(software.getVersion()))
 									found = true;
@@ -300,13 +307,13 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	}
 
 	private String createModificationString(IdentifiedPeptide peptide) {
-		Set<PeptideModification> modificationSet = peptide.getModifications();
+		final Set<PeptideModification> modificationSet = peptide.getModifications();
 		if (modificationSet != null) {
-			List<PeptideModification> modificationList = new ArrayList<PeptideModification>();
-			for (PeptideModification peptideModification : modificationSet) {
+			final List<PeptideModification> modificationList = new ArrayList<PeptideModification>();
+			for (final PeptideModification peptideModification : modificationSet) {
 				modificationList.add(peptideModification);
 			}
-			String sequence = peptide.getSequence();
+			final String sequence = peptide.getSequence();
 			if (modificationList != null && !modificationList.isEmpty()) {
 
 				// sort modifications by position
@@ -318,17 +325,17 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 				});
 				log.debug("PEptide: " + sequence + " numMods=" + modificationList.size());
 				// parse modifications
-				List<String> splits = new ArrayList<String>();
-				String temp = sequence;
+				final List<String> splits = new ArrayList<String>();
+				final String temp = sequence;
 				int previousPosition = 0;
 				String after = "";
-				for (PeptideModification peptideModification : modificationList) {
+				for (final PeptideModification peptideModification : modificationList) {
 					final int position = peptideModification.getPosition();
 
 					log.debug("modification: " + sequence + " pos:" + position);
 
 					if (position > 0 && position <= sequence.length()) {
-						String before = sequence.substring(previousPosition, position);
+						final String before = sequence.substring(previousPosition, position);
 						splits.add(before);
 						previousPosition = position;
 						after = "";
@@ -336,13 +343,13 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 							after = sequence.substring(position);
 						// N-terminal
 					} else if (position == 0) {
-						String before = "";
+						final String before = "";
 						splits.add(before);
 						previousPosition = position;
 						after = sequence;
 						// C-TERMINAL
 					} else if (position == sequence.length()) {
-						String before = sequence;
+						final String before = sequence;
 						splits.add(before);
 						previousPosition = position;
 						after = "";
@@ -350,8 +357,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 				}
 				splits.add(after);
-				DecimalFormat format = new DecimalFormat("#.##");
-				StringBuilder sb = new StringBuilder();
+				final DecimalFormat format = new DecimalFormat("#.##");
+				final StringBuilder sb = new StringBuilder();
 				int i = 0;
 				for (i = 0; i < splits.size(); i++) {
 					PeptideModification peptideModification = null;
@@ -376,7 +383,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 					if (deltaMass != null) {
 						if (deltaMass > 0)
 							prefix = "+";
-						String delta = "(" + prefix + format.format(deltaMass) + ")";
+						final String delta = "(" + prefix + format.format(deltaMass) + ")";
 						sb.append(delta);
 					}
 					if (subtitution != null) {
@@ -384,7 +391,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 					}
 				}
 				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(peptide.getSequence())) {
-					List<String> list = new ArrayList<String>();
+					final List<String> list = new ArrayList<String>();
 					list.add(sb.toString());
 					ExtendedIdentifiedPeptide.sequenceConversion.put(peptide.getSequence(), list);
 				} else {
@@ -394,7 +401,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 						try {
 							if (!list.contains(sb.toString()))
 								list.add(sb.toString());
-						} catch (ArrayIndexOutOfBoundsException e) {
+						} catch (final ArrayIndexOutOfBoundsException e) {
 							e.printStackTrace();
 						}
 					}
@@ -406,7 +413,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 				return sb.toString();
 			} else {
 				if (!ExtendedIdentifiedPeptide.sequenceConversion.containsKey(sequence)) {
-					List<String> list = new ArrayList<String>();
+					final List<String> list = new ArrayList<String>();
 					ExtendedIdentifiedPeptide.sequenceConversion.put(sequence, list);
 				}
 			}
@@ -418,7 +425,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		if (ExtendedIdentifiedPeptide.sequenceConversion.containsKey(sequence))
 			return ExtendedIdentifiedPeptide.sequenceConversion.get(sequence);
 		else {
-			List<String> list = new ArrayList<String>();
+			final List<String> list = new ArrayList<String>();
 			list.add(sequence);
 			return list;
 		}
@@ -439,7 +446,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		if (!(obj instanceof IdentifiedPeptide))
 			return super.equals(obj);
 		else {
-			IdentifiedPeptide peptide = (IdentifiedPeptide) obj;
+			final IdentifiedPeptide peptide = (IdentifiedPeptide) obj;
 			return peptide.getSequence().equals(getSequence());
 		}
 	}
@@ -538,7 +545,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		if (proteins == null)
 			proteins = new ArrayList<ExtendedIdentifiedProtein>();
 
-		for (ExtendedIdentifiedProtein prot : proteins) {
+		for (final ExtendedIdentifiedProtein prot : proteins) {
 			if (prot.getId() == protein.getId())
 				return;
 		}
@@ -564,11 +571,11 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	@Override
 	public void setDecoy(boolean decoy) {
 		this.decoy = decoy;
-		List<ExtendedIdentifiedProtein> proteins2 = getProteins();
+		final List<ExtendedIdentifiedProtein> proteins2 = getProteins();
 		if (proteins2 != null) {
-			for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteins2) {
+			for (final ExtendedIdentifiedProtein extendedIdentifiedProtein : proteins2) {
 				extendedIdentifiedProtein.setDecoy(decoy, false);
-				ProteinGroup group = extendedIdentifiedProtein.getGroup();
+				final ProteinGroup group = extendedIdentifiedProtein.getGroup();
 				if (group != null)
 					group.setDecoy(decoy);
 			}
@@ -578,9 +585,9 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	public void setDecoy(boolean decoy, boolean setProteins) {
 		this.decoy = decoy;
 		if (setProteins) {
-			List<ExtendedIdentifiedProtein> proteins2 = getProteins();
+			final List<ExtendedIdentifiedProtein> proteins2 = getProteins();
 			if (proteins2 != null) {
-				for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteins2) {
+				for (final ExtendedIdentifiedProtein extendedIdentifiedProtein : proteins2) {
 					extendedIdentifiedProtein.setDecoy(decoy, false);
 				}
 			}
@@ -609,16 +616,16 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		return null;
 	}
 
-	public String getCalculatedMassToCharge() {
+	public Float getCalculatedMassToCharge() {
 		return calcMass;
 	}
 
-	public String getExperimentalMassToCharge() {
+	public Float getExperimentalMassToCharge() {
 		return expMass;
 
 	}
 
-	public String getMassError() {
+	public Float getMassError() {
 		return errorMass;
 	}
 
@@ -635,16 +642,16 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	@Override
 	public Float getScore(String scoreName) {
 		if (scoreName != null) {
-			Set<PeptideScore> scores = getScores();
+			final Set<PeptideScore> scores = getScores();
 			if (scores != null && !scores.isEmpty()) {
-				for (PeptideScore peptideScore : scores) {
+				for (final PeptideScore peptideScore : scores) {
 					if (peptideScore.getName().equalsIgnoreCase(scoreName)) {
 						try {
 							String value = peptideScore.getValue();
 							if (value.contains(","))
 								value = value.replace(",", ".");
 							return Float.valueOf(value);
-						} catch (NumberFormatException e) {
+						} catch (final NumberFormatException e) {
 							log.warn(e.getMessage());
 						}
 					}
@@ -656,7 +663,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	@Override
 	public Float getScore() {
-		SortingParameters sorting = SortingManager.getInstance().getPeptideSortingByPeptideScore(this);
+		final SortingParameters sorting = SortingManager.getInstance().getPeptideSortingByPeptideScore(this);
 		if (sorting == null)
 			return null;
 		return this.getScore(sorting.getScoreName());
@@ -679,11 +686,11 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	@Override
 	public List<String> getScoreNames() {
-		List<String> ret = new ArrayList<String>();
-		Set<PeptideScore> scores = getScores();
+		final List<String> ret = new ArrayList<String>();
+		final Set<PeptideScore> scores = getScores();
 		if (scores != null)
-			for (PeptideScore peptideScore : scores) {
-				String name = peptideScore.getName();
+			for (final PeptideScore peptideScore : scores) {
+				final String name = peptideScore.getName();
 				if (!ret.contains(name))
 					ret.add(name);
 			}
@@ -699,14 +706,14 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			try {
 				currentAA = AminoAcid.getAminoAcid(getSequence().charAt(aa));
 				mass += currentAA.monoisotopicMass;
-			} catch (NullPointerException e) {
+			} catch (final NullPointerException e) {
 				throw new IllegalArgumentException("Unknown amino acid: " + getSequence().charAt(aa) + "!");
 			}
 		}
 
 		mass += Atom.H.mass + Atom.O.mass;
 
-		for (PeptideModification ptm : getModifications()) {
+		for (final PeptideModification ptm : getModifications()) {
 			final Double monoDelta = ptm.getMonoDelta();
 			if (monoDelta != null)
 				mass += monoDelta;
@@ -774,7 +781,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	}
 
 	public Set<Software> getSoftwares() {
-		return this.softwares;
+		return softwares;
 	}
 
 }

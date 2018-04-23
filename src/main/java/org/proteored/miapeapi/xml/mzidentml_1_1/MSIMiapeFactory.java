@@ -33,16 +33,16 @@ public class MSIMiapeFactory {
 	public MiapeMSIDocument toDocument(MiapeMzIdentMLFile xmlFile, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String userName, String password, String projectName,
 			boolean processInParallel)
-					throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
+			throws MiapeDatabaseException, MiapeSecurityException, IllegalMiapeArgumentException {
 		MiapeMSIDocument result = null;
 		if (cvManager == null)
 			throw new IllegalMiapeArgumentException("ControlVocabularyManager is not set");
 		try {
 			log.info("before unmarshall");
 			File file = xmlFile.toFile();
-			long t1 = System.currentTimeMillis();
-			file = ZipManager.decompressFileIfNeccessary(file);
-			MzIdentMLUnmarshaller unmarshaller = new MzIdentMLUnmarshaller(file, true);
+			final long t1 = System.currentTimeMillis();
+			file = ZipManager.decompressFileIfNeccessary(file, false);
+			final MzIdentMLUnmarshaller unmarshaller = new MzIdentMLUnmarshaller(file, true);
 
 			log.info("after unmarshall: it took: "
 					+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
@@ -58,7 +58,7 @@ public class MSIMiapeFactory {
 
 			}
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			log.error(e.getMessage());
 			throw new WrongXMLFormatException(e);
