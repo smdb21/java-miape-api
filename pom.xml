@@ -251,57 +251,6 @@
 		<!-- 			</exclusions> -->
 		<!-- 		</dependency> -->
 
-		<dependency>
-			<groupId>com.compomics</groupId>
-			<artifactId>utilities</artifactId>
-			<version>3.13.23</version>
-			<exclusions>
-				<exclusion>
-					<groupId>de.proteinms.xtandemparser</groupId> 
-					<artifactId>xtandem-parser</artifactId> 
-				</exclusion>
-				<exclusion>
-					<groupId>batik</groupId>
-					<artifactId>batik-all</artifactId>
-				</exclusion>
-				<exclusion>
-					<artifactId>pdf-transcoder</artifactId>
-					<groupId>batik</groupId>
-				</exclusion>
-				<exclusion>
-					<groupId>itext</groupId>
-					<artifactId>iText</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jfree</groupId>
-					<artifactId>jcommon</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>lmjunit</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>cpdetector</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>statlib</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>lennart</groupId>
-					<artifactId>xxindex</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>umontreal.iro.lecuyer.gof</groupId>
-					<artifactId>ssj</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jfree</groupId>
-					<artifactId>jfreechart</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<!--  mapeo de modificaciones -->
 		<dependency>
 			<groupId>uk.ac.ebi.pride-mod</groupId>
