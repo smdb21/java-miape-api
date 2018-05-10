@@ -112,14 +112,16 @@ public class ModificationMapping {
 			final HashMap<String, double[]> delta = new HashMap<String, double[]>();
 			final double[] deltas = new double[2];
 			if (peptideModification.getMonoDelta() != null) {
+				AssignMass.getInstance(true);
 				deltas[0] = peptideModification.getMonoDelta()
-						+ AssignMass.getInstance(true).getMass(peptideModification.getResidues().charAt(0));
+						+ AssignMass.getMass(peptideModification.getResidues().charAt(0));
 			} else {
 				deltas[0] = 0.0;
 			}
 			if (peptideModification.getAvgDelta() != null) {
+				AssignMass.getInstance(false);
 				deltas[1] = peptideModification.getAvgDelta()
-						+ AssignMass.getInstance(false).getMass(peptideModification.getResidues().charAt(0));
+						+ AssignMass.getMass(peptideModification.getResidues().charAt(0));
 			} else {
 				deltas[1] = deltas[0];
 			}

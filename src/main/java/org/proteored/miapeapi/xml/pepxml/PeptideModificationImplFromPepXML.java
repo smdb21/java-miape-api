@@ -43,11 +43,11 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 
 	public PeptideModificationImplFromPepXML(String sequence, int position, Double delta,
 			SubInfoDataType aaSubstitution) {
-		this.peptideSequence = sequence;
+		peptideSequence = sequence;
 		this.position = position;
 		this.delta = delta;
 		if (preferredModifications == null) {
-			URL url = getClass().getClassLoader().getResource("modification_mappings_dtaSelect.xml");
+			final URL url = getClass().getClassLoader().getResource("modification_mappings_dtaSelect.xml");
 			if (url != null) {
 				preferredModifications = PrideModController.parseSlimModCollection(url);
 			} else {
@@ -55,10 +55,10 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 			}
 		}
 
-		double precision = 0.01;
+		final double precision = 0.01;
 		// map by delta
 		if (delta != null) {
-			SlimModCollection filteredMods = preferredModifications.getbyDelta(delta, precision);
+			final SlimModCollection filteredMods = preferredModifications.getbyDelta(delta, precision);
 			if (!filteredMods.isEmpty()) {
 				slimModification = filteredMods.get(0);
 			} else {
@@ -119,8 +119,8 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 
 	@Override
 	public String getReplacementResidue() {
-		if (this.aaSubstitution != null) {
-			this.aaSubstitution.getOrigAa();
+		if (aaSubstitution != null) {
+			aaSubstitution.getOrigAa();
 		}
 		return null;
 	}

@@ -27,9 +27,7 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.util.ModificationMapping;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
-import com.compomics.util.experiment.biology.AminoAcid;
-import com.compomics.util.experiment.biology.Atom;
-
+import edu.scripps.yates.dbindex.util.IndexUtil;
 import edu.scripps.yates.utilities.staticstorage.StaticStrings;
 import edu.scripps.yates.utilities.strings.StringUtils;
 import gnu.trove.list.array.TIntArrayList;
@@ -699,19 +697,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	public double getTheoreticMass() throws IllegalArgumentException {
 
-		double mass = Atom.H.mass;
-		AminoAcid currentAA;
-
-		for (int aa = 0; aa < getSequence().length(); aa++) {
-			try {
-				currentAA = AminoAcid.getAminoAcid(getSequence().charAt(aa));
-				mass += currentAA.monoisotopicMass;
-			} catch (final NullPointerException e) {
-				throw new IllegalArgumentException("Unknown amino acid: " + getSequence().charAt(aa) + "!");
-			}
-		}
-
-		mass += Atom.H.mass + Atom.O.mass;
+		double mass = IndexUtil.calculateMass(getSequence(), true);
 
 		for (final PeptideModification ptm : getModifications()) {
 			final Double monoDelta = ptm.getMonoDelta();
