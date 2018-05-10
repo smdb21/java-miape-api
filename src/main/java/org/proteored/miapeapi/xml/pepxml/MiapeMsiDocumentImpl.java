@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +48,7 @@ import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import edu.scripps.yates.utilities.files.ZipManager;
 import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
 import umich.ms.fileio.exceptions.FileParsingException;
 import umich.ms.fileio.filetypes.pepxml.PepXmlParser;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.AminoacidModification;
@@ -150,12 +150,12 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		final MiapeMSIDocumentBuilder miapeBuilder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project,
 				idSetName, owner, dbManager);
 		final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
-		final Set<InputParameter> inputParamters = new HashSet<InputParameter>();
+		final Set<InputParameter> inputParamters = new THashSet<InputParameter>();
 		miapeBuilder.inputParameters(inputParamters);
-		final Set<IdentifiedProteinSet> proteinSets = new HashSet<IdentifiedProteinSet>();
+		final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
 		miapeBuilder.identifiedProteinSets(proteinSets);
-		final Set<InputDataSet> inputDatasets = new HashSet<InputDataSet>();
-		final Set<Software> softwares = new HashSet<Software>();
+		final Set<InputDataSet> inputDatasets = new THashSet<InputDataSet>();
+		final Set<Software> softwares = new THashSet<Software>();
 		int i = 0;
 		int softwareCount = 1;
 		int inputParameterID = 1;
@@ -169,7 +169,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			inputDataSetBuilder.inputData(inputData);
 			final IdentifiedProteinSetBuilder proteinSetBuilder = MiapeMSIDocumentFactory
 					.createIdentifiedProteinSetBuilder("Protein_set_" + i);
-			final Set<InputDataSet> inputDatasetsforProteinSet = new HashSet<InputDataSet>();
+			final Set<InputDataSet> inputDatasetsforProteinSet = new THashSet<InputDataSet>();
 			inputDatasetsforProteinSet.add(inputDataSetBuilder.build());
 			// only one set of proteins per msmsRunSummary. It could contain
 			// several searches (several searchSummaries)
@@ -261,7 +261,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			Set<Software> softwares, SampleEnzyme sampleEnzyme) {
 		String search_engine_version = null;
 
-		final Set<Database> databases = new HashSet<Database>();
+		final Set<Database> databases = new THashSet<Database>();
 		final SearchDatabase searchDatabase = searchSummary.getSearchDatabase();
 		if (searchDatabase != null) {
 			String databaseName = searchDatabase.getDatabaseName();
@@ -321,7 +321,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 			aaModifications = sb.toString();
 		}
-		final Set<AdditionalParameter> additionalParameters = new HashSet<AdditionalParameter>();
+		final Set<AdditionalParameter> additionalParameters = new THashSet<AdditionalParameter>();
 		String missedcleavages = null;
 		if (searchEngine == null) {
 			final EngineType searchEnginePepXML = searchSummary.getSearchEngine();

@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +88,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	private Set<Database> databases;
 
-	private HashSet<Software> softwares;
+	private Set<Software> softwares;
 
 	private List<Integer> identifiedProteinIDs;
 
@@ -230,7 +229,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		rank = peptide.getRank();
 		retentionTimeInSeconds = peptide.getRetentionTimeInSeconds();
 		// databases
-		databases = new HashSet<Database>();
+		databases = new THashSet<Database>();
 		final Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
 		if (inputParameters != null) {
 			for (final InputParameter inputParameter : inputParameters) {
@@ -258,7 +257,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			}
 		}
 		// softwares
-		softwares = new HashSet<Software>();
+		softwares = new THashSet<Software>();
 		final Set<Software> softwares2 = miapeMSI.getSoftwares();
 		if (softwares2 != null) {
 			for (final Software software : softwares2) {

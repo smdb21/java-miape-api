@@ -1,10 +1,7 @@
 package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +23,9 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
 import com.compomics.util.protein.AASequenceImpl;
 import com.compomics.util.protein.Protein;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class ExtendedIdentifiedProtein extends IdentificationItem implements IdentifiedProtein {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -53,7 +53,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	private final List<Integer> identifiedPeptideIDs;
 
-	private final Map<Integer, String> peptideSequencesByID = new HashMap<Integer, String>();
+	private final TIntObjectHashMap<String> peptideSequencesByID = new TIntObjectHashMap<String>();
 
 	private final int id;
 
@@ -79,7 +79,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	private final String validationValue;
 
-	private HashSet<ExtendedIdentifiedPeptide> peptideSet;
+	private Set<ExtendedIdentifiedPeptide> peptideSet;
 
 	public ExtendedIdentifiedProtein(Replicate replicate, IdentifiedProtein identifiedProtein,
 			MiapeMSIDocument miapeMSI) {
@@ -116,7 +116,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		evidence = pe;
 		group = null;
 		// databases
-		databases = new HashSet<Database>();
+		databases = new THashSet<Database>();
 		final Set<InputParameter> inputParameters = miapeMSI.getInputParameters();
 		if (inputParameters != null) {
 			for (final InputParameter inputParameter : inputParameters) {
@@ -144,7 +144,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 			}
 		}
 		// softwares
-		softwares = new HashSet<Software>();
+		softwares = new THashSet<Software>();
 		final Set<Software> softwares2 = miapeMSI.getSoftwares();
 		if (softwares2 != null) {
 			for (final Software software : softwares2) {
@@ -176,7 +176,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		IdentifierParser.setRemove_acc_version(false);
 		parsedAccession = IdentifierParser.parseACC(accession);
 		description = protein.getDescription();
-		scores = new HashSet<ProteinScore>();
+		scores = new THashSet<ProteinScore>();
 		scores.addAll(protein.getScores());
 		peptideNumber = protein.getPeptideNumber();
 		coverage = protein.getCoverage();
@@ -331,7 +331,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 		}
 		if (peptides == null) {
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
-			peptideSet = new HashSet<ExtendedIdentifiedPeptide>();
+			peptideSet = new THashSet<ExtendedIdentifiedPeptide>();
 		}
 
 		for (final ExtendedIdentifiedPeptide pep : peptides) {

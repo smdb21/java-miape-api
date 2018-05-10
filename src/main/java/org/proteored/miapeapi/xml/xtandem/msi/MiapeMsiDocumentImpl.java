@@ -36,6 +36,7 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 import org.proteored.miapeapi.xml.mzidentml.ProjectImpl;
+import org.proteored.miapeapi.xml.util.MiapeIdentifierCounter;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import de.proteinms.xtandemparser.parser.XTandemParser;
@@ -113,14 +114,14 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			parser = xfile.getXTandemParser();
 			performParameters = xfile.getPerformParameters();
 			xmlInputParameters = xfile.getInputParameters();
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 
 		}
 
 		Software software = null;
 		if (performParameters != null) {
 			// Softwares
-			final int softwareID = MiapeXmlUtil.SoftwareCounter.increaseCounter();
+			final int softwareID = MiapeIdentifierCounter.increaseCounter();
 			software = new XTandemSoftwareImpl(performParameters.getProcVersion(), softwareID, cvManager);
 			softwares.add(software);
 		}
@@ -128,7 +129,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		InputParameter inputParameter = null;
 		if (parser != null) {
 			// input parameters
-			Integer inputParamID = MiapeXmlUtil.ParameterCounter.increaseCounter();
+			final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
 			inputParameter = new InputParameterImpl(xfile, parser, inputParamID, software, cvManager);
 			inputParameters.add(inputParameter);
 		}
@@ -138,8 +139,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			if (xmlInputParameters != null) {
 				final String spectrumPath = xmlInputParameters.getSpectrumPath();
 				if (spectrumPath != null && !"".equals(spectrumPath)) {
-					Integer inputDataSetID = MiapeXmlUtil.InputDataSetCounter.increaseCounter();
-					InputDataSet inputDataSet = new InputDataSetImpl(spectrumPath, inputDataSetID);
+					final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
+					final InputDataSet inputDataSet = new InputDataSetImpl(spectrumPath, inputDataSetID);
 					inputDataSets.add(inputDataSet);
 				}
 			}
@@ -154,7 +155,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (xmlInputParameters != null)
 			maxValidExpectValue = xmlInputParameters.getMaxValidExpectValue();
 		if (falsePositives != -1 && maxValidExpectValue != -1) {
-			Validation validation = new ValidationImpl(falsePositives, maxValidExpectValue, cvManager);
+			final Validation validation = new ValidationImpl(falsePositives, maxValidExpectValue, cvManager);
 			validations.add(validation);
 		}
 
@@ -163,10 +164,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			final String procStartTime = performParameters.getProcStartTime();
 			if (procStartTime != null && !"".equals(procStartTime)) {
 				try {
-					String[] tmp = procStartTime.split(":");
+					final String[] tmp = procStartTime.split(":");
 					if (tmp.length > 3)
 						miapeDate = new MiapeDate(tmp[0] + "-" + tmp[1] + "-" + tmp[2]);
-				} catch (PatternSyntaxException ex) {
+				} catch (final PatternSyntaxException ex) {
 					// do nothing
 				}
 			}
@@ -236,7 +237,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (file.exists()) {
 			try {
 				fileURL = file.toURI().toURL().toString();
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 			}
 		}
 		url = fileURL;
@@ -344,10 +345,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public List<IdentifiedPeptide> getIdentifiedPeptides() {
-		Collection<List<IdentifiedPeptide>> values = peptidesByProteinIDHash.values();
-		List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
-		for (List<IdentifiedPeptide> peptideList : values) {
-			for (IdentifiedPeptide identifiedPeptide : peptideList) {
+		final Collection<List<IdentifiedPeptide>> values = peptidesByProteinIDHash.values();
+		final List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
+		for (final List<IdentifiedPeptide> peptideList : values) {
+			for (final IdentifiedPeptide identifiedPeptide : peptideList) {
 				if (!ret.contains(identifiedPeptide))
 					ret.add(identifiedPeptide);
 				else
@@ -355,40 +356,22 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 		}
 		return ret;
-		// List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
-		// final Set<IdentifiedProteinSet> identifiedProteinSets =
-		// this.getIdentifiedProteinSets();
-		// if (identifiedProteinSets != null) {
-		// for (IdentifiedProteinSet identifiedProteinSet :
-		// identifiedProteinSets) {
-		// final HashMap<String, IdentifiedProtein> identifiedProteins =
-		// identifiedProteinSet
-		// .getIdentifiedProteins();
-		// for (String proteinAcc : identifiedProteins.keySet()) {
-		// IdentifiedProtein protein = identifiedProteins.get(proteinAcc);
-		// List<IdentifiedPeptide> identifiedPeptides =
-		// protein.getIdentifiedPeptides();
-		// if (identifiedPeptides != null)
-		// ret.addAll(identifiedPeptides);
-		// }
-		// }
-		// }
-		// return ret;
+
 	}
 
 	private void createPeptideAndProteinHashMaps(XTandemFile xfile) {
 		peptidesByProteinIDHash = new THashMap<String, List<IdentifiedPeptide>>();
-		PeptideMap peptideMap = xfile.getPeptideMap();
+		final PeptideMap peptideMap = xfile.getPeptideMap();
 
-		ModificationMap modificationsMap = xfile.getModificationMap();
+		final ModificationMap modificationsMap = xfile.getModificationMap();
 		final Map<String, String> rawModMap = xfile.getXTandemParser().getRawModMap();
-		InputData inputData = getInputData();
-		ArrayList<Spectrum> spectraList = xfile.getSpectraList();
+		final InputData inputData = getInputData();
+		final ArrayList<Spectrum> spectraList = xfile.getSpectraList();
 		log.info("Iterating over " + spectraList.size() + " spectra...");
 
-		for (Spectrum spectrum : spectraList) {
+		for (final Spectrum spectrum : spectraList) {
 
-			Map<String, IdentifiedPeptide> peptidesByGroup = new THashMap<String, IdentifiedPeptide>();
+			final Map<String, IdentifiedPeptide> peptidesByGroup = new THashMap<String, IdentifiedPeptide>();
 			final int spectrumNumber = spectrum.getSpectrumNumber();
 			final String spectrumRef = xfile.getSupportData(spectrumNumber).getFragIonSpectrumDescription();
 			// ArrayList<Peptide> xTandemPeptides =
@@ -396,27 +379,27 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			// spectrumNumber, index);
 			// ArrayList<Peptide> xTandemPeptides = peptideMap
 			// .getAllPeptides(spectrumNumber);
-			Set<String> numGroups = new THashSet<String>();
+			final Set<String> numGroups = new THashSet<String>();
 			for (int numPeptide = 1; numPeptide <= peptideMap.getNumberOfPeptides(spectrumNumber); numPeptide++) {
 				// for (Peptide xTandemPeptide : xTandemPeptides) {
-				Peptide xTandemPeptide = peptideMap.getPeptideByIndex(spectrumNumber, numPeptide);
-				List<Domain> domains = xTandemPeptide.getDomains();
+				final Peptide xTandemPeptide = peptideMap.getPeptideByIndex(spectrumNumber, numPeptide);
+				final List<Domain> domains = xTandemPeptide.getDomains();
 
-				for (Domain domain : domains) {
+				for (final Domain domain : domains) {
 
-					String proteinRef = domain.getProteinKey();
+					final String proteinRef = domain.getProteinKey();
 					// NO CREAR UN NUEVO PEPTIDO SI LOS DOS PRIMEROS NUMEROS DEL
 					// ID DEL DOMAIN YA SE HAN VISTO PARA ESTE ESPECTRO!!
-					String domainID = domain.getDomainID();
-					String[] split = domainID.split("\\.");
-					String numGroup = split[0];
+					final String domainID = domain.getDomainID();
+					final String[] split = domainID.split("\\.");
+					final String numGroup = split[0];
 
 					IdentifiedPeptide identifiedPeptide = null;
 					if (!numGroups.contains(numGroup)) {
 						numGroups.add(numGroup);
 
 						identifiedPeptide = new IdentifiedPeptideImpl(domain, xTandemPeptide, modificationsMap,
-								rawModMap, xfile.getInputParameters(), MiapeXmlUtil.PeptideCounter.increaseCounter(),
+								rawModMap, xfile.getInputParameters(), MiapeIdentifierCounter.increaseCounter(),
 								inputData, cvManager, spectrum, 1, spectrumRef);
 
 						peptidesByGroup.put(numGroup, identifiedPeptide);
@@ -426,38 +409,38 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 					if (peptidesByProteinIDHash.containsKey(proteinRef)) {
 						peptidesByProteinIDHash.get(proteinRef).add(identifiedPeptide);
 					} else {
-						List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
+						final List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
 						peptideList.add(identifiedPeptide);
 						peptidesByProteinIDHash.put(proteinRef, peptideList);
 					}
 				}
 			}
 		}
-		ProteinMap proteinMap = xfile.getProteinMap();
+		final ProteinMap proteinMap = xfile.getProteinMap();
 		log.info("Iterating over proteins...");
 
 		// protein hash
 		proteinHash = new THashMap<String, IdentifiedProtein>();
-		Iterator<String> proteinIDIterator = proteinMap.getProteinIDIterator();
+		final Iterator<String> proteinIDIterator = proteinMap.getProteinIDIterator();
 		while (proteinIDIterator.hasNext()) {
-			String proteinID = proteinIDIterator.next();
-			Protein protein = proteinMap.getProtein(proteinID);
+			final String proteinID = proteinIDIterator.next();
+			final Protein protein = proteinMap.getProtein(proteinID);
 
 			if (!proteinHash.containsKey(protein.getID())) {
-				IdentifiedProtein identifiedProtein = new IdentifiedProteinImpl(protein,
-						MiapeXmlUtil.ProteinCounter.increaseCounter(), modificationsMap, cvManager);
+				final IdentifiedProtein identifiedProtein = new IdentifiedProteinImpl(protein,
+						MiapeIdentifierCounter.increaseCounter(), modificationsMap, cvManager);
 				proteinHash.put(protein.getID(), identifiedProtein);
 			}
 		}
 
 		// associate proteins and peptides
 		log.info("Associating proteins and peptides...");
-		Set<String> proteinRefs = peptidesByProteinIDHash.keySet();
-		for (String proteinRef : proteinRefs) {
+		final Set<String> proteinRefs = peptidesByProteinIDHash.keySet();
+		for (final String proteinRef : proteinRefs) {
 			if (proteinHash.containsKey(proteinRef)) {
-				IdentifiedProteinImpl identifiedProtein = (IdentifiedProteinImpl) proteinHash.get(proteinRef);
-				List<IdentifiedPeptide> identifiedPeptides = peptidesByProteinIDHash.get(proteinRef);
-				for (IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
+				final IdentifiedProteinImpl identifiedProtein = (IdentifiedProteinImpl) proteinHash.get(proteinRef);
+				final List<IdentifiedPeptide> identifiedPeptides = peptidesByProteinIDHash.get(proteinRef);
+				for (final IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 					((IdentifiedPeptideImpl) identifiedPeptide).addProtein(identifiedProtein);
 				}
 
@@ -468,9 +451,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private InputData getInputData() {
 		if (inputDataSets != null) {
-			InputDataSet next = inputDataSets.iterator().next();
+			final InputDataSet next = inputDataSets.iterator().next();
 			if (next != null) {
-				Set<InputData> inputDatas = next.getInputDatas();
+				final Set<InputData> inputDatas = next.getInputDatas();
 				if (inputDatas != null)
 					return inputDatas.iterator().next();
 			}

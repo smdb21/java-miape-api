@@ -1,8 +1,8 @@
 package org.proteored.miapeapi.experiment.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -15,6 +15,7 @@ import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.Database;
 
+import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -29,7 +30,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	private ExtendedIdentifiedProtein bestProtein = null;
 
 	private List<ExtendedIdentifiedPeptide> peptides;
-	private HashMap<String, List<ExtendedIdentifiedPeptide>> peptideListByScoreNames;
+	private Map<String, List<ExtendedIdentifiedPeptide>> peptideListByScoreNames;
 
 	public ProteinOccurrence(String key) {
 		this.key = key;
@@ -47,7 +48,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 */
 	public String getParsedKey() {
 		if (proteinList != null) {
-			for (ExtendedIdentifiedProtein object : proteinList) {
+			for (final ExtendedIdentifiedProtein object : proteinList) {
 				return object.getParsedAccession();
 
 			}
@@ -150,7 +151,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	public ExtendedIdentifiedProtein getBestProtein() {
 		if (bestProtein != null)
 			return bestProtein;
-		List<ExtendedIdentifiedProtein> proteins = getItemList();
+		final List<ExtendedIdentifiedProtein> proteins = getItemList();
 		SorterUtil.sortProteinsByBestProteinScore(proteins, false);
 		bestProtein = proteins.get(0);
 		return bestProtein;
@@ -159,7 +160,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	@Override
 	public ExtendedIdentifiedProtein getBestProtein(String scoreName) {
 
-		List<ExtendedIdentifiedProtein> proteins = getItemList();
+		final List<ExtendedIdentifiedProtein> proteins = getItemList();
 		if (proteins != null && !proteins.isEmpty()) {
 			SorterUtil.sortProteinsByProteinScore(proteins, scoreName, false);
 			if (proteins.get(0).getScoreNames().contains(scoreName))
@@ -189,7 +190,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	public String getProteinSequence() {
 		if (proteinSequence == null) {
 			if (proteinList != null) {
-				for (ExtendedIdentifiedProtein protein : proteinList) {
+				for (final ExtendedIdentifiedProtein protein : proteinList) {
 					if (protein.getProteinSequence() != null)
 						proteinSequence = protein.getProteinSequence();
 
@@ -206,7 +207,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	public void setProteinSequence(String proteinSequence) {
 		this.proteinSequence = proteinSequence;
 		if (proteinList != null) {
-			for (ExtendedIdentifiedProtein protein : proteinList) {
+			for (final ExtendedIdentifiedProtein protein : proteinList) {
 				protein.setProteinSequence(proteinSequence);
 
 			}
@@ -219,12 +220,12 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 			if (proteinList != null) {
-				TIntHashSet peptideIds = new TIntHashSet();
-				for (ExtendedIdentifiedProtein protein : proteinList) {
+				final TIntHashSet peptideIds = new TIntHashSet();
+				for (final ExtendedIdentifiedProtein protein : proteinList) {
 
 					final List<ExtendedIdentifiedPeptide> peptides = protein.getPeptides();
 					if (peptides != null) {
-						for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
+						for (final ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
 							if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
 								this.peptides.add(extendedIdentifiedPeptide);
 								peptideIds.add(extendedIdentifiedPeptide.getId());
@@ -241,13 +242,13 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	public List<ExtendedIdentifiedPeptide> getPeptides(String scoreName) {
 
 		if (peptideListByScoreNames == null || peptideListByScoreNames.isEmpty()) {
-			List<ExtendedIdentifiedPeptide> peptides = getPeptides();
-			for (ExtendedIdentifiedPeptide peptide : peptides) {
+			final List<ExtendedIdentifiedPeptide> peptides = getPeptides();
+			for (final ExtendedIdentifiedPeptide peptide : peptides) {
 				if (peptide.getScore(scoreName) != null) {
 					if (peptideListByScoreNames.containsKey(scoreName)) {
 						peptideListByScoreNames.get(scoreName).add(peptide);
 					} else {
-						List<ExtendedIdentifiedPeptide> list = new ArrayList<ExtendedIdentifiedPeptide>();
+						final List<ExtendedIdentifiedPeptide> list = new ArrayList<ExtendedIdentifiedPeptide>();
 						list.add(peptide);
 						peptideListByScoreNames.put(scoreName, list);
 					}
@@ -263,7 +264,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	public boolean isDecoy() {
 
 		if (proteinList != null && !proteinList.isEmpty()) {
-			for (ExtendedIdentifiedProtein protein : proteinList) {
+			for (final ExtendedIdentifiedProtein protein : proteinList) {
 				if (protein.isDecoy())
 					return true;
 			}
@@ -274,7 +275,7 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 
 	public void setDecoy(boolean b) {
 
-		for (ExtendedIdentifiedProtein protein : proteinList) {
+		for (final ExtendedIdentifiedProtein protein : proteinList) {
 			protein.setDecoy(b);
 		}
 
@@ -287,18 +288,18 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 * @return
 	 */
 	public List<Database> getProteinDatabases() {
-		List<Database> ret = new ArrayList<Database>();
-		for (ExtendedIdentifiedProtein protein : proteinList) {
+		final List<Database> ret = new ArrayList<Database>();
+		for (final ExtendedIdentifiedProtein protein : proteinList) {
 
-			Set<Database> databases = protein.getDatabases();
+			final Set<Database> databases = protein.getDatabases();
 			if (databases != null) {
-				for (Database database : databases) {
+				for (final Database database : databases) {
 					boolean found = false;
-					for (Database selectedDatabase : ret) {
-						String selectedDatabaseName = selectedDatabase.getName();
+					for (final Database selectedDatabase : ret) {
+						final String selectedDatabaseName = selectedDatabase.getName();
 						if (selectedDatabase != null)
 							if (selectedDatabaseName.equals(database.getName())) {
-								String selectedDatabaseVersion = selectedDatabase.getNumVersion();
+								final String selectedDatabaseVersion = selectedDatabase.getNumVersion();
 								if (selectedDatabaseVersion != null) {
 									if (selectedDatabaseVersion.equals(database.getNumVersion()))
 										found = true;
@@ -323,17 +324,17 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 * @return
 	 */
 	public List<Software> getSoftwares() {
-		List<Software> ret = new ArrayList<Software>();
-		for (ExtendedIdentifiedProtein protein : this.proteinList) {
-			Set<Software> softwares = protein.getSoftwares();
+		final List<Software> ret = new ArrayList<Software>();
+		for (final ExtendedIdentifiedProtein protein : proteinList) {
+			final Set<Software> softwares = protein.getSoftwares();
 			if (softwares != null) {
-				for (Software software : softwares) {
+				for (final Software software : softwares) {
 					boolean found = false;
-					for (Software selectedSoftware : ret) {
-						String selectedDatabaseName = selectedSoftware.getName();
+					for (final Software selectedSoftware : ret) {
+						final String selectedDatabaseName = selectedSoftware.getName();
 						if (selectedSoftware != null)
 							if (selectedDatabaseName.equals(software.getName())) {
-								String selectedSoftwareVersion = selectedSoftware.getVersion();
+								final String selectedSoftwareVersion = selectedSoftware.getVersion();
 								if (selectedSoftwareVersion != null) {
 									if (selectedSoftwareVersion.equals(software.getVersion()))
 										found = true;
@@ -358,11 +359,11 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 */
 	@Override
 	public Set<String> getScoreNames() {
-		Set<String> ret = new THashSet<String>();
+		final Set<String> ret = new THashSet<String>();
 		if (proteinList != null) {
-			for (ExtendedIdentifiedProtein protein : proteinList) {
-				List<String> scoreNames = protein.getScoreNames();
-				for (String scoreName : scoreNames) {
+			for (final ExtendedIdentifiedProtein protein : proteinList) {
+				final List<String> scoreNames = protein.getScoreNames();
+				for (final String scoreName : scoreNames) {
 					if (!ret.contains(scoreName))
 						ret.add(scoreName);
 				}
@@ -378,11 +379,11 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 	 * @param scoreName
 	 * @return
 	 */
-	public List<Float> getScoreValues(String scoreName) {
-		List<Float> values = new ArrayList<Float>();
+	public TFloatArrayList getScoreValues(String scoreName) {
+		final TFloatArrayList values = new TFloatArrayList();
 		if (proteinList != null)
-			for (ExtendedIdentifiedProtein protein : proteinList) {
-				Float score = protein.getScore(scoreName);
+			for (final ExtendedIdentifiedProtein protein : proteinList) {
+				final Float score = protein.getScore(scoreName);
 				if (score != null)
 					values.add(score);
 			}
@@ -391,8 +392,8 @@ public class ProteinOccurrence implements Occurrence<ExtendedIdentifiedProtein>,
 
 	public void setFDRFilter(FDRFilter fdrFilter) {
 		if (proteinList != null)
-			for (ExtendedIdentifiedProtein protein : proteinList) {
-				for (ExtendedIdentifiedPeptide peptide : protein.getPeptides()) {
+			for (final ExtendedIdentifiedProtein protein : proteinList) {
+				for (final ExtendedIdentifiedPeptide peptide : protein.getPeptides()) {
 					peptide.setFDRFilter(fdrFilter);
 				}
 			}

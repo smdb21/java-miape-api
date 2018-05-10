@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +47,7 @@ import org.proteored.miapeapi.validation.msi.MiapeMSIValidator;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 import org.proteored.miapeapi.xml.mzidentml.InputDataSetImpl;
 import org.proteored.miapeapi.xml.mzidentml.util.Utils;
+import org.proteored.miapeapi.xml.util.MiapeIdentifierCounter;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 import org.proteored.miapeapi.xml.util.parallel.MapSync;
 
@@ -115,7 +115,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private final Map<String, Software> msiSoftwares = new THashMap<String, Software>();
 	private final Set<InputDataSet> inputDataSets = new THashSet<InputDataSet>();
 	private final Set<Validation> validations = new THashSet<Validation>();
-	private List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
+	private final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
 	public String url;
 	private String generatedFileURI;
 	private final String mzIdentMLFileName;
@@ -131,7 +131,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	private final Map<ProteinDetectionHypothesis, DBSequence> pdhDBSeqMap = new THashMap<ProteinDetectionHypothesis, DBSequence>();
 
-	private Map<String, SpectrumIdentificationList> spectrumIdentificationListMap = new HashMap<String, SpectrumIdentificationList>();
+	private final Map<String, SpectrumIdentificationList> spectrumIdentificationListMap = new THashMap<String, SpectrumIdentificationList>();
 
 	private Iterator<SpectrumIdentificationList> silIterator;
 
@@ -155,7 +155,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String user, String password, String mzIdentMLFileName,
 			String projectName, boolean processInParallel)
-					throws MiapeDatabaseException, MiapeSecurityException, JAXBException {
+			throws MiapeDatabaseException, MiapeSecurityException, JAXBException {
 		mzIdentMLUnmarshaller = unmarshaller;
 		this.user = databaseManager.getUser(user, password);
 		this.cvManager = cvManager;
@@ -185,7 +185,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private void processMzIdentMLInParallel() throws JAXBException {
 		// clear static identifier counters
 		MiapeXmlUtil.clearIdentifierCounters();
-		Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
+		final Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 
 		String spectrumIdentificationSoftwareID = "";
 		log.info("unmarshalling sourceFiles");
@@ -209,7 +209,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		analysisSampleCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSampleCollection);
 		log.info("unmarshalling spectrumIdentification");
 
-		Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
+		final Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
 				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentification);
 
 		initProteinHypothesisByPeptideEvidenceHashMapInParallel();
@@ -218,8 +218,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// for (SpectrumIdentification spectrumIdent : spectrumIdentifications)
 		// {
 		while (spectrumIdentifications.hasNext()) {
-			SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
-			SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
+			final SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
+			final SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
 					spectrumIdent.getSpectrumIdentificationListRef());
 			Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 
@@ -232,21 +232,21 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			try {
 				spectrumIdentProtocol = mzIdentMLUnmarshaller.unmarshal(SpectrumIdentificationProtocol.class,
 						spectrumIdent.getSpectrumIdentificationProtocolRef());
-			} catch (JAXBException e1) {
+			} catch (final JAXBException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
 			// getSpectrumIdentificationProtocol(spectrumIdent.getSpectrumIdentificationProtocolRef(),
 			// analysisProtocolCollection.getSpectrumIdentificationProtocol());
-			List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
+			final List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
 					searchDataBases);
 
-			AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
+			final AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
 			if (softwareXML != null)
 				spectrumIdentificationSoftwareID = softwareXML.getId();
 
-			ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
+			final ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
 					spectrumIdent.getSpectrumIdentificationListRef());
 			// getSoftware(
 			// spectrumIdentProtocol.getAnalysisSoftwareRef(),
@@ -256,7 +256,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				if (msiSoftwares.containsKey(softwareXML.getId())) {
 					msiSoftware = msiSoftwares.get(softwareXML.getId());
 				} else {
-					Integer softwareID = MiapeXmlUtil.SoftwareCounter.increaseCounter();
+					final Integer softwareID = MiapeIdentifierCounter.increaseCounter();
 					msiSoftware = new SoftwareImpl(softwareXML, softwareID, cvManager);
 					msiSoftwares.put(softwareXML.getId(), msiSoftware);
 				}
@@ -272,12 +272,12 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 			// Input parameter and databases
 			InputParameter inputParameter = null;
-			String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
-					numSeqSearched);
+			final String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML,
+					msiSoftware, numSeqSearched);
 			if (inputParameters.containsKey(inputParameterKey)) {
 				inputParameter = inputParameters.get(inputParameterKey);
 			} else {
-				Integer inputParamID = MiapeXmlUtil.ParameterCounter.increaseCounter();
+				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
 				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
 						inputParamID, numSeqSearched, cvManager);
 				inputParameters.put(inputParameterKey, inputParameter);
@@ -291,45 +291,45 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			// inputDataSet
 			final List<InputSpectra> inputSpectraXML = spectrumIdent.getInputSpectra();
 			if (inputSpectraXML != null) {
-				for (InputSpectra inputSpectra : inputSpectraXML) {
+				for (final InputSpectra inputSpectra : inputSpectraXML) {
 					final String spectraDataRef = inputSpectra.getSpectraDataRef();
 					if (!inputDataSetMap.containsKey(spectraDataRef)) {
-						Integer inputDataSetID = MiapeXmlUtil.InputDataSetCounter.increaseCounter();
-						InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID, spectraDataRef);
+						final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
+						final InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID, spectraDataRef);
 						inputDataSetMap.put(spectraDataRef, inputDataSet);
 					}
 				}
 			}
 
 			// proteinSet
-			IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSetMap.values());
+			final IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSetMap.values());
 			proteinSets.add(proteinSet);
 
 			// time
-			long t1 = System.currentTimeMillis();
+			final long t1 = System.currentTimeMillis();
 
-			List<SpectrumIdentificationResult> spectrumIdentificationResultList = spectrumIdentificationList
+			final List<SpectrumIdentificationResult> spectrumIdentificationResultList = spectrumIdentificationList
 					.getSpectrumIdentificationResult();
-			Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationResultList
+			final Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationResultList
 					.iterator();
 
-			int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
+			final int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
 
 			log.info("Using " + threadCount + " processors from processing " + spectrumIdentificationResultList.size()
 					+ " SIR");
-			ParIterator<SpectrumIdentificationResult> iterator = ParIteratorFactory.createParIterator(
+			final ParIterator<SpectrumIdentificationResult> iterator = ParIteratorFactory.createParIterator(
 					spectrumIdentificationResultIterator, spectrumIdentificationResultList.size(), threadCount,
 					Schedule.GUIDED);
 
-			Reducible<List<IdentifiedPeptide>> reduciblePeptides = new Reducible<List<IdentifiedPeptide>>();
-			Map<String, InputData> inputDataHash = new THashMap<String, InputData>();
-			MapSync<String, InputData> syncInputDataHash = new MapSync<String, InputData>(inputDataHash);
-			Reducible<Map<String, IdentifiedProtein>> reducibleProteinHash = new Reducible<Map<String, IdentifiedProtein>>();
+			final Reducible<List<IdentifiedPeptide>> reduciblePeptides = new Reducible<List<IdentifiedPeptide>>();
+			final Map<String, InputData> inputDataHash = new THashMap<String, InputData>();
+			final MapSync<String, InputData> syncInputDataHash = new MapSync<String, InputData>(inputDataHash);
+			final Reducible<Map<String, IdentifiedProtein>> reducibleProteinHash = new Reducible<Map<String, IdentifiedProtein>>();
 
-			List<SpectrumIdentificationResultParallelProcesser> runners = new ArrayList<SpectrumIdentificationResultParallelProcesser>();
+			final List<SpectrumIdentificationResultParallelProcesser> runners = new ArrayList<SpectrumIdentificationResultParallelProcesser>();
 			for (int numCore = 0; numCore < threadCount; numCore++) {
 				// take current DB session
-				SpectrumIdentificationResultParallelProcesser runner = new SpectrumIdentificationResultParallelProcesser(
+				final SpectrumIdentificationResultParallelProcesser runner = new SpectrumIdentificationResultParallelProcesser(
 						iterator, numCore, cvManager, mzIdentMLUnmarshaller, syncInputDataHash, reduciblePeptides,
 						new MapSync<String, ProteinDetectionHypothesis>(proteinDetectionHypotesisWithPeptideEvidence),
 						reducibleProteinHash);
@@ -341,59 +341,59 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			for (int k = 0; k < threadCount; k++) {
 				try {
 					runners.get(k).join();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 
 			// Handle exceptions
-			ParIteratorException<SpectrumIdentificationResult>[] piExceptions = iterator.getAllExceptions();
+			final ParIteratorException<SpectrumIdentificationResult>[] piExceptions = iterator.getAllExceptions();
 			for (int k = 0; k < piExceptions.length; k++) {
-				ParIteratorException<SpectrumIdentificationResult> pie = piExceptions[k];
+				final ParIteratorException<SpectrumIdentificationResult> pie = piExceptions[k];
 				// object for iteration in which exception was encountered
-				Object iteration = pie.getIteration();
+				final Object iteration = pie.getIteration();
 				// thread executing that iteration
-				Thread thread = pie.getRegisteringThread();
+				final Thread thread = pie.getRegisteringThread();
 				// actual exception thrown
-				Exception e = pie.getException();
+				final Exception e = pie.getException();
 				// print exact location of exception
 				e.printStackTrace();
 				throw new IllegalMiapeArgumentException("Error in SIR parallel iterator: " + e.getMessage());
 			}
 			// Reductors
-			Reduction<List<IdentifiedPeptide>> peptideListReduction = new Reduction<List<IdentifiedPeptide>>() {
+			final Reduction<List<IdentifiedPeptide>> peptideListReduction = new Reduction<List<IdentifiedPeptide>>() {
 				@Override
 				public List<IdentifiedPeptide> reduce(List<IdentifiedPeptide> first, List<IdentifiedPeptide> second) {
-					List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
+					final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
 					peptides.addAll(first);
 					peptides.addAll(second);
 					return peptides;
 				}
 			};
 
-			Reduction<Map<String, IdentifiedProtein>> proteinHashReduction = new Reduction<Map<String, IdentifiedProtein>>() {
+			final Reduction<Map<String, IdentifiedProtein>> proteinHashReduction = new Reduction<Map<String, IdentifiedProtein>>() {
 				@Override
 				public Map<String, IdentifiedProtein> reduce(Map<String, IdentifiedProtein> first,
 						Map<String, IdentifiedProtein> second) {
-					Map<String, IdentifiedProtein> map = new THashMap<String, IdentifiedProtein>();
+					final Map<String, IdentifiedProtein> map = new THashMap<String, IdentifiedProtein>();
 
-					List<Map<String, IdentifiedProtein>> listofmaps = new ArrayList<Map<String, IdentifiedProtein>>();
+					final List<Map<String, IdentifiedProtein>> listofmaps = new ArrayList<Map<String, IdentifiedProtein>>();
 					listofmaps.add(first);
 					listofmaps.add(second);
-					for (Map<String, IdentifiedProtein> mapToReduce : listofmaps) {
+					for (final Map<String, IdentifiedProtein> mapToReduce : listofmaps) {
 
-						for (String proteinAcc : mapToReduce.keySet()) {
+						for (final String proteinAcc : mapToReduce.keySet()) {
 							if (!map.containsKey(proteinAcc)) {
 								map.put(proteinAcc, mapToReduce.get(proteinAcc));
 							} else {
 								// Add peptides from protein2 to the protein1
 								final IdentifiedProteinImpl protein = (IdentifiedProteinImpl) map.get(proteinAcc);
 								final IdentifiedProtein protein2 = mapToReduce.get(proteinAcc);
-								for (IdentifiedPeptide peptide2 : protein2.getIdentifiedPeptides()) {
+								for (final IdentifiedPeptide peptide2 : protein2.getIdentifiedPeptides()) {
 									protein.addIdentifiedPeptide(peptide2);
 
 									// delete protein2 from peptide
-									IdentifiedPeptideImpl peptideImpl2 = (IdentifiedPeptideImpl) peptide2;
+									final IdentifiedPeptideImpl peptideImpl2 = (IdentifiedPeptideImpl) peptide2;
 									final Iterator<IdentifiedProtein> iterator2 = peptideImpl2.getIdentifiedProteins()
 											.iterator();
 									while (iterator2.hasNext()) {
@@ -413,13 +413,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			peptides.addAll(reduciblePeptides.reduce(peptideListReduction));
 			proteinHash = reducibleProteinHash.reduce(proteinHashReduction);
 
-			for (String spectraDataRef : syncInputDataHash.keySet()) {
+			for (final String spectraDataRef : syncInputDataHash.keySet()) {
 				if (inputDataSetMap.containsKey(spectraDataRef)) {
 					final InputDataSet inputDataSet = inputDataSetMap.get(spectraDataRef);
 
 					final Set<InputData> inputDatas = inputDataSet.getInputDatas();
 					boolean include = true;
-					for (InputData inputData : inputDatas) {
+					for (final InputData inputData : inputDatas) {
 						if (inputData.getName().equals(spectraDataRef))
 							include = false;
 					}
@@ -432,22 +432,22 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					+ (System.currentTimeMillis() - t1) / 1000 + " sg.");
 
 			// Add all the proteins to the proteinSet
-			for (String protein_Acc : proteinHash.keySet()) {
+			for (final String protein_Acc : proteinHash.keySet()) {
 				final IdentifiedProtein protein = proteinHash.get(protein_Acc);
 				((ProteinSetImpl) proteinSet).addIdentifiedProtein(protein);
 			}
 			log.info("Parsed " + proteinHash.size() + " proteins and " + peptides.size() + " peptides.");
 		}
 		// add input data sets:
-		for (InputDataSet inputDataSet : inputDataSetMap.values()) {
+		for (final InputDataSet inputDataSet : inputDataSetMap.values()) {
 			inputDataSets.add(inputDataSet);
 		}
 
 		// for the protein detection protocol and the peptide identification
 		// detection protocol
-		Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(analysisProtocolCollection);
+		final Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(analysisProtocolCollection);
 		if (protocolsBySoftware != null) {
-			for (List<Object> list : protocolsBySoftware.values()) {
+			for (final List<Object> list : protocolsBySoftware.values()) {
 				// Validations
 				validations.add(new ValidationImpl(list, analysisSoftwareList.getAnalysisSoftware(),
 						spectrumIdentificationSoftwareID, cvManager));
@@ -457,9 +457,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// Add new validation softwares for the softwares not referenced by
 		// protocols
 		if (analysisSoftwareList != null) {
-			Set<String> referencesSoftwareRefs = getProtocolsBySoftwareIDs(analysisProtocolCollection);
-			for (AnalysisSoftware analysisSoftware : analysisSoftwareList.getAnalysisSoftware()) {
-				String analysisSoftwareID = analysisSoftware.getId();
+			final Set<String> referencesSoftwareRefs = getProtocolsBySoftwareIDs(analysisProtocolCollection);
+			for (final AnalysisSoftware analysisSoftware : analysisSoftwareList.getAnalysisSoftware()) {
+				final String analysisSoftwareID = analysisSoftware.getId();
 				if (!referencesSoftwareRefs.contains(analysisSoftwareID)
 						&& !spectrumIdentificationSoftwareID.equals(analysisSoftwareID)) {
 					validations.add(new ValidationImpl(analysisSoftware, cvManager));
@@ -470,7 +470,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (existsSourceFile()) {
 			// Get the location of the first file in the list. The rest of them,
 			// put it in GeneratedFilesDescription
-			SourceFile file = sourceFiles.next();
+			final SourceFile file = sourceFiles.next();
 			generatedFileURI = file.getLocation();
 		}
 
@@ -479,7 +479,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private String getInputParameterKey(SpectrumIdentificationProtocol spectrumIdentProtocol,
 			ProteinDetectionProtocol pdp, List<SearchDatabase> databaseListXML, Software msiSoftware,
 			Long numSeqSearched) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		if (spectrumIdentProtocol != null) {
 			sb.append(spectrumIdentProtocol.getId());
 		}
@@ -495,7 +495,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (numSeqSearched != null) {
 			sb.append(numSeqSearched);
 		}
-		String inputParameterKey = sb.toString();
+		final String inputParameterKey = sb.toString();
 		return inputParameterKey;
 	}
 
@@ -511,7 +511,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		}
 		while (silIterator.hasNext()) {
 			log.debug("Unmarshalling  next SpectrumIdentificationList");
-			SpectrumIdentificationList sil = silIterator.next();
+			final SpectrumIdentificationList sil = silIterator.next();
 			log.debug("SpectrumIdentificationList " + sil.getId() + " unmarshalled");
 			spectrumIdentificationListMap.put(sil.getId(), sil);
 			if (sil.getId().equals(spectrumIdentificationListId)) {
@@ -563,7 +563,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// e1.printStackTrace();
 		// }
 
-		Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
+		final Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
 				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentification);
 		// List<SpectrumIdentification> spectrumIdentification =
 		// analysisCollection
@@ -575,12 +575,12 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// for (SpectrumIdentification spectrumIdent : spectrumIdentifications)
 		// {
 		while (spectrumIdentifications.hasNext()) {
-			Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
+			final Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 
-			SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
+			final SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
 			log.info("spectrum identification " + i++ + " " + spectrumIdent.getId());
 
-			SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
+			final SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
 					spectrumIdent.getSpectrumIdentificationListRef());
 
 			SpectrumIdentificationProtocol spectrumIdentProtocol = null;
@@ -588,28 +588,28 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			try {
 				spectrumIdentProtocol = mzIdentMLUnmarshaller.unmarshal(SpectrumIdentificationProtocol.class,
 						spectrumIdent.getSpectrumIdentificationProtocolRef());
-			} catch (JAXBException e1) {
+			} catch (final JAXBException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
-			List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
+			final List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
 					searchDataBases);
 
 			// MSI Software
 
-			AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
+			final AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
 			if (softwareXML != null)
 				spectrumIdentificationSoftwareID = softwareXML.getId();
 
-			ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
+			final ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
 					spectrumIdent.getSpectrumIdentificationListRef());
 			Software msiSoftware = null;
 			if (softwareXML != null) {
 				if (msiSoftwares.containsKey(softwareXML.getId())) {
 					msiSoftware = msiSoftwares.get(softwareXML.getId());
 				} else {
-					Integer softwareID = MiapeXmlUtil.SoftwareCounter.increaseCounter();
+					final Integer softwareID = MiapeIdentifierCounter.increaseCounter();
 
 					msiSoftware = new SoftwareImpl(softwareXML, softwareID, cvManager);
 					msiSoftwares.put(softwareXML.getId(), msiSoftware);
@@ -621,28 +621,28 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			if (elementAttributes.containsKey("numSequencesSearched"))
 				numSeqSearched = Long.valueOf(elementAttributes.get("numSequencesSearched"));
 
-			String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
-					numSeqSearched);
+			final String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML,
+					msiSoftware, numSeqSearched);
 			// Input parameter and databases
 			InputParameter inputParameter = null;
 			if (inputParameters.containsKey(inputParameterKey)) {
 				inputParameter = inputParameters.get(inputParameterKey);
 			} else {
-				Integer inputParamID = MiapeXmlUtil.ParameterCounter.increaseCounter();
+				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
 				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
 						inputParamID, numSeqSearched, cvManager);
 				inputParameters.put(inputParameterKey, inputParameter);
 			}
 
 			// inputDataSet
-			Integer inputDataSetID = MiapeXmlUtil.InputDataSetCounter.increaseCounter();
-			InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID);
+			final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
+			final InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID);
 			inputDataSets.add(inputDataSet);
 
 			// proteinSet
-			IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSet);
+			final IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSet);
 			proteinSets.add(proteinSet);
-			Map<String, InputData> inputDataBySpectraDataRef = new HashMap<String, InputData>();
+			final Map<String, InputData> inputDataBySpectraDataRef = new THashMap<String, InputData>();
 			// Map<spectraDataXML.ID, InputData
 
 			// List<SpectrumIdentificationResult> spectrumIdentificationResult =
@@ -651,29 +651,30 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 			long peptideCount = 0;
 
-			Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationList
+			final Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationList
 					.getSpectrumIdentificationResult().iterator();
 			log.info("processing SpectrumIdentificationResults in SIL " + spectrumIdentificationList.getId());
 			while (spectrumIdentificationResultIterator.hasNext()) {
-				SpectrumIdentificationResult spectIdentResultXML = spectrumIdentificationResultIterator.next();
+				final SpectrumIdentificationResult spectIdentResultXML = spectrumIdentificationResultIterator.next();
 
-				String RT = getRetentionTimeInSeconds(spectIdentResultXML);
+				final String RT = getRetentionTimeInSeconds(spectIdentResultXML);
 
 				// TODO this is very important! Be careful.
 
 				// final String spectrumID =
 				// spectIdentResultXML.getSpectrumID();
-				String spectrumRef = parseSpectrumRef(spectIdentResultXML.getSpectrumID());
+				final String spectrumRef = parseSpectrumRef(spectIdentResultXML.getSpectrumID());
 
 				// Input data
 				// check if the spectraData is already captured. If not, add a
 				// new input Data
-				String spectraDataRef = spectIdentResultXML.getSpectraDataRef();
+				final String spectraDataRef = spectIdentResultXML.getSpectraDataRef();
 				InputData inputData = null;
 				try {
 					if (!inputDataBySpectraDataRef.containsKey(spectraDataRef)) {
-						SpectraData spectraDataXML = mzIdentMLUnmarshaller.unmarshal(SpectraData.class, spectraDataRef);
-						Integer inputDataID = MiapeXmlUtil.InputDataCounter.increaseCounter();
+						final SpectraData spectraDataXML = mzIdentMLUnmarshaller.unmarshal(SpectraData.class,
+								spectraDataRef);
+						final Integer inputDataID = MiapeIdentifierCounter.increaseCounter();
 						inputData = new InputDataImpl(spectraDataXML, inputDataID);
 						inputDataBySpectraDataRef.put(spectraDataRef, inputData);
 					} else {
@@ -681,15 +682,15 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					}
 					((InputDataSetImpl) inputDataSet).addInputData(inputData);
 
-				} catch (JAXBException e1) {
+				} catch (final JAXBException e1) {
 					e1.printStackTrace();
 				}
 				// log.info(spectIdentResultXML.getSpectrumIdentificationItem().size()
 				// + " SpectrumIdentificationItems");
-				Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
-				List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
+				final Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
+				final List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
 						.getSpectrumIdentificationItem();
-				for (SpectrumIdentificationItem spectIdentItemXML : spectrumIdentificationItems) {
+				for (final SpectrumIdentificationItem spectIdentItemXML : spectrumIdentificationItems) {
 
 					// some peptides contribute to proteins even if they
 					// have
@@ -697,7 +698,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					// if (spectIdentItemXML.isPassThreshold()) {
 
 					// CREATE Peptide
-					Integer peptideID = MiapeXmlUtil.PeptideCounter.increaseCounter();
+					final Integer peptideID = MiapeIdentifierCounter.increaseCounter();
 					Peptide peptideXML = null;
 
 					if (spectIdentItemXML.getPeptideRef() != null) {
@@ -705,9 +706,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 							try {
 								peptideXML = mzIdentMLUnmarshaller.unmarshal(Peptide.class,
 										spectIdentItemXML.getPeptideRef());
-							} catch (JAXBException e) {
+							} catch (final JAXBException e) {
 								log.debug(e.getMessage());
-							} catch (IllegalArgumentException e) {
+							} catch (final IllegalArgumentException e) {
 								log.debug(e.getMessage());
 							}
 						}
@@ -721,8 +722,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					} else {
 
 						boolean includePeptide = false;
-						Set<PeptideScore> scores = IdentifiedPeptideImpl.getScoresFromThisPeptide(spectIdentItemXML,
-								peptideXML, cvManager);
+						final Set<PeptideScore> scores = IdentifiedPeptideImpl
+								.getScoresFromThisPeptide(spectIdentItemXML, peptideXML, cvManager);
 						// if (scores == null || scores.isEmpty()) {
 						// log.info("Skipping SII:" + spectIdentItemXML.getId()
 						// + " because no scores have found");
@@ -744,7 +745,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						if (!includePeptide) {
 							break;
 						} else {
-							IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
+							final IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
 									inputData, spectrumRef, peptideID, cvManager,
 									new MapSync<String, ProteinDetectionHypothesis>(
 											proteinDetectionHypotesisWithPeptideEvidence),
@@ -764,7 +765,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				}
 			}
 			// Add all the proteins to the proteinSet
-			for (String protein_Acc : proteinHash.keySet()) {
+			for (final String protein_Acc : proteinHash.keySet()) {
 				final IdentifiedProtein protein = proteinHash.get(protein_Acc);
 				((ProteinSetImpl) proteinSet).addIdentifiedProtein(protein);
 			}
@@ -773,9 +774,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 		// for the protein detection protocol and the peptide identification
 		// detection protocol
-		Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(analysisProtocolCollection);
+		final Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(analysisProtocolCollection);
 		if (protocolsBySoftware != null) {
-			for (List<Object> list : protocolsBySoftware.values()) {
+			for (final List<Object> list : protocolsBySoftware.values()) {
 				// Validations
 				validations.add(new ValidationImpl(list, analysisSoftwareList.getAnalysisSoftware(),
 						spectrumIdentificationSoftwareID, cvManager));
@@ -785,9 +786,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// Add new validation softwares for the softwares not referenced by
 		// protocols
 		if (analysisSoftwareList != null) {
-			Set<String> referencesSoftwareRefs = getProtocolsBySoftwareIDs(analysisProtocolCollection);
-			for (AnalysisSoftware analysisSoftware : analysisSoftwareList.getAnalysisSoftware()) {
-				String analysisSoftwareID = analysisSoftware.getId();
+			final Set<String> referencesSoftwareRefs = getProtocolsBySoftwareIDs(analysisProtocolCollection);
+			for (final AnalysisSoftware analysisSoftware : analysisSoftwareList.getAnalysisSoftware()) {
+				final String analysisSoftwareID = analysisSoftware.getId();
 				if (!referencesSoftwareRefs.contains(analysisSoftwareID)
 						&& !spectrumIdentificationSoftwareID.equals(analysisSoftwareID)) {
 					validations.add(new ValidationImpl(analysisSoftware, cvManager));
@@ -798,7 +799,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (existsSourceFile()) {
 			// Get the location of the first file in the list. The rest of them,
 			// put it in GeneratedFilesDescription
-			SourceFile file = sourceFiles.next();
+			final SourceFile file = sourceFiles.next();
 			generatedFileURI = file.getLocation();
 		}
 
@@ -807,7 +808,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private int comparePeptideScores(Set<PeptideScore> scoresFromFirstPeptide, Set<PeptideScore> scores) {
 		if (scoresFromFirstPeptide != null && scores != null) {
 			if (scores.size() == scoresFromFirstPeptide.size()) {
-				for (PeptideScore peptideScore : scores) {
+				for (final PeptideScore peptideScore : scores) {
 					if (!foundPeptideScore(peptideScore, scoresFromFirstPeptide))
 						return -1;
 				}
@@ -818,7 +819,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private boolean foundPeptideScore(PeptideScore peptideScore, Set<PeptideScore> scoresFromFirstPeptide) {
-		for (PeptideScore peptideScore2 : scoresFromFirstPeptide) {
+		for (final PeptideScore peptideScore2 : scoresFromFirstPeptide) {
 			if (peptideScore2.getName().equals(peptideScore.getName()))
 				if (peptideScore2.getValue().equals(peptideScore.getValue()))
 					return true;
@@ -829,17 +830,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private String getRetentionTimeInSeconds(SpectrumIdentificationResult spectIdentResultXML) {
 		if (spectIdentResultXML != null) {
 			if (spectIdentResultXML.getParamGroup() != null) {
-				for (AbstractParam paramType : spectIdentResultXML.getParamGroup()) {
+				for (final AbstractParam paramType : spectIdentResultXML.getParamGroup()) {
 					if (paramType instanceof CvParam) {
-						CvParam cvparam = (CvParam) paramType;
-						ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
+						final CvParam cvparam = (CvParam) paramType;
+						final ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
 								.getCVTermByAccession(new Accession(cvparam.getAccession()));
 						if (cvTerm != null) {
 							if (cvparam.getValue() != null) {
 								try {
 									double num = Double.valueOf(cvparam.getValue());
 									// check unit
-									String unitAccession = cvparam.getUnitAccession();
+									final String unitAccession = cvparam.getUnitAccession();
 									if (unitAccession != null) {
 										if ("UO:0000010".equals(unitAccession)) {
 											log.debug("Retention time in seconds: " + num);
@@ -850,7 +851,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 										}
 									}
 									return String.valueOf(num);
-								} catch (NumberFormatException e) {
+								} catch (final NumberFormatException e) {
 
 								}
 							}
@@ -859,22 +860,22 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				}
 			}
 		}
-		List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
+		final List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
 				.getSpectrumIdentificationItem();
 		if (spectrumIdentificationItems != null) {
-			for (SpectrumIdentificationItem spectrumIdentificationItem : spectrumIdentificationItems) {
+			for (final SpectrumIdentificationItem spectrumIdentificationItem : spectrumIdentificationItems) {
 				if (spectrumIdentificationItem.getParamGroup() != null) {
-					for (AbstractParam paramType : spectrumIdentificationItem.getParamGroup()) {
+					for (final AbstractParam paramType : spectrumIdentificationItem.getParamGroup()) {
 						if (paramType instanceof CvParam) {
-							CvParam cvparam = (CvParam) paramType;
-							ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
+							final CvParam cvparam = (CvParam) paramType;
+							final ControlVocabularyTerm cvTerm = RetentionTime.getInstance(cvManager)
 									.getCVTermByAccession(new Accession(cvparam.getAccession()));
 							if (cvTerm != null) {
 								if (cvparam.getValue() != null) {
 									try {
 										double num = Double.valueOf(cvparam.getValue());
 										// check unit
-										String unitAccession = cvparam.getUnitAccession();
+										final String unitAccession = cvparam.getUnitAccession();
 										if (unitAccession != null) {
 											if ("UO:0000010".equals(unitAccession)) {
 												log.debug("Retention time in seconds: " + num);
@@ -885,7 +886,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 											}
 										}
 										return String.valueOf(num);
-									} catch (NumberFormatException e) {
+									} catch (final NumberFormatException e) {
 
 									}
 								}
@@ -905,13 +906,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (proteinDetection != null) {
 			final List<InputSpectrumIdentifications> inputSpectrumIdentifications = proteinDetection
 					.getInputSpectrumIdentifications();
-			for (InputSpectrumIdentifications inputSpectrumIdentification : inputSpectrumIdentifications) {
+			for (final InputSpectrumIdentifications inputSpectrumIdentification : inputSpectrumIdentifications) {
 				if (inputSpectrumIdentification.getSpectrumIdentificationListRef()
 						.equals(spectrumIdentificationListRef))
 					try {
 						return mzIdentMLUnmarshaller.unmarshal(ProteinDetectionProtocol.class,
 								proteinDetection.getProteinDetectionProtocolRef());
-					} catch (JAXBException e) {
+					} catch (final JAXBException e) {
 
 						e.printStackTrace();
 					}
@@ -921,17 +922,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Map<String, List<Object>> getProtocolsBySoftware(AnalysisProtocolCollection analysisProtocolCollection2) {
-		Map<String, List<Object>> ret = new THashMap<String, List<Object>>();
+		final Map<String, List<Object>> ret = new THashMap<String, List<Object>>();
 		if (analysisProtocolCollection2 != null) {
 			final List<SpectrumIdentificationProtocol> spectrumIdentificationProtocol = analysisProtocolCollection2
 					.getSpectrumIdentificationProtocol();
 			if (spectrumIdentificationProtocol != null) {
-				for (SpectrumIdentificationProtocol sip : spectrumIdentificationProtocol) {
+				for (final SpectrumIdentificationProtocol sip : spectrumIdentificationProtocol) {
 					final String analysisSoftwareRef = sip.getAnalysisSoftwareRef();
 					if (ret.containsKey(analysisSoftwareRef))
 						ret.get(analysisSoftwareRef).add(sip);
 					else {
-						List<Object> list = new ArrayList<Object>();
+						final List<Object> list = new ArrayList<Object>();
 						list.add(sip);
 						ret.put(analysisSoftwareRef, list);
 					}
@@ -944,7 +945,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				if (ret.containsKey(analysisSoftwareRef))
 					ret.get(analysisSoftwareRef).add(proteinDetectionProtocol);
 				else {
-					List<Object> list = new ArrayList<Object>();
+					final List<Object> list = new ArrayList<Object>();
 					list.add(proteinDetectionProtocol);
 					ret.put(analysisSoftwareRef, list);
 				}
@@ -955,12 +956,12 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Set<String> getProtocolsBySoftwareIDs(AnalysisProtocolCollection analysisProtocolCollection2) {
-		Set<String> ret = new THashSet<String>();
+		final Set<String> ret = new THashSet<String>();
 		if (analysisProtocolCollection2 != null) {
 			final List<SpectrumIdentificationProtocol> spectrumIdentificationProtocol = analysisProtocolCollection2
 					.getSpectrumIdentificationProtocol();
 			if (spectrumIdentificationProtocol != null) {
-				for (SpectrumIdentificationProtocol sip : spectrumIdentificationProtocol) {
+				for (final SpectrumIdentificationProtocol sip : spectrumIdentificationProtocol) {
 					final String analysisSoftwareRef = sip.getAnalysisSoftwareRef();
 
 					ret.add(analysisSoftwareRef);
@@ -986,7 +987,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 */
 	private Peptide getPeptideFromPeptideEvidences(List<PeptideEvidenceRef> peptideEvidenceRefs) {
 		if (peptideEvidenceRefs != null && !peptideEvidenceRefs.isEmpty()) {
-			for (PeptideEvidenceRef peptideEvidenceRef : peptideEvidenceRefs) {
+			for (final PeptideEvidenceRef peptideEvidenceRef : peptideEvidenceRefs) {
 				final PeptideEvidence peptideEvidence = peptideEvidenceRef.getPeptideEvidence();
 				if (peptideEvidence != null) {
 					if (peptideEvidence.getPeptide() != null)
@@ -995,11 +996,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					final String peptideRef = peptideEvidence.getPeptideRef();
 					try {
 						return mzIdentMLUnmarshaller.unmarshal(Peptide.class, peptideRef);
-					} catch (JAXBException e) {
+					} catch (final JAXBException e) {
 						log.info("JAXBException for unmarshal Peptide with ID:" + peptideRef);
-					} catch (NumberFormatException e) {
+					} catch (final NumberFormatException e) {
 						log.info("Number format exception for unmarshal Peptide with ID:" + peptideRef);
-					} catch (IllegalArgumentException e) {
+					} catch (final IllegalArgumentException e) {
 						log.info("IllegalArgumentException for unmarshal Peptide with ID:" + peptideRef);
 					}
 				}
@@ -1031,27 +1032,27 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (spectrumID == null)
 			return null;
 		Integer specRefInt = 0;
-		String mzMLSpectrumIDRegexp = "^mzMLid=(.*)$";
+		final String mzMLSpectrumIDRegexp = "^mzMLid=(.*)$";
 
 		if (Pattern.matches(mzMLSpectrumIDRegexp, spectrumID)) {
 			// in case of being a spectrumID of a mzML file, return the
 			// string that appears after the "mzMLid="
-			Pattern p = Pattern.compile(mzMLSpectrumIDRegexp);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mzMLSpectrumIDRegexp);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find())
 				return m.group(1);
 
 		}
-		String mgfSpectrumIDRegexp = "^index=(\\d+)$";
-		String mzMLSpectrumIDRegexp2 = ".*scan=(\\d+)$";
-		String mgfSpectrumIDRegexpQuery = "^query=(\\d+)$";
-		String mgfSpectrumIDRegexpQuery2 = "^(\\d+)$";
-		String mgfPMEQCIDRegexp = "^.*\\.\\d+\\.\\d+\\.\\d+$"; // spectrumID='OrbiVL1A01.13334.13334.2'
+		final String mgfSpectrumIDRegexp = "^index=(\\d+)$";
+		final String mzMLSpectrumIDRegexp2 = ".*scan=(\\d+)$";
+		final String mgfSpectrumIDRegexpQuery = "^query=(\\d+)$";
+		final String mgfSpectrumIDRegexpQuery2 = "^(\\d+)$";
+		final String mgfPMEQCIDRegexp = "^.*\\.\\d+\\.\\d+\\.\\d+$"; // spectrumID='OrbiVL1A01.13334.13334.2'
 
 		// if is like "index=1235"
 		if (Pattern.matches(mgfSpectrumIDRegexp, spectrumID)) {
-			Pattern p = Pattern.compile(mgfSpectrumIDRegexp);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mgfSpectrumIDRegexp);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find()) {
 				specRefInt = Integer.valueOf(m.group(1)) + 1; // sum 1
 																// (starts
@@ -1060,28 +1061,28 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			// if it is like
 			// "mzMLid=controllerType=0 controllerNumber=1 scan=3423"
 		} else if (Pattern.matches(mzMLSpectrumIDRegexp2, spectrumID)) {
-			Pattern p = Pattern.compile(mzMLSpectrumIDRegexp2);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mzMLSpectrumIDRegexp2);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find()) {
 				specRefInt = Integer.valueOf(m.group(1)); // don't sum 1
 															// (starts
 															// by 1)
 			}
 		} else if (Pattern.matches(mgfSpectrumIDRegexpQuery, spectrumID)) {
-			Pattern p = Pattern.compile(mgfSpectrumIDRegexpQuery);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mgfSpectrumIDRegexpQuery);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find()) {
 				specRefInt = Integer.valueOf(m.group(1));
 			}
 		} else if (Pattern.matches(mgfSpectrumIDRegexpQuery2, spectrumID)) {
-			Pattern p = Pattern.compile(mgfSpectrumIDRegexpQuery2);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mgfSpectrumIDRegexpQuery2);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find()) {
 				specRefInt = Integer.valueOf(m.group(1));
 			}
 		} else if (Pattern.matches(mgfPMEQCIDRegexp, spectrumID)) { // spectrumID='OrbiVL1A01.13334.13334.2'
-			Pattern p = Pattern.compile(mgfPMEQCIDRegexp);
-			Matcher m = p.matcher(spectrumID);
+			final Pattern p = Pattern.compile(mgfPMEQCIDRegexp);
+			final Matcher m = p.matcher(spectrumID);
 			if (m.find()) {
 				return spectrumID;
 			}
@@ -1100,7 +1101,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	protected void initProteinHypothesisByPeptideEvidenceHashMap() {
 		log.info("Keeping relationships between ProteinDetectionHypothesis and peptideEvidences");
 		log.info("Unmarshalling ProteinDetectionHypotesis");
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 		final Iterator<ProteinDetectionHypothesis> proteinDetectionHypothesises = mzIdentMLUnmarshaller
 				.unmarshalCollectionFromXpath(MzIdentMLElement.ProteinDetectionHypothesis);
 		if (proteinDetectionHypothesises != null) {
@@ -1110,7 +1111,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					final DBSequence dbSequence = proteinHypothesisXML.getDBSequence();
 					pdhDBSeqMap.put(proteinHypothesisXML, dbSequence);
 				}
-				for (PeptideHypothesis peptideHypothesisXML : proteinHypothesisXML.getPeptideHypothesis()) {
+				for (final PeptideHypothesis peptideHypothesisXML : proteinHypothesisXML.getPeptideHypothesis()) {
 					if (!proteinDetectionHypotesisWithPeptideEvidence
 							.containsKey(peptideHypothesisXML.getPeptideEvidenceRef()))
 						proteinDetectionHypotesisWithPeptideEvidence.put(peptideHypothesisXML.getPeptideEvidenceRef(),
@@ -1135,25 +1136,25 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 * PeptideHypotheisis in there.
 	 */
 	protected void initProteinHypothesisByPeptideEvidenceHashMapInParallel() {
-		int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
-		int proteinDetectionHypothesisCount = mzIdentMLUnmarshaller
+		final int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
+		final int proteinDetectionHypothesisCount = mzIdentMLUnmarshaller
 				.getObjectCountForXpath(MzIdentMLElement.ProteinDetectionHypothesis.getXpath());
 		log.info("Keeping relationships between " + proteinDetectionHypothesisCount
 				+ " ProteinDetectionHypothesis and peptideEvidences using " + threadCount + " cores");
 		log.info("Unmarshalling ProteinDetectionHypotesis");
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 		final Iterator<ProteinDetectionHypothesis> proteinDetectionHypothesises = mzIdentMLUnmarshaller
 				.unmarshalCollectionFromXpath(MzIdentMLElement.ProteinDetectionHypothesis);
 
-		ParIterator<ProteinDetectionHypothesis> iterator = ParIteratorFactory.createParIterator(
+		final ParIterator<ProteinDetectionHypothesis> iterator = ParIteratorFactory.createParIterator(
 				proteinDetectionHypothesises, proteinDetectionHypothesisCount, threadCount, Schedule.GUIDED);
 
-		Reducible<Map<String, ProteinDetectionHypothesis>> reducibleProteinHash = new Reducible<Map<String, ProteinDetectionHypothesis>>();
+		final Reducible<Map<String, ProteinDetectionHypothesis>> reducibleProteinHash = new Reducible<Map<String, ProteinDetectionHypothesis>>();
 
-		List<ProteinDetectionHypothesisParallelProcesser> runners = new ArrayList<ProteinDetectionHypothesisParallelProcesser>();
+		final List<ProteinDetectionHypothesisParallelProcesser> runners = new ArrayList<ProteinDetectionHypothesisParallelProcesser>();
 		for (int numCore = 0; numCore < threadCount; numCore++) {
 			// take current DB session
-			ProteinDetectionHypothesisParallelProcesser runner = new ProteinDetectionHypothesisParallelProcesser(
+			final ProteinDetectionHypothesisParallelProcesser runner = new ProteinDetectionHypothesisParallelProcesser(
 					iterator, numCore, reducibleProteinHash);
 			runners.add(runner);
 			runner.start();
@@ -1163,7 +1164,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		for (int k = 0; k < threadCount; k++) {
 			try {
 				runners.get(k).join();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -1171,16 +1172,16 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			throw new IllegalArgumentException(iterator.getAllExceptions()[0].getException());
 		}
 		// Reductors
-		Reduction<Map<String, ProteinDetectionHypothesis>> pdhReduction = new Reduction<Map<String, ProteinDetectionHypothesis>>() {
+		final Reduction<Map<String, ProteinDetectionHypothesis>> pdhReduction = new Reduction<Map<String, ProteinDetectionHypothesis>>() {
 			@Override
 			public Map<String, ProteinDetectionHypothesis> reduce(Map<String, ProteinDetectionHypothesis> first,
 					Map<String, ProteinDetectionHypothesis> second) {
-				Map<String, ProteinDetectionHypothesis> ret = new THashMap<String, ProteinDetectionHypothesis>();
-				for (String key : first.keySet()) {
+				final Map<String, ProteinDetectionHypothesis> ret = new THashMap<String, ProteinDetectionHypothesis>();
+				for (final String key : first.keySet()) {
 					if (!ret.containsKey(key))
 						ret.put(key, first.get(key));
 				}
-				for (String key : second.keySet()) {
+				for (final String key : second.keySet()) {
 					if (!ret.containsKey(key))
 						ret.put(key, second.get(key));
 				}
@@ -1256,11 +1257,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 */
 	private List<SearchDatabase> getSearchDatabases(List<SearchDatabaseRef> searchDatabaseRefs,
 			Iterator<SearchDatabase> searchDataBases) {
-		List<SearchDatabase> ret = new ArrayList<SearchDatabase>();
+		final List<SearchDatabase> ret = new ArrayList<SearchDatabase>();
 
-		for (SearchDatabaseRef searchDatabaseRef : searchDatabaseRefs) {
+		for (final SearchDatabaseRef searchDatabaseRef : searchDatabaseRefs) {
 			while (searchDataBases.hasNext()) {
-				SearchDatabase database = searchDataBases.next();
+				final SearchDatabase database = searchDataBases.next();
 				if (searchDatabaseRef.getSearchDatabaseRef().equals(database.getId())) {
 					ret.add(database);
 				}
@@ -1286,14 +1287,14 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public String getGeneratedFilesDescription() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		if (existsSourceFile() == false) {
 			return null;
 		}
 		int counter = 1;
 
 		while (sourceFiles.hasNext()) {
-			SourceFile file = sourceFiles.next();
+			final SourceFile file = sourceFiles.next();
 
 			if (file.getName() != null) {
 				sb.append(Utils.SOURCE_FILE_NAME + "=" + file.getName());
@@ -1308,15 +1309,15 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 			}
 			if (file.getFileFormat() != null) {
-				uk.ac.ebi.jmzidml.model.mzidml.FileFormat fileFormat = file.getFileFormat();
+				final uk.ac.ebi.jmzidml.model.mzidml.FileFormat fileFormat = file.getFileFormat();
 				fileFormat.getCvParam();
 				sb.append(Utils.FILE_FORMAT + "=");
 				sb.append(org.proteored.miapeapi.xml.mzidentml_1_1.util.MzidentmlControlVocabularyXmlFactory
 						.readEntireParam(fileFormat.getCvParam()));
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 			}
-			List<AbstractParam> paramGroup = file.getParamGroup();
-			for (AbstractParam param : paramGroup) {
+			final List<AbstractParam> paramGroup = file.getParamGroup();
+			for (final AbstractParam param : paramGroup) {
 				org.proteored.miapeapi.xml.mzidentml_1_1.util.MzidentmlControlVocabularyXmlFactory
 						.readEntireParam(param);
 				sb.append(MiapeXmlUtil.TERM_SEPARATOR);
@@ -1341,52 +1342,6 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	@Override
 	public Set<IdentifiedProteinSet> getIdentifiedProteinSets() {
 
-		/*
-		 * List<IdentifiedProtein> proteins = new
-		 * ArrayList<IdentifiedProtein>(); Map<String,
-		 * PSIPIAnalysisSearchDBSequenceType> mapProteins =
-		 * initMapProteins(mzIdentML.getSequenceCollection().getDBSequence());
-		 * Map<String, PSIPIPolypeptidePeptideType> mapPeptides =
-		 * initMapPeptides(mzIdentML.getSequenceCollection().getPeptide());
-		 * Map<String, PSIPIAnalysisSearchSpectrumIdentificationItemType>
-		 * mapEvidenceSpectrum = new THashMap<String,
-		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>(); Map<String,
-		 * PSIPIAnalysisSearchDBSequenceType> mapEvidenceProtein = new
-		 * HashMap<String, PSIPIAnalysisSearchDBSequenceType>();
-		 * Map<PSIPIPolypeptidePeptideType,
-		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>
-		 * mapPeptidesSpectrum = new THashMap<PSIPIPolypeptidePeptideType,
-		 * PSIPIAnalysisSearchSpectrumIdentificationItemType>();
-		 * initPepEvidenceMap(mapPeptides, mapEvidenceSpectrum,
-		 * mapPeptidesSpectrum, mapEvidenceProtein, mapProteins); if
-		 * (hasIdentifiedProteins()) {
-		 * PSIPIAnalysisProcessProteinDetectionListType proteinDetectionList =
-		 * mzIdentML
-		 * .getDataCollection().getAnalysisData().getProteinDetectionList(); if
-		 * (proteinDetectionList != null) {
-		 * List<PSIPIAnalysisProcessProteinAmbiguityGroupType> proteinGroups =
-		 * proteinDetectionList.getProteinAmbiguityGroup(); for
-		 * (PSIPIAnalysisProcessProteinAmbiguityGroupType proteinGroup :
-		 * proteinGroups) { for
-		 * (PSIPIAnalysisProcessProteinDetectionHypothesisType hypothesis :
-		 * proteinGroup.getProteinDetectionHypothesis()) { if
-		 * (hypothesis.isPassThreshold()) { // This has been an advise from Andy
-		 * Jones: it is better to do it, than only to include the highest score.
-		 * proteins.add(new IdentifiedProteinImpl(hypothesis ,
-		 * mapEvidenceSpectrum, mapEvidenceProtein , proteinDetectionList
-		 * ,mapPeptides, mapProteins)); } } } } else { for
-		 * (PSIPIAnalysisSearchDBSequenceType xmlProtein :
-		 * mzIdentML.getSequenceCollection().getDBSequence()) { proteins.add(new
-		 * IdentifiedProteinImpl(xmlProtein, mapPeptides, mapEvidenceSpectrum,
-		 * mapEvidenceProtein)); } } } else { IdentifiedProtein protein =
-		 * ProteinType.UNIDENTIFIED.createUnidentifiedProtein(); for
-		 * (Entry<PSIPIPolypeptidePeptideType,
-		 * PSIPIAnalysisSearchSpectrumIdentificationItemType> pepSpectrum :
-		 * mapPeptidesSpectrum.entrySet()) {
-		 * protein.getIdentifiedPeptides().add(new
-		 * IdentifiedPeptideImpl(pepSpectrum.getValue(), pepSpectrum.getKey()));
-		 * } proteins.add(protein); } return proteins;
-		 */
 		return proteinSets;
 	}
 
@@ -1414,7 +1369,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public MSContact getContact() {
-		Provider provider = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.Provider);
+		final Provider provider = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.Provider);
 
 		if (provider != null) {
 			if (mzIdentMLUnmarshaller != null) {
@@ -1461,7 +1416,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			try {
 				return dbManager.getMiapeMSIPersistenceManager()
 						.getMiapeById(id, user.getUserName(), user.getPassword()).getProject();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -1566,11 +1521,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Set<MSIAdditionalInformation> getAdditionalInformations() {
-		Set<MSIAdditionalInformation> addInfos = new THashSet<MSIAdditionalInformation>();
+		final Set<MSIAdditionalInformation> addInfos = new THashSet<MSIAdditionalInformation>();
 
 		// Capture information about the samples
 		if (analysisSampleCollection != null) {
-			for (Sample sampleXML : analysisSampleCollection.getSample()) {
+			for (final Sample sampleXML : analysisSampleCollection.getSample()) {
 
 				addInfos.add(new AdditionalInformationImpl(sampleXML));
 			}
@@ -1613,7 +1568,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (file.exists()) {
 			try {
 				fileURL = file.toURI().toURL().toString();
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 			}
 		}
 		url = fileURL;

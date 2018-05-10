@@ -2,7 +2,6 @@ package org.proteored.miapeapi.cv;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -96,7 +95,7 @@ public class OboControlVocabularyConnector {
 			try {
 				Thread.sleep(1000);
 				log.info("Waiting for the ontology loading");
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -105,16 +104,16 @@ public class OboControlVocabularyConnector {
 			try {
 				omAvailable = false;
 				log.info("Loading ontologies from " + configFile);
-				long time1 = System.currentTimeMillis();
+				final long time1 = System.currentTimeMillis();
 				om = new OntologyManager(getConfigFile(configFile));
 				omAvailable = true;
 				log.info("ontologies loaded from " + configFile);
-				long time2 = System.currentTimeMillis();
+				final long time2 = System.currentTimeMillis();
 				log.info("Ontologies loaded in " + (time2 - time1) / 1000 + " seconds");
 				return om;
 
 				// if fails retrieving remote ontologies, get local ontologies
-			} catch (OntologyLoaderException e) {
+			} catch (final OntologyLoaderException e) {
 				log.info("Error loading ontologies from " + configFile + ": " + e.getMessage());
 				configFile = LOCAL_CONFIG_FILE;
 				omAvailable = false;
@@ -124,14 +123,14 @@ public class OboControlVocabularyConnector {
 					omAvailable = true;
 					log.info("ontologies loaded from " + configFile);
 					return om;
-				} catch (OntologyLoaderException e1) {
+				} catch (final OntologyLoaderException e1) {
 					error = true;
 					e1.printStackTrace();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					error = true;
 					e1.printStackTrace();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				configFile = LOCAL_CONFIG_FILE;
 				omAvailable = false;
 				log.info("Loading ontologies from " + configFile);
@@ -140,10 +139,10 @@ public class OboControlVocabularyConnector {
 					omAvailable = true;
 					log.info("ontologies loaded from " + configFile);
 					return om;
-				} catch (OntologyLoaderException e1) {
+				} catch (final OntologyLoaderException e1) {
 					error = true;
 					e1.printStackTrace();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					error = true;
 					e1.printStackTrace();
 				}
@@ -157,7 +156,7 @@ public class OboControlVocabularyConnector {
 
 	private static InputStream getConfigFile(String configFile) throws IOException {
 		// Check the environment variable SERVER_TEST
-		Map<String, String> env = System.getenv();
+		final Map<String, String> env = System.getenv();
 		ClassPathResource file = null;
 		// if true, take local ontologies
 		if (env.get("SERVER_TEST") != null && env.get("SERVER_TEST").equals("true")) {
@@ -174,7 +173,7 @@ public class OboControlVocabularyConnector {
 	public OntologyTermI getTermForAccession(Accession accession) {
 
 		if (om != null) {
-			for (String ontologyID : om.getOntologyIDs()) {
+			for (final String ontologyID : om.getOntologyIDs()) {
 				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 
 				if (ontologyAccess != null) {
@@ -191,7 +190,7 @@ public class OboControlVocabularyConnector {
 	public Set<OntologyTermI> getAllChildren(Accession accession) {
 
 		if (om != null) {
-			for (String ontologyID : om.getOntologyIDs()) {
+			for (final String ontologyID : om.getOntologyIDs()) {
 				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
 					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
@@ -208,9 +207,9 @@ public class OboControlVocabularyConnector {
 
 	public Set<OntologyTermI> getTermParents(Accession accession) {
 		if (om != null) {
-			Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
+			final Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
 
-			for (String ontologyID : om.getOntologyIDs()) {
+			for (final String ontologyID : om.getOntologyIDs()) {
 				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
 					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
@@ -226,9 +225,9 @@ public class OboControlVocabularyConnector {
 
 	public Set<OntologyTermI> getDirectTermParents(Accession accession) {
 		if (om != null) {
-			Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
+			final Set<OntologyTermI> ret = new THashSet<OntologyTermI>();
 
-			for (String ontologyID : om.getOntologyIDs()) {
+			for (final String ontologyID : om.getOntologyIDs()) {
 				final OntologyAccess ontologyAccess = om.getOntologyAccess(ontologyID);
 				if (ontologyAccess != null) {
 					final OntologyTermI term = ontologyAccess.getTermForAccession(accession.toString());
@@ -243,15 +242,15 @@ public class OboControlVocabularyConnector {
 	}
 
 	public boolean isSonOf(Accession accession, Accession potentialParent) {
-		Map<?, ?> accesionParents = getAccesionParents(accession);
+		final Map<?, ?> accesionParents = getAccesionParents(accession);
 		if (accesionParents != null)
 			return accesionParents.containsKey(potentialParent.toString());
 		return false;
 	}
 
 	/**
-	 * Gets a {@link HashMap} that contains the accession string of the term and
-	 * the term
+	 * Gets a {@link Map} that contains the accession string of the term and the
+	 * term
 	 * 
 	 * @param accession
 	 * @return
@@ -259,8 +258,8 @@ public class OboControlVocabularyConnector {
 	public Map<String, OntologyTermI> getAccesionParents(Accession accession) {
 		final Set<OntologyTermI> termParents = getTermParents(accession);
 		if (termParents != null) {
-			Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
-			for (OntologyTermI ontologyTermI : termParents) {
+			final Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
+			for (final OntologyTermI ontologyTermI : termParents) {
 				ret.put(ontologyTermI.getTermAccession(), ontologyTermI);
 			}
 			return ret;
@@ -271,8 +270,8 @@ public class OboControlVocabularyConnector {
 	public Map<String, OntologyTermI> getChildren(Accession accession) {
 		final Set<OntologyTermI> allChildren = getAllChildren(accession);
 		if (allChildren != null) {
-			Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
-			for (OntologyTermI ontologyTermI : allChildren) {
+			final Map<String, OntologyTermI> ret = new THashMap<String, OntologyTermI>();
+			for (final OntologyTermI ontologyTermI : allChildren) {
 				ret.put(ontologyTermI.getTermAccession(), ontologyTermI);
 			}
 			return ret;

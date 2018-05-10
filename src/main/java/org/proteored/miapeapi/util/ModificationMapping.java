@@ -46,7 +46,7 @@ public class ModificationMapping {
 			try {
 				url = resource.getURL();
 				ModificationMapping.preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -54,36 +54,37 @@ public class ModificationMapping {
 	}
 
 	public SlimModCollection getModification(String modificationName, Double mass, String aaSpecificity) {
-		SlimModCollection preferredModifications = loadPreferredModifications();
-		SlimModCollection candidates = new SlimModCollection();
+		final SlimModCollection preferredModifications = loadPreferredModifications();
+		final SlimModCollection candidates = new SlimModCollection();
 
 		// name and no MASS
 		if (modificationName != null && mass == null) {
-			SlimModification slimMod = preferredModifications.getbyName(modificationName);
+			final SlimModification slimMod = preferredModifications.getbyName(modificationName);
 			if (slimMod != null) {
 				candidates.add(slimMod);
 			}
 			// MASS
 		} else if (mass != null && aaSpecificity == null) {
-			SlimModCollection slimMods = preferredModifications.getbyDelta(mass, ERROR_TOLERANCE);
+			final SlimModCollection slimMods = preferredModifications.getbyDelta(mass, ERROR_TOLERANCE);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (SlimModification slimModification : slimMods) {
+				for (final SlimModification slimModification : slimMods) {
 					candidates.add(slimModification);
 				}
 			}
 			// SPECIFICITY
 		} else if (mass == null && aaSpecificity != null) {
-			SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity);
+			final SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (SlimModification slimModification : slimMods) {
+				for (final SlimModification slimModification : slimMods) {
 					candidates.add(slimModification);
 				}
 			}
 			// MASS + SPECIFICITY
 		} else if (mass != null && aaSpecificity != null) {
-			SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity, mass, ERROR_TOLERANCE);
+			final SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity, mass,
+					ERROR_TOLERANCE);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (SlimModification slimModification : slimMods) {
+				for (final SlimModification slimModification : slimMods) {
 					candidates.add(slimModification);
 				}
 			}
@@ -105,11 +106,11 @@ public class ModificationMapping {
 
 	private static Vector<ModificationImplementation> getModificationsImplementations(
 			Set<PeptideModification> modifications) {
-		Vector<ModificationImplementation> ret = new Vector<ModificationImplementation>();
-		for (PeptideModification peptideModification : modifications) {
+		final Vector<ModificationImplementation> ret = new Vector<ModificationImplementation>();
+		for (final PeptideModification peptideModification : modifications) {
 
-			HashMap<String, double[]> delta = new HashMap<String, double[]>();
-			double[] deltas = new double[2];
+			final HashMap<String, double[]> delta = new HashMap<String, double[]>();
+			final double[] deltas = new double[2];
 			if (peptideModification.getMonoDelta() != null) {
 				deltas[0] = peptideModification.getMonoDelta()
 						+ AssignMass.getInstance(true).getMass(peptideModification.getResidues().charAt(0));
@@ -123,8 +124,8 @@ public class ModificationMapping {
 				deltas[1] = deltas[0];
 			}
 			delta.put(peptideModification.getResidues(), deltas);
-			ModificationImplementation mod = new ModificationImplementation(peptideModification.getName(), null, delta,
-					peptideModification.getPosition());
+			final ModificationImplementation mod = new ModificationImplementation(peptideModification.getName(), null,
+					delta, peptideModification.getPosition());
 			ret.add(mod);
 
 		}

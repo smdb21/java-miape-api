@@ -55,7 +55,7 @@ public class Experiment implements IdentificationSet<Replicate> {
 			ControlVocabularyManager cvManager, boolean processInParallel) {
 		this.replicates = replicates;
 		if (replicates != null)
-			for (Replicate replicate : replicates) {
+			for (final Replicate replicate : replicates) {
 				replicate.setPreviousLevelIdentificationSet(this);
 			}
 		this.experimentName = experimentName;
@@ -123,16 +123,16 @@ public class Experiment implements IdentificationSet<Replicate> {
 	 */
 	@Override
 	public List<DataManager> getNextLevelDataManagers() {
-		List<Replicate> reps = getNextLevelIdentificationSetList();
-		List<DataManager> list = new ArrayList<DataManager>();
-		for (Replicate replicate : reps) {
+		final List<Replicate> reps = getNextLevelIdentificationSetList();
+		final List<DataManager> list = new ArrayList<DataManager>();
+		for (final Replicate replicate : reps) {
 			list.add(replicate.getDataManager());
 		}
 		return list;
 	}
 
 	public Replicate getReplicate(String replicateName) {
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			if (replicate.getName().equals(replicateName))
 				return replicate;
 		}
@@ -169,19 +169,19 @@ public class Experiment implements IdentificationSet<Replicate> {
 	public int getProteinGroupOccurrenceNumber(ProteinGroup proteinGroup) {
 		try {
 			int num = 0;
-			List<Replicate> nextLevelIdentificationSetList = getNextLevelIdentificationSetList();
-			for (Replicate replicate : nextLevelIdentificationSetList) {
+			final List<Replicate> nextLevelIdentificationSetList = getNextLevelIdentificationSetList();
+			for (final Replicate replicate : nextLevelIdentificationSetList) {
 				num += replicate.getProteinGroupOccurrenceNumber(proteinGroup);
 			}
 			return num;
-		} catch (UnsupportedOperationException e) {
+		} catch (final UnsupportedOperationException e) {
 			return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
 		}
 	}
 
 	/**
-	 * Gets a hashmap that indicates how many times has been identified each
-	 * protein in the total number of replicates.
+	 * Gets a Map that indicates how many times has been identified each protein
+	 * in the total number of replicates.
 	 *
 	 * @return
 	 */
@@ -206,8 +206,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 	}
 
 	/**
-	 * Gets a hashMap that indicates how many times has been identified each
-	 * peptide in the total number of replicates.
+	 * Gets a Map that indicates how many times has been identified each peptide
+	 * in the total number of replicates.
 	 *
 	 * @return
 	 */
@@ -231,8 +231,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageNumDifferentProteinGroups(boolean countNonConclusiveProteins) {
-		List<Integer> nums = new ArrayList<Integer>();
-		for (Replicate replicate : replicates) {
+		final List<Integer> nums = new ArrayList<Integer>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getNumDifferentProteinGroups(countNonConclusiveProteins));
 		}
 		return Statistics.calculateMean(nums);
@@ -240,8 +240,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageNumDifferentPeptides(boolean distPeptides) {
-		List<Integer> nums = new ArrayList<Integer>();
-		for (Replicate replicate : replicates) {
+		final List<Integer> nums = new ArrayList<Integer>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getNumDifferentPeptides(distPeptides));
 		}
 		return Statistics.calculateMean(nums);
@@ -249,10 +249,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdNumDifferentProteinGroups(boolean countNonConclusiveProteins) {
-		List<Integer> nums = new ArrayList<Integer>();
+		final List<Integer> nums = new ArrayList<Integer>();
 		if (replicates.size() < 2)
 			return 0;
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getNumDifferentProteinGroups(countNonConclusiveProteins));
 		}
 		final double stdDev = Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -261,10 +261,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdNumDifferentPeptides(boolean distPeptides) {
-		List<Integer> nums = new ArrayList<Integer>();
+		final List<Integer> nums = new ArrayList<Integer>();
 		if (replicates.size() < 2)
 			return 0;
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getNumDifferentPeptides(distPeptides));
 		}
 		return Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -292,7 +292,7 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("\tExperiment " + experimentName + ":\n");
 		sb.append("\t\t\t\tNumber of protein groups:" + getTotalNumProteinGroups(false) + "\n");
 		sb.append("\t\t\t\tNumber of different protein groups:" + getNumDifferentProteinGroups(false) + "\n");
@@ -300,7 +300,7 @@ public class Experiment implements IdentificationSet<Replicate> {
 		sb.append("\t\t\t\tNumber of peptides:" + getTotalNumPeptides() + "\n");
 		sb.append("\t\t\t\tNumber of different peptides:" + getNumDifferentPeptides(true) + "\n");
 		sb.append("\t\t" + replicates.size() + " replicates:\n");
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			sb.append("\t\t" + replicate);
 		}
 		return sb.toString();
@@ -309,7 +309,7 @@ public class Experiment implements IdentificationSet<Replicate> {
 	public static void printProteinOcurrenceList(List<ProteinGroupOccurrence> proteinGroupOccurrences) {
 		System.out.println();
 		int previousSize = 10;
-		for (ProteinGroupOccurrence po : proteinGroupOccurrences) {
+		for (final ProteinGroupOccurrence po : proteinGroupOccurrences) {
 			final int size = po.getItemList().size();
 			if (size > previousSize)
 				System.out.print("ERROR");
@@ -341,8 +341,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<Replicate> getNextLevelIdentificationSetList() {
-		List<Replicate> ret = new ArrayList<Replicate>();
-		for (Replicate replicate : replicates) {
+		final List<Replicate> ret = new ArrayList<Replicate>();
+		for (final Replicate replicate : replicates) {
 			ret.add(replicate);
 		}
 		return ret;
@@ -379,10 +379,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<String> getProteinScoreNames() {
-		List<String> ret = new ArrayList<String>();
-		for (Replicate iterable_element : replicates) {
-			List<String> scoreNames = iterable_element.getProteinScoreNames();
-			for (String scoreName : scoreNames) {
+		final List<String> ret = new ArrayList<String>();
+		for (final Replicate iterable_element : replicates) {
+			final List<String> scoreNames = iterable_element.getProteinScoreNames();
+			for (final String scoreName : scoreNames) {
 				if (!ret.contains(scoreName))
 					ret.add(scoreName);
 			}
@@ -392,10 +392,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<String> getPeptideScoreNames() {
-		List<String> ret = new ArrayList<String>();
-		for (Replicate iterable_element : replicates) {
-			List<String> scoreNames = iterable_element.getPeptideScoreNames();
-			for (String scoreName : scoreNames) {
+		final List<String> ret = new ArrayList<String>();
+		for (final Replicate iterable_element : replicates) {
+			final List<String> scoreNames = iterable_element.getPeptideScoreNames();
+			for (final String scoreName : scoreNames) {
 				if (!ret.contains(scoreName))
 					ret.add(scoreName);
 			}
@@ -405,10 +405,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<String> getDifferentPeptideModificationNames() {
-		List<String> ret = new ArrayList<String>();
-		for (Replicate replicate : replicates) {
-			List<String> modifs = replicate.getDifferentPeptideModificationNames();
-			for (String modif : modifs) {
+		final List<String> ret = new ArrayList<String>();
+		for (final Replicate replicate : replicates) {
+			final List<String> modifs = replicate.getDifferentPeptideModificationNames();
+			for (final String modif : modifs) {
 				if (!ret.contains(modif))
 					ret.add(modif);
 			}
@@ -430,7 +430,7 @@ public class Experiment implements IdentificationSet<Replicate> {
 	@Override
 	public void setFilters(List<Filter> filters) {
 		dataManager.setFilters(filters);
-		for (Replicate idSet : getNextLevelIdentificationSetList())
+		for (final Replicate idSet : getNextLevelIdentificationSetList())
 			idSet.setFilters(filters);
 	}
 
@@ -522,8 +522,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageTotalNumProteinGroups(boolean countNonConclusiveProteins) {
-		List<Integer> nums = new ArrayList<Integer>();
-		for (Replicate replicate : replicates) {
+		final List<Integer> nums = new ArrayList<Integer>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalNumProteinGroups(countNonConclusiveProteins));
 		}
 		return Statistics.calculateMean(nums);
@@ -531,8 +531,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageTotalNumPeptides() {
-		List<Integer> nums = new ArrayList<Integer>();
-		for (Replicate replicate : replicates) {
+		final List<Integer> nums = new ArrayList<Integer>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalNumPeptides());
 		}
 		return Statistics.calculateMean(nums);
@@ -545,8 +545,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageTotalVsDifferentNumProteinGroups(boolean countNonConclusiveProteins) {
-		List<Double> nums = new ArrayList<Double>();
-		for (Replicate replicate : replicates) {
+		final List<Double> nums = new ArrayList<Double>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalVsDifferentNumProteinGroups(countNonConclusiveProteins));
 		}
 		return Statistics.calculateMean(nums);
@@ -566,8 +566,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getAverageTotalVsDifferentNumPeptides(boolean distModPep) {
-		List<Double> nums = new ArrayList<Double>();
-		for (Replicate replicate : replicates) {
+		final List<Double> nums = new ArrayList<Double>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalVsDifferentNumPeptides(distModPep));
 		}
 		return Statistics.calculateMean(nums);
@@ -584,8 +584,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdTotalVsDifferentNumProteinGroups(boolean countNonConclusiveProteins) {
-		List<Double> nums = new ArrayList<Double>();
-		for (Replicate replicate : replicates) {
+		final List<Double> nums = new ArrayList<Double>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalVsDifferentNumProteinGroups(countNonConclusiveProteins));
 		}
 		return Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -593,8 +593,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdTotalVsDifferentNumPeptides(Boolean distModPeptides) {
-		List<Double> nums = new ArrayList<Double>();
-		for (Replicate replicate : replicates) {
+		final List<Double> nums = new ArrayList<Double>();
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalVsDifferentNumPeptides(distModPeptides));
 		}
 		return Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -602,10 +602,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdTotalNumProteinGroups(boolean countNonConclusiveProteins) {
-		List<Integer> nums = new ArrayList<Integer>();
+		final List<Integer> nums = new ArrayList<Integer>();
 		if (replicates.size() < 2)
 			return 0;
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalNumProteinGroups(countNonConclusiveProteins));
 		}
 		final double stdDev = Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -614,10 +614,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public double getStdTotalNumPeptides() {
-		List<Integer> nums = new ArrayList<Integer>();
+		final List<Integer> nums = new ArrayList<Integer>();
 		if (replicates.size() < 2)
 			return 0;
-		for (Replicate replicate : replicates) {
+		for (final Replicate replicate : replicates) {
 			nums.add(replicate.getTotalNumPeptides());
 		}
 		return Statistics.getStdDev(nums.toArray(new Integer[0]));
@@ -630,8 +630,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<ResultingData> getResultingDatas() {
-		List<ResultingData> ret = new ArrayList<ResultingData>();
-		for (Replicate replicate : replicates) {
+		final List<ResultingData> ret = new ArrayList<ResultingData>();
+		for (final Replicate replicate : replicates) {
 			ret.addAll(replicate.getResultingDatas());
 		}
 		return ret;
@@ -691,8 +691,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<MiapeMSDocument> getMiapeMSs() {
-		List<MiapeMSDocument> ret = new ArrayList<MiapeMSDocument>();
-		for (Replicate replicate : getReplicates()) {
+		final List<MiapeMSDocument> ret = new ArrayList<MiapeMSDocument>();
+		for (final Replicate replicate : getReplicates()) {
 			ret.addAll(replicate.getMiapeMSs());
 		}
 		return ret;
@@ -700,18 +700,18 @@ public class Experiment implements IdentificationSet<Replicate> {
 
 	@Override
 	public List<MiapeMSIDocument> getMiapeMSIs() {
-		List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
-		for (Replicate replicate : getReplicates()) {
+		final List<MiapeMSIDocument> ret = new ArrayList<MiapeMSIDocument>();
+		for (final Replicate replicate : getReplicates()) {
 			ret.addAll(replicate.getMiapeMSIs());
 		}
 		return ret;
 	}
 
 	public Map<Replicate, List<ResultingData>> getPeakListResultingDataMap() {
-		Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
+		final Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
 		if (getReplicates() != null) {
-			for (Replicate replicate : getReplicates()) {
-				List<ResultingData> resultingDatas = replicate.getPeakListResultingDatas();
+			for (final Replicate replicate : getReplicates()) {
+				final List<ResultingData> resultingDatas = replicate.getPeakListResultingDatas();
 				if (resultingDatas != null && !resultingDatas.isEmpty()) {
 					ret.put(replicate, resultingDatas);
 				}
@@ -723,10 +723,10 @@ public class Experiment implements IdentificationSet<Replicate> {
 	}
 
 	public Map<Replicate, List<ResultingData>> getRawFileResultingDataMap() {
-		Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
+		final Map<Replicate, List<ResultingData>> ret = new THashMap<Replicate, List<ResultingData>>();
 		if (getReplicates() != null) {
-			for (Replicate replicate : getReplicates()) {
-				List<ResultingData> resultingDatas = replicate.getRawFileResultingDatas();
+			for (final Replicate replicate : getReplicates()) {
+				final List<ResultingData> resultingDatas = replicate.getRawFileResultingDatas();
 				if (resultingDatas != null && !resultingDatas.isEmpty()) {
 					ret.put(replicate, resultingDatas);
 				}
@@ -765,8 +765,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 	@Override
 	public Set<Spectrometer> getSpectrometers() {
 		final List<Replicate> replicates = getReplicates();
-		Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
-		for (Replicate replicate : replicates) {
+		final Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
+		for (final Replicate replicate : replicates) {
 			spectrometers.addAll(replicate.getSpectrometers());
 		}
 		return spectrometers;
@@ -775,8 +775,8 @@ public class Experiment implements IdentificationSet<Replicate> {
 	@Override
 	public Set<InputParameter> getInputParameters() {
 		final List<Replicate> replicates = getReplicates();
-		Set<InputParameter> inputParameters = new THashSet<InputParameter>();
-		for (Replicate replicate : replicates) {
+		final Set<InputParameter> inputParameters = new THashSet<InputParameter>();
+		for (final Replicate replicate : replicates) {
 			inputParameters.addAll(replicate.getInputParameters());
 		}
 		return inputParameters;

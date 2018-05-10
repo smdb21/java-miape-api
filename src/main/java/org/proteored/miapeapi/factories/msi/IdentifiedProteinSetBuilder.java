@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.factories.msi;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +7,8 @@ import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProteinSet;
 import org.proteored.miapeapi.interfaces.msi.InputDataSet;
 import org.proteored.miapeapi.interfaces.msi.InputParameter;
+
+import gnu.trove.map.hash.THashMap;
 
 public class IdentifiedProteinSetBuilder {
 
@@ -22,22 +23,22 @@ public class IdentifiedProteinSetBuilder {
 	}
 
 	public IdentifiedProteinSetBuilder fileLocation(String value) {
-		this.fileLocation = value;
+		fileLocation = value;
 		return this;
 	}
 
 	public IdentifiedProteinSetBuilder identifiedProteins(Map<String, IdentifiedProtein> value) {
-		this.identifiedProteins = value;
+		identifiedProteins = value;
 		return this;
 	}
 
 	public IdentifiedProteinSetBuilder inputDataSets(Set<InputDataSet> value) {
-		this.inputDataSets = value;
+		inputDataSets = value;
 		return this;
 	}
 
 	public IdentifiedProteinSetBuilder name(String value) {
-		this.name = value;
+		name = value;
 		return this;
 	}
 
@@ -47,7 +48,7 @@ public class IdentifiedProteinSetBuilder {
 
 	public IdentifiedProteinSetBuilder identifiedProtein(IdentifiedProtein protein) {
 		if (identifiedProteins == null) {
-			identifiedProteins = new HashMap<String, IdentifiedProtein>();
+			identifiedProteins = new THashMap<String, IdentifiedProtein>();
 		}
 		identifiedProteins.put(protein.getAccession(), protein);
 		return this;

@@ -10,11 +10,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
@@ -74,7 +73,7 @@ public class TMsData {
 		// setSpectrumReference(i, String.valueOf(i + 1));
 		// }
 		if (Outputview) {
-			TPeptideInformation _test = new TPeptideInformation();
+			final TPeptideInformation _test = new TPeptideInformation();
 			for (int i = 0; i < pffSpectra.size(); i++) {
 				// Metemos el spectrum Reference
 				setSpectrumReference(i, String.valueOf(i + 1));
@@ -133,8 +132,8 @@ public class TMsData {
 		ArrayList<Double> intensities;
 		int precursorCharge = -1;
 		try {
-			URL url = new URL(_inputfile);
-			BufferedReader inStream = new BufferedReader(new InputStreamReader(url.openStream()));
+			final URL url = new URL(_inputfile);
+			final BufferedReader inStream = new BufferedReader(new InputStreamReader(url.openStream()));
 			precursorMasses = new ArrayList<Double>();
 			massesLocal = new ArrayList<Double>();
 			intensities = new ArrayList<Double>();
@@ -178,7 +177,7 @@ public class TMsData {
 								// "massesLocal" array with the reference to
 								// precursor to -1. It will be updated at the
 								// end
-								TSpectrum mySpectrum = createSpectrum(queryNumber, -1, peakListId, precursorMass,
+								final TSpectrum mySpectrum = createSpectrum(queryNumber, -1, peakListId, precursorMass,
 										charge, rt);
 
 								mySpectrum.fillMassValues(massesLocal, intensities);
@@ -212,7 +211,7 @@ public class TMsData {
 										separator = ARRAYS_TAB;
 									}
 
-									String[] split = inLine.split(separator);
+									final String[] split = inLine.split(separator);
 									if (split.length == 2 || split.length == 3) {
 
 										centroidMass = Double.valueOf(split[0]);
@@ -242,25 +241,25 @@ public class TMsData {
 				// search backward a query number that is not used to use it as
 				// precursorQueryNumber, starting by the maximum queryNumber
 				// captured
-				List<Integer> queryNumbers = new ArrayList<Integer>();
-				for (int key : pffSpectra.keys()) {
+				final TIntArrayList queryNumbers = new TIntArrayList();
+				for (final int key : pffSpectra.keys()) {
 					queryNumbers.add(key);
 				}
-				Collections.sort(queryNumbers);
+				queryNumbers.sort();
 				queryNumber = queryNumbers.get(queryNumbers.size() - 1);
 				while (pffSpectra.containsKey(queryNumber)) {
 					log.info("Searching a valid precursor queryNumber: " + queryNumber);
 					queryNumber--;
 				}
-				int precursorQueryNumber = queryNumber;
-				TSpectrum precursorSpectrum = createSpectrum(precursorQueryNumber, -1, peakListId, null,
+				final int precursorQueryNumber = queryNumber;
+				final TSpectrum precursorSpectrum = createSpectrum(precursorQueryNumber, -1, peakListId, null,
 						precursorCharge, rt);
 				precursorSpectrum.fillMassValues(precursorMasses, null);
 				precursorSpectrum.setMsLevel(1);
 				log.info("MS1 spectrum created with index=" + queryNumber);
 				// iterate all MS2 spectra to asign the precursor spectrum to
 				// precursorQueryNumber
-				for (TSpectrum spectrum : pffSpectra.valueCollection()) {
+				for (final TSpectrum spectrum : pffSpectra.valueCollection()) {
 					spectrum.setPrecursorQueryNumber(precursorQueryNumber);
 				}
 				pffSpectra.put(precursorQueryNumber, precursorSpectrum);
@@ -268,7 +267,7 @@ public class TMsData {
 
 		} catch (
 
-		IOException ex) {
+		final IOException ex) {
 			ex.printStackTrace();
 		}
 		log.info(pffSpectra.size() + " spectra readed from '" + _inputfile + "'");
@@ -287,7 +286,7 @@ public class TMsData {
 		try {
 
 			return Double.valueOf(_ret);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 
 		}
 		return null;
@@ -300,7 +299,7 @@ public class TMsData {
 			if (split.length == 2) {
 				try {
 					return Double.valueOf(split[1]);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					// it can be also like: RTINSECONDS=95-97
 					// take the first value, in the example, the 95
 					if (split[1].contains("-")) {
@@ -308,7 +307,7 @@ public class TMsData {
 						if (split2.length == 2) {
 							try {
 								return Double.valueOf(split2[0]);
-							} catch (NumberFormatException e2) {
+							} catch (final NumberFormatException e2) {
 
 							}
 						}
@@ -331,7 +330,7 @@ public class TMsData {
 
 		try {
 			return Integer.valueOf(_ret);
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 
 		}
 		return null;
@@ -341,7 +340,7 @@ public class TMsData {
 		// En principio es del tipo
 		String _ret = "";
 		if (_line.contains("=")) {
-			String[] split = _line.split("=");
+			final String[] split = _line.split("=");
 			if (split.length == 2)
 				return split[1];
 		}
@@ -353,11 +352,12 @@ public class TMsData {
 			Double precursor_mass, Integer _charge, Double rt) {
 
 		try {
-			TSpectrum mySpectrum = new TSpectrum(queryNumber, precursorQueryNumber, _peak_list_id, precursor_mass, rt);
+			final TSpectrum mySpectrum = new TSpectrum(queryNumber, precursorQueryNumber, _peak_list_id, precursor_mass,
+					rt);
 
 			mySpectrum.setPeptideCharge(_charge);
 			return mySpectrum;
-		} catch (Exception ex2) {
+		} catch (final Exception ex2) {
 			ex2.printStackTrace();
 		}
 		return null;

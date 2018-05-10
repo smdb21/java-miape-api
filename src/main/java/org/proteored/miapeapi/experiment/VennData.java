@@ -3,23 +3,22 @@ package org.proteored.miapeapi.experiment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import edu.scripps.yates.utilities.dates.DatesUtil;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 public abstract class VennData {
 	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("log4j.logger.org.proteored");
 	private static int count = 0;
 
-	private Map<Object, Set<Object>> hash1 = new HashMap<Object, Set<Object>>();
-	private Map<Object, Set<Object>> hash2 = new HashMap<Object, Set<Object>>();
-	private Map<Object, Set<Object>> hash3 = new HashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash1 = new THashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash2 = new THashMap<Object, Set<Object>>();
+	private Map<Object, Set<Object>> hash3 = new THashMap<Object, Set<Object>>();
 
 	private Set<Object> keys1 = new THashSet<Object>();
 	private Set<Object> keys2 = new THashSet<Object>();
@@ -31,9 +30,9 @@ public abstract class VennData {
 	private Set<Object> union13Keys;
 	private Set<Object> union23Keys;
 	private Set<Object> union123Keys;
-	private Collection<Object> col1;
-	private Collection<Object> col2;
-	private Collection<Object> col3;
+	private final Collection<Object> col1;
+	private final Collection<Object> col2;
+	private final Collection<Object> col3;
 	private boolean collectionProcessed;
 	private Integer uniqueTo2Num;
 	private Integer uniqueTo3Num;
@@ -84,7 +83,7 @@ public abstract class VennData {
 			processCollections(col2, keys2, hash2);
 			log.debug("Processing collection 3");
 			processCollections(col3, keys3, hash3);
-			StringBuilder logmessage = new StringBuilder();
+			final StringBuilder logmessage = new StringBuilder();
 			if (keys1 != null) {
 				logmessage.append("keys1=" + keys1.size());
 			} else {
@@ -102,24 +101,24 @@ public abstract class VennData {
 			}
 			log.debug(logmessage);
 		}
-		this.collectionProcessed = true;
+		collectionProcessed = true;
 	}
 
 	private final void processCollections(Collection<Object> referenceCollection, Collection<Object> keys,
 			Map<Object, Set<Object>> hash) {
 
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 		// 1 VS (2 and 3)
 		if (referenceCollection != null)
-			for (Object obj1 : referenceCollection) {
+			for (final Object obj1 : referenceCollection) {
 
 				if (isObjectValid(obj1)) {
-					Object key = getKeyFromObject(obj1);
+					final Object key = getKeyFromObject(obj1);
 					addTo123UnionKeys(key);
 					if (hash.containsKey(key)) {
 						hash.get(key).add(obj1);
 					} else {
-						Set<Object> set = new HashSet<Object>();
+						final Set<Object> set = new THashSet<Object>();
 						set.add(obj1);
 						hash.put(key, set);
 					}
@@ -152,8 +151,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getIntersection123() {
-		Set<Object> intersectionKeys = getIntersection123Keys();
-		List<Object> ret = getObjectsByKeys(intersectionKeys, true, true, true);
+		final Set<Object> intersectionKeys = getIntersection123Keys();
+		final List<Object> ret = getObjectsByKeys(intersectionKeys, true, true, true);
 		return ret;
 	}
 
@@ -170,8 +169,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getIntersection12() {
-		Set<Object> intersectionKeys = getIntersection12Keys();
-		List<Object> ret = getObjectsByKeys(intersectionKeys, true, true, false);
+		final Set<Object> intersectionKeys = getIntersection12Keys();
+		final List<Object> ret = getObjectsByKeys(intersectionKeys, true, true, false);
 		return ret;
 	}
 
@@ -188,8 +187,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getIntersection23() {
-		Set<Object> intersectionKeys = getIntersection23Keys();
-		List<Object> ret = getObjectsByKeys(intersectionKeys, false, true, true);
+		final Set<Object> intersectionKeys = getIntersection23Keys();
+		final List<Object> ret = getObjectsByKeys(intersectionKeys, false, true, true);
 		return ret;
 	}
 
@@ -206,8 +205,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getIntersection13() {
-		Set<Object> intersectionKeys = getIntersection13Keys();
-		List<Object> ret = getObjectsByKeys(intersectionKeys, true, false, true);
+		final Set<Object> intersectionKeys = getIntersection13Keys();
+		final List<Object> ret = getObjectsByKeys(intersectionKeys, true, false, true);
 		return ret;
 	}
 
@@ -224,8 +223,8 @@ public abstract class VennData {
 	}
 
 	public Collection<Object> getUniqueTo1() {
-		List<Object> uniqueTo1 = getUniqueTo1Keys();
-		return this.getObjectsByKeys(uniqueTo1, true, false, false);
+		final List<Object> uniqueTo1 = getUniqueTo1Keys();
+		return getObjectsByKeys(uniqueTo1, true, false, false);
 	}
 
 	private List<Object> getUniqueTo1Keys() {
@@ -244,8 +243,8 @@ public abstract class VennData {
 	}
 
 	public Collection<Object> getUniqueTo2() {
-		List<Object> uniqueTo2 = getUniqueTo2Keys();
-		return this.getObjectsByKeys(uniqueTo2, false, true, false);
+		final List<Object> uniqueTo2 = getUniqueTo2Keys();
+		return getObjectsByKeys(uniqueTo2, false, true, false);
 	}
 
 	private List<Object> getUniqueTo2Keys() {
@@ -264,8 +263,8 @@ public abstract class VennData {
 	}
 
 	public Collection<Object> getUniqueTo3() {
-		List<Object> uniqueTo3 = getUniqueTo3Keys();
-		return this.getObjectsByKeys(uniqueTo3, false, false, true);
+		final List<Object> uniqueTo3 = getUniqueTo3Keys();
+		return getObjectsByKeys(uniqueTo3, false, false, true);
 	}
 
 	private List<Object> getUniqueTo3Keys() {
@@ -287,9 +286,9 @@ public abstract class VennData {
 
 	private static List<Object> getUniqueToFirstSet(Collection<Object> hashToIsolate, Collection<Object> hash2,
 			Collection<Object> hash3) {
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 
-		List<Object> ret = new ArrayList<Object>();
+		final List<Object> ret = new ArrayList<Object>();
 		if (hashToIsolate == null) {
 			return ret;
 		}
@@ -299,10 +298,10 @@ public abstract class VennData {
 		}
 		log.debug("Unique to isolate size = " + hashToIsolate.size());
 		if (hashToIsolate != null) {
-			Iterator<Object> toIsolateIterator = hashToIsolate.iterator();
+			final Iterator<Object> toIsolateIterator = hashToIsolate.iterator();
 
 			while (toIsolateIterator.hasNext()) {
-				Object item = toIsolateIterator.next();
+				final Object item = toIsolateIterator.next();
 				if (hash2 != null && hash2.contains(item)) {
 					continue;
 				} else if (hash3 != null && hash3.contains(item)) {
@@ -318,8 +317,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getUnion123() {
-		Set<Object> unionKeys = getUnion123Keys();
-		List<Object> ret = getObjectsByKeys(unionKeys, true, true, true);
+		final Set<Object> unionKeys = getUnion123Keys();
+		final List<Object> ret = getObjectsByKeys(unionKeys, true, true, true);
 		return ret;
 	}
 
@@ -340,8 +339,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getUnion12() {
-		Set<Object> unionKeys = getUnion12Keys();
-		List<Object> ret = getObjectsByKeys(unionKeys, true, true, false);
+		final Set<Object> unionKeys = getUnion12Keys();
+		final List<Object> ret = getObjectsByKeys(unionKeys, true, true, false);
 		return ret;
 	}
 
@@ -363,8 +362,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getUnion13() {
-		Set<Object> unionKeys = getUnion13Keys();
-		List<Object> ret = getObjectsByKeys(unionKeys, true, false, true);
+		final Set<Object> unionKeys = getUnion13Keys();
+		final List<Object> ret = getObjectsByKeys(unionKeys, true, false, true);
 		return ret;
 	}
 
@@ -386,8 +385,8 @@ public abstract class VennData {
 	}
 
 	public List<Object> getUnion23() {
-		Set<Object> unionKeys = getUnion23Keys();
-		List<Object> ret = getObjectsByKeys(unionKeys, false, true, true);
+		final Set<Object> unionKeys = getUnion23Keys();
+		final List<Object> ret = getObjectsByKeys(unionKeys, false, true, true);
 		return ret;
 	}
 
@@ -411,19 +410,19 @@ public abstract class VennData {
 	private List<Object> getObjectsByKeys(Collection<Object> keys, boolean from1, boolean from2, boolean from3) {
 		processCollections();
 
-		List<Object> ret = new ArrayList<Object>();
+		final List<Object> ret = new ArrayList<Object>();
 
-		for (Object key : keys) {
-			if (from1 && this.hash1 != null && this.hash1.containsKey(key)) {
-				ret.addAll(this.hash1.get(key));
-
-			}
-			if (from2 && this.hash2 != null && this.hash2.containsKey(key)) {
-				ret.addAll(this.hash2.get(key));
+		for (final Object key : keys) {
+			if (from1 && hash1 != null && hash1.containsKey(key)) {
+				ret.addAll(hash1.get(key));
 
 			}
-			if (from3 && this.hash3 != null && this.hash3.containsKey(key)) {
-				ret.addAll(this.hash3.get(key));
+			if (from2 && hash2 != null && hash2.containsKey(key)) {
+				ret.addAll(hash2.get(key));
+
+			}
+			if (from3 && hash3 != null && hash3.containsKey(key)) {
+				ret.addAll(hash3.get(key));
 
 			}
 
@@ -464,8 +463,8 @@ public abstract class VennData {
 			longest2 = col3;
 		}
 
-		Set<Object> ret = new THashSet<Object>();
-		for (Object key : shortest) {
+		final Set<Object> ret = new THashSet<Object>();
+		for (final Object key : shortest) {
 			if (longest.contains(key) && longest2.contains(key)) {
 				ret.add(key);
 			}
@@ -480,7 +479,7 @@ public abstract class VennData {
 
 			return Collections.emptySet();
 		}
-		Set<Object> ret = new THashSet<Object>();
+		final Set<Object> ret = new THashSet<Object>();
 		// loop with the sortest
 		Collection<Object> shortest;
 		Collection<Object> longest;
@@ -491,7 +490,7 @@ public abstract class VennData {
 			shortest = col1;
 			longest = col2;
 		}
-		for (Object key : shortest) {
+		for (final Object key : shortest) {
 			if (longest.contains(key)) {
 				ret.add(key);
 			}
@@ -512,7 +511,7 @@ public abstract class VennData {
 
 		// Since the HashSet doesn't allow to add repeated elements, add all to
 		// the set
-		Set<Object> ret = new THashSet<Object>();
+		final Set<Object> ret = new THashSet<Object>();
 		if (list1 != null && list2 == null && list3 == null) {
 			return list1;
 		}
@@ -529,22 +528,22 @@ public abstract class VennData {
 	}
 
 	public Integer getSize1() {
-		if (this.col1 != null) {
-			return this.col1.size();
+		if (col1 != null) {
+			return col1.size();
 		}
 		return null;
 	}
 
 	public Integer getSize2() {
-		if (this.col2 != null) {
-			return this.col2.size();
+		if (col2 != null) {
+			return col2.size();
 		}
 		return null;
 	}
 
 	public Integer getSize3() {
-		if (this.col3 != null) {
-			return this.col3.size();
+		if (col3 != null) {
+			return col3.size();
 		}
 		return null;
 	}

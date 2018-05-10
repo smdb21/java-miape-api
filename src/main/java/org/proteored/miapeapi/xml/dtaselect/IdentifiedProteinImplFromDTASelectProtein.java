@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.dtaselect;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -16,6 +15,7 @@ import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.dtaselectparser.util.DTASelectProtein;
 import edu.scripps.yates.utilities.fasta.FastaParser;
 import edu.scripps.yates.utilities.util.Pair;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
 public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProtein {
@@ -24,7 +24,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	private Set<ProteinScore> proteinScores;
 	private List<IdentifiedPeptide> peptides;
 	private final ControlVocabularyManager cvManager;
-	public static final Map<String, IdentifiedPeptide> psmMapByPSMId = new HashMap<String, IdentifiedPeptide>();
+	public static final Map<String, IdentifiedPeptide> psmMapByPSMId = new THashMap<String, IdentifiedPeptide>();
 	private final static String EMPAI_VALUE = "emPAI value";
 	private static final String NSAF = "normalized spectral abundance factor";
 	private static final String NSAF_NORM = "NSAF_norm";

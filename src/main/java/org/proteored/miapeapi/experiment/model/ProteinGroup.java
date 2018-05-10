@@ -3,7 +3,6 @@ package org.proteored.miapeapi.experiment.model;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +19,7 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
@@ -37,40 +37,40 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	public ProteinGroup(ProteinEvidence e) {
 		super();
-		this.evidence = e;
+		evidence = e;
 	}
 
 	public ProteinGroup(ProteinGroupInference iProteinGroup) {
 		if (iProteinGroup == null)
 			throw new IllegalMiapeArgumentException("group is null");
 
-		for (InferenceProtein inferenceProtein : iProteinGroup) {
-			List<ExtendedIdentifiedProtein> proteinsMerged = inferenceProtein.getProteinsMerged();
-			for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
+		for (final InferenceProtein inferenceProtein : iProteinGroup) {
+			final List<ExtendedIdentifiedProtein> proteinsMerged = inferenceProtein.getProteinsMerged();
+			for (final ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
 				extendedIdentifiedProtein.setGroup(this);
 				extendedIdentifiedProtein.setEvidence(inferenceProtein.getEvidence());
 			}
 			this.addAll(proteinsMerged);
 		}
-		this.evidence = iProteinGroup.getEvidence();
+		evidence = iProteinGroup.getEvidence();
 
 	}
 
 	public String getKey() {
-		if (this.key != null)
-			return this.key;
+		if (key != null)
+			return key;
 		String ret = "";
 
-		List<String> accessions2 = this.getAccessions();
+		final List<String> accessions2 = getAccessions();
 
-		for (String accession : accessions2) {
+		for (final String accession : accessions2) {
 			if (!"".equals(ret)) {
 				ret = ret + ",";
 			}
 			ret = ret + accession;
 		}
 
-		this.key = ret + "[" + this.evidence.toString() + "]";
+		key = ret + "[" + evidence.toString() + "]";
 		return key;
 	}
 
@@ -80,39 +80,39 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	@Override
 	public String toString() {
-		return this.getKey();
+		return getKey();
 	}
 
 	public String getProteinSequence(boolean retrieveFromTheInternet, UniprotProteinLocalRetriever upr) {
-		if (this.selectedProteinSequence == null) {
+		if (selectedProteinSequence == null) {
 
 			// First look at local data
-			for (ExtendedIdentifiedProtein protein : this) {
+			for (final ExtendedIdentifiedProtein protein : this) {
 				if (protein.getProteinSequence() != null) {
-					this.selectedProteinSequence = protein.getProteinSequence();
-					return this.selectedProteinSequence;
+					selectedProteinSequence = protein.getProteinSequence();
+					return selectedProteinSequence;
 				}
 			}
 			// if there is not data look in the cache of the class
 			// ProteinRetrieval or at the Internet
-			for (ExtendedIdentifiedProtein protein : this) {
-				String proteinAcc = protein.getAccession();
+			for (final ExtendedIdentifiedProtein protein : this) {
+				final String proteinAcc = protein.getAccession();
 
-				this.selectedProteinSequence = ProteinSequenceRetrieval.getProteinSequence(proteinAcc,
+				selectedProteinSequence = ProteinSequenceRetrieval.getProteinSequence(proteinAcc,
 						retrieveFromTheInternet, upr);
-				if (this.selectedProteinSequence != null)
-					return this.selectedProteinSequence;
+				if (selectedProteinSequence != null)
+					return selectedProteinSequence;
 			}
 
 		}
-		return this.selectedProteinSequence;
+		return selectedProteinSequence;
 	}
 
 	public void dump(PrintStream stream) {
 		stream.println(evidence.toString());
-		for (ExtendedIdentifiedProtein prot : this) {
+		for (final ExtendedIdentifiedProtein prot : this) {
 			stream.print("\t" + prot.getAccession() + ": ");
-			for (ExtendedIdentifiedPeptide pept : prot.getPeptides())
+			for (final ExtendedIdentifiedPeptide pept : prot.getPeptides())
 				stream.print(pept.toString() + " ");
 			stream.println();
 		}
@@ -127,16 +127,16 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	public boolean shareAllProteins(Object object) {
 		if (object instanceof ProteinGroup) {
-			ProteinGroup pg2 = (ProteinGroup) object;
+			final ProteinGroup pg2 = (ProteinGroup) object;
 
-			if (this.getKey().equals(pg2.getKey())) {
+			if (getKey().equals(pg2.getKey())) {
 				// if (this.evidence == pg2.evidence)
 				return true;
 			}
 			return false;
 		} else if (object instanceof ProteinGroupOccurrence) {
-			ProteinGroupOccurrence pgo2 = (ProteinGroupOccurrence) object;
-			if (this.equals(pgo2.getFirstOccurrence()))
+			final ProteinGroupOccurrence pgo2 = (ProteinGroupOccurrence) object;
+			if (equals(pgo2.getFirstOccurrence()))
 				return true;
 			return false;
 		}
@@ -150,17 +150,17 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 */
 	public boolean shareOneProtein(Object object) {
 		if (object instanceof ProteinGroup) {
-			ProteinGroup pg2 = (ProteinGroup) object;
+			final ProteinGroup pg2 = (ProteinGroup) object;
 
 			// At least share one protein
-			for (String acc : this.getAccessions()) {
+			for (final String acc : getAccessions()) {
 				if (pg2.getAccessions().contains(acc))
 					return true;
 			}
 			return false;
 		} else if (object instanceof ProteinGroupOccurrence) {
-			ProteinGroupOccurrence pgo2 = (ProteinGroupOccurrence) object;
-			if (this.equals(pgo2.getFirstOccurrence()))
+			final ProteinGroupOccurrence pgo2 = (ProteinGroupOccurrence) object;
+			if (equals(pgo2.getFirstOccurrence()))
 				return true;
 			return false;
 		}
@@ -179,10 +179,10 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	public List<String> getAccessions() {
 
-		if (this.accessions != null)
-			return this.accessions;
-		this.accessions = new ArrayList<String>();
-		for (ExtendedIdentifiedProtein protein : this) {
+		if (accessions != null)
+			return accessions;
+		accessions = new ArrayList<String>();
+		for (final ExtendedIdentifiedProtein protein : this) {
 			if (!accessions.contains(protein.getAccession()))
 				accessions.add(protein.getAccession());
 		}
@@ -197,10 +197,10 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 * @return
 	 */
 	public String getAccessionsString() {
-		List<String> accList = getAccessions();
+		final List<String> accList = getAccessions();
 
 		String ret = "";
-		for (String accession : accList) {
+		for (final String accession : accList) {
 			if (!"".equals(ret))
 				ret = ret + ",";
 			ret = ret + accession;
@@ -211,13 +211,13 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	@Override
 	public void add(int index, ExtendedIdentifiedProtein element) {
-		this.accessions = null;
+		accessions = null;
 		super.add(index, element);
-		this.key = null;
+		key = null;
 	}
 
 	public ProteinEvidence getEvidence() {
-		return this.evidence;
+		return evidence;
 	}
 
 	public void setEvidence(ProteinEvidence evidence) {
@@ -231,8 +231,8 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 * @return
 	 */
 	public List<ProteinScore> getScores() {
-		List<ProteinScore> ret = new ArrayList<ProteinScore>();
-		for (ExtendedIdentifiedProtein protein : this) {
+		final List<ProteinScore> ret = new ArrayList<ProteinScore>();
+		for (final ExtendedIdentifiedProtein protein : this) {
 			ret.addAll(protein.getScores());
 		}
 		return ret;
@@ -245,12 +245,12 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 */
 	public List<ExtendedIdentifiedPeptide> getPeptides() {
 		// if (this.peptides == null || this.peptides.isEmpty()) {
-		List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
-		TIntHashSet peptideIds = new TIntHashSet();
-		for (ExtendedIdentifiedProtein protein : this) {
+		final List<ExtendedIdentifiedPeptide> ret = new ArrayList<ExtendedIdentifiedPeptide>();
+		final TIntHashSet peptideIds = new TIntHashSet();
+		for (final ExtendedIdentifiedProtein protein : this) {
 			final List<ExtendedIdentifiedPeptide> pepts = protein.getPeptides();
 			if (pepts != null)
-				for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : pepts) {
+				for (final ExtendedIdentifiedPeptide extendedIdentifiedPeptide : pepts) {
 					if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
 						peptideIds.add(extendedIdentifiedPeptide.getId());
 						ret.add(extendedIdentifiedPeptide);
@@ -270,7 +270,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 * @return
 	 */
 	public boolean isDecoyOLD(FDRFilter filter) {
-		for (ExtendedIdentifiedProtein protein : this) {
+		for (final ExtendedIdentifiedProtein protein : this) {
 			if (protein.isDecoy(filter))
 				return true;
 		}
@@ -284,7 +284,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	 * @return
 	 */
 	public boolean isDecoy(FDRFilter filter) {
-		for (ExtendedIdentifiedProtein protein : this) {
+		for (final ExtendedIdentifiedProtein protein : this) {
 			if (!protein.isDecoy(filter))
 				return false;
 		}
@@ -292,7 +292,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public boolean isDecoy() {
-		for (ExtendedIdentifiedProtein protein : this) {
+		for (final ExtendedIdentifiedProtein protein : this) {
 			if (!protein.isDecoy())
 				return false;
 		}
@@ -302,12 +302,12 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	@Override
 	public boolean add(ExtendedIdentifiedProtein e) {
-		this.key = null;
+		key = null;
 		return super.add(e);
 	}
 
 	public void setDecoy(boolean b) {
-		for (ExtendedIdentifiedProtein protein : this) {
+		for (final ExtendedIdentifiedProtein protein : this) {
 			protein.setDecoy(b, false);
 		}
 
@@ -316,17 +316,17 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	public void setDecoy(boolean b, boolean setProteins) {
 
 		if (setProteins)
-			for (ExtendedIdentifiedProtein protein : this) {
+			for (final ExtendedIdentifiedProtein protein : this) {
 				protein.setDecoy(b, false, false);
 			}
 
 	}
 
 	public List<String> getProteinScoreNames() {
-		List<String> ret = new ArrayList<String>();
-		for (ExtendedIdentifiedProtein protein : this) {
+		final List<String> ret = new ArrayList<String>();
+		for (final ExtendedIdentifiedProtein protein : this) {
 			if (protein.getScoreNames() != null) {
-				for (String scoreName : protein.getScoreNames()) {
+				for (final String scoreName : protein.getScoreNames()) {
 					if (!ret.contains(scoreName))
 						ret.add(scoreName);
 				}
@@ -336,14 +336,14 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public List<Float> getProteinScores(String scoreName) {
-		List<Float> ret = new ArrayList<Float>();
+		final List<Float> ret = new ArrayList<Float>();
 
-		final List<ProteinScore> scores = this.getScores();
-		for (ProteinScore proteinScore : scores) {
+		final List<ProteinScore> scores = getScores();
+		for (final ProteinScore proteinScore : scores) {
 			try {
 				if (proteinScore.getName().equals(scoreName))
 					ret.add(Float.valueOf(proteinScore.getValue()));
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 
 			}
 		}
@@ -364,22 +364,22 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 
 	private ExtendedIdentifiedProtein getBestProtein(String scoreName) {
 		SorterUtil.sortProteinsByProteinScore(this, scoreName, false);
-		return this.get(0);
+		return get(0);
 	}
 
 	public ExtendedIdentifiedProtein getBestProtein() {
 		SorterUtil.sortProteinsByBestProteinScore(this, false);
-		return this.get(0);
+		return get(0);
 	}
 
 	public ExtendedIdentifiedPeptide getBestPeptideByScore() {
-		if (this.bestPeptide != null)
-			return this.bestPeptide;
+		if (bestPeptide != null)
+			return bestPeptide;
 
-		List<ExtendedIdentifiedPeptide> peptides = this.getPeptides();
+		final List<ExtendedIdentifiedPeptide> peptides = getPeptides();
 		if (peptides != null && !peptides.isEmpty()) {
 			SorterUtil.sortPeptidesByBestPeptideScore(peptides, false);
-			this.bestPeptide = peptides.get(0);
+			bestPeptide = peptides.get(0);
 			return peptides.get(0);
 		}
 		return null;
@@ -387,7 +387,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public ExtendedIdentifiedPeptide getBestPeptideByScore(String scoreName) {
-		List<ExtendedIdentifiedPeptide> peptides = this.getPeptides();
+		final List<ExtendedIdentifiedPeptide> peptides = getPeptides();
 		if (peptides != null && !peptides.isEmpty()) {
 			SorterUtil.sortPeptidesByPeptideScore(peptides, scoreName, false);
 			return peptides.get(0);
@@ -397,7 +397,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public Float getBestPeptideScore() {
-		ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore();
+		final ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore();
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore();
 		}
@@ -405,7 +405,7 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public Float getBestPeptideScore(String scoreName) {
-		ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore(scoreName);
+		final ExtendedIdentifiedPeptide bestPeptideByScore = this.getBestPeptideByScore(scoreName);
 		if (bestPeptideByScore != null) {
 			return bestPeptideByScore.getScore(scoreName);
 		}
@@ -431,18 +431,18 @@ public class ProteinGroup extends ArrayList<ExtendedIdentifiedProtein> {
 	}
 
 	public Set<Database> getDatabases() {
-		Set<Database> ret = new HashSet<Database>();
-		for (ExtendedIdentifiedProtein protein : this) {
-			Set<Database> databases = protein.getDatabases();
+		final Set<Database> ret = new THashSet<Database>();
+		for (final ExtendedIdentifiedProtein protein : this) {
+			final Set<Database> databases = protein.getDatabases();
 			ret.addAll(databases);
 		}
 		return ret;
 	}
 
 	public Set<Software> getSoftwares() {
-		Set<Software> ret = new HashSet<Software>();
-		for (ExtendedIdentifiedProtein protein : this) {
-			Set<Software> softwares = protein.getSoftwares();
+		final Set<Software> ret = new THashSet<Software>();
+		for (final ExtendedIdentifiedProtein protein : this) {
+			final Set<Software> softwares = protein.getSoftwares();
 			ret.addAll(softwares);
 		}
 		return ret;

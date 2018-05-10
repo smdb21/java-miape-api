@@ -62,14 +62,14 @@ public class FDRFilter implements Filter {
 		if (threshold < 0 || threshold > 100)
 			throw new IllegalMiapeArgumentException("Threshold has to be a number between 0 and 100");
 		this.threshold = threshold;
-		this.decoyPrefix = prefix;
-		this.decoyRegExp = null;
-		this.identificationItem = item;
-		this.isConcatenatedDecoy = concatenatedDecoy;
+		decoyPrefix = prefix;
+		decoyRegExp = null;
+		identificationItem = item;
+		isConcatenatedDecoy = concatenatedDecoy;
 		if (IdentificationItemEnum.PEPTIDE.equals(item) || IdentificationItemEnum.PSM.equals(item))
-			this.appliedToPeptides = true;
+			appliedToPeptides = true;
 		else if (IdentificationItemEnum.PROTEIN.equals(item))
-			this.appliedToProteins = true;
+			appliedToProteins = true;
 
 		this.sortingParameters = sortingParameters;
 		this.replicateName = replicateName;
@@ -100,14 +100,14 @@ public class FDRFilter implements Filter {
 		if (threshold < 0 || threshold > 100)
 			throw new IllegalMiapeArgumentException("Threshold has to be a number between 0 and 100");
 		this.threshold = threshold;
-		this.decoyRegExp = pattern;
-		this.decoyPrefix = null;
-		this.isConcatenatedDecoy = concatenatedDecoy;
-		this.identificationItem = item;
+		decoyRegExp = pattern;
+		decoyPrefix = null;
+		isConcatenatedDecoy = concatenatedDecoy;
+		identificationItem = item;
 		if (IdentificationItemEnum.PEPTIDE.equals(item) || IdentificationItemEnum.PSM.equals(item))
-			this.appliedToPeptides = true;
+			appliedToPeptides = true;
 		else if (IdentificationItemEnum.PROTEIN.equals(item))
-			this.appliedToProteins = true;
+			appliedToProteins = true;
 		this.sortingParameters = sortingParameters;
 		this.experimentName = experimentName;
 		this.replicateName = replicateName;
@@ -135,7 +135,7 @@ public class FDRFilter implements Filter {
 	public boolean isDecoy(String acc) {
 		if (acc != null) {
 			if (decoyRegExp != null) {
-				Matcher m = decoyRegExp.matcher(acc);
+				final Matcher m = decoyRegExp.matcher(acc);
 				return m.find();
 			} else if (decoyPrefix != null) {
 				return acc.startsWith(decoyPrefix);
@@ -145,7 +145,7 @@ public class FDRFilter implements Filter {
 	}
 
 	// /**
-	// * Get an ordered HashMap of the proteins after filter them by an FDR
+	// * Get an ordered Map of the proteins after filter them by an FDR
 	// threshold
 	// *
 	// * @param sortedProteinHash
@@ -223,16 +223,16 @@ public class FDRFilter implements Filter {
 		if (currentIdSet != null)
 			cvManager = currentIdSet.getCvManager();
 		if (appliedToPeptides) {
-			if (this.identificationItem.equals(IdentificationItemEnum.PEPTIDE)) {
-				List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
+			if (identificationItem.equals(IdentificationItemEnum.PEPTIDE)) {
+				final List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 						.getPeptidesFromProteinGroups(proteinGroups);
-				TIntHashSet filteredPeptideIDs = filterPeptides(identifiedPeptides);
+				final TIntHashSet filteredPeptideIDs = filterPeptides(identifiedPeptides);
 				return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 						separateNonConclusiveProteins, filteredPeptideIDs, cvManager);
-			} else if (this.identificationItem.equals(IdentificationItemEnum.PSM)) {
-				List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
+			} else if (identificationItem.equals(IdentificationItemEnum.PSM)) {
+				final List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
 						.getPeptidesFromProteinGroups(proteinGroups);
-				TIntHashSet filteredPeptideIDs = filterPSMs(identifiedPeptides);
+				final TIntHashSet filteredPeptideIDs = filterPSMs(identifiedPeptides);
 				return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 						separateNonConclusiveProteins, filteredPeptideIDs, cvManager);
 			}
@@ -240,28 +240,28 @@ public class FDRFilter implements Filter {
 		} else if (appliedToProteins) {
 
 			log.info("sorting " + proteinGroups.size() + " protein  groups by peptide score before to apply FDR");
-			Collection<ProteinGroupOccurrence> proteinGroupOccurrencesSet = DataManager
+			final Collection<ProteinGroupOccurrence> proteinGroupOccurrencesSet = DataManager
 					.createProteinGroupOccurrenceList(proteinGroups).values();
-			List<ProteinGroupOccurrence> proteinGroupOccurrences = new ArrayList<ProteinGroupOccurrence>();
-			for (ProteinGroupOccurrence proteinGroupOccurrence : proteinGroupOccurrencesSet) {
+			final List<ProteinGroupOccurrence> proteinGroupOccurrences = new ArrayList<ProteinGroupOccurrence>();
+			for (final ProteinGroupOccurrence proteinGroupOccurrence : proteinGroupOccurrencesSet) {
 				proteinGroupOccurrences.add(proteinGroupOccurrence);
 			}
 			SorterUtil.sortProteinGroupOcurrencesByPeptideScore(proteinGroupOccurrences,
-					this.sortingParameters.getScoreName());
+					sortingParameters.getScoreName());
 
 			long numFWHits = 0; // forward hits
 			long numDCHits = 0; // decoy hits
 
 			// List<ProteinGroup> proteinGroupsList = new
 			// ArrayList<ProteinGroup>();
-			TIntHashSet peptidesToIncludeAfterFilter = new TIntHashSet();
+			final TIntHashSet peptidesToIncludeAfterFilter = new TIntHashSet();
 
 			Float bestPeptideScore = null;
 			Float currentFDR = null;
 			// - 4: for each peptide, look to its protein and count if it is
 			// decoy or not. Ignore it if already has been seen
-			for (ProteinGroupOccurrence proteinGroupOccurrence : proteinGroupOccurrences) {
-				bestPeptideScore = proteinGroupOccurrence.getBestPeptideScore(this.sortingParameters.getScoreName());
+			for (final ProteinGroupOccurrence proteinGroupOccurrence : proteinGroupOccurrences) {
+				bestPeptideScore = proteinGroupOccurrence.getBestPeptideScore(sortingParameters.getScoreName());
 				if (bestPeptideScore != null) {
 					// if (!proteinGroupsList.contains(proteinGroup)) {
 					// proteinGroupsList.add(proteinGroup);
@@ -293,9 +293,9 @@ public class FDRFilter implements Filter {
 						// this.sortingParameters.getScoreName())
 						// .getSequence() + " - "
 						// + bestPeptideScore);
-						if (currentFDR > this.threshold) {
+						if (currentFDR > threshold) {
 							log.info("Threshold reached (FW=" + numFWHits + ", DC=" + numDCHits + ") -> (protein FDR="
-									+ currentFDR + " > " + this.threshold + ") " + proteinGroupOccurrence + " -> "
+									+ currentFDR + " > " + threshold + ") " + proteinGroupOccurrence + " -> "
 									+ bestPeptideScore);
 							log.info("This is new!!! (25Oct12)");
 							log.info("Now filtering peptides in these proteins by peptide score=" + bestPeptideScore);
@@ -310,7 +310,7 @@ public class FDRFilter implements Filter {
 
 			}
 			// In case of no threshold has been reached
-			if (currentFDR <= this.threshold) {
+			if (currentFDR <= threshold) {
 				log.info("No threshold has been reached. " + proteinGroups.size() + " proteins pass it");
 				// Include all peptides
 				peptidesToIncludeAfterFilter.clear();
@@ -358,7 +358,7 @@ public class FDRFilter implements Filter {
 	// SorterUtil
 	// .sortPeptideOcurrencesByBestPeptideScore(peptideOccurrenceList);
 	// int i = 1;
-	// HashSet<String> proteinAccs = new THashSet<String>();
+	// Set<String> proteinAccs = new THashSet<String>();
 	// double thresholdScore = Double.MIN_VALUE;
 	//
 	// for (PeptideOccurrence peptideOccurrence : peptideOccurrenceList) {
@@ -426,12 +426,12 @@ public class FDRFilter implements Filter {
 	 */
 	private TIntHashSet getPeptidesIdentifiersThatPassScoreThreshold(Float thresholdScore,
 			List<ExtendedIdentifiedPeptide> identifiedPeptides) {
-		TIntHashSet ret = new TIntHashSet();
-		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+		final TIntHashSet ret = new TIntHashSet();
+		for (final ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 			if (thresholdScore != null) {
-				Float score = peptide.getScore(this.sortingParameters.getScoreName());
+				final Float score = peptide.getScore(sortingParameters.getScoreName());
 				if (score != null) {
-					if (this.getSortingParameters().getOrder().equals(Order.ASCENDANT)) {
+					if (getSortingParameters().getOrder().equals(Order.ASCENDANT)) {
 						if (score <= thresholdScore)
 							ret.add(peptide.getId());
 					} else {
@@ -459,12 +459,12 @@ public class FDRFilter implements Filter {
 	 */
 	private TIntHashSet getPeptideIdsThatPassScoreThreshold(List<ProteinGroup> proteinGroups, Float thresholdScore,
 			SortingParameters sortingParameters) {
-		TIntHashSet ret = new TIntHashSet();
+		final TIntHashSet ret = new TIntHashSet();
 
-		for (ProteinGroup proteinGroup : proteinGroups) {
+		for (final ProteinGroup proteinGroup : proteinGroups) {
 			final List<ExtendedIdentifiedPeptide> peptides = proteinGroup.getPeptides();
 			if (peptides != null) {
-				for (ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
+				for (final ExtendedIdentifiedPeptide extendedIdentifiedPeptide : peptides) {
 					if (sortingParameters == null || thresholdScore == null) {
 						ret.add(extendedIdentifiedPeptide.getId());
 					} else {
@@ -548,7 +548,7 @@ public class FDRFilter implements Filter {
 	// }
 
 	public float calculateFDR(long numFWHits, long numDCHits) {
-		float ret = (float) (numDCHits * 100.0 / (numFWHits + numDCHits));
+		final float ret = (float) (numDCHits * 100.0 / (numFWHits + numDCHits));
 		if (isConcatenatedDecoy)
 			return 2 * ret;
 		else
@@ -557,40 +557,40 @@ public class FDRFilter implements Filter {
 
 	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides) {
 
-		log.info("filtering " + identifiedPeptides.size() + " peptides by FDR <= " + this.threshold);
+		log.info("filtering " + identifiedPeptides.size() + " peptides by FDR <= " + threshold);
 		long numFWHits = 0; // forward hits
 		long numDCHits = 0; // decoy hits
 		long numPSMFWHits = 0; // forward hits for PSMs
 		long numPSMDCHits = 0; // decoy hits for PSMs
 
 		// create peptide occurrence in order to avoid PSM redundancy
-		Collection<PeptideOccurrence> peptideOccurrenceCollection = DataManager
+		final Collection<PeptideOccurrence> peptideOccurrenceCollection = DataManager
 				.createPeptideOccurrenceListInParallel(identifiedPeptides, false).values();
-		List<PeptideOccurrence> peptideOccurrenceList = new ArrayList<PeptideOccurrence>();
-		for (PeptideOccurrence identificationOccurrence : peptideOccurrenceCollection) {
+		final List<PeptideOccurrence> peptideOccurrenceList = new ArrayList<PeptideOccurrence>();
+		for (final PeptideOccurrence identificationOccurrence : peptideOccurrenceCollection) {
 			peptideOccurrenceList.add(identificationOccurrence);
 		}
 		// Sort peptide occurrences by score
 		log.info("sorting " + peptideOccurrenceList.size() + " peptide occurrences before to apply FDR");
 
-		SorterUtil.sortPeptideOcurrencesByPeptideScore(peptideOccurrenceList, this.sortingParameters.getScoreName());
-		int i = 1;
-		for (PeptideOccurrence peptideOccurrence : peptideOccurrenceList) {
-			List<ExtendedIdentifiedPeptide> peptides = peptideOccurrence.getPeptides();
-			SorterUtil.sortPeptidesByPeptideScore(peptides, this.sortingParameters.getScoreName(), false);
-			for (ExtendedIdentifiedPeptide peptide : peptides) {
+		SorterUtil.sortPeptideOcurrencesByPeptideScore(peptideOccurrenceList, sortingParameters.getScoreName());
+		final int i = 1;
+		for (final PeptideOccurrence peptideOccurrence : peptideOccurrenceList) {
+			final List<ExtendedIdentifiedPeptide> peptides = peptideOccurrence.getPeptides();
+			SorterUtil.sortPeptidesByPeptideScore(peptides, sortingParameters.getScoreName(), false);
+			for (final ExtendedIdentifiedPeptide peptide : peptides) {
 				if (peptide != null && peptide.isDecoy(this)) {
 					numPSMDCHits++;
 				} else {
 					numPSMFWHits++;
 				}
-				float currentPSMFDR = calculateFDR(numPSMFWHits, numPSMDCHits);
+				final float currentPSMFDR = calculateFDR(numPSMFWHits, numPSMDCHits);
 				peptide.setPSMLocalFDR(currentPSMFDR);
 			}
 
 			peptideOccurrence.setFDRFilter(this);
 			final ExtendedIdentifiedPeptide bestPeptide = peptideOccurrence
-					.getBestPeptide(this.sortingParameters.getScoreName());
+					.getBestPeptide(sortingParameters.getScoreName());
 
 			// String accession =
 			// peptide.getIdentifiedProteins().get(0).getAccession();
@@ -601,7 +601,7 @@ public class FDRFilter implements Filter {
 				numFWHits++;
 				peptideOccurrence.setDecoy(false);
 			}
-			float currentFDR = calculateFDR(numFWHits, numDCHits);
+			final float currentFDR = calculateFDR(numFWHits, numDCHits);
 			peptideOccurrence.setPeptideLocalFDR(currentFDR);
 
 			// System.out.println(i++
@@ -612,12 +612,12 @@ public class FDRFilter implements Filter {
 			// + peptideOccurrence.getKey());
 
 			// log.info("Current FDR = " + currentFDR);
-			if (currentFDR > this.threshold) {
-				Float bestPeptideScore = peptideOccurrence.getBestPeptideScore(this.sortingParameters.getScoreName());
+			if (currentFDR > threshold) {
+				final Float bestPeptideScore = peptideOccurrence.getBestPeptideScore(sortingParameters.getScoreName());
 
-				TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(
+				final TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(
 						bestPeptideScore, identifiedPeptides);
-				log.info("Threshold reached (peptide FDR=" + currentFDR + " > " + this.threshold + ") "
+				log.info("Threshold reached (peptide FDR=" + currentFDR + " > " + threshold + ") "
 						+ peptidesIdentifiersThatPassScoreThreshold.size() + " peptides pass threshold. NumFW:"
 						+ numFWHits + " numDC:" + numDCHits + " Score=" + bestPeptideScore);
 				return peptidesIdentifiersThatPassScoreThreshold;
@@ -626,7 +626,7 @@ public class FDRFilter implements Filter {
 
 		}
 
-		TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(null,
+		final TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(null,
 				identifiedPeptides);
 		log.info("No threshold has been reached. " + peptidesIdentifiersThatPassScoreThreshold.size()
 				+ " peptides pass it");
@@ -636,13 +636,13 @@ public class FDRFilter implements Filter {
 
 	private TIntHashSet filterPSMs(List<ExtendedIdentifiedPeptide> identifiedPeptides) {
 
-		log.info("filtering " + identifiedPeptides.size() + " PSMs by FDR <= " + this.threshold);
+		log.info("filtering " + identifiedPeptides.size() + " PSMs by FDR <= " + threshold);
 		long numFWHits = 0; // forward hits
 		long numDCHits = 0; // decoy hits
 
-		SorterUtil.sortPeptidesByPeptideScore(identifiedPeptides, this.sortingParameters.getScoreName(), true);
+		SorterUtil.sortPeptidesByPeptideScore(identifiedPeptides, sortingParameters.getScoreName(), true);
 		int i = 0;
-		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+		for (final ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 			peptide.setFDRFilter(this);
 			i++;
 			// String accession =
@@ -654,7 +654,7 @@ public class FDRFilter implements Filter {
 				numFWHits++;
 				peptide.setDecoy(false);
 			}
-			float currentFDR = calculateFDR(numFWHits, numDCHits);
+			final float currentFDR = calculateFDR(numFWHits, numDCHits);
 			peptide.setPSMLocalFDR(currentFDR);
 
 			// System.out.println(i++
@@ -665,12 +665,12 @@ public class FDRFilter implements Filter {
 			// + peptideOccurrence.getKey());
 
 			// log.info("Current FDR = " + currentFDR);
-			if (currentFDR > this.threshold) {
-				Float peptideScore = peptide.getScore(this.sortingParameters.getScoreName());
+			if (currentFDR > threshold) {
+				final Float peptideScore = peptide.getScore(sortingParameters.getScoreName());
 
-				TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(
+				final TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(
 						peptideScore, identifiedPeptides);
-				log.info("Threshold reached (peptide FDR=" + currentFDR + " > " + this.threshold + ") "
+				log.info("Threshold reached (peptide FDR=" + currentFDR + " > " + threshold + ") "
 						+ peptidesIdentifiersThatPassScoreThreshold.size() + " peptides pass threshold. NumFW:"
 						+ numFWHits + " numDC:" + numDCHits + " Score=" + peptideScore);
 				return peptidesIdentifiersThatPassScoreThreshold;
@@ -679,7 +679,7 @@ public class FDRFilter implements Filter {
 
 		}
 
-		TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(null,
+		final TIntHashSet peptidesIdentifiersThatPassScoreThreshold = getPeptidesIdentifiersThatPassScoreThreshold(null,
 				identifiedPeptides);
 		log.info("No threshold has been reached. " + peptidesIdentifiersThatPassScoreThreshold.size()
 				+ " peptides pass it");
@@ -763,7 +763,7 @@ public class FDRFilter implements Filter {
 	public boolean isDecoy(List<IdentifiedProtein> identifiedProteins) {
 		if (identifiedProteins == null)
 			return true;
-		for (IdentifiedProtein identifiedProtein : identifiedProteins) {
+		for (final IdentifiedProtein identifiedProtein : identifiedProteins) {
 			if (isDecoy(identifiedProtein.getAccession()))
 				return true;
 		}
@@ -773,7 +773,7 @@ public class FDRFilter implements Filter {
 	public boolean isDecoyExtendedProteins(List<ExtendedIdentifiedProtein> identifiedProteins) {
 		if (identifiedProteins == null)
 			return true;
-		for (ExtendedIdentifiedProtein identifiedProtein : identifiedProteins) {
+		for (final ExtendedIdentifiedProtein identifiedProtein : identifiedProteins) {
 			if (isDecoy(identifiedProtein.getAccession()))
 				return true;
 		}
@@ -789,32 +789,32 @@ public class FDRFilter implements Filter {
 	public boolean equals(Object paramObject) {
 		if (paramObject != null)
 			if (paramObject instanceof FDRFilter) {
-				FDRFilter filter = (FDRFilter) paramObject;
-				if (filter.isConcatenatedDecoy != this.isConcatenatedDecoy)
+				final FDRFilter filter = (FDRFilter) paramObject;
+				if (filter.isConcatenatedDecoy != isConcatenatedDecoy)
 					return false;
 				if (filter.decoyPrefix != null) {
-					if (!filter.decoyPrefix.equals(this.decoyPrefix))
+					if (!filter.decoyPrefix.equals(decoyPrefix))
 						return false;
 				} else {
-					if (this.decoyPrefix != null)
+					if (decoyPrefix != null)
 						return false;
 				}
 				if (filter.decoyRegExp != null) {
-					if (!filter.decoyRegExp.pattern().equals(this.decoyRegExp.pattern()))
+					if (!filter.decoyRegExp.pattern().equals(decoyRegExp.pattern()))
 						return false;
 				} else {
-					if (this.decoyRegExp != null)
+					if (decoyRegExp != null)
 						return false;
 				}
-				if (filter.threshold != this.threshold)
+				if (filter.threshold != threshold)
 					return false;
-				if (!filter.sortingParameters.equals(this.sortingParameters))
+				if (!filter.sortingParameters.equals(sortingParameters))
 					return false;
-				if (filter.appliedToPeptides && !this.appliedToPeptides)
+				if (filter.appliedToPeptides && !appliedToPeptides)
 					return false;
-				if (filter.appliedToProteins && !this.appliedToProteins)
+				if (filter.appliedToProteins && !appliedToProteins)
 					return false;
-				if (filter.identificationItem != this.identificationItem)
+				if (filter.identificationItem != identificationItem)
 					return false;
 				return true;
 			}
@@ -823,38 +823,38 @@ public class FDRFilter implements Filter {
 
 	@Override
 	public boolean appliedToProteins() {
-		return this.appliedToProteins;
+		return appliedToProteins;
 	}
 
 	@Override
 	public boolean appliedToPeptides() {
-		return this.appliedToPeptides;
+		return appliedToPeptides;
 	}
 
 	public String getReplicateName() {
-		return this.replicateName;
+		return replicateName;
 	}
 
 	public String getExperimentName() {
-		return this.experimentName;
+		return experimentName;
 	}
 
 	@Override
 	public String toString() {
 		String level;
-		if (this.appliedToPeptides) {
-			if (IdentificationItemEnum.PSM.equals(this.identificationItem))
+		if (appliedToPeptides) {
+			if (IdentificationItemEnum.PSM.equals(identificationItem))
 				level = "PSM level";
 			else
 				level = "peptide level";
 		} else
 			level = "protein level";
-		String ret = "FDR at " + this.threshold + "% at " + level;
+		String ret = "FDR at " + threshold + "% at " + level;
 		// if (this.experimentName!=null)
 		// ret += " in '"+experimentName + "'";
-		if (this.replicateName != null)
+		if (replicateName != null)
 			ret += " in '" + replicateName + "'";
-		ret += " (" + this.sortingParameters.getScoreName() + ")";
+		ret += " (" + sortingParameters.getScoreName() + ")";
 		return ret;
 	}
 

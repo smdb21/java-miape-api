@@ -1,6 +1,5 @@
 package org.proteored.miapeapi.util;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 
 import edu.scripps.yates.utilities.progresscounter.ProgressCounter;
 import edu.scripps.yates.utilities.progresscounter.ProgressPrintingType;
+import gnu.trove.set.hash.THashSet;
 
 public class ProteinPeptideConsistencyChecker {
 	private static final Logger log = Logger.getLogger(ProteinPeptideConsistencyChecker.class);
@@ -25,18 +25,18 @@ public class ProteinPeptideConsistencyChecker {
 		if (peptides != null && !peptides.isEmpty()) {
 			// store them in a set, which is going to be much faster to check
 			// whether a peptide is in there or not
-			Set<IdentifiedPeptide> peptideSet = new HashSet<IdentifiedPeptide>();
+			final Set<IdentifiedPeptide> peptideSet = new THashSet<IdentifiedPeptide>();
 			peptideSet.addAll(peptides);
 			final Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSI.getIdentifiedProteinSets();
 			if (identifiedProteinSets != null) {
-				for (IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
+				for (final IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
 					final Map<String, IdentifiedProtein> proteinMap = identifiedProteinSet.getIdentifiedProteins();
 					if (proteinMap == null || proteinMap.isEmpty()) {
 						throw new MiapeDataInconsistencyException("Error, proteinSet is empty or null");
 					}
-					ProgressCounter counter = new ProgressCounter(proteinMap.size(),
+					final ProgressCounter counter = new ProgressCounter(proteinMap.size(),
 							ProgressPrintingType.PERCENTAGE_STEPS, 0);
-					for (String acc : proteinMap.keySet()) {
+					for (final String acc : proteinMap.keySet()) {
 						counter.increment();
 						final String printIfNecessary = counter.printIfNecessary();
 						if (!"".equals(printIfNecessary)) {
@@ -45,7 +45,7 @@ public class ProteinPeptideConsistencyChecker {
 						final IdentifiedProtein protein = proteinMap.get(acc);
 						try {
 							checkProtein(protein, peptideSet);
-						} catch (MiapeDataInconsistencyException e) {
+						} catch (final MiapeDataInconsistencyException e) {
 							e.printStackTrace();
 							log.error(e.getMessage());
 							throw e;
@@ -53,8 +53,9 @@ public class ProteinPeptideConsistencyChecker {
 					}
 				}
 			}
-			ProgressCounter counter = new ProgressCounter(peptides.size(), ProgressPrintingType.PERCENTAGE_STEPS, 0);
-			for (IdentifiedPeptide peptide : peptides) {
+			final ProgressCounter counter = new ProgressCounter(peptides.size(), ProgressPrintingType.PERCENTAGE_STEPS,
+					0);
+			for (final IdentifiedPeptide peptide : peptides) {
 				counter.increment();
 				final String printIfNecessary = counter.printIfNecessary();
 				if (!"".equals(printIfNecessary)) {
@@ -62,7 +63,7 @@ public class ProteinPeptideConsistencyChecker {
 				}
 				try {
 					checkPeptide(peptide);
-				} catch (MiapeDataInconsistencyException e) {
+				} catch (final MiapeDataInconsistencyException e) {
 					e.printStackTrace();
 					log.error(e.getMessage());
 					throw e;
@@ -76,7 +77,7 @@ public class ProteinPeptideConsistencyChecker {
 		// check that its proteins have the peptide on them
 		final List<IdentifiedProtein> identifiedProteins = peptide.getIdentifiedProteins();
 		if (identifiedProteins != null && !identifiedProteins.isEmpty()) {
-			for (IdentifiedProtein protein : identifiedProteins) {
+			for (final IdentifiedProtein protein : identifiedProteins) {
 				if (!protein.getIdentifiedPeptides().contains(peptide)) {
 					throw new MiapeDataInconsistencyException(
 							getProteinInfo(protein) + " has not " + getPeptideInfo(peptide) + " assigned");
@@ -90,7 +91,7 @@ public class ProteinPeptideConsistencyChecker {
 	private static void checkProtein(IdentifiedProtein protein, Set<IdentifiedPeptide> totalPeptides) {
 		final List<IdentifiedPeptide> peptides = protein.getIdentifiedPeptides();
 		if (peptides != null && !peptides.isEmpty()) {
-			for (IdentifiedPeptide peptide : peptides) {
+			for (final IdentifiedPeptide peptide : peptides) {
 				// check that the peptide has this protein in his list
 				if (!peptide.getIdentifiedProteins().contains(protein)) {
 					throw new MiapeDataInconsistencyException(

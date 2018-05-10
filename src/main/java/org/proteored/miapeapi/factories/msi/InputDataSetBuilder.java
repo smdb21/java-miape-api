@@ -1,10 +1,11 @@
 package org.proteored.miapeapi.factories.msi;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.InputData;
 import org.proteored.miapeapi.interfaces.msi.InputDataSet;
+
+import gnu.trove.set.hash.THashSet;
 
 public class InputDataSetBuilder {
 
@@ -17,12 +18,12 @@ public class InputDataSetBuilder {
 	}
 
 	public InputDataSetBuilder id(int value) {
-		this.id = value;
+		id = value;
 		return this;
 	}
 
 	public InputDataSetBuilder inputDatas(Set<InputData> value) {
-		this.inputDatas = value;
+		inputDatas = value;
 		return this;
 	}
 
@@ -34,10 +35,10 @@ public class InputDataSetBuilder {
 		if (inputData == null) {
 			return this;
 		}
-		if (this.inputDatas == null) {
-			this.inputDatas = new HashSet<InputData>();
+		if (inputDatas == null) {
+			inputDatas = new THashSet<InputData>();
 		}
-		this.inputDatas.add(inputData);
+		inputDatas.add(inputData);
 		return this;
 	}
 
