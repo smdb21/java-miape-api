@@ -33,6 +33,7 @@ import com.compomics.util.experiment.biology.Atom;
 
 import edu.scripps.yates.utilities.staticstorage.StaticStrings;
 import edu.scripps.yates.utilities.strings.StringUtils;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
@@ -770,7 +771,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		int ret = 0;
 		final String sequence = getSequence().substring(0, getSequence().length() - 1);
 		for (int i = 0; i < cleavageAminoacids.length(); i++) {
-			final List<Integer> allPositionsOf = StringUtils.allPositionsOf(sequence, cleavageAminoacids.charAt(i));
+			final TIntArrayList allPositionsOf = StringUtils.allPositionsOf(sequence, cleavageAminoacids.charAt(i));
 			ret += allPositionsOf.size();
 		}
 		return ret;
