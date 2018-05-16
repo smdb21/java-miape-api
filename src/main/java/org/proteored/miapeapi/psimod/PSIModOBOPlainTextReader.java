@@ -11,7 +11,7 @@ public class PSIModOBOPlainTextReader {
 	private static PSIModOBOPlainTextReader instance;
 	private static final String fileName = "PSI-MOD.obo";
 
-	public PSIModOBOPlainTextReader() throws IOException {
+	private PSIModOBOPlainTextReader() throws IOException {
 		psiOBOFile = new File(getClass().getResource(fileName).getFile());
 		index();
 	}
