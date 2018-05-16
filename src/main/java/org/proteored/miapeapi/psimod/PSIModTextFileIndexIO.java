@@ -9,6 +9,13 @@ import gnu.trove.set.hash.THashSet;
 
 public class PSIModTextFileIndexIO extends TextFileIndexIO {
 
+	/**
+	 * Creates a {@link TextFileIndexIO} with begin token as '[Term]' and end
+	 * token as empty string ''
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
 	public PSIModTextFileIndexIO(File file) throws IOException {
 		super(file, "[Term]", "");
 	}
