@@ -3,17 +3,16 @@ package org.proteored.miapeapi.psimod;
 import java.io.File;
 import java.io.IOException;
 
-import org.springframework.core.io.ClassPathResource;
-
 import edu.scripps.yates.utilities.index.TextFileIndex;
 
 public class PSIModOBOPlainTextReader {
 	private final File psiOBOFile;
 	private TextFileIndex index;
 	private static PSIModOBOPlainTextReader instance;
+	private static final String fileName = "PSI-MOD.obo";
 
 	public PSIModOBOPlainTextReader() throws IOException {
-		psiOBOFile = new ClassPathResource("PSI-MOD.obo").getFile();
+		psiOBOFile = new File(getClass().getResource(fileName).getFile());
 		index();
 	}
 
