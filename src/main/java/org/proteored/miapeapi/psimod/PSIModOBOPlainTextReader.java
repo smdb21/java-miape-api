@@ -1,7 +1,12 @@
 package org.proteored.miapeapi.psimod;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.springframework.core.io.ClassPathResource;
 
 import edu.scripps.yates.utilities.index.TextFileIndex;
 
@@ -12,7 +17,11 @@ public class PSIModOBOPlainTextReader {
 	private static final String fileName = "PSI-MOD.obo";
 
 	private PSIModOBOPlainTextReader() throws IOException {
-		psiOBOFile = new File(getClass().getResource(fileName).getFile());
+		final File tempFile = File.createTempFile(fileName, "tmp");
+		tempFile.deleteOnExit();
+		final OutputStream outputStream = new FileOutputStream(tempFile);
+		IOUtils.copy(new ClassPathResource(fileName).getInputStream(), outputStream);
+		psiOBOFile = tempFile;
 		index();
 	}
 
