@@ -85,7 +85,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (tsvFile == null) {
 			throw new IllegalArgumentException("TSV file cannot be null");
 		}
-		this.owner = null;
+		owner = null;
 		this.cvManager = cvManager;
 		this.projectName = projectName;
 		this.idSetName = idSetName;
@@ -116,7 +116,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (file.exists()) {
 			try {
 				fileURL = file.toURI().toURL().toString();
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 			}
 		}
 		url = fileURL;
@@ -135,7 +135,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	private MiapeMSIDocument getMiapeMSIDocument() {
 		if (miapeMSI == null) {
-			MiapeMSIDocumentBuilder processFile = processFile();
+			final MiapeMSIDocumentBuilder processFile = processFile();
 			if (processFile != null) {
 				miapeMSI = processFile.build();
 			}
@@ -270,14 +270,14 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		BufferedReader dis = null;
 		try {
 
-			Map<TableTextFileColumn, Integer> indexesByHeaders = new THashMap<TableTextFileColumn, Integer>();
-			Map<String, Integer> indexesByScoreNames = new THashMap<String, Integer>();
+			final Map<TableTextFileColumn, Integer> indexesByHeaders = new THashMap<TableTextFileColumn, Integer>();
+			final Map<String, Integer> indexesByScoreNames = new THashMap<String, Integer>();
 
 			dis = new BufferedReader(new FileReader(tsvFile));
 			String line = "";
 			log.info("Parsing file TSV " + tsvFile.getAbsolutePath());
-			Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
-			Map<String, IdentifiedPeptide> peptides = new THashMap<String, IdentifiedPeptide>();
+			final Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
+			final Map<String, IdentifiedPeptide> peptides = new THashMap<String, IdentifiedPeptide>();
 			String previousProteinACC = null;
 			// String scoreName = null;
 			while ((line = dis.readLine()) != null) {
@@ -297,19 +297,19 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 					if (indexesByHeaders.isEmpty()) {
 						parseHeader(split, indexesByHeaders, indexesByScoreNames);
 						if (!indexesByHeaders.containsKey(TableTextFileColumn.ACC)) {
-							String message = "ACC column for protein accessions is missing in input file '"
+							final String message = "ACC column for protein accessions is missing in input file '"
 									+ tsvFile.getAbsolutePath() + "'";
 
 							throw new IllegalArgumentException(message);
 						}
 						if (!indexesByHeaders.containsKey(TableTextFileColumn.SEQ)) {
-							String message = "SEQ column for peptide sequences is missing in input file '"
+							final String message = "SEQ column for peptide sequences is missing in input file '"
 									+ tsvFile.getAbsolutePath() + "'";
 
 							throw new IllegalArgumentException(message);
 						}
 					} else {
-						int accIndex = indexesByHeaders.get(TableTextFileColumn.ACC);
+						final int accIndex = indexesByHeaders.get(TableTextFileColumn.ACC);
 						String preliminarProteinAcc = split[accIndex].trim();
 						if ("".equals(preliminarProteinAcc)) {
 							preliminarProteinAcc = previousProteinACC;
@@ -320,9 +320,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						previousProteinACC = preliminarProteinAcc;
 
 						// PEPTIDE SEQUENCE
-						int seqIndex = indexesByHeaders.get(TableTextFileColumn.SEQ);
-						String rawSeq = split[seqIndex].trim();
-						String seq = FastaParser.cleanSequence(rawSeq);
+						final int seqIndex = indexesByHeaders.get(TableTextFileColumn.SEQ);
+						final String rawSeq = split[seqIndex].trim();
+						final String seq = FastaParser.cleanSequence(rawSeq);
 						// seq = parseSequence(seq);
 
 						// PSMID
@@ -336,11 +336,20 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 							peptide = new IdentifiedPeptideImplFromTSV(seq);
 							peptides.put(psmID, peptide);
 							if (FastaParser.somethingExtrangeInSequence(rawSeq)) {
-								TIntDoubleHashMap pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
-								for (int position : pTMsByPosition.keys()) {
-									String aa = String.valueOf(peptide.getSequence().charAt(position - 1));
-									double deltaMass = pTMsByPosition.get(position);
-									PeptideModificationBuilder ptmBuilder = MiapeMSIDocumentFactory
+								final TIntDoubleHashMap pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
+								for (final int position : pTMsByPosition.keys()) {
+									String aa = null;
+									if (position == 0) {
+										// N-terminal
+										aa = "N-term";
+									} else if (position == peptide.getSequence().length() + 1) {
+										// C-terminal
+										aa = "C-term";
+									} else {
+										aa = String.valueOf(peptide.getSequence().charAt(position - 1));
+									}
+									final double deltaMass = pTMsByPosition.get(position);
+									final PeptideModificationBuilder ptmBuilder = MiapeMSIDocumentFactory
 											.createPeptideModificationBuilder(
 													getModificationNameFromResidueAndMass(aa, deltaMass))
 											.monoDelta(deltaMass).position(position).residues(aa);
@@ -357,7 +366,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						if (indexesByHeaders.containsKey(TableTextFileColumn.CHARGE)) {
 							try {
 								charge = Integer.valueOf(split[indexesByHeaders.get(TableTextFileColumn.CHARGE)]);
-							} catch (NumberFormatException e) {
+							} catch (final NumberFormatException e) {
 								log.warn("Error parsing charge state from column "
 										+ (indexesByHeaders.get(TableTextFileColumn.CHARGE) + 1) + " in file '"
 										+ tsvFile.getAbsolutePath() + "'");
@@ -371,7 +380,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						if (indexesByHeaders.containsKey(TableTextFileColumn.MZ)) {
 							try {
 								mz = Double.valueOf(split[indexesByHeaders.get(TableTextFileColumn.MZ)]);
-							} catch (NumberFormatException e) {
+							} catch (final NumberFormatException e) {
 								log.warn("Error parsing precursor M/Z from column "
 										+ (indexesByHeaders.get(TableTextFileColumn.MZ) + 1) + " in file '"
 										+ tsvFile.getAbsolutePath() + "'");
@@ -385,7 +394,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						if (indexesByHeaders.containsKey(TableTextFileColumn.RT)) {
 							try {
 								rt = Double.valueOf(split[indexesByHeaders.get(TableTextFileColumn.RT)]);
-							} catch (NumberFormatException e) {
+							} catch (final NumberFormatException e) {
 								log.warn("Error parsing retention time rom column "
 										+ (indexesByHeaders.get(TableTextFileColumn.RT) + 1) + " in file '"
 										+ tsvFile.getAbsolutePath() + "'");
@@ -395,15 +404,15 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						peptide.setRetentionTime(rt);
 
 						// PEPTIDE SCORES
-						for (String scoreName : indexesByScoreNames.keySet()) {
-							String scoreString = split[indexesByScoreNames.get(scoreName)].trim();
+						for (final String scoreName : indexesByScoreNames.keySet()) {
+							final String scoreString = split[indexesByScoreNames.get(scoreName)].trim();
 							Double score = null;
 							try {
 								score = Double.valueOf(scoreString);
-								PeptideScore peptideScore = MiapeMSIDocumentFactory
+								final PeptideScore peptideScore = MiapeMSIDocumentFactory
 										.createPeptideScoreBuilder(scoreName, score.toString()).build();
 								peptide.addScore(peptideScore);
-							} catch (NumberFormatException e) {
+							} catch (final NumberFormatException e) {
 								log.warn("Error parsing score value for column "
 										+ (indexesByScoreNames.get(scoreName) + 1) + " in file '"
 										+ tsvFile.getAbsolutePath() + "'");
@@ -412,8 +421,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						}
 
 						// if more than one accession is present, get the list
-						List<String> accessions = splitAccessions(preliminarProteinAcc);
-						for (String proteinAcc : accessions) {
+						final List<String> accessions = splitAccessions(preliminarProteinAcc);
+						for (final String proteinAcc : accessions) {
 
 							if (proteins.containsKey(proteinAcc)) {
 								final IdentifiedProteinImplFromTSV protein = (IdentifiedProteinImplFromTSV) proteins
@@ -423,8 +432,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 									peptide.addProtein(protein);
 								}
 							} else {
-								IdentifiedProteinImplFromTSV protein = new IdentifiedProteinImplFromTSV(proteinAcc,
-										null);
+								final IdentifiedProteinImplFromTSV protein = new IdentifiedProteinImplFromTSV(
+										proteinAcc, null);
 								if (peptide != null) {
 									protein.addPeptide(peptide);
 									peptide.addProtein(protein);
@@ -447,27 +456,27 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			log.info(peptides.size() + " PSMs and " + proteins.size() + " proteins from file "
 					+ tsvFile.getAbsolutePath());
 
-			Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
+			final Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
 
 			final MiapeMSIDocumentBuilder builder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project,
-					idSetName, this.owner);
-			List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
+					idSetName, owner);
+			final List<IdentifiedPeptide> peptideList = new ArrayList<IdentifiedPeptide>();
 			peptideList.addAll(peptides.values());
 			builder.identifiedPeptides(peptideList);
-			Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
-			IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory.createIdentifiedProteinSetBuilder("Protein set")
-					.identifiedProteins(proteins).build();
+			final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
+			final IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory
+					.createIdentifiedProteinSetBuilder("Protein set").identifiedProteins(proteins).build();
 			proteinSets.add(proteinSet);
 			builder.identifiedProteinSets(proteinSets);
 			log.info("MIAPE MSI builder created.");
 			return builder;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (dis != null) {
 				try {
 					dis.close();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -485,11 +494,11 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	 */
 	private void checkRelationBetweenPeptidesAndProteins(Map<String, IdentifiedPeptide> peptides,
 			Map<String, IdentifiedProtein> proteins) {
-		for (String psmID : peptides.keySet()) {
-			IdentifiedPeptide identifiedPeptide = peptides.get(psmID);
+		for (final String psmID : peptides.keySet()) {
+			final IdentifiedPeptide identifiedPeptide = peptides.get(psmID);
 			if (identifiedPeptide.getIdentifiedProteins() == null
 					|| identifiedPeptide.getIdentifiedProteins().isEmpty()) {
-				String message = "Peptide " + identifiedPeptide.getSequence() + " with ID " + psmID
+				final String message = "Peptide " + identifiedPeptide.getSequence() + " with ID " + psmID
 						+ " has no linked to any protein";
 				log.warn(message);
 				throw new IllegalArgumentException(message);
@@ -497,10 +506,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 
 		}
-		for (IdentifiedProtein identifiedProtein : proteins.values()) {
+		for (final IdentifiedProtein identifiedProtein : proteins.values()) {
 			if (identifiedProtein.getIdentifiedPeptides() == null
 					|| identifiedProtein.getIdentifiedPeptides().isEmpty()) {
-				String message = "Protein " + identifiedProtein.getAccession() + " has no linked to any peptide";
+				final String message = "Protein " + identifiedProtein.getAccession() + " has no linked to any peptide";
 				log.warn(message);
 				throw new IllegalArgumentException(message);
 			}
@@ -520,12 +529,12 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		List<String> ret = new ArrayList<String>();
 		if (proteinAcc == null)
 			return ret;
-		for (TableTextFileSeparator separator2 : TableTextFileSeparator.values()) {
+		for (final TableTextFileSeparator separator2 : TableTextFileSeparator.values()) {
 			if (!separator2.equals(separator)) {
 				if (proteinAcc.contains(separator2.getSymbol())) {
 
-					String[] split = proteinAcc.split(separator2.getSymbol());
-					for (String string : split) {
+					final String[] split = proteinAcc.split(separator2.getSymbol());
+					for (final String string : split) {
 
 						ret.add(FastaParser.getACC(string).getFirstelement());
 					}
@@ -545,7 +554,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			try {
 				url = resource.getURL();
 				preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -556,8 +565,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 		try {
 
-			List<String> ret = new ArrayList<String>();
-			for (String string : accs) {
+			final List<String> ret = new ArrayList<String>();
+			for (final String string : accs) {
 				final UniprotId2AccMapping instance = UniprotId2AccMapping.getInstance();
 				if (instance != null) {
 					final String accFromID = instance.getAccFromID(string);
@@ -570,7 +579,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 				}
 			}
 			return ret;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -580,9 +589,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private String getModificationNameFromResidueAndMass(String aa, double deltaMass) {
 		try {
 			// try first with the PRIDE mapping
-			SlimModCollection modificationMapping = getModificationMapping();
+			final SlimModCollection modificationMapping = getModificationMapping();
 
-			SlimModCollection slimMods = modificationMapping.getbyDelta(deltaMass, 0.03);
+			final SlimModCollection slimMods = modificationMapping.getbyDelta(deltaMass, 0.03);
 			if (slimMods != null && !slimMods.isEmpty()) {
 				return slimMods.get(0).getPsiModDesc();
 			}
@@ -606,18 +615,22 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 				else
 					return "Glu->pyro-Glu";
 			}
-			final ControlVocabularyTerm pepModifDetailsTerm = PeptideModificationName.getPepModifDetailsTerm(cvManager);
-			if (pepModifDetailsTerm != null)
-				return pepModifDetailsTerm.getPreferredName();
-		} catch (Exception e) {
+			final DecimalFormat df = new DecimalFormat("+#.####");
+			return df.format(deltaMass);
+
+			// final ControlVocabularyTerm pepModifDetailsTerm =
+			// PeptideModificationName.getPepModifDetailsTerm(cvManager);
+			// if (pepModifDetailsTerm != null)
+			// return pepModifDetailsTerm.getPreferredName();
+		} catch (final Exception e) {
 
 		}
-		DecimalFormat format = new DecimalFormat("#.###");
+		final DecimalFormat format = new DecimalFormat("#.###");
 		return "[" + aa + format.format(deltaMass) + "]";
 	}
 
 	private boolean compareWithError(double num1, double num2) {
-		double tolerance = 0.001;
+		final double tolerance = 0.001;
 		if (num1 > num2)
 			if (num1 - num2 < tolerance)
 				return true;
@@ -635,7 +648,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		for (String element : splittedLine) {
 			element = element.trim();
 			boolean found = false;
-			for (TableTextFileColumn tsvColumn : TableTextFileColumn.values()) {
+			for (final TableTextFileColumn tsvColumn : TableTextFileColumn.values()) {
 				if (element.equalsIgnoreCase(tsvColumn.getHeaderName())) {
 					indexesByHeaders.put(tsvColumn, index);
 					found = true;
