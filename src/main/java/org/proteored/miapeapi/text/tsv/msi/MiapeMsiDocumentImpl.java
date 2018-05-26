@@ -18,6 +18,7 @@ import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.cv.ControlVocabularyTerm;
 import org.proteored.miapeapi.cv.msi.PeptideModificationName;
+import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
 import org.proteored.miapeapi.exceptions.MiapeDatabaseException;
 import org.proteored.miapeapi.exceptions.MiapeSecurityException;
 import org.proteored.miapeapi.factories.MiapeDocumentFactory;
@@ -279,8 +280,10 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			final Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
 			final Map<String, IdentifiedPeptide> peptides = new THashMap<String, IdentifiedPeptide>();
 			String previousProteinACC = null;
+			int row = 0;
 			// String scoreName = null;
 			while ((line = dis.readLine()) != null) {
+				row++;
 				// COMMENTS STARTING BY #
 				if (line.trim().startsWith("#")) {
 					// scoreName = getScoreName(line);
@@ -321,21 +324,30 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 						// PEPTIDE SEQUENCE
 						final int seqIndex = indexesByHeaders.get(TableTextFileColumn.SEQ);
-						final String rawSeq = split[seqIndex].trim();
+						String rawSeq = null;
+						if (seqIndex < split.length) {
+							rawSeq = split[seqIndex].trim();
+						} else {
+							throw new IllegalMiapeArgumentException(
+									"peptide sequence is missing at column " + seqIndex + 1 + " in row " + row);
+						}
 						final String seq = FastaParser.cleanSequence(rawSeq);
 						// seq = parseSequence(seq);
 
 						// PSMID
 						String psmID = String.valueOf(peptides.size() + 1);
 						if (indexesByHeaders.containsKey(TableTextFileColumn.PSMID)) {
-							psmID = split[indexesByHeaders.get(TableTextFileColumn.PSMID)];
+							final Integer index = indexesByHeaders.get(TableTextFileColumn.PSMID);
+							if (index < split.length) {
+								psmID = split[index];
+							}
 						}
 						// create or get the peptide (PSM)
 						IdentifiedPeptideImplFromTSV peptide = null;
 						if (!peptides.containsKey(psmID)) {
 							peptide = new IdentifiedPeptideImplFromTSV(seq);
 							peptides.put(psmID, peptide);
-							if (FastaParser.somethingExtrangeInSequence(rawSeq)) {
+							if (FastaParser.somethingExtrangeInSequence(rawSeq) || rawSeq.contains("ox")) {
 								final TIntDoubleHashMap pTMsByPosition = FastaParser.getPTMsFromSequence(rawSeq);
 								for (final int position : pTMsByPosition.keys()) {
 									String aa = null;
@@ -364,13 +376,16 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						// CHARGE
 						Integer charge = null;
 						if (indexesByHeaders.containsKey(TableTextFileColumn.CHARGE)) {
-							try {
-								charge = Integer.valueOf(split[indexesByHeaders.get(TableTextFileColumn.CHARGE)]);
-							} catch (final NumberFormatException e) {
-								log.warn("Error parsing charge state from column "
-										+ (indexesByHeaders.get(TableTextFileColumn.CHARGE) + 1) + " in file '"
-										+ tsvFile.getAbsolutePath() + "'");
-								log.warn(e.getMessage());
+							final Integer index = indexesByHeaders.get(TableTextFileColumn.CHARGE);
+							if (index < split.length) {
+								try {
+
+									charge = Integer.valueOf(split[index]);
+								} catch (final NumberFormatException e) {
+									log.warn("Error parsing charge state from column " + (index + 1) + " in file '"
+											+ tsvFile.getAbsolutePath() + "'");
+									log.warn(e.getMessage());
+								}
 							}
 						}
 						peptide.setCharge(String.valueOf(charge));
@@ -378,13 +393,15 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						// precursor MZ
 						Double mz = null;
 						if (indexesByHeaders.containsKey(TableTextFileColumn.MZ)) {
-							try {
-								mz = Double.valueOf(split[indexesByHeaders.get(TableTextFileColumn.MZ)]);
-							} catch (final NumberFormatException e) {
-								log.warn("Error parsing precursor M/Z from column "
-										+ (indexesByHeaders.get(TableTextFileColumn.MZ) + 1) + " in file '"
-										+ tsvFile.getAbsolutePath() + "'");
-								log.warn(e.getMessage());
+							final Integer index = indexesByHeaders.get(TableTextFileColumn.MZ);
+							if (index < split.length) {
+								try {
+									mz = Double.valueOf(split[index]);
+								} catch (final NumberFormatException e) {
+									log.warn("Error parsing precursor M/Z from column " + (index + 1) + " in file '"
+											+ tsvFile.getAbsolutePath() + "'");
+									log.warn(e.getMessage());
+								}
 							}
 						}
 						peptide.setPrecursorMZ(mz);
@@ -392,31 +409,36 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 						// RT
 						Double rt = null;
 						if (indexesByHeaders.containsKey(TableTextFileColumn.RT)) {
-							try {
-								rt = Double.valueOf(split[indexesByHeaders.get(TableTextFileColumn.RT)]);
-							} catch (final NumberFormatException e) {
-								log.warn("Error parsing retention time rom column "
-										+ (indexesByHeaders.get(TableTextFileColumn.RT) + 1) + " in file '"
-										+ tsvFile.getAbsolutePath() + "'");
-								log.warn(e.getMessage());
+							final Integer index = indexesByHeaders.get(TableTextFileColumn.RT);
+							if (index < split.length) {
+								try {
+									rt = Double.valueOf(split[index]);
+								} catch (final NumberFormatException e) {
+									log.warn("Error parsing retention time rom column " + (index + 1) + " in file '"
+											+ tsvFile.getAbsolutePath() + "'");
+									log.warn(e.getMessage());
+								}
 							}
 						}
 						peptide.setRetentionTime(rt);
 
 						// PEPTIDE SCORES
 						for (final String scoreName : indexesByScoreNames.keySet()) {
-							final String scoreString = split[indexesByScoreNames.get(scoreName)].trim();
-							Double score = null;
-							try {
-								score = Double.valueOf(scoreString);
-								final PeptideScore peptideScore = MiapeMSIDocumentFactory
-										.createPeptideScoreBuilder(scoreName, score.toString()).build();
-								peptide.addScore(peptideScore);
-							} catch (final NumberFormatException e) {
-								log.warn("Error parsing score value for column "
-										+ (indexesByScoreNames.get(scoreName) + 1) + " in file '"
-										+ tsvFile.getAbsolutePath() + "'");
-								log.warn(e.getMessage());
+
+							final Integer index = indexesByScoreNames.get(scoreName);
+							if (split.length > index) {
+								final String scoreString = split[index].trim();
+								Double score = null;
+								try {
+									score = Double.valueOf(scoreString);
+									final PeptideScore peptideScore = MiapeMSIDocumentFactory
+											.createPeptideScoreBuilder(scoreName, score.toString()).build();
+									peptide.addScore(peptideScore);
+								} catch (final NumberFormatException e) {
+									log.warn("Error parsing score value for column " + (index + 1) + " row " + row
+											+ " in file '" + tsvFile.getAbsolutePath() + "'");
+									log.warn(e.getMessage());
+								}
 							}
 						}
 
@@ -472,6 +494,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			return builder;
 		} catch (final Exception e) {
 			e.printStackTrace();
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
 		} finally {
 			if (dis != null) {
 				try {

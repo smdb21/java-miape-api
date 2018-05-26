@@ -2,7 +2,6 @@ package org.proteored.miapeapi.text.tsv.msi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
@@ -19,31 +18,32 @@ import gnu.trove.set.hash.THashSet;
 public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	private final String sequence;
 	private final int id;
-	private List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
-	private Set<PeptideScore> scores = new THashSet<PeptideScore>();
-	private Set<PeptideModification> modifications = new THashSet<PeptideModification>();
+	private final List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
+	private final Set<PeptideScore> scores = new THashSet<PeptideScore>();
+	private final Set<PeptideModification> modifications = new THashSet<PeptideModification>();
 	private String charge;
 	private Double precursorMZ;
 	private String retentionTime;
 
 	public IdentifiedPeptideImplFromTSV(String seq) {
-		this.sequence = seq.toUpperCase();
-		this.id = getRandomInt();
+		sequence = seq.toUpperCase();
+		id = getRandomInt();
 	}
 
 	public void addProtein(IdentifiedProtein protein) {
-		this.proteins.add(protein);
+		proteins.add(protein);
 	}
 
 	private int getRandomInt() {
-		Random generator = new Random();
-		int i = generator.nextInt(Integer.MAX_VALUE);
-		return i;
+		// Random generator = new Random();
+		// int i = generator.nextInt(Integer.MAX_VALUE);
+		// return i;
+		return hashCode();
 	}
 
 	@Override
 	public int getId() {
-		return this.id;
+		return id;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	@Override
 	public Set<PeptideScore> getScores() {
-		return this.scores;
+		return scores;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	@Override
 	public String getCharge() {
-		return this.charge;
+		return charge;
 	}
 
 	public void setCharge(String charge) {
@@ -72,7 +72,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	@Override
 	public String getMassDesviation() {
-		Double theoreticalMZ = getTheoreticalMZ();
+		final Double theoreticalMZ = getTheoreticalMZ();
 		if (theoreticalMZ != null && precursorMZ != null) {
 			return String.valueOf(theoreticalMZ - precursorMZ);
 		}
@@ -81,23 +81,23 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	private Double getTheoreticalMZ() {
 
-		Set<PeptideModification> modifications2 = getModifications();
+		final Set<PeptideModification> modifications2 = getModifications();
 
-		AASequenceImpl seq = ModificationMapping.getAASequenceImpl(getSequence(), modifications2);
+		final AASequenceImpl seq = ModificationMapping.getAASequenceImpl(getSequence(), modifications2);
 		try {
-			int z = Integer.valueOf(getCharge());
-			double mz = seq.getMz(z);
+			final int z = Integer.valueOf(getCharge());
+			final double mz = seq.getMz(z);
 			return mz;
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 		}
 		return null;
 	}
 
 	public void setPrecursorMZ(Double mz) {
-		this.precursorMZ = mz;
+		precursorMZ = mz;
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 
 	@Override
 	public List<IdentifiedProtein> getIdentifiedProteins() {
-		return this.proteins;
+		return proteins;
 	}
 
 	@Override
@@ -129,17 +129,17 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	}
 
 	public void addScore(PeptideScore peptideScore) {
-		this.scores.add(peptideScore);
+		scores.add(peptideScore);
 
 	}
 
 	public void addModification(PeptideModification modification) {
-		this.modifications.add(modification);
+		modifications.add(modification);
 	}
 
 	public void setRetentionTime(Double rt) {
 		if (rt != null) {
-			this.retentionTime = String.valueOf(rt);
+			retentionTime = String.valueOf(rt);
 		}
 	}
 
