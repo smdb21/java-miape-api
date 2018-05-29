@@ -283,6 +283,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			int row = 0;
 			// String scoreName = null;
 			while ((line = dis.readLine()) != null) {
+				log.debug("Reading " + line);
 				row++;
 				// COMMENTS STARTING BY #
 				if (line.trim().startsWith("#")) {
@@ -469,7 +470,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			}
 
 			if (proteins.isEmpty() && peptides.isEmpty()) {
-				return null;
+				throw new IllegalArgumentException("No proteins and peptides were able to be parsed");
 			}
 
 			checkRelationBetweenPeptidesAndProteins(peptides, proteins);
