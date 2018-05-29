@@ -24,6 +24,7 @@ import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 import com.compomics.util.protein.AASequenceImpl;
 import com.compomics.util.protein.Protein;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -51,7 +52,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	private final Set<Software> softwares;
 
-	private final List<Integer> identifiedPeptideIDs;
+	private final TIntArrayList identifiedPeptideIDs = new TIntArrayList();
 
 	private final TIntObjectHashMap<String> peptideSequencesByID = new TIntObjectHashMap<String>();
 
@@ -166,8 +167,9 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 					softwares.add(software);
 			}
 		}
-		identifiedPeptideIDs = protein.getIdentifiedPeptides().stream().map(p -> p.getId())
+		final List<Integer> ids = protein.getIdentifiedPeptides().stream().map(p -> p.getId())
 				.collect(Collectors.toList());
+		identifiedPeptideIDs.addAll(ids);
 		protein.getIdentifiedPeptides().stream()
 				.forEach(pep -> peptideSequencesByID.put(pep.getId(), pep.getSequence()));
 		id = protein.getId();
@@ -316,7 +318,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	}
 
-	public List<Integer> getIdentifiedPeptideIDs() {
+	public TIntArrayList getIdentifiedPeptideIDs() {
 		return identifiedPeptideIDs;
 	}
 
@@ -344,12 +346,12 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 
 	public void resetPeptides(String idSetFullName) {
 
-		final List<Integer> identifiedPeptideIDs = getIdentifiedPeptideIDs();
+		final TIntArrayList identifiedPeptideIDs = getIdentifiedPeptideIDs();
 		if (peptides == null)
 			peptides = new ArrayList<ExtendedIdentifiedPeptide>();
 		if (identifiedPeptideIDs != null) {
 			peptides.clear();
-			for (final Integer peptideID : identifiedPeptideIDs) {
+			for (final int peptideID : identifiedPeptideIDs.toArray()) {
 				final ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(miapeMSIName, idSetFullName,
 						peptideID);
 				if (peptide2 != null) {

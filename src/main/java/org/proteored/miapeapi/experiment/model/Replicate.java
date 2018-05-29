@@ -105,10 +105,13 @@ public class Replicate implements IdentificationSet<Void> {
 
 	@Override
 	public String getFullName() {
-		if (previousLevelIdentificationSet != null
-				&& previousLevelIdentificationSet.getPreviousLevelIdentificationSet() != null
-				&& previousLevelIdentificationSet.getPreviousLevelIdentificationSet().getNumExperiments() == 1)
-			return getName();
+		// if (previousLevelIdentificationSet != null
+		// && previousLevelIdentificationSet.getPreviousLevelIdentificationSet()
+		// != null
+		// &&
+		// previousLevelIdentificationSet.getPreviousLevelIdentificationSet().getNumExperiments()
+		// == 1)
+		// return getName();
 		return getName() + " / " + getExperimentName();
 	}
 
@@ -198,16 +201,16 @@ public class Replicate implements IdentificationSet<Void> {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		sb.append("\t\tReplicate " + getName() + "\n");
 		if (miapeMSs != null) {
-			for (MiapeMSDocument ms : miapeMSs) {
+			for (final MiapeMSDocument ms : miapeMSs) {
 				sb.append("\t\t\t\tMIAPE MS: " + ms.getName() + "\n");
 			}
 
 		}
 		if (miapeMSIs != null) {
-			for (MiapeMSIDocument msi : miapeMSIs) {
+			for (final MiapeMSIDocument msi : miapeMSIs) {
 				sb.append("\t\t\t\tMIAPE MSI: " + msi.getName() + "\n");
 			}
 
@@ -224,7 +227,7 @@ public class Replicate implements IdentificationSet<Void> {
 
 	@Override
 	public int getProteinGroupOccurrenceNumber(ProteinGroup proteinGroup) {
-		List<ProteinGroup> proteinGroups = getIdentifiedProteinGroups();
+		final List<ProteinGroup> proteinGroups = getIdentifiedProteinGroups();
 		if (proteinGroups.contains(proteinGroup))
 			return 1;
 
@@ -451,11 +454,11 @@ public class Replicate implements IdentificationSet<Void> {
 
 	@Override
 	public List<ResultingData> getResultingDatas() {
-		List<ResultingData> ret = new ArrayList<ResultingData>();
+		final List<ResultingData> ret = new ArrayList<ResultingData>();
 
 		if (miapeMSs != null) {
-			for (MiapeMSDocument miapeMSDocument : miapeMSs) {
-				List<ResultingData> resultingDatas = miapeMSDocument.getResultingDatas();
+			for (final MiapeMSDocument miapeMSDocument : miapeMSs) {
+				final List<ResultingData> resultingDatas = miapeMSDocument.getResultingDatas();
 				if (resultingDatas != null) {
 					ret.addAll(resultingDatas);
 				}
@@ -539,11 +542,11 @@ public class Replicate implements IdentificationSet<Void> {
 	public List<ResultingData> getPeakListResultingDatas() {
 
 		if (miapeMSs != null) {
-			List<ResultingData> ret = new ArrayList<ResultingData>();
-			for (MiapeMSDocument miapeMS : miapeMSs) {
-				List<ResultingData> resultingDatas = miapeMS.getResultingDatas();
+			final List<ResultingData> ret = new ArrayList<ResultingData>();
+			for (final MiapeMSDocument miapeMS : miapeMSs) {
+				final List<ResultingData> resultingDatas = miapeMS.getResultingDatas();
 				if (resultingDatas != null) {
-					for (ResultingData resultingData : resultingDatas) {
+					for (final ResultingData resultingData : resultingDatas) {
 						if (isPeakList(resultingData))
 							ret.add(resultingData);
 					}
@@ -556,7 +559,7 @@ public class Replicate implements IdentificationSet<Void> {
 
 	private boolean isPeakList(ResultingData resultingData) {
 		if (resultingData != null) {
-			String dataFileType = resultingData.getDataFileType();
+			final String dataFileType = resultingData.getDataFileType();
 			if (dataFileType != null) {
 				if (MSFileType.getInstance(cvManager).isPeakListFileType(dataFileType, cvManager))
 					return true;
@@ -567,11 +570,11 @@ public class Replicate implements IdentificationSet<Void> {
 
 	public List<ResultingData> getRawFileResultingDatas() {
 		if (miapeMSs != null) {
-			List<ResultingData> ret = new ArrayList<ResultingData>();
-			for (MiapeMSDocument miapeMS : miapeMSs) {
-				List<ResultingData> resultingDatas = miapeMS.getResultingDatas();
+			final List<ResultingData> ret = new ArrayList<ResultingData>();
+			for (final MiapeMSDocument miapeMS : miapeMSs) {
+				final List<ResultingData> resultingDatas = miapeMS.getResultingDatas();
 				if (resultingDatas != null) {
-					for (ResultingData resultingData : resultingDatas) {
+					for (final ResultingData resultingData : resultingDatas) {
 						if (!isPeakList(resultingData))
 							ret.add(resultingData);
 					}
@@ -584,8 +587,8 @@ public class Replicate implements IdentificationSet<Void> {
 
 	public List<String> getMSIGeneratedFiles() {
 		if (miapeMSIs != null) {
-			List<String> ret = new ArrayList<String>();
-			for (MiapeMSIDocument miapeMSI : miapeMSIs) {
+			final List<String> ret = new ArrayList<String>();
+			for (final MiapeMSIDocument miapeMSI : miapeMSIs) {
 				if (miapeMSI.getGeneratedFilesURI() != null)
 					ret.add(miapeMSI.getGeneratedFilesURI());
 			}
@@ -595,19 +598,19 @@ public class Replicate implements IdentificationSet<Void> {
 	}
 
 	public TIntObjectHashMap<URL> getMSReportURLs(int userId) {
-		TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
-		for (MiapeMSDocument miapeMS : miapeMSs) {
-			URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMS.getId(), "MS");
+		final TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
+		for (final MiapeMSDocument miapeMS : miapeMSs) {
+			final URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMS.getId(), "MS");
 			reports.put(miapeMS.getId(), miapePublicLink);
 		}
 		return reports;
 	}
 
 	public TIntObjectHashMap<URL> getMSIReportURLs(int userId) {
-		TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
+		final TIntObjectHashMap<URL> reports = new TIntObjectHashMap<URL>();
 
-		for (MiapeMSIDocument miapeMSI : miapeMSIs) {
-			URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMSI.getId(), "MSI");
+		for (final MiapeMSIDocument miapeMSI : miapeMSIs) {
+			final URL miapePublicLink = MiapeReportsLinkGenerator.getMiapePublicLink(userId, miapeMSI.getId(), "MSI");
 			reports.put(miapeMSI.getId(), miapePublicLink);
 		}
 		return reports;
@@ -641,8 +644,8 @@ public class Replicate implements IdentificationSet<Void> {
 	@Override
 	public Set<Spectrometer> getSpectrometers() {
 		final List<MiapeMSDocument> miapeMSs = getMiapeMSs();
-		Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
-		for (MiapeMSDocument miapeMSDocument : miapeMSs) {
+		final Set<Spectrometer> spectrometers = new THashSet<Spectrometer>();
+		for (final MiapeMSDocument miapeMSDocument : miapeMSs) {
 			if (miapeMSDocument.getSpectrometers() != null)
 				spectrometers.addAll(miapeMSDocument.getSpectrometers());
 		}
@@ -652,8 +655,8 @@ public class Replicate implements IdentificationSet<Void> {
 	@Override
 	public Set<InputParameter> getInputParameters() {
 		final List<MiapeMSIDocument> miapeMSIs = getMiapeMSIs();
-		Set<InputParameter> inputParameters = new THashSet<InputParameter>();
-		for (MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
+		final Set<InputParameter> inputParameters = new THashSet<InputParameter>();
+		for (final MiapeMSIDocument miapeMSIDocument : miapeMSIs) {
 			if (miapeMSIDocument.getInputParameters() != null)
 				inputParameters.addAll(miapeMSIDocument.getInputParameters());
 		}

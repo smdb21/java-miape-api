@@ -47,6 +47,7 @@ import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
 import edu.scripps.yates.utilities.pi.ParIteratorFactory;
 import edu.scripps.yates.utilities.pi.reductions.Reducible;
 import edu.scripps.yates.utilities.pi.reductions.Reduction;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -282,14 +283,14 @@ public abstract class DataManager {
 			if (Thread.currentThread().isInterrupted()) {
 				throw new InterruptedMIAPEThreadException("Task cancelled");
 			}
-			final List<Integer> peptidesFromProteinIDs = protein.getIdentifiedPeptideIDs();
+			final TIntArrayList peptidesFromProteinIDs = protein.getIdentifiedPeptideIDs();
 			if (peptidesFromProteinIDs != null && !peptidesFromProteinIDs.isEmpty()) {
 				boolean peptideFound = false;
-				for (final Integer peptideFromProteinID : peptidesFromProteinIDs) {
+				for (final int peptideFromProteinID : peptidesFromProteinIDs.toArray()) {
 					if (Thread.currentThread().isInterrupted()) {
 						throw new InterruptedMIAPEThreadException("Task cancelled");
 					}
-					if (peptideFromProteinID != null && protein.getPeptideSequenceByID(peptideFromProteinID) != null
+					if (protein.getPeptideSequenceByID(peptideFromProteinID) != null
 							&& protein.getPeptideSequenceByID(peptideFromProteinID).length() >= minPeptideLength
 							&& peptideMap.containsKey(peptideFromProteinID)) {
 
@@ -340,7 +341,7 @@ public abstract class DataManager {
 				peptideIterator.remove();
 			}
 		}
-		log.info("Discarded peptides = " + numPeptidesDiscarded + " because they have not a protein linked");
+		log.info("Discarded " + numPeptidesDiscarded + " peptides because they have not a protein linked");
 		int numProteinsDiscarded = 0;
 		while (proteinIterator.hasNext()) {
 			final List<ExtendedIdentifiedPeptide> peptides = proteinIterator.next().getPeptides();
@@ -349,7 +350,7 @@ public abstract class DataManager {
 				proteinIterator.remove();
 			}
 		}
-		log.info("Discarded proteins = " + numProteinsDiscarded + " because of the minimum peptide length limit");
+		log.info("Discarded " + numProteinsDiscarded + " proteins because of the minimum peptide length limit");
 	}
 
 	public static int getMinPeptideLength() {
@@ -991,7 +992,7 @@ public abstract class DataManager {
 			protein.setDecoy(false, false);
 			protein.resetPeptides(idSet.getFullName());
 			// check that it has all the peptides
-			for (final Integer peptideID : protein.getIdentifiedPeptideIDs()) {
+			for (final int peptideID : protein.getIdentifiedPeptideIDs().toArray()) {
 				final ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSIName(),
 						idSet.getFullName(), peptideID);
 				if (peptide2 != null) {
@@ -2249,8 +2250,7 @@ public abstract class DataManager {
 							log.info(extendedIdentifiedPeptide);
 						}
 						// Do not take the same peptide several times ->
-						// This
-						// happens when a peptide is shared by several
+						// This happens when a peptide is shared by several
 						// proteins
 						if (!peptideIds.contains(extendedIdentifiedPeptide.getId())) {
 							if (minPeptideLength2 > extendedIdentifiedPeptide.getSequence().length())
