@@ -1,12 +1,14 @@
 package org.proteored.miapeapi.interfaces;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +23,6 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.persistence.MiapeFile;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,7 +49,7 @@ public class MiapeHeaderImpl implements MiapeDocument {
 		attachedFileLocation = miape.getAttachedFileLocation();
 		template = miape.getTemplate();
 		version = miape.getVersion();
-		Project project = miape.getProject();
+		final Project project = miape.getProject();
 		if (project != null) {
 			idProject = project.getId();
 			projectName = project.getName();
@@ -63,7 +64,7 @@ public class MiapeHeaderImpl implements MiapeDocument {
 		attachedFileLocation = miape.getAttachedFileLocation();
 		template = miape.getTemplate();
 		version = miape.getVersion();
-		Project project = miape.getProject();
+		final Project project = miape.getProject();
 		if (project != null) {
 			idProject = project.getId();
 			projectName = project.getName();
@@ -79,7 +80,7 @@ public class MiapeHeaderImpl implements MiapeDocument {
 		attachedFileLocation = miape.getAttachedFileLocation();
 		template = miape.getTemplate();
 		version = miape.getVersion();
-		Project project = miape.getProject();
+		final Project project = miape.getProject();
 		if (project != null) {
 			idProject = project.getId();
 			projectName = project.getName();
@@ -94,7 +95,7 @@ public class MiapeHeaderImpl implements MiapeDocument {
 		attachedFileLocation = miape.getAttachedFileLocation();
 		template = miape.getTemplate();
 		version = miape.getVersion();
-		Project project = miape.getProject();
+		final Project project = miape.getProject();
 		if (project != null) {
 			idProject = project.getId();
 			projectName = project.getName();
@@ -119,18 +120,18 @@ public class MiapeHeaderImpl implements MiapeDocument {
 
 		try {
 			miapeFile = new MiapeFile(bytes);
-			File file = miapeFile.toFile();
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document document = builder.parse(file);
+			final File file = miapeFile.toFile();
+			final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			final Document document = builder.parse(file);
 			file.delete();
 			readDocument(document);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SAXException e) {
+		} catch (final SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -177,13 +178,13 @@ public class MiapeHeaderImpl implements MiapeDocument {
 	}
 
 	private void readDocument(Document document) {
-		NodeList childNodes = document.getChildNodes();
-		Node rootElement = childNodes.item(0);
+		final NodeList childNodes = document.getChildNodes();
+		final Node rootElement = childNodes.item(0);
 		for (int i = 0; i < rootElement.getChildNodes().getLength(); i++) {
-			Node childNode = rootElement.getChildNodes().item(i);
-			if (childNode.getNodeType() == Element.ELEMENT_NODE) {
+			final Node childNode = rootElement.getChildNodes().item(i);
+			if (childNode.getNodeType() == Node.ELEMENT_NODE) {
 				if (childNode.getNodeName().equals(MiapeHeader.NAME)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
 							name = attr.item(j).getNodeValue();
@@ -191,80 +192,80 @@ public class MiapeHeaderImpl implements MiapeDocument {
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.DATE)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								date = new MiapeDate(nodeValue);
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.ID)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								id = Integer.valueOf(nodeValue);
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.MODIFICATION_DATE)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								modificationDate = new MiapeDate(nodeValue).toDate();
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.ATTACHED_FILE_LOCATION)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								attachedFileLocation = nodeValue;
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.TEMPLATE)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								template = Boolean.valueOf(nodeValue);
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.VERSION)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								version = nodeValue;
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.PROJECTID)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								idProject = Integer.valueOf(nodeValue);
 						}
 					}
 				}
 				if (childNode.getNodeName().equals(MiapeHeader.PROJECTNAME)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					for (int j = 0; j < attr.getLength(); j++) {
 						if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-							String nodeValue = attr.item(j).getNodeValue();
+							final String nodeValue = attr.item(j).getNodeValue();
 							if (nodeValue != null && !nodeValue.equals(""))
 								projectName = nodeValue;
 						}
@@ -273,15 +274,15 @@ public class MiapeHeaderImpl implements MiapeDocument {
 				if (childNode.getNodeName().equals(MiapeHeader.MIAPE_REFERENCE)
 						|| childNode.getNodeName().equals(MiapeHeader.MIAPE_MS_REFERENCE)
 						|| childNode.getNodeName().equals(MiapeHeader.MIAPE_GE_REFERENCE)) {
-					NamedNodeMap attr = childNode.getAttributes();
+					final NamedNodeMap attr = childNode.getAttributes();
 					if (attr.getLength() > 0) {
 						for (int j = 0; j < attr.getLength(); j++) {
 							if (attr.item(j).getNodeName().equals(MiapeHeader.VALUE)) {
-								String nodeValue = attr.item(j).getNodeValue();
+								final String nodeValue = attr.item(j).getNodeValue();
 								if (nodeValue != null && !nodeValue.equals("")) {
 									try {
 										miapeReference = Integer.valueOf(nodeValue);
-									} catch (NumberFormatException e) {
+									} catch (final NumberFormatException e) {
 
 									}
 								}
@@ -289,13 +290,13 @@ public class MiapeHeaderImpl implements MiapeDocument {
 						}
 					} else if (childNode.getChildNodes() != null) {
 						for (int j = 0; j < childNode.getChildNodes().getLength(); j++) {
-							Node childchildNode = childNode.getChildNodes().item(j);
-							if (childchildNode.getNodeType() == Element.TEXT_NODE) {
-								String nodeValue = childchildNode.getNodeValue();
+							final Node childchildNode = childNode.getChildNodes().item(j);
+							if (childchildNode.getNodeType() == Node.TEXT_NODE) {
+								final String nodeValue = childchildNode.getNodeValue();
 								if (nodeValue != null && !nodeValue.equals("")) {
 									try {
 										miapeReference = Integer.valueOf(nodeValue);
-									} catch (NumberFormatException e) {
+									} catch (final NumberFormatException e) {
 
 									}
 								}
@@ -309,13 +310,15 @@ public class MiapeHeaderImpl implements MiapeDocument {
 	}
 
 	private void readDocumentLineally(File file) {
-		BufferedReader br = null;
+		Stream<String> streamOfLines = null;
 		try {
-			br = new BufferedReader(new FileReader(file));
+			streamOfLines = Files.lines(Paths.get(file.toURI()));
 			final Pattern idPattern = Pattern.compile("\"[-]?(\\d+)\"");
-			String line = br.readLine();
+
 			boolean inProject = false;
-			while (line != null) {
+			final Iterator<String> iterator = streamOfLines.iterator();
+			while (iterator.hasNext()) {
+				final String line = iterator.next();
 				if (line.contains("<MIAPEProject")) {
 					inProject = true;
 					final Matcher matcher = idPattern.matcher(line);
@@ -384,17 +387,12 @@ public class MiapeHeaderImpl implements MiapeDocument {
 				if (line.contains("<MSI_Identified_Protein_Set>")) {
 					break;
 				}
-				line = br.readLine();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (br != null) {
-					br.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+			if (streamOfLines != null) {
+				streamOfLines.close();
 			}
 		}
 
