@@ -309,17 +309,18 @@ public class MiapeHeaderImpl implements MiapeDocument {
 
 	}
 
+	private static final Pattern idPattern = Pattern.compile("\"[-]?(\\d+)\"");
+
 	private void readDocumentLineally(File file) {
 		Stream<String> streamOfLines = null;
 		try {
 			streamOfLines = Files.lines(Paths.get(file.toURI()));
-			final Pattern idPattern = Pattern.compile("\"[-]?(\\d+)\"");
 
 			boolean inProject = false;
 			final Iterator<String> iterator = streamOfLines.iterator();
 			while (iterator.hasNext()) {
 				final String line = iterator.next();
-				if (line.contains("<MIAPEProject")) {
+				if (!line.contains("<MIAPEProject")) {
 					inProject = true;
 					final Matcher matcher = idPattern.matcher(line);
 					if (matcher.find()) {

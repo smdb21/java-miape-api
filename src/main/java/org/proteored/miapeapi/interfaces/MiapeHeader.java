@@ -86,86 +86,86 @@ public class MiapeHeader {
 	private File getMiapeHeaderFile(MiapeDocument miape) {
 		try {
 
-			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document document = builder.newDocument();
-			Element rootElement = document.createElement("MiapeHeader");
+			final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			final Document document = builder.newDocument();
+			final Element rootElement = document.createElement("MiapeHeader");
 			document.appendChild(rootElement);
 
 			if (miape.getId() > 0) {
-				Element element = document.createElement(ID);
+				final Element element = document.createElement(ID);
 				element.setAttribute(VALUE, String.valueOf(miape.getId()));
 				rootElement.appendChild(element);
 			}
 			if (miape.getName() != null) {
-				Element element = document.createElement(NAME);
+				final Element element = document.createElement(NAME);
 				element.setAttribute(VALUE, miape.getName());
 				rootElement.appendChild(element);
 			}
 			if (miape.getTemplate() != null) {
-				Element element = document.createElement(TEMPLATE);
+				final Element element = document.createElement(TEMPLATE);
 				element.setAttribute(VALUE, String.valueOf(miape.getTemplate()));
 				rootElement.appendChild(element);
 			}
 			if (miape.getDate() != null) {
-				Element element = document.createElement(DATE);
+				final Element element = document.createElement(DATE);
 				element.setAttribute(VALUE, miape.getDate().getValue());
 				rootElement.appendChild(element);
 			}
 			if (miape.getModificationDate() != null) {
-				Element element = document.createElement(MODIFICATION_DATE);
+				final Element element = document.createElement(MODIFICATION_DATE);
 				element.setAttribute(VALUE, miape.getModificationDate().toString());
 				rootElement.appendChild(element);
 			}
 			if (miape.getVersion() != null) {
-				Element element = document.createElement(VERSION);
+				final Element element = document.createElement(VERSION);
 				element.setAttribute(VALUE, miape.getVersion());
 				rootElement.appendChild(element);
 			}
 			if (miape.getAttachedFileLocation() != null) {
-				Element element = document.createElement(ATTACHED_FILE_LOCATION);
+				final Element element = document.createElement(ATTACHED_FILE_LOCATION);
 				element.setAttribute(VALUE, miape.getAttachedFileLocation());
 				rootElement.appendChild(element);
 			}
 			if (miape.getProject() != null) {
 				if (miape.getProject().getName() != null) {
-					Element element = document.createElement(PROJECTNAME);
+					final Element element = document.createElement(PROJECTNAME);
 					element.setAttribute(VALUE, miape.getProject().getName());
 					rootElement.appendChild(element);
 				}
 				if (miape.getProject().getId() > 0) {
-					Element element = document.createElement(PROJECTID);
+					final Element element = document.createElement(PROJECTID);
 					element.setAttribute(VALUE, String.valueOf(miape.getProject().getId()));
 					rootElement.appendChild(element);
 				}
 			}
 			// In case of MIAPE GI and MSI, add the MIAPE REFERENCE NODE
 			if (miape instanceof MiapeHeaderImpl) {
-				int miapeReference = ((MiapeHeaderImpl) miape).getMiapeReference();
-				Element element = document.createElement(MIAPE_REFERENCE);
+				final int miapeReference = ((MiapeHeaderImpl) miape).getMiapeReference();
+				final Element element = document.createElement(MIAPE_REFERENCE);
 				element.setAttribute(VALUE, String.valueOf(miapeReference));
 				rootElement.appendChild(element);
 			}
 			// transform the Document into a String
-			DOMSource domSource = new DOMSource(document);
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
+			final DOMSource domSource = new DOMSource(document);
+			final TransformerFactory tf = TransformerFactory.newInstance();
+			final Transformer transformer = tf.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			java.io.StringWriter sw = new java.io.StringWriter();
-			StreamResult sr = new StreamResult(sw);
+			final java.io.StringWriter sw = new java.io.StringWriter();
+			final StreamResult sr = new StreamResult(sw);
 			transformer.transform(domSource, sr);
-			String xml = sw.toString();
+			final String xml = sw.toString();
 			sw.close();
-			File file = File.createTempFile(this.getClass().getName(), "temp");
-			FileWriter fos = new FileWriter(file);
+			final File file = File.createTempFile(this.getClass().getName(), "temp");
+			final FileWriter fos = new FileWriter(file);
 			fos.write(xml);
 			fos.close();
 			file.deleteOnExit();
 			return file;
-		} catch (ParserConfigurationException e) {
+		} catch (final ParserConfigurationException e) {
 			e.printStackTrace();
-		} catch (TransformerException e) {
+		} catch (final TransformerException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -175,7 +175,7 @@ public class MiapeHeader {
 		if (file != null) {
 			try {
 				return getBytesFromFile(file);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -183,17 +183,17 @@ public class MiapeHeader {
 	}
 
 	private static byte[] getBytesFromFile(File file) throws IOException {
-		InputStream is = new FileInputStream(file);
+		final InputStream is = new FileInputStream(file);
 
 		// Get the size of the file
-		long length = file.length();
+		final long length = file.length();
 
 		if (length > Integer.MAX_VALUE) {
 			// File is too large
 		}
 
 		// Create the byte array to hold the data
-		byte[] bytes = new byte[(int) length];
+		final byte[] bytes = new byte[(int) length];
 
 		// Read in the bytes
 		int offset = 0;
