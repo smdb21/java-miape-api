@@ -9,6 +9,8 @@ import org.proteored.miapeapi.util.ProteinSequenceRetrieval;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
 import edu.scripps.yates.annotations.uniprot.UniprotProteinLocalRetriever;
+import edu.scripps.yates.utilities.maths.Maths;
+import gnu.trove.list.array.TDoubleArrayList;
 
 public class ProteinMerger {
 	private static final Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -31,16 +33,16 @@ public class ProteinMerger {
 	 */
 	public static String getCoverage(ProteinGroupOccurrence proteinGroupOccurrence, FDRFilter filter,
 			boolean retrieveProteinSeqIfNotAvailable, UniprotProteinLocalRetriever upr) {
-		List<Double> coverages = new ArrayList<Double>();
+		final TDoubleArrayList coverages = new TDoubleArrayList();
 		if (proteinGroupOccurrence != null) {
-			List<String> accessions = proteinGroupOccurrence.getAccessions();
+			final List<String> accessions = proteinGroupOccurrence.getAccessions();
 
 			ProteinSequenceRetrieval.getProteinSequence(accessions, retrieveProteinSeqIfNotAvailable, upr);
-			for (String accession : accessions) {
+			for (final String accession : accessions) {
 				final List<ExtendedIdentifiedProtein> proteins = proteinGroupOccurrence.getProteins(accession);
 				// take the peptides of all ocurrences of the same protein
-				List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
-				for (ExtendedIdentifiedProtein protein : proteins) {
+				final List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
+				for (final ExtendedIdentifiedProtein protein : proteins) {
 					peptides.addAll(protein.getPeptides());
 				}
 
@@ -49,7 +51,7 @@ public class ProteinMerger {
 
 				// Get the protein sequence
 				String sequence = null;
-				for (ExtendedIdentifiedProtein protein : proteins) {
+				for (final ExtendedIdentifiedProtein protein : proteins) {
 					sequence = protein.getProteinSequence();
 					if (sequence != null && !"".equals(sequence))
 						break;
@@ -62,13 +64,13 @@ public class ProteinMerger {
 							upr);
 					if (sequence != null)
 						// set to all proteins
-						for (ExtendedIdentifiedProtein protein : proteins) {
+						for (final ExtendedIdentifiedProtein protein : proteins) {
 						protein.setProteinSequence(sequence);
 						}
 				}
 
 				// Calculate the protein coverage using all the peptides
-				Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
+				final Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
 				if (coverage != null) {
 					coverages.add(coverage);
 				}
@@ -76,7 +78,8 @@ public class ProteinMerger {
 			}
 			if (!coverages.isEmpty()) {
 				// make the mean of the coverages
-				Double meanCoverage = getMean(coverages);
+				final Double meanCoverage = getMean(coverages);
+				// return String.valueOf(coverages.max());
 
 				return meanCoverage.toString();
 			}
@@ -101,13 +104,13 @@ public class ProteinMerger {
 	 */
 	public static String getCoverage(ProteinGroup proteinGroup, FDRFilter filter,
 			boolean retrieveProteinSeqIfNotAvailable, UniprotProteinLocalRetriever upr) {
-		List<Double> coverages = new ArrayList<Double>();
+		final TDoubleArrayList coverages = new TDoubleArrayList();
 		if (proteinGroup != null) {
-			List<String> accessions = proteinGroup.getAccessions();
-			for (String accession : accessions) {
+			final List<String> accessions = proteinGroup.getAccessions();
+			for (final String accession : accessions) {
 				// take the peptides of all ocurrences of the same protein
-				List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
-				for (ExtendedIdentifiedProtein protein : proteinGroup) {
+				final List<ExtendedIdentifiedPeptide> peptides = new ArrayList<ExtendedIdentifiedPeptide>();
+				for (final ExtendedIdentifiedProtein protein : proteinGroup) {
 					peptides.addAll(protein.getPeptides());
 				}
 
@@ -116,7 +119,7 @@ public class ProteinMerger {
 
 				// Get the protein sequence
 				String sequence = null;
-				for (ExtendedIdentifiedProtein protein : proteinGroup) {
+				for (final ExtendedIdentifiedProtein protein : proteinGroup) {
 					sequence = protein.getProteinSequence();
 					if (sequence != null && !"".equals(sequence))
 						continue;
@@ -130,13 +133,13 @@ public class ProteinMerger {
 							upr);
 
 					// set to all proteins
-					for (ExtendedIdentifiedProtein protein : proteinGroup) {
+					for (final ExtendedIdentifiedProtein protein : proteinGroup) {
 						protein.setProteinSequence(sequence);
 					}
 				}
 
 				// Calculate the protein coverage using all the peptides
-				Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
+				final Double coverage = MiapeXmlUtil.calculateProteinCoverage(sequence, peptides);
 				if (coverage != null) {
 					coverages.add(coverage);
 
@@ -145,24 +148,18 @@ public class ProteinMerger {
 			}
 			if (!coverages.isEmpty()) {
 				// make the mean of the coverages
-				Double meanCoverage = getMean(coverages);
-
-				return meanCoverage.toString();
+				final double meanCoverage = getMean(coverages);
+				// return String.valueOf(coverages.max());
+				return String.valueOf(meanCoverage);
 			}
 		}
 		return null;
 	}
 
-	private static Double getMean(List<Double> doubles) {
+	private static double getMean(TDoubleArrayList doubles) {
 		if (doubles.isEmpty())
 			return 0.0;
-		int total = doubles.size();
-		Double sum = 0.0;
-		for (Double double1 : doubles) {
-			sum = sum + double1;
-		}
-		return sum / total;
-
+		return Maths.mean(doubles);
 	}
 
 }
