@@ -320,7 +320,7 @@ public class MiapeHeaderImpl implements MiapeDocument {
 			final Iterator<String> iterator = streamOfLines.iterator();
 			while (iterator.hasNext()) {
 				final String line = iterator.next();
-				if (!line.contains("<MIAPEProject")) {
+				if (line.contains("<MIAPEProject")) {
 					inProject = true;
 					final Matcher matcher = idPattern.matcher(line);
 					if (matcher.find()) {
@@ -334,7 +334,8 @@ public class MiapeHeaderImpl implements MiapeDocument {
 							idProject = -idProject;
 						}
 					}
-				} else if (line.contains("</MIAPEProject>")) {
+				}
+				if (line.contains("</MIAPEProject>")) {
 					inProject = false;
 				}
 				if (line.contains("<Name>")) {
