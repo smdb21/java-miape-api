@@ -221,7 +221,8 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		scores = new THashSet<PeptideScore>();
 		// scores.addAll(peptide.getScores());
 		for (final PeptideScore score : peptide.getScores()) {
-			final PeptideScore adaptedScore = new PeptideScoreBuilder(score.getName(), score.getValue()).build();
+			final PeptideScore adaptedScore = new PeptideScoreBuilder(StaticStrings.getUniqueInstance(score.getName()),
+					StaticStrings.getUniqueInstance(score.getValue())).build();
 			scores.add(adaptedScore);
 		}
 
