@@ -15,6 +15,7 @@ import org.proteored.miapeapi.experiment.model.grouping.PeptideRelation;
 import org.proteored.miapeapi.experiment.model.sort.SorterUtil;
 import org.proteored.miapeapi.experiment.model.sort.SortingManager;
 import org.proteored.miapeapi.experiment.model.sort.SortingParameters;
+import org.proteored.miapeapi.factories.msi.PeptideScoreBuilder;
 import org.proteored.miapeapi.interfaces.Software;
 import org.proteored.miapeapi.interfaces.msi.Database;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
@@ -218,7 +219,12 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		id = peptide.getId();
 		sequence = peptide.getSequence();
 		scores = new THashSet<PeptideScore>();
-		scores.addAll(peptide.getScores());
+		// scores.addAll(peptide.getScores());
+		for (final PeptideScore score : peptide.getScores()) {
+			final PeptideScore adaptedScore = new PeptideScoreBuilder(score.getName(), score.getValue()).build();
+			scores.add(adaptedScore);
+		}
+
 		modifications = new THashSet<PeptideModification>();
 		modifications.addAll(peptide.getModifications());
 		massDeviation = StaticStrings.getUniqueInstance(peptide.getMassDesviation());
