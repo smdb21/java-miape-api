@@ -28,18 +28,18 @@ public abstract class AbstractMiapeDocumentImpl implements MiapeDocument {
 	protected final ControlVocabularyManager cvUtil;
 
 	public AbstractMiapeDocumentImpl(AbstractMiapeDocumentBuilder builder) {
-		this.date = builder.date;
-		this.owner = builder.owner;
-		this.modificationDate = builder.modificationDate;
-		this.name = builder.name;
-		this.prideUrl = builder.prideUrl;
-		this.project = builder.project;
-		this.template = builder.template;
-		this.version = builder.version;
-		this.dbManager = builder.dbManager;
-		this.xmlManager = builder.xmlManager;
-		this.cvUtil = builder.cvUtil;
-
+		date = builder.date;
+		owner = builder.owner;
+		modificationDate = builder.modificationDate;
+		name = builder.name;
+		prideUrl = builder.prideUrl;
+		project = builder.project;
+		template = builder.template;
+		version = builder.version;
+		dbManager = builder.dbManager;
+		xmlManager = builder.xmlManager;
+		cvUtil = builder.cvUtil;
+		id = builder.id;
 	}
 
 	@Override
