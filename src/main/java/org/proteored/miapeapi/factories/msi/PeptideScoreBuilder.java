@@ -13,8 +13,8 @@ public class PeptideScoreBuilder {
 	 * {@link Score}
 	 */
 	public PeptideScoreBuilder(String scoreName, String scoreValue) {
-		this.name = scoreName;
-		this.value = scoreValue;
+		name = scoreName;
+		value = scoreValue;
 	}
 
 	public PeptideScore build() {
