@@ -24,6 +24,7 @@ public abstract class AbstractMiapeDocumentBuilder {
 	protected String prideUrl;
 	protected Boolean template;
 	protected String version;
+	protected int id;
 	protected ControlVocabularyManager cvUtil;
 
 	/**
@@ -33,14 +34,13 @@ public abstract class AbstractMiapeDocumentBuilder {
 	 * @param name
 	 * @param owner
 	 */
-	protected AbstractMiapeDocumentBuilder(Project project, String name,
-			User owner, PersistenceManager db) {
+	protected AbstractMiapeDocumentBuilder(Project project, String name, User owner, PersistenceManager db) {
 		this.project = project;
 		this.name = name;
 		this.owner = owner;
-		this.dbManager = db;
-		this.xmlManager = SpringHandler.getInstance().getXmlManager();
-		this.cvUtil = SpringHandler.getInstance().getCVManager();
+		dbManager = db;
+		xmlManager = SpringHandler.getInstance().getXmlManager();
+		cvUtil = SpringHandler.getInstance().getCVManager();
 	}
 
 	/**
@@ -52,24 +52,22 @@ public abstract class AbstractMiapeDocumentBuilder {
 	 * @param xmlManager
 	 * @param cvUtil
 	 */
-	protected AbstractMiapeDocumentBuilder(Project project, String name,
-			User owner, PersistenceManager db, XmlManager xmlManager,
-			ControlVocabularyManager cvUtil) {
+	protected AbstractMiapeDocumentBuilder(Project project, String name, User owner, PersistenceManager db,
+			XmlManager xmlManager, ControlVocabularyManager cvUtil) {
 		this.project = project;
 		this.name = name;
 		this.owner = owner;
-		this.dbManager = db;
+		dbManager = db;
 		this.xmlManager = xmlManager;
 		this.cvUtil = cvUtil;
 	}
 
-	protected AbstractMiapeDocumentBuilder(Project project, String name,
-			User owner) {
+	protected AbstractMiapeDocumentBuilder(Project project, String name, User owner) {
 		this.project = project;
 		this.name = name;
-		this.xmlManager = SpringHandler.getInstance().getXmlManager();
+		xmlManager = SpringHandler.getInstance().getXmlManager();
 		this.owner = owner;
-		this.cvUtil = SpringHandler.getInstance().getCVManager();
+		cvUtil = SpringHandler.getInstance().getCVManager();
 	}
 
 	public AbstractMiapeDocumentBuilder date(MiapeDate value) {
@@ -97,14 +95,18 @@ public abstract class AbstractMiapeDocumentBuilder {
 		return this;
 	}
 
-	public AbstractMiapeDocumentBuilder cvManager(
-			ControlVocabularyManager cvManager) {
-		this.cvUtil = cvManager;
+	public AbstractMiapeDocumentBuilder cvManager(ControlVocabularyManager cvManager) {
+		cvUtil = cvManager;
 		return this;
 	}
 
 	public AbstractMiapeDocumentBuilder dbManager(PersistenceManager dbManager) {
 		this.dbManager = dbManager;
+		return this;
+	}
+
+	public AbstractMiapeDocumentBuilder id(int id) {
+		this.id = id;
 		return this;
 	}
 
