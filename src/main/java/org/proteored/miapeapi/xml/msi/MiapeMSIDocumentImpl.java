@@ -78,6 +78,16 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	private int id = -1;
 	private boolean throwInconsistencies = true;
+	private THashSet<InputParameter> parameters;
+	private THashSet<Software> softwares;
+	private THashSet<Validation> validations;
+	private MSContact contact;
+	private MiapeDate date;
+	private Date modificationDate;
+	private Project project;
+	private Set<MSIAdditionalInformation> additionalInformations;
+	private Set<InputDataSet> inputDataSets;
+	private Set<IdentifiedProteinSet> proteinSets;
 	// private final List<IdentifiedProtein> identifiedProteins;
 	// private final List<IdentifiedPeptide> peptidesWithoutProtein = new
 	// ArrayList<IdentifiedPeptide>();
@@ -136,12 +146,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	private void initializeProteinsAndPeptideLists() {
 		log.info("Reading proteins and peptides...");
 		if (xmlMSIMiape != null) {
-			MSIIdentifiedPeptideSet msiIdentifiedPeptideSet = xmlMSIMiape.getMSIIdentifiedPeptideSet();
+			final MSIIdentifiedPeptideSet msiIdentifiedPeptideSet = xmlMSIMiape.getMSIIdentifiedPeptideSet();
 			if (msiIdentifiedPeptideSet != null) {
-				List<MSIIdentifiedPeptide> msiIdentifiedPeptides = msiIdentifiedPeptideSet.getMSIIdentifiedPeptide();
+				final List<MSIIdentifiedPeptide> msiIdentifiedPeptides = msiIdentifiedPeptideSet
+						.getMSIIdentifiedPeptide();
 				log.info(msiIdentifiedPeptides.size() + " peptides in dataset");
 				if (msiIdentifiedPeptides != null) {
-					for (MSIIdentifiedPeptide msiIdentifiedPeptide : msiIdentifiedPeptides) {
+					for (final MSIIdentifiedPeptide msiIdentifiedPeptide : msiIdentifiedPeptides) {
 						// Just include peptides that have been linked to any
 						// protein
 						// if (msiIdentifiedPeptide.getProteinRefs() != null) {
@@ -151,14 +162,14 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					}
 				}
 			}
-			List<MSIIdentifiedProteinSet> msiIdentifiedProteinSets = xmlMSIMiape.getMSIIdentifiedProteinSet();
+			final List<MSIIdentifiedProteinSet> msiIdentifiedProteinSets = xmlMSIMiape.getMSIIdentifiedProteinSet();
 			if (msiIdentifiedProteinSets != null) {
 				log.info(msiIdentifiedProteinSets.size() + " proteins in dataset");
-				for (MSIIdentifiedProteinSet msiIdentifiedProteinSet : msiIdentifiedProteinSets) {
-					List<MSIIdentifiedProtein> msiIdentifiedProteins = msiIdentifiedProteinSet
+				for (final MSIIdentifiedProteinSet msiIdentifiedProteinSet : msiIdentifiedProteinSets) {
+					final List<MSIIdentifiedProtein> msiIdentifiedProteins = msiIdentifiedProteinSet
 							.getMSIIdentifiedProtein();
 					if (msiIdentifiedProteins != null) {
-						for (MSIIdentifiedProtein msiIdentifiedProtein : msiIdentifiedProteins) {
+						for (final MSIIdentifiedProtein msiIdentifiedProtein : msiIdentifiedProteins) {
 							// Just include proteins that have been linked to
 							// any peptide
 							if (msiIdentifiedProtein.getPeptideRefs() != null) {
@@ -172,17 +183,17 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		}
 		// MAKE THE LINKS BETWEEN PROTEIN AND PEPTIDES:
 		if (!peptideList.isEmpty()) {
-			for (IdentifiedPeptide peptide : peptideList.values()) {
+			for (final IdentifiedPeptide peptide : peptideList.values()) {
 
-				IdentifiedPeptideImpl peptideImpl = (IdentifiedPeptideImpl) peptide;
-				List<Ref> proteinRefs = peptideImpl.getProteinRefs();
+				final IdentifiedPeptideImpl peptideImpl = (IdentifiedPeptideImpl) peptide;
+				final List<Ref> proteinRefs = peptideImpl.getProteinRefs();
 				if (proteinRefs != null && !proteinRefs.isEmpty()) {
-					for (Ref ref : proteinRefs) {
+					for (final Ref ref : proteinRefs) {
 						if (proteinList.containsKey(ref.getId())) {
 							peptideImpl.addProteinRelationship(proteinList.get(ref.getId()));
 						} else {
-							String message = "Referenced protein + '" + ref.getId() + "' not present in dataset "
-									+ this.getName();
+							final String message = "Referenced protein + '" + ref.getId() + "' not present in dataset "
+									+ getName();
 							log.debug(message);
 							if (throwInconsistencies) {
 								throw new MiapeDataInconsistencyException(message);
@@ -190,7 +201,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						}
 					}
 				} else {
-					String message = "Peptide " + peptide.getId() + " with no proteins";
+					final String message = "Peptide " + peptide.getId() + " with no proteins";
 					log.debug(message);
 					if (throwInconsistencies) {
 						throw new MiapeDataInconsistencyException(message);
@@ -199,16 +210,16 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			}
 		}
 		if (!proteinList.isEmpty()) {
-			for (IdentifiedProtein protein : proteinList.values()) {
-				IdentifiedProteinImpl proteinImpl = (IdentifiedProteinImpl) protein;
-				List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
+			for (final IdentifiedProtein protein : proteinList.values()) {
+				final IdentifiedProteinImpl proteinImpl = (IdentifiedProteinImpl) protein;
+				final List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
 				if (peptideRefs != null && !peptideRefs.isEmpty()) {
-					for (Ref ref : peptideRefs) {
+					for (final Ref ref : peptideRefs) {
 						if (peptideList.containsKey(ref.getId())) {
 							proteinImpl.addPeptideRelationship(peptideList.get(ref.getId()));
 						} else {
-							String message = "Referenced peptide '" + ref.getId() + "' not present in dataset "
-									+ this.getName();
+							final String message = "Referenced peptide '" + ref.getId() + "' not present in dataset "
+									+ getName();
 							log.debug(message);
 							if (throwInconsistencies) {
 								throw new MiapeDataInconsistencyException(message);
@@ -216,7 +227,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						}
 					}
 				} else {
-					String message = "Protein " + protein.getId() + " with no peptides";
+					final String message = "Protein " + protein.getId() + " with no peptides";
 					log.debug(message);
 					if (throwInconsistencies) {
 						throw new MiapeDataInconsistencyException(message);
@@ -225,23 +236,23 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			}
 		}
 
-		TIntHashSet peptideIds = new TIntHashSet();
-		for (IdentifiedProtein prot : proteinList.values()) {
+		final TIntHashSet peptideIds = new TIntHashSet();
+		for (final IdentifiedProtein prot : proteinList.values()) {
 			if (prot.getIdentifiedPeptides().isEmpty()) {
 				log.debug("Protein with no peptides: ID=" + prot.getId() + " in " + xmlMSIMiape.getName());
 			}
-			for (IdentifiedPeptide pep : prot.getIdentifiedPeptides()) {
+			for (final IdentifiedPeptide pep : prot.getIdentifiedPeptides()) {
 				peptideIds.add(pep.getId());
 			}
 		}
 		log.info("peptides=" + peptideList.size());
-		TIntHashSet proteinIds = new TIntHashSet();
-		for (IdentifiedPeptide pept : peptideList.values()) {
+		final TIntHashSet proteinIds = new TIntHashSet();
+		for (final IdentifiedPeptide pept : peptideList.values()) {
 
 			if (pept.getIdentifiedProteins().isEmpty()) {
 				log.debug("Peptide with no proteins: ID=" + pept.getId() + " in " + xmlMSIMiape.getName());
 			}
-			for (IdentifiedProtein prot : pept.getIdentifiedProteins()) {
+			for (final IdentifiedProtein prot : pept.getIdentifiedProteins()) {
 				proteinIds.add(prot.getId());
 			}
 		}
@@ -249,22 +260,23 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private void initializeProteinsAndPeptideListsInParallel() {
-		int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
+		final int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
 		log.info("Reading proteins and peptides in parallel...");
 		if (xmlMSIMiape != null) {
-			MSIIdentifiedPeptideSet msiIdentifiedPeptideSet = xmlMSIMiape.getMSIIdentifiedPeptideSet();
+			final MSIIdentifiedPeptideSet msiIdentifiedPeptideSet = xmlMSIMiape.getMSIIdentifiedPeptideSet();
 			if (msiIdentifiedPeptideSet != null) {
-				List<MSIIdentifiedPeptide> msiIdentifiedPeptides = msiIdentifiedPeptideSet.getMSIIdentifiedPeptide();
+				final List<MSIIdentifiedPeptide> msiIdentifiedPeptides = msiIdentifiedPeptideSet
+						.getMSIIdentifiedPeptide();
 				if (msiIdentifiedPeptides != null) {
 
-					ParIterator<MSIIdentifiedPeptide> iterator = ParIteratorFactory
+					final ParIterator<MSIIdentifiedPeptide> iterator = ParIteratorFactory
 							.createParIterator(msiIdentifiedPeptides, threadCount, Schedule.GUIDED);
 
-					Reducible<Map<String, IdentifiedPeptide>> reduciblePeptideMap = new Reducible<Map<String, IdentifiedPeptide>>();
-					List<IdentifiedPeptideParallelProcesor> runners = new ArrayList<IdentifiedPeptideParallelProcesor>();
+					final Reducible<Map<String, IdentifiedPeptide>> reduciblePeptideMap = new Reducible<Map<String, IdentifiedPeptide>>();
+					final List<IdentifiedPeptideParallelProcesor> runners = new ArrayList<IdentifiedPeptideParallelProcesor>();
 					for (int numCore = 0; numCore < threadCount; numCore++) {
 						// take current DB session
-						IdentifiedPeptideParallelProcesor runner = new IdentifiedPeptideParallelProcesor(iterator,
+						final IdentifiedPeptideParallelProcesor runner = new IdentifiedPeptideParallelProcesor(iterator,
 								reduciblePeptideMap, mapInputData);
 						runners.add(runner);
 						runner.start();
@@ -273,24 +285,24 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					for (int k = 0; k < threadCount; k++) {
 						try {
 							runners.get(k).join();
-						} catch (InterruptedException e) {
+						} catch (final InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
 					if (iterator.getAllExceptions().length > 0) {
 						throw new IllegalArgumentException(iterator.getAllExceptions()[0].getException());
 					}
-					Reduction<Map<String, IdentifiedPeptide>> peptideReduction = new Reduction<Map<String, IdentifiedPeptide>>() {
+					final Reduction<Map<String, IdentifiedPeptide>> peptideReduction = new Reduction<Map<String, IdentifiedPeptide>>() {
 						@Override
 						public Map<String, IdentifiedPeptide> reduce(Map<String, IdentifiedPeptide> first,
 								Map<String, IdentifiedPeptide> second) {
-							Map<String, IdentifiedPeptide> ret = new THashMap<String, IdentifiedPeptide>();
-							for (String peptideID : first.keySet()) {
+							final Map<String, IdentifiedPeptide> ret = new THashMap<String, IdentifiedPeptide>();
+							for (final String peptideID : first.keySet()) {
 								if (!ret.containsKey(peptideID)) {
 									ret.put(peptideID, first.get(peptideID));
 								}
 							}
-							for (String peptideID : second.keySet()) {
+							for (final String peptideID : second.keySet()) {
 								if (!ret.containsKey(peptideID)) {
 									ret.put(peptideID, second.get(peptideID));
 								}
@@ -305,20 +317,20 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			}
 
 			// Proteins
-			List<MSIIdentifiedProteinSet> msiIdentifiedProteinSets = xmlMSIMiape.getMSIIdentifiedProteinSet();
+			final List<MSIIdentifiedProteinSet> msiIdentifiedProteinSets = xmlMSIMiape.getMSIIdentifiedProteinSet();
 			if (msiIdentifiedProteinSets != null) {
-				for (MSIIdentifiedProteinSet msiIdentifiedProteinSet : msiIdentifiedProteinSets) {
-					List<MSIIdentifiedProtein> msiIdentifiedProteins = msiIdentifiedProteinSet
+				for (final MSIIdentifiedProteinSet msiIdentifiedProteinSet : msiIdentifiedProteinSets) {
+					final List<MSIIdentifiedProtein> msiIdentifiedProteins = msiIdentifiedProteinSet
 							.getMSIIdentifiedProtein();
 					if (msiIdentifiedProteins != null) {
-						ParIterator<MSIIdentifiedProtein> iterator = ParIteratorFactory
+						final ParIterator<MSIIdentifiedProtein> iterator = ParIteratorFactory
 								.createParIterator(msiIdentifiedProteins, threadCount, Schedule.GUIDED);
-						Reducible<Map<String, IdentifiedProtein>> reducibleProteinMap = new Reducible<Map<String, IdentifiedProtein>>();
-						List<IdentifiedProteinParallelProcesor> runners = new ArrayList<IdentifiedProteinParallelProcesor>();
+						final Reducible<Map<String, IdentifiedProtein>> reducibleProteinMap = new Reducible<Map<String, IdentifiedProtein>>();
+						final List<IdentifiedProteinParallelProcesor> runners = new ArrayList<IdentifiedProteinParallelProcesor>();
 						for (int numCore = 0; numCore < threadCount; numCore++) {
 							// take current DB session
-							IdentifiedProteinParallelProcesor runner = new IdentifiedProteinParallelProcesor(iterator,
-									reducibleProteinMap);
+							final IdentifiedProteinParallelProcesor runner = new IdentifiedProteinParallelProcesor(
+									iterator, reducibleProteinMap);
 							runners.add(runner);
 							runner.start();
 						}
@@ -327,22 +339,23 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						for (int k = 0; k < threadCount; k++) {
 							try {
 								runners.get(k).join();
-							} catch (InterruptedException e) {
+							} catch (final InterruptedException e) {
 								e.printStackTrace();
 							}
 						}
 
-						Reduction<Map<String, IdentifiedProtein>> ProteinReduction = new Reduction<Map<String, IdentifiedProtein>>() {
+						final Reduction<Map<String, IdentifiedProtein>> ProteinReduction = new Reduction<Map<String, IdentifiedProtein>>() {
+
 							@Override
 							public Map<String, IdentifiedProtein> reduce(Map<String, IdentifiedProtein> first,
 									Map<String, IdentifiedProtein> second) {
-								Map<String, IdentifiedProtein> ret = new THashMap<String, IdentifiedProtein>();
-								for (String ProteinID : first.keySet()) {
+								final Map<String, IdentifiedProtein> ret = new THashMap<String, IdentifiedProtein>();
+								for (final String ProteinID : first.keySet()) {
 									if (!ret.containsKey(ProteinID)) {
 										ret.put(ProteinID, first.get(ProteinID));
 									}
 								}
-								for (String ProteinID : second.keySet()) {
+								for (final String ProteinID : second.keySet()) {
 									if (!ret.containsKey(ProteinID)) {
 										ret.put(ProteinID, second.get(ProteinID));
 									}
@@ -359,12 +372,12 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		}
 		// MAKE THE LINKS BETWEEN PROTEIN AND PEPTIDES:
 		if (!peptideList.isEmpty()) {
-			for (IdentifiedPeptide peptide : peptideList.values()) {
+			for (final IdentifiedPeptide peptide : peptideList.values()) {
 
-				IdentifiedPeptideImpl peptideImpl = (IdentifiedPeptideImpl) peptide;
-				List<Ref> proteinRefs = peptideImpl.getProteinRefs();
+				final IdentifiedPeptideImpl peptideImpl = (IdentifiedPeptideImpl) peptide;
+				final List<Ref> proteinRefs = peptideImpl.getProteinRefs();
 				if (proteinRefs != null) {
-					for (Ref ref : proteinRefs) {
+					for (final Ref ref : proteinRefs) {
 						if (proteinList.containsKey(ref.getId())) {
 							peptideImpl.addProteinRelationship(proteinList.get(ref.getId()));
 						} else {
@@ -376,11 +389,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			}
 		}
 		if (!proteinList.isEmpty()) {
-			for (IdentifiedProtein protein : proteinList.values()) {
-				IdentifiedProteinImpl proteinImpl = (IdentifiedProteinImpl) protein;
-				List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
+			for (final IdentifiedProtein protein : proteinList.values()) {
+				final IdentifiedProteinImpl proteinImpl = (IdentifiedProteinImpl) protein;
+				final List<Ref> peptideRefs = proteinImpl.getPeptideRefs();
 				if (peptideRefs != null) {
-					for (Ref ref : peptideRefs) {
+					for (final Ref ref : peptideRefs) {
 						if (peptideList.containsKey(ref.getId()))
 							proteinImpl.addPeptideRelationship(peptideList.get(ref.getId()));
 						else
@@ -393,10 +406,10 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Map<String, MSISoftwareType> initMapSoftware() {
-		Map<String, MSISoftwareType> map = new THashMap<String, MSISoftwareType>();
-		List<MSISoftwareType> msiSoftware = xmlMSIMiape.getMSISoftware();
+		final Map<String, MSISoftwareType> map = new THashMap<String, MSISoftwareType>();
+		final List<MSISoftwareType> msiSoftware = xmlMSIMiape.getMSISoftware();
 		if (msiSoftware != null) {
-			for (MSISoftwareType softwareXML : msiSoftware) {
+			for (final MSISoftwareType softwareXML : msiSoftware) {
 				map.put(softwareXML.getId(), softwareXML);
 			}
 		}
@@ -404,10 +417,10 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Map<String, MSIInputParameters> initMapInputParameter() {
-		Map<String, MSIInputParameters> map = new THashMap<String, MSIInputParameters>();
-		List<MSIInputParameters> msiInputParameters = xmlMSIMiape.getMSIInputParameters();
+		final Map<String, MSIInputParameters> map = new THashMap<String, MSIInputParameters>();
+		final List<MSIInputParameters> msiInputParameters = xmlMSIMiape.getMSIInputParameters();
 		if (msiInputParameters != null) {
-			for (MSIInputParameters inputParameterXML : msiInputParameters) {
+			for (final MSIInputParameters inputParameterXML : msiInputParameters) {
 				map.put(inputParameterXML.getId(), inputParameterXML);
 			}
 		}
@@ -415,13 +428,13 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Map<String, MSIInputData> initMapInputData() {
-		Map<String, MSIInputData> map = new THashMap<String, MSIInputData>();
-		List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
+		final Map<String, MSIInputData> map = new THashMap<String, MSIInputData>();
+		final List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
 		if (msiInputDataSet != null) {
-			for (MSIInputDataSet inputDataSetXML : msiInputDataSet) {
-				List<MSIInputData> msiInputData = inputDataSetXML.getMSIInputData();
+			for (final MSIInputDataSet inputDataSetXML : msiInputDataSet) {
+				final List<MSIInputData> msiInputData = inputDataSetXML.getMSIInputData();
 				if (msiInputData != null) {
-					for (MSIInputData inputDataXML : msiInputData) {
+					for (final MSIInputData inputDataXML : msiInputData) {
 						map.put(inputDataXML.getId(), inputDataXML);
 					}
 				}
@@ -431,10 +444,10 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private Map<String, MSIInputDataSet> initMapInputDataSet() {
-		Map<String, MSIInputDataSet> map = new THashMap<String, MSIInputDataSet>();
-		List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
+		final Map<String, MSIInputDataSet> map = new THashMap<String, MSIInputDataSet>();
+		final List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
 		if (msiInputDataSet != null) {
-			for (MSIInputDataSet xmlInputDataSet : msiInputDataSet) {
+			for (final MSIInputDataSet xmlInputDataSet : msiInputDataSet) {
 				map.put(xmlInputDataSet.getId(), xmlInputDataSet);
 			}
 		}
@@ -457,49 +470,58 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Set<IdentifiedProteinSet> getIdentifiedProteinSets() {
-		List<MSIIdentifiedProteinSet> msiIdentifiedProteinSet = xmlMSIMiape.getMSIIdentifiedProteinSet();
-		if (msiIdentifiedProteinSet == null)
-			return null;
-		Set<IdentifiedProteinSet> proteinSet = new THashSet<IdentifiedProteinSet>();
-		for (MSIIdentifiedProteinSet xmlProteinSet : msiIdentifiedProteinSet) {
-			proteinSet.add(new IdentifiedProteinSetImpl(xmlProteinSet, mapInputData, mapInputDataSet, mapInputParameter,
-					mapSoftware, proteinList));
+		if (proteinSets == null) {
+			final List<MSIIdentifiedProteinSet> msiIdentifiedProteinSet = xmlMSIMiape.getMSIIdentifiedProteinSet();
+			if (msiIdentifiedProteinSet == null)
+				return null;
+			proteinSets = new THashSet<IdentifiedProteinSet>();
+			for (final MSIIdentifiedProteinSet xmlProteinSet : msiIdentifiedProteinSet) {
+				proteinSets.add(new IdentifiedProteinSetImpl(xmlProteinSet, mapInputData, mapInputDataSet,
+						mapInputParameter, mapSoftware, proteinList));
+			}
 		}
-		return proteinSet;
+		return proteinSets;
 	}
 
 	@Override
 	public Set<InputDataSet> getInputDataSets() {
-		List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
-		if (msiInputDataSet == null)
-			return null;
-		Set<InputDataSet> inputDataSets = new THashSet<InputDataSet>();
-		for (MSIInputDataSet xmlInputDataSet : msiInputDataSet) {
-			inputDataSets.add(new InputDataSetImpl(xmlInputDataSet));
+		if (inputDataSets == null) {
+			final List<MSIInputDataSet> msiInputDataSet = xmlMSIMiape.getMSIInputDataSet();
+			if (msiInputDataSet == null)
+				return null;
+			inputDataSets = new THashSet<InputDataSet>();
+			for (final MSIInputDataSet xmlInputDataSet : msiInputDataSet) {
+				inputDataSets.add(new InputDataSetImpl(xmlInputDataSet));
+			}
 		}
 		return inputDataSets;
+
 	}
 
 	@Override
 	public Set<InputParameter> getInputParameters() {
-		List<MSIInputParameters> msiInputParameters = xmlMSIMiape.getMSIInputParameters();
-		if (msiInputParameters == null)
-			return null;
-		Set<InputParameter> parameters = new THashSet<InputParameter>();
-		for (MSIInputParameters xmlInputParameter : msiInputParameters) {
-			parameters.add(new InputParameterImpl(xmlInputParameter, mapSoftware));
+		if (parameters == null) {
+			final List<MSIInputParameters> msiInputParameters = xmlMSIMiape.getMSIInputParameters();
+			if (msiInputParameters == null)
+				return null;
+			parameters = new THashSet<InputParameter>();
+			for (final MSIInputParameters xmlInputParameter : msiInputParameters) {
+				parameters.add(new InputParameterImpl(xmlInputParameter, mapSoftware));
+			}
 		}
 		return parameters;
 	}
 
 	@Override
 	public Set<Software> getSoftwares() {
-		List<MSISoftwareType> msiSoftware = xmlMSIMiape.getMSISoftware();
-		if (msiSoftware == null)
-			return null;
-		Set<Software> softwares = new THashSet<Software>();
-		for (MSISoftwareType software : msiSoftware) {
-			softwares.add(new SoftwareMSIImpl(software));
+		if (softwares == null) {
+			final List<MSISoftwareType> msiSoftware = xmlMSIMiape.getMSISoftware();
+			if (msiSoftware == null)
+				return null;
+			softwares = new THashSet<Software>();
+			for (final MSISoftwareType software : msiSoftware) {
+				softwares.add(new SoftwareMSIImpl(software));
+			}
 		}
 		return softwares;
 	}
@@ -509,7 +531,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		if (msDocumentID > 0)
 			return msDocumentID;
 		if (xmlMSIMiape != null) {
-			Integer miapemsRef = xmlMSIMiape.getMIAPEMSRef();
+			final Integer miapemsRef = xmlMSIMiape.getMIAPEMSRef();
 			if (miapemsRef != null)
 				return miapemsRef;
 		}
@@ -518,30 +540,37 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Set<Validation> getValidations() {
-		Set<Validation> validations = new THashSet<Validation>();
-		List<MSIValidation> msiValidation = xmlMSIMiape.getMSIValidation();
-		if (msiValidation == null)
-			return null;
-		for (MSIValidation xmlValidation : msiValidation) {
-			validations.add(new ValidationImpl(xmlValidation));
+		if (validations == null) {
+			validations = new THashSet<Validation>();
+			final List<MSIValidation> msiValidation = xmlMSIMiape.getMSIValidation();
+			if (msiValidation == null)
+				return null;
+			for (final MSIValidation xmlValidation : msiValidation) {
+				validations.add(new ValidationImpl(xmlValidation));
+			}
 		}
 		return validations;
 	}
 
 	@Override
 	public MSContact getContact() {
-		MIAPEContactType msiContact = xmlMSIMiape.getMSIContact();
-		if (msiContact != null)
-			return new ContactImpl(msiContact);
-		return null;
+		if (contact == null) {
+			final MIAPEContactType msiContact = xmlMSIMiape.getMSIContact();
+			if (msiContact != null) {
+				contact = new ContactImpl(msiContact);
+			}
+		}
+		return contact;
 	}
 
 	@Override
 	public MiapeDate getDate() {
-		String date = xmlMSIMiape.getDate();
-		if (date != null)
-			return new MiapeDate(date);
-		return null;
+		if (date == null) {
+			final String dateString = xmlMSIMiape.getDate();
+			if (dateString != null)
+				date = new MiapeDate(dateString);
+		}
+		return date;
 	}
 
 	@Override
@@ -555,11 +584,14 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Date getModificationDate() {
-		XMLGregorianCalendar modificationDate = xmlMSIMiape.getModificationDate();
-		if (modificationDate != null && modificationDate.toGregorianCalendar() != null) {
-			return modificationDate.toGregorianCalendar().getTime();
+		if (modificationDate == null) {
+			final XMLGregorianCalendar modificationDateXML = xmlMSIMiape.getModificationDate();
+			if (modificationDateXML != null && modificationDateXML.toGregorianCalendar() != null) {
+				modificationDate = modificationDateXML.toGregorianCalendar().getTime();
+
+			}
 		}
-		return null;
+		return modificationDate;
 	}
 
 	@Override
@@ -579,10 +611,12 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Project getProject() {
-		MIAPEProject project = xmlMSIMiape.getMIAPEProject();
-		if (project != null)
-			return new ProjectImpl(project, user, dbManager);
-		return null;
+		if (project == null) {
+			final MIAPEProject projectXML = xmlMSIMiape.getMIAPEProject();
+			if (projectXML != null)
+				project = new ProjectImpl(projectXML, user, dbManager);
+		}
+		return project;
 	}
 
 	@Override
@@ -633,15 +667,16 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public Set<MSIAdditionalInformation> getAdditionalInformations() {
-		Set<MSIAdditionalInformation> setOfAdditionalInformation = new THashSet<MSIAdditionalInformation>();
-		List<ParamType> additionalInformationList = xmlMSIMiape.getMSIAdditionalInformation();
-		if (additionalInformationList != null) {
-			for (ParamType msAdditionalInformation : additionalInformationList) {
-				setOfAdditionalInformation.add(new AdditionalInformationImpl(msAdditionalInformation));
+		if (additionalInformations == null) {
+			additionalInformations = new THashSet<MSIAdditionalInformation>();
+			final List<ParamType> additionalInformationList = xmlMSIMiape.getMSIAdditionalInformation();
+			if (additionalInformationList != null) {
+				for (final ParamType msAdditionalInformation : additionalInformationList) {
+					additionalInformations.add(new AdditionalInformationImpl(msAdditionalInformation));
+				}
 			}
-			return setOfAdditionalInformation;
 		}
-		return null;
+		return additionalInformations;
 	}
 
 	@Override
@@ -656,9 +691,9 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public List<IdentifiedPeptide> getIdentifiedPeptides() {
-		List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
+		final List<IdentifiedPeptide> ret = new ArrayList<IdentifiedPeptide>();
 		if (peptideList != null) {
-			for (IdentifiedPeptide identifiedPeptide : peptideList.values()) {
+			for (final IdentifiedPeptide identifiedPeptide : peptideList.values()) {
 
 				ret.add(identifiedPeptide);
 			}
