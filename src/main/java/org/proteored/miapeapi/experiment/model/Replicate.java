@@ -86,7 +86,7 @@ public class Replicate implements IdentificationSet<Void> {
 		else
 			this.cvManager = SpringHandler.getInstance().getCVManager();
 		this.miapeMSs = miapeMSs;
-		this.miapeMSIs = miapeMSIs;
+		this.miapeMSIs = new LightMiapeMSIListAdapter(miapeMSIs).adapt();
 		dataManager = new ReplicateDataManager(this, miapeMSIs, filters, doNotGroupNonConclusiveProteins,
 				separateNonConclusiveProteins, minPeptideLength, processInParallel);
 	}
