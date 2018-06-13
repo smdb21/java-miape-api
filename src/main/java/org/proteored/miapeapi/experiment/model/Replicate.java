@@ -227,11 +227,13 @@ public class Replicate implements IdentificationSet<Void> {
 
 	@Override
 	public int getProteinGroupOccurrenceNumber(ProteinGroup proteinGroup) {
-		final List<ProteinGroup> proteinGroups = getIdentifiedProteinGroups();
-		if (proteinGroups.contains(proteinGroup))
-			return 1;
-
-		return 0;
+		return dataManager.getProteinGroupOccurrenceNumber(proteinGroup);
+		// final List<ProteinGroup> proteinGroups =
+		// getIdentifiedProteinGroups();
+		// if (proteinGroups.contains(proteinGroup))
+		// return 1;
+		//
+		// return 0;
 	}
 
 	@Override
