@@ -217,8 +217,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	@Override
 	public String getGeneratedFilesDescription() {
-		// TODO
-		return "MIAPEMSIfromDTASelect";
+		return "MIAPEMSIfromTextFile";
 	}
 
 	@Override
