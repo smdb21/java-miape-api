@@ -505,7 +505,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 										}
 									}
 									if (ptmFromReader == null) {
-										System.out.println(individualModification);
+										log.info(individualModification + " not recognized in ontologies");
 									}
 									if (ptmFromReader != null) {
 										final PeptideModificationBuilder ptmBuilder = MiapeMSIDocumentFactory
