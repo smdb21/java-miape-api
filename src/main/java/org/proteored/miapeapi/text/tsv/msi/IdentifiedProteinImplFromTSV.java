@@ -14,6 +14,7 @@ public class IdentifiedProteinImplFromTSV implements IdentifiedProtein {
 	private final int id;
 	private final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
 	private final String description;
+	private static Integer seed;
 
 	public IdentifiedProteinImplFromTSV(String acc) {
 		this.acc = acc;
@@ -32,9 +33,12 @@ public class IdentifiedProteinImplFromTSV implements IdentifiedProtein {
 	}
 
 	private int getRandomInt() {
-		Random generator = new Random();
-		int i = generator.nextInt(Integer.MAX_VALUE);
-		return i;
+		if (seed == null) {
+			final Random generator = new Random();
+			seed = generator.nextInt(Integer.MAX_VALUE);
+		}
+		seed = seed + 1;
+		return seed;
 	}
 
 	@Override

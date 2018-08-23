@@ -2,6 +2,7 @@ package org.proteored.miapeapi.text.tsv.msi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
@@ -24,6 +25,7 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	private String charge;
 	private Double precursorMZ;
 	private String retentionTime;
+	private static Integer seed;
 
 	public IdentifiedPeptideImplFromTSV(String seq) {
 		sequence = seq.toUpperCase();
@@ -35,10 +37,12 @@ public class IdentifiedPeptideImplFromTSV implements IdentifiedPeptide {
 	}
 
 	private int getRandomInt() {
-		// Random generator = new Random();
-		// int i = generator.nextInt(Integer.MAX_VALUE);
-		// return i;
-		return hashCode();
+		if (seed == null) {
+			final Random generator = new Random();
+			seed = generator.nextInt(Integer.MAX_VALUE);
+		}
+		seed = seed + 1;
+		return seed;
 	}
 
 	@Override
