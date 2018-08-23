@@ -42,7 +42,7 @@ public class PAnalyzer {
 	private PanalyzerStats mStats;
 	private final boolean separateNonConclusiveProteins;
 	private final boolean doNotGroupNonConclusiveProteins;
-	private boolean ignoreProteinId;
+	private final boolean ignoreProteinId;
 
 	/**
 	 * ignoreProteinId=true
@@ -74,7 +74,8 @@ public class PAnalyzer {
 	}
 
 	public List<ProteinGroup> run(Collection<ExtendedIdentifiedProtein> proteins) {
-		long t1 = System.currentTimeMillis();
+
+		final long t1 = System.currentTimeMillis();
 		log.info("Grouping " + proteins.size() + " proteins");
 		createInferenceMaps(proteins);
 		log.debug("Running panalyzer for " + mProts.size() + " proteins and " + mPepts.size() + " peptides");
@@ -107,7 +108,7 @@ public class PAnalyzer {
 		}
 
 		log.debug("Extracting groups");
-		ArrayList<ProteinGroup> resultingGroups = extractProteinGroups();
+		final ArrayList<ProteinGroup> resultingGroups = extractProteinGroups();
 		// long t7 = System.currentTimeMillis();
 
 		// SorterUtil.sortProteinGroupsByAccession(resultingGroups);
@@ -129,18 +130,18 @@ public class PAnalyzer {
 	private void collapseNonConclusiveGroups() {
 		final Iterator<ProteinGroupInference> proteinGroupIterator = mGroups.iterator();
 		while (proteinGroupIterator.hasNext()) {
-			ProteinGroupInference proteinGroup = proteinGroupIterator.next();
+			final ProteinGroupInference proteinGroup = proteinGroupIterator.next();
 
 			if (proteinGroup.getEvidence() == ProteinEvidence.NONCONCLUSIVE) {
-				InferenceProtein nonConclusiveProtein = proteinGroup.get(0);
+				final InferenceProtein nonConclusiveProtein = proteinGroup.get(0);
 
-				List<InferencePeptide> inferencePeptides = nonConclusiveProtein.getInferencePeptides();
+				final List<InferencePeptide> inferencePeptides = nonConclusiveProtein.getInferencePeptides();
 				if (doNotGroupNonConclusiveProteins) {
 					// remove the group and remove the protein from the dataset
 					// by removing
 					// the nonConclusive protein from all its peptides
-					for (InferencePeptide inferencePeptide : inferencePeptides) {
-						int size = inferencePeptide.getInferenceProteins().size();
+					for (final InferencePeptide inferencePeptide : inferencePeptides) {
+						final int size = inferencePeptide.getInferenceProteins().size();
 						if (size < 2) {
 							throw new MiapeDataInconsistencyException(
 									"Peptides of a non conclusive protein are always shared by another protein");
@@ -150,14 +151,14 @@ public class PAnalyzer {
 						}
 						// remove the non conclusive protein from their peptides
 						// (those peptide could be linked to any other protein)
-						boolean remove = inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
+						final boolean remove = inferencePeptide.getInferenceProteins().remove(nonConclusiveProtein);
 						//// do the same for the actual
 						//// ExtendedIdentifiedProteins that are behind the
 						//// inferenceProteins
-						List<ExtendedIdentifiedProtein> proteinsMerged = nonConclusiveProtein.getProteinsMerged();
-						for (ExtendedIdentifiedPeptide peptide : inferencePeptide.getMergedPeptides()) {
-							for (ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
-								boolean removed = peptide.getProteins().remove(extendedIdentifiedProtein);
+						final List<ExtendedIdentifiedProtein> proteinsMerged = nonConclusiveProtein.getProteinsMerged();
+						for (final ExtendedIdentifiedPeptide peptide : inferencePeptide.getMergedPeptides()) {
+							for (final ExtendedIdentifiedProtein extendedIdentifiedProtein : proteinsMerged) {
+								final boolean removed = peptide.getProteins().remove(extendedIdentifiedProtein);
 								if (removed && nonConclusiveProtein.getAccession().equals("P01774")) {
 									System.out.println(extendedIdentifiedProtein.getId() + " " + peptide.getId());
 								}
@@ -175,11 +176,11 @@ public class PAnalyzer {
 				final List<InferencePeptide> peptides = inferencePeptides;
 				// grab all other protein groups in which that protein is
 				// sharing non discriminating peptides
-				Set<ProteinGroupInference> otherProteinGroups = new THashSet<ProteinGroupInference>();
-				for (InferencePeptide peptide : peptides) {
+				final Set<ProteinGroupInference> otherProteinGroups = new THashSet<ProteinGroupInference>();
+				for (final InferencePeptide peptide : peptides) {
 					if (peptide.getRelation() == PeptideRelation.NONDISCRIMINATING) {
 						final List<InferenceProtein> proteinsSharingThisPeptide = peptide.getInferenceProteins();
-						for (InferenceProtein proteinSharingNonDiscriminatingPeptide : proteinsSharingThisPeptide) {
+						for (final InferenceProtein proteinSharingNonDiscriminatingPeptide : proteinsSharingThisPeptide) {
 							if (proteinSharingNonDiscriminatingPeptide.hashCode() != nonConclusiveProteinHashCode) {
 								if (!proteinSharingNonDiscriminatingPeptide.getGroup().equals(proteinGroup)
 										&& proteinSharingNonDiscriminatingPeptide.getGroup()
@@ -206,10 +207,10 @@ public class PAnalyzer {
 	}
 
 	private ArrayList<ProteinGroup> extractProteinGroups() {
-		ArrayList<ProteinGroup> ret = new ArrayList<ProteinGroup>();
+		final ArrayList<ProteinGroup> ret = new ArrayList<ProteinGroup>();
 
-		for (ProteinGroupInference iProteinGroup : mGroups) {
-			ProteinGroup pg = new ProteinGroup(iProteinGroup);
+		for (final ProteinGroupInference iProteinGroup : mGroups) {
+			final ProteinGroup pg = new ProteinGroup(iProteinGroup);
 			ret.add(pg);
 		}
 
@@ -219,9 +220,9 @@ public class PAnalyzer {
 	private void createInferenceMaps(Collection<ExtendedIdentifiedProtein> proteins) {
 		InferenceProtein iProt = null;
 		InferencePeptide iPept = null;
-		TIntHashSet proteinIds = new TIntHashSet();
+		final TIntHashSet proteinIds = new TIntHashSet();
 
-		for (ExtendedIdentifiedProtein prot : proteins) {
+		for (final ExtendedIdentifiedProtein prot : proteins) {
 			if (ignoreProteinId || !proteinIds.contains(prot.getId())) {
 				proteinIds.add(prot.getId());
 				iProt = mProts.get(prot.getAccession());
@@ -233,9 +234,9 @@ public class PAnalyzer {
 					iProt.addExtendedProtein(prot);
 				}
 
-				List<ExtendedIdentifiedPeptide> peptides = prot.getPeptides();
+				final List<ExtendedIdentifiedPeptide> peptides = prot.getPeptides();
 				if (peptides != null && !peptides.isEmpty()) {
-					for (ExtendedIdentifiedPeptide pept : peptides) {
+					for (final ExtendedIdentifiedPeptide pept : peptides) {
 						iPept = mPepts.get(pept.getSequence());
 						if (iPept == null) {
 							iPept = new InferencePeptide(pept);
@@ -266,7 +267,7 @@ public class PAnalyzer {
 
 	private void classifyPeptides() {
 		// Locate unique peptides
-		for (InferencePeptide pept : mPepts.values()) {
+		for (final InferencePeptide pept : mPepts.values()) {
 			if (pept.getInferenceProteins().size() == 1) {
 				pept.setRelation(PeptideRelation.UNIQUE);
 				pept.getInferenceProteins().get(0).setEvidence(ProteinEvidence.CONCLUSIVE);
@@ -275,10 +276,10 @@ public class PAnalyzer {
 			}
 		}
 		// Locate non-meaningful peptides (first round)
-		for (InferenceProtein prot : mProts.values()) {
+		for (final InferenceProtein prot : mProts.values()) {
 			if (prot.getEvidence() == ProteinEvidence.CONCLUSIVE) {
 				// if conclusive is because they have a unique peptide
-				for (InferencePeptide pept : prot.getInferencePeptides()) {
+				for (final InferencePeptide pept : prot.getInferencePeptides()) {
 					if (pept.getRelation() != PeptideRelation.UNIQUE) {
 						pept.setRelation(PeptideRelation.NONDISCRIMINATING);
 					}
@@ -288,11 +289,11 @@ public class PAnalyzer {
 
 		// Locate non-meaningful peptides (second round)
 		boolean shared;
-		for (InferencePeptide pept : mPepts.values()) {
+		for (final InferencePeptide pept : mPepts.values()) {
 			if (pept.getRelation() != PeptideRelation.DISCRIMINATING) {
 				continue;
 			}
-			for (InferencePeptide pept2 : pept.getInferenceProteins().get(0).getInferencePeptides()) {
+			for (final InferencePeptide pept2 : pept.getInferenceProteins().get(0).getInferencePeptides()) {
 				if (pept2.getRelation() == PeptideRelation.NONDISCRIMINATING) {
 					continue;
 				}
@@ -300,7 +301,7 @@ public class PAnalyzer {
 					continue;
 				}
 				shared = true;
-				for (InferenceProtein p : pept.getInferenceProteins()) {
+				for (final InferenceProtein p : pept.getInferenceProteins()) {
 					if (!p.getInferencePeptides().contains(pept2)) {
 						shared = false;
 						break;
@@ -316,18 +317,18 @@ public class PAnalyzer {
 	private void classifyProteins() {
 		boolean group;
 
-		for (InferenceProtein prot : mProts.values()) {
+		for (final InferenceProtein prot : mProts.values()) {
 			if (prot.getEvidence() == ProteinEvidence.CONCLUSIVE) {
 				continue;
 			}
-			List<InferencePeptide> peptides = prot.getInferencePeptides();
+			final List<InferencePeptide> peptides = prot.getInferencePeptides();
 			if (peptides == null || peptides.isEmpty()) {
 				prot.setEvidence(ProteinEvidence.FILTERED);
 				continue;
 			}
 
 			group = false;
-			for (InferencePeptide pept : peptides) {
+			for (final InferencePeptide pept : peptides) {
 				if (pept.getRelation() == PeptideRelation.DISCRIMINATING) {
 					group = true;
 					break;
@@ -339,9 +340,9 @@ public class PAnalyzer {
 	}
 
 	private void createGroups() {
-		for (InferenceProtein prot : mProts.values()) {
+		for (final InferenceProtein prot : mProts.values()) {
 			if (prot.getGroup() == null) {
-				ProteinGroupInference group = new ProteinGroupInference(prot.getEvidence());
+				final ProteinGroupInference group = new ProteinGroupInference(prot.getEvidence());
 				group.add(prot);
 				prot.setGroup(group);
 				mGroups.add(group);
@@ -349,11 +350,11 @@ public class PAnalyzer {
 			if (prot.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP) {
 				continue;
 			}
-			for (InferencePeptide pept : prot.getInferencePeptides()) {
+			for (final InferencePeptide pept : prot.getInferencePeptides()) {
 				if (pept.getRelation() != PeptideRelation.DISCRIMINATING) {
 					continue;
 				}
-				for (InferenceProtein subp : pept.getInferenceProteins()) {
+				for (final InferenceProtein subp : pept.getInferenceProteins()) {
 					if (subp.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP) {
 						continue;
 					}
@@ -363,7 +364,7 @@ public class PAnalyzer {
 						}
 						mGroups.remove(prot.getGroup());
 						subp.getGroup().addAll(prot.getGroup());
-						for (InferenceProtein pg : prot.getGroup()) {
+						for (final InferenceProtein pg : prot.getGroup()) {
 							pg.setGroup(subp.getGroup());
 						}
 						continue;
@@ -399,17 +400,17 @@ public class PAnalyzer {
 	//
 	// }
 	private void markIndistinguishable() {
-		Set<InferencePeptide> discriminating = new THashSet<InferencePeptide>();
+		final Set<InferencePeptide> discriminating = new THashSet<InferencePeptide>();
 		boolean indistinguishable;
-		for (ProteinGroupInference group : mGroups) {
+		for (final ProteinGroupInference group : mGroups) {
 			if (group.getEvidence() != ProteinEvidence.AMBIGUOUSGROUP || group.size() < 2)
 				continue;
 			indistinguishable = true;
-			for (InferenceProtein prot : group)
-				for (InferencePeptide pept : prot.getInferencePeptides())
+			for (final InferenceProtein prot : group)
+				for (final InferencePeptide pept : prot.getInferencePeptides())
 					if (pept.getRelation() == PeptideRelation.DISCRIMINATING)
 						discriminating.add(pept);
-			for (InferenceProtein prot : group)
+			for (final InferenceProtein prot : group)
 				if (!prot.getInferencePeptides().containsAll(discriminating)) {
 					indistinguishable = false;
 					break;
@@ -417,7 +418,7 @@ public class PAnalyzer {
 			discriminating.clear();
 			if (indistinguishable) {
 				group.setEvidence(ProteinEvidence.INDISTINGUISHABLE);
-				for (InferenceProtein prot : group)
+				for (final InferenceProtein prot : group)
 					prot.setEvidence(ProteinEvidence.INDISTINGUISHABLE);
 			}
 		}
@@ -446,20 +447,20 @@ public class PAnalyzer {
 	// }
 
 	private static List<MiapeMSIDocument> getMiapeMSI(File miapeMSI) {
-		List<MiapeMSIDocument> miapeMSIs = new ArrayList<MiapeMSIDocument>();
-		MiapeXmlFile<MiapeMSIDocument> xmlFile = new MIAPEMSIXmlFile(miapeMSI);
+		final List<MiapeMSIDocument> miapeMSIs = new ArrayList<MiapeMSIDocument>();
+		final MiapeXmlFile<MiapeMSIDocument> xmlFile = new MIAPEMSIXmlFile(miapeMSI);
 		try {
 			miapeMSIs.add(MiapeMSIXmlFactory.getFactory().toDocument(xmlFile, cvManager, null, null, null));
-		} catch (MiapeDatabaseException e) {
+		} catch (final MiapeDatabaseException e) {
 			e.printStackTrace();
-		} catch (MiapeSecurityException e) {
+		} catch (final MiapeSecurityException e) {
 			e.printStackTrace();
 		}
 		return miapeMSIs;
 	}
 
 	public static void checkGroups(List<ProteinGroup> groups) {
-		for (ProteinGroup proteinGroup : groups) {
+		for (final ProteinGroup proteinGroup : groups) {
 			if (proteinGroup.getEvidence() == ProteinEvidence.AMBIGUOUSGROUP)
 				Assert.assertTrue(proteinGroup.size() > 1);
 			if (proteinGroup.getEvidence() == ProteinEvidence.CONCLUSIVE)
