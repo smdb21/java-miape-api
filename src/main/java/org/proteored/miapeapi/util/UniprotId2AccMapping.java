@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
 
+import edu.scripps.yates.utilities.dates.DatesUtil;
 import gnu.trove.map.hash.THashMap;
 
 public class UniprotId2AccMapping {
@@ -44,7 +45,7 @@ public class UniprotId2AccMapping {
 		if (instance == null) {
 			try {
 				instance = new UniprotId2AccMapping(mappingFileName);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 
 			}
 		}
@@ -53,12 +54,12 @@ public class UniprotId2AccMapping {
 
 	private UniprotId2AccMapping(String mappingFileName) throws IOException {
 		log.info("REading mapping file: " + mappingFileName);
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 		BufferedReader br = null;
 
 		try {
-			InputStream istream = new ClassPathResource(mappingFileName).getInputStream();
-			DataInputStream in = new DataInputStream(istream);
+			final InputStream istream = new ClassPathResource(mappingFileName).getInputStream();
+			final DataInputStream in = new DataInputStream(istream);
 			br = new BufferedReader(new InputStreamReader(in));
 
 			String line = "";
@@ -75,8 +76,8 @@ public class UniprotId2AccMapping {
 				br.close();
 			}
 		}
-		log.info(uniprotIDACCMap.size() + " entries mapped");
-		log.info("in " + (System.currentTimeMillis() - t1) / 1000 + " sg");
+		log.info(uniprotIDACCMap.size() + " entries mapped in "
+				+ DatesUtil.getDescriptiveTimeFromMillisecs(System.currentTimeMillis() - t1));
 	}
 
 	public String getAccFromID(String uniprotID) {
