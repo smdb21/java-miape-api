@@ -314,7 +314,7 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 	public List<IdentifiedPeptide> getIdentifiedPeptides() {
 		// return protein.getIdentifiedPeptides();
 
-		throw new UnsupportedOperationException();
+		return getPeptides().stream().map(p -> (IdentifiedPeptide) p).collect(Collectors.toList());
 
 	}
 
@@ -366,10 +366,14 @@ public class ExtendedIdentifiedProtein extends IdentificationItem implements Ide
 								idSetFullName, identifiedProteinID);
 						if (protein2 != null) {
 							peptide2.addProtein(protein2);
+						} else {
+							log.warn("Protein id: " + identifiedProteinID + " not found in static storage");
 						}
 
 					}
 
+				} else {
+					log.warn("Peptide id: " + peptideID + " not found in static storage");
 				}
 			}
 		}

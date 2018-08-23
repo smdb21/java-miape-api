@@ -138,7 +138,10 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	private void processPeptide(IdentifiedPeptide peptide, MiapeMSIDocument miapeMSI) {
 		final String string = peptide.getMassDesviation();
-
+		charge = peptide.getCharge();
+		modifications = new THashSet<PeptideModification>();
+		modifications.addAll(peptide.getModifications());
+		sequence = peptide.getSequence();
 		if (string != null) {
 			if (string.contains("\n")) {
 				final String[] lines = string.split("\n");
@@ -215,9 +218,9 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 		// }
 		// }
 		// TODO add all parameters
-		charge = peptide.getCharge();
+
 		id = peptide.getId();
-		sequence = peptide.getSequence();
+
 		scores = new THashSet<PeptideScore>();
 		// scores.addAll(peptide.getScores());
 		for (final PeptideScore score : peptide.getScores()) {
@@ -226,8 +229,6 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 			scores.add(adaptedScore);
 		}
 
-		modifications = new THashSet<PeptideModification>();
-		modifications.addAll(peptide.getModifications());
 		massDeviation = StaticStrings.getUniqueInstance(peptide.getMassDesviation());
 		spectrumRef = peptide.getSpectrumRef();
 		inputData = peptide.getInputData();
@@ -532,8 +533,7 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 	@Override
 	public List<IdentifiedProtein> getIdentifiedProteins() {
 
-		// return peptide.getIdentifiedProteins();
-		throw new UnsupportedOperationException();
+		return getProteins().stream().map(p -> (IdentifiedProtein) p).collect(Collectors.toList());
 	}
 
 	public List<Integer> getIdentifiedProteinIDs() {
