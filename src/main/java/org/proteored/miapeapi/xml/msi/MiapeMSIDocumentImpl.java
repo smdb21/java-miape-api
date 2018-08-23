@@ -156,6 +156,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						// Just include peptides that have been linked to any
 						// protein
 						// if (msiIdentifiedPeptide.getProteinRefs() != null) {
+						if (peptideList.containsKey(msiIdentifiedPeptide.getId())) {
+							throw new MiapeDataInconsistencyException("Some peptides in the file had the same id: "
+									+ msiIdentifiedPeptide.getId()
+									+ ". Contact the PACOM developers at salvador@scripps.edu in order to fix this problem.");
+						}
 						peptideList.put(msiIdentifiedPeptide.getId(),
 								new IdentifiedPeptideImpl(msiIdentifiedPeptide, mapInputData));
 						// }
@@ -173,6 +178,11 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 							// Just include proteins that have been linked to
 							// any peptide
 							if (msiIdentifiedProtein.getPeptideRefs() != null) {
+								if (proteinList.containsKey(msiIdentifiedProtein.getId())) {
+									throw new MiapeDataInconsistencyException(
+											"Some proteins in the file had the same id: " + msiIdentifiedProtein.getId()
+													+ ". Contact the PACOM developers at salvador@scripps.edu in order to fix this problem.");
+								}
 								proteinList.put(msiIdentifiedProtein.getId(),
 										new IdentifiedProteinImpl(msiIdentifiedProtein));
 							}
