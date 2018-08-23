@@ -568,7 +568,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 				}
 			}
 		}
-		ret.add(proteinAcc);
+		ret.add(FastaParser.getACC(proteinAcc).getFirstelement());
 		ret = convertUniprotIDToAcc(ret);
 		return ret;
 	}
