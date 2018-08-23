@@ -107,6 +107,9 @@ public class ModificationMapping {
 	private static Vector<ModificationImplementation> getModificationsImplementations(
 			Set<PeptideModification> modifications) {
 		final Vector<ModificationImplementation> ret = new Vector<ModificationImplementation>();
+		if (modifications == null) {
+			return ret;
+		}
 		for (final PeptideModification peptideModification : modifications) {
 
 			final HashMap<String, double[]> delta = new HashMap<String, double[]>();
