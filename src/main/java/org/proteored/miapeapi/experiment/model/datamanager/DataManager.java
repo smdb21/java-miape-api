@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
 import org.proteored.miapeapi.exceptions.IllegalMiapeArgumentException;
 import org.proteored.miapeapi.exceptions.InterruptedMIAPEThreadException;
+import org.proteored.miapeapi.exceptions.MiapeDataInconsistencyException;
 import org.proteored.miapeapi.experiment.model.Experiment;
 import org.proteored.miapeapi.experiment.model.ExperimentList;
 import org.proteored.miapeapi.experiment.model.ExtendedIdentifiedPeptide;
@@ -274,11 +275,16 @@ public abstract class DataManager {
 		for (final ExtendedIdentifiedPeptide peptide : nonFilteredIdentifiedPeptides) {
 			peptideMap.put(peptide.getId(), peptide);
 		}
+		if (peptideMap.size() != nonFilteredIdentifiedPeptides.size()) {
+			throw new MiapeDataInconsistencyException("Some peptides contain the same id");
+		}
 		final TIntObjectHashMap<ExtendedIdentifiedProtein> proteinMap = new TIntObjectHashMap<ExtendedIdentifiedProtein>();
 		for (final ExtendedIdentifiedProtein prot : nonFilteredIdentifiedProteins) {
 			proteinMap.put(prot.getId(), prot);
 		}
-
+		if (proteinMap.size() != nonFilteredIdentifiedProteins.size()) {
+			throw new MiapeDataInconsistencyException("Some proteins contain the same id");
+		}
 		for (final ExtendedIdentifiedProtein protein : nonFilteredIdentifiedProteins) {
 			if (Thread.currentThread().isInterrupted()) {
 				throw new InterruptedMIAPEThreadException("Task cancelled");
@@ -985,20 +991,12 @@ public abstract class DataManager {
 	}
 
 	private void resetPeptidesFromProteins(List<ExtendedIdentifiedProtein> proteins) {
-		// if (!this.isReseted) {
+
 		log.info("RESETING PROTEINS");
 
 		for (final ExtendedIdentifiedProtein protein : proteins) {
 			protein.setDecoy(false, false);
 			protein.resetPeptides(idSet.getFullName());
-			// check that it has all the peptides
-			for (final int peptideID : protein.getIdentifiedPeptideIDs().toArray()) {
-				final ExtendedIdentifiedPeptide peptide2 = StaticPeptideStorage.getPeptide(protein.getMiapeMSIName(),
-						idSet.getFullName(), peptideID);
-				if (peptide2 != null) {
-					protein.addPeptide(peptide2);
-				}
-			}
 		}
 		log.info("END RESETING PROTEINS");
 
