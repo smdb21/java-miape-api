@@ -98,7 +98,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 			ControlVocabularyManager cvManager, User owner, String projectName) throws IOException {
 		IdentifiedProteinImplFromDTASelectProtein.psmMapByPSMId.clear();
 
-		final Map<String, DTASelectProtein> dtaSelectProteins = parser.getDTASelectProteins();
+		final Map<String, DTASelectProtein> dtaSelectProteins = parser.getProteins();
 		Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
 		List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
 		Set<String> psmIDs = new THashSet<String>();
