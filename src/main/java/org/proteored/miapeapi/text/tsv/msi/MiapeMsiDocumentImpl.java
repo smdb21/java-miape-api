@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,14 +43,13 @@ import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
 import org.proteored.miapeapi.util.UniprotId2AccMapping;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import edu.scripps.yates.utilities.fasta.FastaParser;
+import edu.scripps.yates.utilities.proteomicsmodel.PTM;
+import edu.scripps.yates.utilities.proteomicsmodel.factories.PTMEx;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.set.hash.THashSet;
-import uk.ac.ebi.pridemod.PrideModController;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
 public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -71,11 +69,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private final String idSetName;
 
 	private final TableTextFileSeparator separator;
-	private static final ClassPathResource resource = new ClassPathResource("modification_mappings.xml");
 
 	//
-
-	private SlimModCollection preferredModifications;
 
 	private final String projectName;
 	private final User owner;
@@ -561,29 +556,16 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 					final String[] split = proteinAcc.split(separator2.getSymbol());
 					for (final String string : split) {
 
-						ret.add(FastaParser.getACC(string).getFirstelement());
+						ret.add(FastaParser.getACC(string).getAccession());
 					}
 					ret = convertUniprotIDToAcc(ret);
 					return ret;
 				}
 			}
 		}
-		ret.add(FastaParser.getACC(proteinAcc).getFirstelement());
+		ret.add(FastaParser.getACC(proteinAcc).getAccession());
 		ret = convertUniprotIDToAcc(ret);
 		return ret;
-	}
-
-	private SlimModCollection getModificationMapping() {
-		if (preferredModifications == null) {
-			URL url;
-			try {
-				url = resource.getURL();
-				preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return preferredModifications;
 	}
 
 	private List<String> convertUniprotIDToAcc(List<String> accs) {
@@ -614,11 +596,9 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private String getModificationNameFromResidueAndMass(String aa, double deltaMass) {
 		try {
 			// try first with the PRIDE mapping
-			final SlimModCollection modificationMapping = getModificationMapping();
-
-			final SlimModCollection slimMods = modificationMapping.getbyDelta(deltaMass, 0.03);
-			if (slimMods != null && !slimMods.isEmpty()) {
-				return slimMods.get(0).getPsiModDesc();
+			final PTM ptm = new PTMEx(deltaMass, aa.charAt(0), -1);
+			if (ptm.getName() != null) {
+				return ptm.getName();
 			}
 			// TODO add more modifications!
 			// read from a file?

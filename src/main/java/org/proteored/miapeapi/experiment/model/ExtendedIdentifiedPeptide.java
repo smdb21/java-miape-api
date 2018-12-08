@@ -34,7 +34,6 @@ import edu.scripps.yates.utilities.strings.StringUtils;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
 
 public class ExtendedIdentifiedPeptide extends IdentificationItem implements IdentifiedPeptide {
 	private static Map<String, List<String>> sequenceConversion = new THashMap<String, List<String>>();
@@ -61,7 +60,6 @@ public class ExtendedIdentifiedPeptide extends IdentificationItem implements Ide
 
 	private SortingParameters sortingParameters;
 
-	private SlimModCollection preferredModifications;
 	// private static int staticIdentifier = 0;
 	// private final int id = ++staticIdentifier;
 

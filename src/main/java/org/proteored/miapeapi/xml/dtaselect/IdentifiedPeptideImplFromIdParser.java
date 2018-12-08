@@ -17,21 +17,22 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
-import edu.scripps.yates.dtaselectparser.util.DTASelectModification;
-import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.utilities.masses.MassesUtil;
+import edu.scripps.yates.utilities.proteomicsmodel.PSM;
+import edu.scripps.yates.utilities.proteomicsmodel.PTM;
+import edu.scripps.yates.utilities.proteomicsmodel.PTMSite;
 import gnu.trove.set.hash.THashSet;
 
-public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
-	private final DTASelectPSM dtaSelectPSM;
+public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
+	private final PSM psm;
 	private final ControlVocabularyManager cvManager;
 	private final List<IdentifiedProtein> proteins = new ArrayList<IdentifiedProtein>();
 	private final int id;
 	private static Integer seed;
 
-	public IdentifiedPeptideImplFromDTASelect(DTASelectPSM dtaSelectPSM, ControlVocabularyManager cvManager) {
+	public IdentifiedPeptideImplFromIdParser(PSM psm, ControlVocabularyManager cvManager) {
 		this.cvManager = cvManager;
-		this.dtaSelectPSM = dtaSelectPSM;
+		this.psm = psm;
 		id = getRandomInt();
 	}
 
@@ -42,8 +43,8 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof IdentifiedPeptideImplFromDTASelect) {
-			if (((IdentifiedPeptideImplFromDTASelect) obj).getSpectrumRef().equals(getSpectrumRef())) {
+		if (obj instanceof IdentifiedPeptideImplFromIdParser) {
+			if (((IdentifiedPeptideImplFromIdParser) obj).getSpectrumRef().equals(getSpectrumRef())) {
 				return true;
 			}
 		}
@@ -53,7 +54,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 	private int getRandomInt() {
 
 		if (seed == null) {
-			Random generator = new Random();
+			final Random generator = new Random();
 			seed = generator.nextInt(Integer.MAX_VALUE);
 		}
 		seed = seed + 1;
@@ -68,12 +69,12 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public String getSequence() {
-		if (dtaSelectPSM.getSequence() != null && dtaSelectPSM.getSequence().getSequence() != null) {
-			String seq = parseSequence(dtaSelectPSM.getSequence().getSequence());
+		if (psm.getSequence() != null && psm.getSequence() != null) {
+			final String seq = parseSequence(psm.getSequence());
 			if (seq != null)
 				return seq;
 		}
-		return parseSequence(dtaSelectPSM.getFullSequence());
+		return parseSequence(psm.getFullSequence());
 	}
 
 	/**
@@ -97,9 +98,9 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 			while (somethingExtrangeInSequence(seq)) {
 				if (seq.matches(".*\\[.*\\].*")) {
 					int indexOf = seq.indexOf("[");
-					String left = seq.substring(0, indexOf);
+					final String left = seq.substring(0, indexOf);
 					indexOf = seq.indexOf("]");
-					String rigth = seq.substring(indexOf + 1);
+					final String rigth = seq.substring(indexOf + 1);
 					seq = left + rigth;
 
 				}
@@ -117,7 +118,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 				}
 			}
 			return seq.toUpperCase();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return seq;
 		}
 	}
@@ -129,19 +130,20 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public Set<PeptideScore> getScores() {
-		Set<PeptideScore> ret = new THashSet<PeptideScore>();
-		final Double conf = dtaSelectPSM.getConf();
-		if (conf != null) {
-			PeptideScore score = new PeptideScoreBuilder("Conf%", conf.toString()).build();
-			ret.add(score);
-		}
-		final Double deltacn = dtaSelectPSM.getDeltacn();
+		final Set<PeptideScore> ret = new THashSet<PeptideScore>();
+		// final Double conf = dtaSelectPSM.getConf();
+		// if (conf != null) {
+		// final PeptideScore score = new PeptideScoreBuilder("Conf%",
+		// conf.toString()).build();
+		// ret.add(score);
+		// }
+		final Double deltacn = psm.getDeltaCn();
 		if (deltacn != null) {
 			ControlVocabularyTerm scoreTerm = null;
-			if ("sequest".equalsIgnoreCase(dtaSelectPSM.getSearchEngine())) {
+			if ("sequest".equalsIgnoreCase(psm.getSearchEngine())) {
 				Score.getInstance(cvManager);
 				scoreTerm = Score.getSequestDeltaCNTerm(cvManager);
-			} else if ("ProLuCID".equalsIgnoreCase(dtaSelectPSM.getSearchEngine())) {
+			} else if ("ProLuCID".equalsIgnoreCase(psm.getSearchEngine())) {
 				Score.getInstance(cvManager);
 				scoreTerm = Score.getProLuCIDDeltaCNTerm(cvManager);
 			}
@@ -149,16 +151,16 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 			if (scoreTerm != null) {
 				scoreName = scoreTerm.getPreferredName();
 			}
-			PeptideScore score = new PeptideScoreBuilder(scoreName, deltacn.toString()).build();
+			final PeptideScore score = new PeptideScoreBuilder(scoreName, deltacn.toString()).build();
 			ret.add(score);
 		}
-		final Double xcorr = dtaSelectPSM.getXcorr();
+		final Double xcorr = psm.getXCorr();
 		if (xcorr != null) {
 			ControlVocabularyTerm scoreTerm = null;
-			if ("sequest".equalsIgnoreCase(dtaSelectPSM.getSearchEngine())) {
+			if ("sequest".equalsIgnoreCase(psm.getSearchEngine())) {
 				Score.getInstance(cvManager);
 				scoreTerm = Score.getSequestXCorrTerm(cvManager);
-			} else if ("ProLuCID".equalsIgnoreCase(dtaSelectPSM.getSearchEngine())) {
+			} else if ("ProLuCID".equalsIgnoreCase(psm.getSearchEngine())) {
 				Score.getInstance(cvManager);
 				scoreTerm = Score.getProLuCIDXCorrCNTerm(cvManager);
 			}
@@ -166,24 +168,26 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 			if (scoreTerm != null) {
 				scoreName = scoreTerm.getPreferredName();
 			}
-			PeptideScore score = new PeptideScoreBuilder(scoreName, xcorr.toString()).build();
+			final PeptideScore score = new PeptideScoreBuilder(scoreName, xcorr.toString()).build();
 			ret.add(score);
 		}
-		if (dtaSelectPSM.getProb() != null) {
-			PeptideScore score = new PeptideScoreBuilder("Prob", dtaSelectPSM.getProb().toString()).build();
-			ret.add(score);
-		}
-		if (dtaSelectPSM.getProb_score() != null) {
-			PeptideScore score = new PeptideScoreBuilder("Prob Score", dtaSelectPSM.getProb_score().toString()).build();
-			ret.add(score);
-		}
-		if (dtaSelectPSM.getIonProportion() != null) {
-			PeptideScore score = new PeptideScoreBuilder("Ion proportion", dtaSelectPSM.getIonProportion().toString())
+		// if (psm.getProb() != null) {
+		// final PeptideScore score = new PeptideScoreBuilder("Prob",
+		// psm.getProb().toString()).build();
+		// ret.add(score);
+		// }
+		// if (psm.getProb_score() != null) {
+		// final PeptideScore score = new PeptideScoreBuilder("Prob Score",
+		// psm.getProb_score().toString()).build();
+		// ret.add(score);
+		// }
+		if (psm.getIonProportion() != null) {
+			final PeptideScore score = new PeptideScoreBuilder("Ion proportion", psm.getIonProportion().toString())
 					.build();
 			ret.add(score);
 		}
-		if (dtaSelectPSM.getTotalIntensity() != null) {
-			PeptideScore score = new PeptideScoreBuilder("Total Intensity", dtaSelectPSM.getTotalIntensity().toString())
+		if (psm.getTotalIntensity() != null) {
+			final PeptideScore score = new PeptideScoreBuilder("Total Intensity", psm.getTotalIntensity().toString())
 					.build();
 			ret.add(score);
 		}
@@ -192,11 +196,13 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public Set<PeptideModification> getModifications() {
-		final List<DTASelectModification> modifications = dtaSelectPSM.getModifications();
-		Set<PeptideModification> ret = new THashSet<PeptideModification>();
+		final List<PTM> modifications = psm.getPTMs();
+		final Set<PeptideModification> ret = new THashSet<PeptideModification>();
 		if (modifications != null) {
-			for (DTASelectModification dtaSelectPTM : modifications) {
-				ret.add(new PeptideModificationImplFromDTASelect(dtaSelectPTM));
+			for (final PTM dtaSelectPTM : modifications) {
+				for (final PTMSite ptmSite : dtaSelectPTM.getPTMSites()) {
+					ret.add(new PeptideModificationImplFromIdParser(dtaSelectPTM, ptmSite));
+				}
 			}
 		}
 		return ret;
@@ -204,13 +210,13 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public String getCharge() {
-		return String.valueOf(dtaSelectPSM.getChargeState());
+		return String.valueOf(psm.getChargeState());
 	}
 
 	@Override
 	public String getMassDesviation() {
-		StringBuilder sb = new StringBuilder();
-		Double calculatedMassH = dtaSelectPSM.getCalcMh();
+		final StringBuilder sb = new StringBuilder();
+		final Double calculatedMassH = psm.getCalcMH();
 		Integer charge = null;
 		charge = Integer.valueOf(getCharge());
 		if (calculatedMassH != null && charge != null) {
@@ -219,7 +225,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 			sb.append(mz);
 			sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 		}
-		Double experimentalMassH = dtaSelectPSM.getMh();
+		final Double experimentalMassH = psm.getExperimentalMH();
 		if (experimentalMassH != null && charge != null) {
 			sb.append(MiapeXmlUtil.EXPERIMENTAL_MZ + "=");
 			final double mz = (experimentalMassH - MassesUtil.H) / charge * 1.0;
@@ -236,7 +242,7 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public String getSpectrumRef() {
-		return dtaSelectPSM.getPsmIdentifier();
+		return psm.getIdentifier();
 	}
 
 	@Override
@@ -258,8 +264,8 @@ public class IdentifiedPeptideImplFromDTASelect implements IdentifiedPeptide {
 
 	@Override
 	public String getRetentionTimeInSeconds() {
-		if (dtaSelectPSM.getRTInMin() != null) {
-			return String.valueOf(dtaSelectPSM.getRTInMin() * 60.0);
+		if (psm.getRtInMinutes() != null) {
+			return String.valueOf(psm.getRtInMinutes() * 60.0);
 		}
 		return null;
 	}

@@ -1,8 +1,8 @@
 package org.proteored.miapeapi.util;
 
-import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -13,9 +13,9 @@ import com.compomics.util.protein.AASequenceImpl;
 import com.compomics.util.protein.ModificationImplementation;
 
 import edu.scripps.yates.utilities.masses.AssignMass;
-import uk.ac.ebi.pridemod.PrideModController;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
+import uk.ac.ebi.pride.utilities.pridemod.ModReader;
+import uk.ac.ebi.pride.utilities.pridemod.model.PTM;
+import uk.ac.ebi.pride.utilities.pridemod.model.Specificity;
 
 /**
  * This class helps to identify a modification and get the appropriate name and
@@ -27,65 +27,44 @@ import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
 public class ModificationMapping {
 	private static final double ERROR_TOLERANCE = 0.001;
 	private final ClassPathResource resource = new ClassPathResource("modification_mappings.xml");
-	private static ModificationMapping instance = null;
-	private static SlimModCollection preferredModifications;
+	private static ModReader instance = ModReader.getInstance();
 
 	private ModificationMapping() {
 
 	}
 
-	public static ModificationMapping getInstance() {
-		if (instance == null)
-			instance = new ModificationMapping();
-		return instance;
-	}
-
-	private SlimModCollection loadPreferredModifications() {
-		if (ModificationMapping.preferredModifications == null) {
-			URL url;
-			try {
-				url = resource.getURL();
-				ModificationMapping.preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return ModificationMapping.preferredModifications;
-	}
-
-	public SlimModCollection getModification(String modificationName, Double mass, String aaSpecificity) {
-		final SlimModCollection preferredModifications = loadPreferredModifications();
-		final SlimModCollection candidates = new SlimModCollection();
+	public List<PTM> getModification(String modificationName, Double mass, String aaSpecificity) {
+		final List<PTM> candidates = new ArrayList<PTM>();
 
 		// name and no MASS
 		if (modificationName != null && mass == null) {
-			final SlimModification slimMod = preferredModifications.getbyName(modificationName);
+			final List<PTM> slimMod = instance.getPTMListByEqualName(modificationName);
 			if (slimMod != null) {
-				candidates.add(slimMod);
+				candidates.addAll(slimMod);
 			}
 			// MASS
 		} else if (mass != null && aaSpecificity == null) {
-			final SlimModCollection slimMods = preferredModifications.getbyDelta(mass, ERROR_TOLERANCE);
+			final List<PTM> slimMods = instance.getPTMListByMonoDeltaMass(mass, ERROR_TOLERANCE);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (final SlimModification slimModification : slimMods) {
-					candidates.add(slimModification);
-				}
+				candidates.addAll(slimMods);
 			}
 			// SPECIFICITY
 		} else if (mass == null && aaSpecificity != null) {
-			final SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity);
+			final Specificity specificity = new Specificity(aaSpecificity, null);
+			final List<PTM> slimMods = instance.getPTMListBySpecificity(specificity);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (final SlimModification slimModification : slimMods) {
-					candidates.add(slimModification);
-				}
+				candidates.addAll(slimMods);
 			}
 			// MASS + SPECIFICITY
 		} else if (mass != null && aaSpecificity != null) {
-			final SlimModCollection slimMods = preferredModifications.getbySpecificity(aaSpecificity, mass,
-					ERROR_TOLERANCE);
+			final List<PTM> slimMods = instance.getPTMListByMonoDeltaMass(mass, ERROR_TOLERANCE);
 			if (slimMods != null && !slimMods.isEmpty()) {
-				for (final SlimModification slimModification : slimMods) {
-					candidates.add(slimModification);
+				for (final PTM ptm : slimMods) {
+					for (final Specificity specificity : ptm.getSpecificityCollection()) {
+						if (specificity.getName().name().equals(specificity)) {
+							candidates.add(ptm);
+						}
+					}
 				}
 			}
 		}

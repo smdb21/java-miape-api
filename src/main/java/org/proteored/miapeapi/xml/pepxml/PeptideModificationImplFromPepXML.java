@@ -1,25 +1,23 @@
 package org.proteored.miapeapi.xml.pepxml;
 
-import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 
 import edu.scripps.yates.utilities.masses.AssignMass;
 import gnu.trove.set.hash.THashSet;
-import uk.ac.ebi.pridemod.PrideModController;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
+import uk.ac.ebi.pride.utilities.pridemod.ModReader;
+import uk.ac.ebi.pride.utilities.pridemod.model.PTM;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.ModAminoacidMass;
 import umich.ms.fileio.filetypes.pepxml.jaxb.standard.SubInfoDataType;
 
 public class PeptideModificationImplFromPepXML implements PeptideModification {
-	private final SlimModification slimModification;
 	private final SubInfoDataType aaSubstitution;
 	private final String peptideSequence;
 	private final int position;
 	private final Double delta;
-	private static SlimModCollection preferredModifications;
+	private PTM ptm;
 	private static final org.apache.log4j.Logger log = org.apache.log4j.Logger
 			.getLogger(PeptideModificationImplFromPepXML.class);
 	private static Set<String> errorMessages = new THashSet<String>();
@@ -32,7 +30,8 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 
 	private static double getMassOfAA(String peptideSequence, Integer position) {
 		if (position != null && peptideSequence != null && peptideSequence.length() >= position) {
-			return AssignMass.getInstance(true).getMass(peptideSequence.charAt(position - 1));
+			AssignMass.getInstance(true);
+			return AssignMass.getMass(peptideSequence.charAt(position - 1));
 		}
 		return 0;
 	}
@@ -46,21 +45,13 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 		peptideSequence = sequence;
 		this.position = position;
 		this.delta = delta;
-		if (preferredModifications == null) {
-			final URL url = getClass().getClassLoader().getResource("modification_mappings_dtaSelect.xml");
-			if (url != null) {
-				preferredModifications = PrideModController.parseSlimModCollection(url);
-			} else {
-				throw new IllegalArgumentException("Could not find preferred modification file");
-			}
-		}
 
 		final double precision = 0.01;
 		// map by delta
 		if (delta != null) {
-			final SlimModCollection filteredMods = preferredModifications.getbyDelta(delta, precision);
+			final List<PTM> filteredMods = ModReader.getInstance().getPTMListByMonoDeltaMass(delta, precision);
 			if (!filteredMods.isEmpty()) {
-				slimModification = filteredMods.get(0);
+				ptm = filteredMods.get(0);
 			} else {
 				final String message = "Peptide modification with delta mass=" + delta
 						+ " is not recognized in the system. Please, contact system administrator in order to add it as a supported PTM in the system.";
@@ -68,18 +59,18 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 					log.warn(message);
 					errorMessages.add(message);
 				}
-				slimModification = null;
+				ptm = null;
 			}
 		} else {
-			slimModification = null;
+			ptm = null;
 		}
 		this.aaSubstitution = aaSubstitution;
 	}
 
 	@Override
 	public String getName() {
-		if (slimModification != null)
-			return slimModification.getShortNamePsiMod();
+		if (ptm != null)
+			return ptm.getName();
 		if (aaSubstitution != null) {
 			return "substitution of " + aaSubstitution.getOrigAa() + " by " + getResidues() + " at "
 					+ aaSubstitution.getPosition();
@@ -113,7 +104,9 @@ public class PeptideModificationImplFromPepXML implements PeptideModification {
 
 	@Override
 	public Double getAvgDelta() {
-		// TODO Auto-generated method stub
+		if (ptm != null) {
+			return ptm.getAveDeltaMass();
+		}
 		return null;
 	}
 

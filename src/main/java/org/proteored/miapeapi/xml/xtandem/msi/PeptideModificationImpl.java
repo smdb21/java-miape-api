@@ -1,7 +1,6 @@
 package org.proteored.miapeapi.xml.xtandem.msi;
 
-import java.io.IOException;
-import java.net.URL;
+import java.util.List;
 
 import org.proteored.miapeapi.cv.Accession;
 import org.proteored.miapeapi.cv.ControlVocabularyManager;
@@ -11,13 +10,12 @@ import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import org.springframework.core.io.ClassPathResource;
 
 import de.proteinms.xtandemparser.interfaces.Modification;
-import uk.ac.ebi.pridemod.PrideModController;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
+import uk.ac.ebi.pride.utilities.pridemod.ModReader;
+import uk.ac.ebi.pride.utilities.pridemod.model.PTM;
 
 public class PeptideModificationImpl implements PeptideModification {
-	private static SlimModCollection preferredModifications;
 	private final Modification modification;
+	private PTM ptm;
 	private String residue;
 	private final Integer domainStart;
 	private final ControlVocabularyManager cvManager;
@@ -30,11 +28,12 @@ public class PeptideModificationImpl implements PeptideModification {
 		this.cvManager = cvManager;
 		if (modification != null) {
 			if (modification.getName().contains("@")) {
-				String tmp[] = modification.getName().split("@");
+				final String tmp[] = modification.getName().split("@");
 				residue = tmp[1];
 			}
 		}
-
+		// to map using the reader
+		getName();
 	}
 
 	@Override
@@ -45,14 +44,16 @@ public class PeptideModificationImpl implements PeptideModification {
 	private String getModificationNameFromResidueAndMass() {
 		try {
 			// try first with the PRIDE mapping
-			SlimModCollection modificationMapping = getModificationMapping();
-			SlimModification slimMod = modificationMapping.getbyName(modification.getName());
-			if (slimMod != null) {
-				return slimMod.getPsiModDesc();
+			final ModReader modreader = ModReader.getInstance();
+			List<PTM> ptms = modreader.getPTMListByEqualName(modification.getName());
+			if (ptms != null && !ptms.isEmpty()) {
+				ptm = ptms.get(0);
+				return ptms.get(0).getName();
 			}
-			SlimModCollection slimMods = modificationMapping.getbyDelta(modification.getMass(), 0.001);
-			if (slimMods != null && !slimMods.isEmpty()) {
-				return slimMods.get(0).getPsiModDesc();
+			ptms = modreader.getPTMListByMonoDeltaMass(modification.getMass(), 0.001);
+			if (ptms != null && !ptms.isEmpty()) {
+				ptm = ptms.get(0);
+				return ptms.get(0).getName();
 			}
 			// TODO add more modifications!
 			// read from a file?
@@ -76,14 +77,14 @@ public class PeptideModificationImpl implements PeptideModification {
 			final ControlVocabularyTerm pepModifDetailsTerm = PeptideModificationName.getPepModifDetailsTerm(cvManager);
 			if (pepModifDetailsTerm != null)
 				return pepModifDetailsTerm.getPreferredName();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
 		}
 		return "peptide modification details";
 	}
 
 	private boolean compareWithError(double num1, double num2) {
-		double tolerance = 0.001;
+		final double tolerance = 0.001;
 		if (num1 > num2)
 			if (num1 - num2 < tolerance)
 				return true;
@@ -100,7 +101,7 @@ public class PeptideModificationImpl implements PeptideModification {
 
 		try {
 			return Integer.parseInt(modification.getLocation()) - domainStart + 1;
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return -1;
 		}
 	}
@@ -117,7 +118,9 @@ public class PeptideModificationImpl implements PeptideModification {
 
 	@Override
 	public Double getAvgDelta() {
-		// TODO Auto-generated method stub
+		if (ptm == null) {
+			return ptm.getAveDeltaMass();
+		}
 		return null;
 	}
 
@@ -140,16 +143,4 @@ public class PeptideModificationImpl implements PeptideModification {
 		return null;
 	}
 
-	private SlimModCollection getModificationMapping() {
-		if (PeptideModificationImpl.preferredModifications == null) {
-			URL url;
-			try {
-				url = resource.getURL();
-				PeptideModificationImpl.preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return PeptideModificationImpl.preferredModifications;
-	}
 }

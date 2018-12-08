@@ -1,8 +1,6 @@
 package org.proteored.miapeapi.xml.pride.adapter;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,9 +35,8 @@ import org.proteored.miapeapi.xml.pride.util.PrideControlVocabularyXmlFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import gnu.trove.map.hash.TDoubleObjectHashMap;
-import uk.ac.ebi.pridemod.PrideModController;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModCollection;
-import uk.ac.ebi.pridemod.slimmod.model.SlimModification;
+import uk.ac.ebi.pride.utilities.pridemod.ModReader;
+import uk.ac.ebi.pride.utilities.pridemod.model.PTM;
 
 public class PeptideAdapter implements Adapter<Peptide> {
 	private static Logger log = Logger.getLogger("log4j.logger.org.proteored");
@@ -48,7 +45,6 @@ public class PeptideAdapter implements Adapter<Peptide> {
 	private final ObjectFactory factory;
 	private final ExtendedIdentifiedPeptide identifiedPeptide;
 	private final PrideControlVocabularyXmlFactory prideCvUtil;
-	private static SlimModCollection preferredModifications;
 	private final ControlVocabularyTerm chargeStateTerm;
 	private final ControlVocabularyTerm mOverZTerm;
 	private final ControlVocabularyTerm selectedMOverZTerm;
@@ -74,17 +70,17 @@ public class PeptideAdapter implements Adapter<Peptide> {
 
 	@Override
 	public Peptide adapt() {
-		Peptide xmlPeptide = factory.createPeptide();
+		final Peptide xmlPeptide = factory.createPeptide();
 		xmlPeptide.setSequence(identifiedPeptide.getSequence());
 		if (identifiedPeptide.getRetentionTimeInSeconds() != null) {
 			try {
-				double rtInSeconds = Double.valueOf(identifiedPeptide.getRetentionTimeInSeconds());
-				double rtInMinutes = rtInSeconds / 60;
-				ControlVocabularyTerm rtTerm = RetentionTime.getInstance(cvManager)
+				final double rtInSeconds = Double.valueOf(identifiedPeptide.getRetentionTimeInSeconds());
+				final double rtInMinutes = rtInSeconds / 60;
+				final ControlVocabularyTerm rtTerm = RetentionTime.getInstance(cvManager)
 						.getCVTermByAccession(new Accession(RetentionTime.RetentionTimeMinutes));
 				prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(), rtTerm.getTermAccession(),
 						rtTerm.getPreferredName(), String.valueOf(rtInMinutes), rtTerm.getCVRef());
-			} catch (NumberFormatException e) {
+			} catch (final NumberFormatException e) {
 
 			}
 		}
@@ -99,7 +95,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 				try {
 					spectrumReference = BigInteger.valueOf(Long.valueOf(identifiedPeptide.getSpectrumRef()));
 					xmlPeptide.setSpectrumReference(spectrumReference);
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					if (includeSpectra) {
 						throw e;
 					}
@@ -108,7 +104,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 					if (xmlPeptide.getAdditional() == null) {
 						xmlPeptide.setAdditional(factory.createParamType());
 					}
-					ControlVocabularyTerm spectrumTitleTerm = SpectrumAttribute.getInstance(cvManager)
+					final ControlVocabularyTerm spectrumTitleTerm = SpectrumAttribute.getInstance(cvManager)
 							.getCVTermByAccession(SpectrumAttribute.SPECTRUM_TITLE_ACC);
 					if (spectrumTitleTerm != null) {
 						prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(),
@@ -132,7 +128,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			if (xmlPeptide.getAdditional() == null) {
 				xmlPeptide.setAdditional(factory.createParamType());
 			}
-			ControlVocabularyTerm chargeTerm = ChargeState.getInstance(cvManager)
+			final ControlVocabularyTerm chargeTerm = ChargeState.getInstance(cvManager)
 					.getCVTermByAccession(ChargeState.CHARGE_STATE_ACCESSION);
 			if (chargeTerm != null) {
 				prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(), chargeTerm.getTermAccession(),
@@ -153,10 +149,10 @@ public class PeptideAdapter implements Adapter<Peptide> {
 		// scores
 		if (xmlPeptide.getAdditional() == null)
 			xmlPeptide.setAdditional(factory.createParamType());
-		Set<PeptideScore> scores = identifiedPeptide.getScores();
+		final Set<PeptideScore> scores = identifiedPeptide.getScores();
 		if (scores != null) {
-			for (PeptideScore peptideScore : scores) {
-				ControlVocabularyTerm scoreTerm = Score.getInstance(cvManager)
+			for (final PeptideScore peptideScore : scores) {
+				final ControlVocabularyTerm scoreTerm = Score.getInstance(cvManager)
 						.getCVTermByPreferredName(peptideScore.getName());
 				if (scoreTerm != null) {
 					prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(), scoreTerm.getTermAccession(),
@@ -169,18 +165,18 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			}
 		}
 		// modifications
-		Set<PeptideModification> modifications = identifiedPeptide.getModifications();
+		final Set<PeptideModification> modifications = identifiedPeptide.getModifications();
 		if (modifications != null) {
-			for (PeptideModification peptideModification : modifications) {
+			for (final PeptideModification peptideModification : modifications) {
 				xmlPeptide.getModificationItem().add(getModification(peptideModification));
 			}
 		}
 
 		// Local FDR
 
-		Float localFDR = identifiedPeptide.getPeptideLocalFDR();
+		final Float localFDR = identifiedPeptide.getPeptideLocalFDR();
 		if (localFDR != null) {
-			ControlVocabularyTerm localFDRTerm = Score.getLocalFDRTerm(cvManager);
+			final ControlVocabularyTerm localFDRTerm = Score.getLocalFDRTerm(cvManager);
 			if (localFDRTerm != null) {
 				prideCvUtil.addCvParamToParamType(xmlPeptide.getAdditional(), localFDRTerm.getTermAccession(),
 						localFDRTerm.getPreferredName(), localFDR.toString(), localFDRTerm.getCVRef());
@@ -199,7 +195,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 	private void recalibrateChargeAndPrecursorMass(Peptide xmlPeptide, String charge) {
 
 		if (identifiedPeptide.getExperimentalMassToCharge() != null) {
-			double moverz = Double.valueOf(identifiedPeptide.getExperimentalMassToCharge());
+			final double moverz = Double.valueOf(identifiedPeptide.getExperimentalMassToCharge());
 			boolean spectrumMatched = false;
 			final TDoubleObjectHashMap<Spectrum> spectrumBymoverZMap = SpectrumListAdapter.getSpectrumByMoverZMap();
 			if (spectrumBymoverZMap.containsKey(moverz)) {
@@ -220,9 +216,9 @@ public class PeptideAdapter implements Adapter<Peptide> {
 						// that has that m over z
 
 						// look at the referenced spectrum
-						for (Object object : precursorCVParams) {
+						for (final Object object : precursorCVParams) {
 							if (object instanceof CvParamType) {
-								CvParamType cvParam = (CvParamType) object;
+								final CvParamType cvParam = (CvParamType) object;
 								if (cvParam.getAccession().equals(mOverZTerm.getTermAccession().toString()) || cvParam
 										.getAccession().equals(selectedMOverZTerm.getTermAccession().toString())) {
 
@@ -238,13 +234,13 @@ public class PeptideAdapter implements Adapter<Peptide> {
 						// experimental m/z as the peptide, search
 						// in the following spectrums
 						if (!spectrumMatched) {
-							BigInteger previousSpectrumReference = spectrumReference;
+							final BigInteger previousSpectrumReference = spectrumReference;
 							// start on 5 spectrum before
 							spectrumReference = spectrumReference.subtract(BigInteger.valueOf(100));
 							log.debug("Referenced spectrum (ID:" + previousSpectrumReference
 									+ ") doesn't match with the m/z value: " + moverz
 									+ ". Looking other spectra starting by " + spectrumReference + " ...");
-							int maxNumIterations = 400;
+							final int maxNumIterations = 400;
 							int numIteration = 0;
 							while (!spectrumMatched) {
 								// sum 1 to the reference
@@ -259,9 +255,9 @@ public class PeptideAdapter implements Adapter<Peptide> {
 								spectrum = spectrumMap.get(spectrumReference);
 								if (spectrum != null) {
 									precursorCVParams = getPrecursorCVParams(spectrum);
-									for (Object object : precursorCVParams) {
+									for (final Object object : precursorCVParams) {
 										if (object instanceof CvParamType) {
-											CvParamType cvParam = (CvParamType) object;
+											final CvParamType cvParam = (CvParamType) object;
 											if (cvParam.getAccession().equals(mOverZTerm.getTermAccession().toString())
 													|| cvParam.getAccession()
 															.equals(selectedMOverZTerm.getTermAccession().toString())) {
@@ -284,9 +280,9 @@ public class PeptideAdapter implements Adapter<Peptide> {
 							}
 						}
 						precursorCVParams = getPrecursorCVParams(spectrum);
-						for (Object object : precursorCVParams) {
+						for (final Object object : precursorCVParams) {
 							if (object instanceof CvParamType) {
-								CvParamType cvParam = (CvParamType) object;
+								final CvParamType cvParam = (CvParamType) object;
 								if (cvParam.getAccession().equals(chargeStateTerm.getTermAccession().toString())) {
 									if (!cvParam.getValue().equals(charge)) {
 										log.info("Changing charge of peptide " + identifiedPeptide.getSequence()
@@ -299,7 +295,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 							}
 
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 
 					}
 
@@ -316,7 +312,7 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			if (spectrumDesc != null) {
 				final PrecursorList precursorList = spectrumDesc.getPrecursorList();
 				if (precursorList != null && precursorList.getPrecursor() != null) {
-					for (PrecursorType precursor : precursorList.getPrecursor()) {
+					for (final PrecursorType precursor : precursorList.getPrecursor()) {
 						final ParamType ionSelection = precursor.getIonSelection();
 						if (ionSelection != null) {
 							return ionSelection.getCvParamOrUserParam();
@@ -341,43 +337,38 @@ public class PeptideAdapter implements Adapter<Peptide> {
 	// }
 
 	private Modification getModification(PeptideModification peptideModification) {
-		Modification xmlModification = factory.createModification();
+		final Modification xmlModification = factory.createModification();
 		// mandatory fields
 		xmlModification.setModDatabase("");
 		xmlModification.setModAccession("");
 
 		if (peptideModification == null)
 			return xmlModification;
-		String replacementResidue = peptideModification.getReplacementResidue();
-		String name = peptideModification.getName();
+		final String replacementResidue = peptideModification.getReplacementResidue();
+		final String name = peptideModification.getName();
 		if (name != null) {
-			SlimModCollection preferredModifications = getPreferredModifications();
-
-			if (preferredModifications != null) {
-				SlimModification mod = preferredModifications.getbyName(peptideModification.getName());
-				if (mod != null) {
-					Modification xmlModification2 = getModificationFromMapping(peptideModification, mod);
+			final ModReader modReader = ModReader.getInstance();
+			List<PTM> mods = modReader.getPTMListByEqualName(peptideModification.getName());
+			if (mods != null && !mods.isEmpty()) {
+				final Modification xmlModification2 = getModificationFromMapping(peptideModification, mods.get(0));
+				if (xmlModification2 != null)
+					return xmlModification2;
+			}
+			if (peptideModification.getMonoDelta() != null) {
+				mods = modReader.getPTMListByMonoDeltaMass(peptideModification.getMonoDelta(), 0.01);
+				if (!mods.isEmpty()) {
+					final Modification xmlModification2 = getModificationFromMapping(peptideModification, mods.get(0));
 					if (xmlModification2 != null)
 						return xmlModification2;
 				}
-				if (peptideModification.getMonoDelta() != null) {
-					SlimModCollection mods = preferredModifications.getbyDelta(peptideModification.getMonoDelta(),
-							0.01);
-					if (!mods.isEmpty()) {
-						mod = mods.get(0);
-						Modification xmlModification2 = getModificationFromMapping(peptideModification, mod);
-						if (xmlModification2 != null)
-							return xmlModification2;
-					}
-				}
-				if (peptideModification.getAvgDelta() != null) {
-					SlimModCollection mods = preferredModifications.getbyDelta(peptideModification.getAvgDelta(), 0.01);
-					if (!mods.isEmpty()) {
-						mod = mods.get(0);
-						Modification xmlModification2 = getModificationFromMapping(peptideModification, mod);
-						if (xmlModification2 != null)
-							return xmlModification2;
-					}
+			}
+			if (peptideModification.getAvgDelta() != null) {
+				mods = modReader.getPTMListByAvgDeltaMass(peptideModification.getAvgDelta(), 0.01);
+				if (!mods.isEmpty()) {
+
+					final Modification xmlModification2 = getModificationFromMapping(peptideModification, mods.get(0));
+					if (xmlModification2 != null)
+						return xmlModification2;
 				}
 			}
 
@@ -416,15 +407,15 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			xmlModification
 					.setModLocation(new BigInteger(Integer.valueOf(peptideModification.getPosition()).toString()));
 
-		Double monoDelta = peptideModification.getMonoDelta();
+		final Double monoDelta = peptideModification.getMonoDelta();
 		if (monoDelta != null)
 			xmlModification.getModMonoDelta().add(monoDelta.toString());
 
-		Double avgDelta = peptideModification.getAvgDelta();
+		final Double avgDelta = peptideModification.getAvgDelta();
 		if (avgDelta != null)
 			xmlModification.getModAvgDelta().add(avgDelta.toString());
 
-		Double neutralLoss = peptideModification.getNeutralLoss();
+		final Double neutralLoss = peptideModification.getNeutralLoss();
 		if (neutralLoss != null) {
 			xmlModification.setAdditional(prideCvUtil.addCvParamOrUserParamToParamType(xmlModification.getAdditional(),
 					PeptideModificationName.getInstance(cvManager)
@@ -446,24 +437,10 @@ public class PeptideAdapter implements Adapter<Peptide> {
 		return xmlModification;
 	}
 
-	private SlimModCollection getPreferredModifications() {
-
-		if (PeptideAdapter.preferredModifications == null) {
-			URL url;
-			try {
-				url = resource.getURL();
-				PeptideAdapter.preferredModifications = PrideModController.parseSlimModCollection(url);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return PeptideAdapter.preferredModifications;
-	}
-
-	private Modification getModificationFromMapping(PeptideModification peptideModification, SlimModification mod) {
-		Modification xmlModification = factory.createModification();
-		final String idPsiMod = mod.getIdPsiMod();
-		String replacementResidue = peptideModification.getReplacementResidue();
+	private Modification getModificationFromMapping(PeptideModification peptideModification, PTM mod) {
+		final Modification xmlModification = factory.createModification();
+		final String idPsiMod = mod.getAccession();
+		final String replacementResidue = peptideModification.getReplacementResidue();
 		final ControlVocabularyTerm cvTermByAccession = PeptideModificationName.getInstance(cvManager)
 				.getCVTermByAccession(new Accession(idPsiMod));
 		if (cvTermByAccession != null) {
@@ -483,15 +460,15 @@ public class PeptideAdapter implements Adapter<Peptide> {
 			prideCvUtil.addCvParamToParamType(xmlModification.getAdditional(), cvTermByAccession.getTermAccession(),
 					cvTermByAccession.getPreferredName(), null, cvTermByAccession.getCVRef());
 			// MONO DELTA
-			Double monoDelta = peptideModification.getMonoDelta();
+			final Double monoDelta = peptideModification.getMonoDelta();
 			if (monoDelta != null)
 				xmlModification.getModMonoDelta().add(monoDelta.toString());
 			// AVG DELTA
-			Double avgDelta = peptideModification.getAvgDelta();
+			final Double avgDelta = peptideModification.getAvgDelta();
 			if (avgDelta != null)
 				xmlModification.getModAvgDelta().add(avgDelta.toString());
 			// NEUTRAL LOSS
-			Double neutralLoss = peptideModification.getNeutralLoss();
+			final Double neutralLoss = peptideModification.getNeutralLoss();
 			if (neutralLoss != null) {
 				prideCvUtil.addCvParamOrUserParamToParamType(xmlModification.getAdditional(),
 						PeptideModificationName.getInstance(cvManager)

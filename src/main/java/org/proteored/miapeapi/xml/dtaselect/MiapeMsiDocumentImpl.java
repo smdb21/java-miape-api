@@ -36,7 +36,7 @@ import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
 import edu.scripps.yates.dtaselectparser.DTASelectParser;
-import edu.scripps.yates.dtaselectparser.util.DTASelectProtein;
+import edu.scripps.yates.utilities.proteomicsmodel.Protein;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -96,21 +96,21 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 	public static MiapeMSIDocumentBuilder getMIAPEMSIDocumentBuilder(DTASelectParser parser, String idSetName,
 			ControlVocabularyManager cvManager, User owner, String projectName) throws IOException {
-		IdentifiedProteinImplFromDTASelectProtein.psmMapByPSMId.clear();
+		IdentifiedProteinImplFromIdParser.psmMapByPSMId.clear();
 
-		final Map<String, DTASelectProtein> dtaSelectProteins = parser.getProteins();
-		Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
-		List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
-		Set<String> psmIDs = new THashSet<String>();
-		for (String acc : dtaSelectProteins.keySet()) {
-			final DTASelectProtein dtaSelectProtein = dtaSelectProteins.get(acc);
-			IdentifiedProtein protein = new IdentifiedProteinImplFromDTASelectProtein(dtaSelectProtein, cvManager);
+		final Map<String, Protein> dtaSelectProteins = parser.getProteinMap();
+		final Map<String, IdentifiedProtein> proteins = new THashMap<String, IdentifiedProtein>();
+		final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
+		final Set<String> psmIDs = new THashSet<String>();
+		for (final String acc : dtaSelectProteins.keySet()) {
+			final Protein dtaSelectProtein = dtaSelectProteins.get(acc);
+			IdentifiedProtein protein = new IdentifiedProteinImplFromIdParser(dtaSelectProtein, cvManager);
 			final String accession = protein.getAccession();
 			if (proteins.containsKey(accession))
 				protein = proteins.get(accession);
 			proteins.put(accession, protein);
 			final List<IdentifiedPeptide> identifiedPeptides = protein.getIdentifiedPeptides();
-			for (IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
+			for (final IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 				if (!psmIDs.contains(identifiedPeptide.getSpectrumRef())) {
 					psmIDs.add(identifiedPeptide.getSpectrumRef());
 					peptides.add(identifiedPeptide);
@@ -120,12 +120,12 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 
 		log.info("End parsing. Now building MIAPE MSI with " + proteins.size() + " proteins and " + peptides.size()
 				+ " peptides");
-		Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
-		MiapeMSIDocumentBuilder builder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project, idSetName,
-				owner);
+		final Project project = MiapeDocumentFactory.createProjectBuilder(projectName).build();
+		final MiapeMSIDocumentBuilder builder = MiapeMSIDocumentFactory.createMiapeDocumentMSIBuilder(project,
+				idSetName, owner);
 		builder.identifiedPeptides(peptides);
-		Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
-		IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory.createIdentifiedProteinSetBuilder("Protein set")
+		final Set<IdentifiedProteinSet> proteinSets = new THashSet<IdentifiedProteinSet>();
+		final IdentifiedProteinSet proteinSet = MiapeMSIDocumentFactory.createIdentifiedProteinSetBuilder("Protein set")
 				.identifiedProteins(proteins).build();
 		proteinSets.add(proteinSet);
 		builder.identifiedProteinSets(proteinSets);
@@ -140,7 +140,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (file.exists()) {
 			try {
 				fileURL = file.toURI().toURL().toString();
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 			}
 		}
 		url = fileURL;
@@ -161,7 +161,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 		if (miapeMSI == null) {
 			try {
 				miapeMSI = processDTASelectFile(parser).build();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}

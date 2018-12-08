@@ -11,15 +11,14 @@ import org.proteored.miapeapi.interfaces.msi.IdentifiedPeptide;
 import org.proteored.miapeapi.interfaces.msi.IdentifiedProtein;
 import org.proteored.miapeapi.interfaces.msi.ProteinScore;
 
-import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
-import edu.scripps.yates.dtaselectparser.util.DTASelectProtein;
 import edu.scripps.yates.utilities.fasta.FastaParser;
-import edu.scripps.yates.utilities.util.Pair;
+import edu.scripps.yates.utilities.proteomicsmodel.PSM;
+import edu.scripps.yates.utilities.proteomicsmodel.Protein;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
-public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProtein {
-	private final DTASelectProtein dtaSelectProtein;
+public class IdentifiedProteinImplFromIdParser implements IdentifiedProtein {
+	private final Protein idProtein;
 	private final int id;
 	private Set<ProteinScore> proteinScores;
 	private List<IdentifiedPeptide> peptides;
@@ -31,9 +30,8 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	private static final String SPC_BY_LEN_RATIO = "SPC/Length ratio";
 	private static final String PEPTIDE_PSM_COUNT = "peptide PSM count";
 
-	public IdentifiedProteinImplFromDTASelectProtein(DTASelectProtein dtaSelectProtein,
-			ControlVocabularyManager cvManager) {
-		this.dtaSelectProtein = dtaSelectProtein;
+	public IdentifiedProteinImplFromIdParser(Protein dtaSelectProtein, ControlVocabularyManager cvManager) {
+		this.idProtein = dtaSelectProtein;
 		id = getRandomInt();
 		this.cvManager = cvManager;
 	}
@@ -52,54 +50,62 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 
 	@Override
 	public String getAccession() {
-		final Pair<String, String> acc = FastaParser.getACC(dtaSelectProtein.getLocus());
-		if (acc != null)
-			return acc.getFirstelement();
-		return dtaSelectProtein.getLocus();
+		return idProtein.getAccession();
 	}
 
 	@Override
 	public String getDescription() {
 
-		final String description = FastaParser.getDescription(dtaSelectProtein.getDescription());
+		final String description = FastaParser.getDescription(idProtein.getDescription());
 		if (description != null)
 			return description;
-		return dtaSelectProtein.getDescription();
+		return idProtein.getDescription();
 	}
 
 	@Override
 	public Set<ProteinScore> getScores() {
 		if (proteinScores == null) {
 			proteinScores = new THashSet<ProteinScore>();
-			if (dtaSelectProtein.getEmpai() != null) {
+			if (idProtein.getEmpai() != null) {
 
 				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(EMPAI_VALUE,
-						dtaSelectProtein.getEmpai());
+						idProtein.getEmpai());
 				proteinScores.add(score);
 			}
-			if (dtaSelectProtein.getNsaf() != null) {
+			if (idProtein.getNsaf() != null) {
 				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(NSAF,
-						dtaSelectProtein.getNsaf());
+						idProtein.getNsaf());
 				proteinScores.add(score);
 			}
 			// if (dtaSelectProtein.getNsaf_norm() != null) {
 			final ProteinScore NSAF_norm = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(NSAF_NORM,
-					dtaSelectProtein.getNsaf_norm());
+					idProtein.getNsaf_norm());
 			proteinScores.add(NSAF_norm);
 			// }
 
 			final ProteinScore ratio = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(SPC_BY_LEN_RATIO,
-					dtaSelectProtein.getRatio());
+					getRatio(idProtein));
 			proteinScores.add(ratio);
 
-			if (dtaSelectProtein.getSpectrumCount() != null) {
+			if (idProtein.getSpectrumCount() != null) {
 
 				final ProteinScore score = new org.proteored.miapeapi.xml.xtandem.msi.ProteinScoreImpl(
-						PEPTIDE_PSM_COUNT, dtaSelectProtein.getSpectrumCount());
+						PEPTIDE_PSM_COUNT, idProtein.getSpectrumCount());
 				proteinScores.add(score);
 			}
 		}
 		return proteinScores;
+	}
+
+	/**
+	 * SPC / LENGTH
+	 *
+	 * @return
+	 */
+	public double getRatio(Protein protein) {
+		if (protein.getSpectrumCount() != null && protein.getLength() != null && protein.getLength() > 0)
+			return protein.getSpectrumCount() / protein.getLength();
+		return Double.NaN;
 	}
 
 	@Override
@@ -116,7 +122,7 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 
 	@Override
 	public String getCoverage() {
-		return String.valueOf(dtaSelectProtein.getCoverage());
+		return String.valueOf(idProtein.getCoverage());
 	}
 
 	@Override
@@ -155,17 +161,17 @@ public class IdentifiedProteinImplFromDTASelectProtein implements IdentifiedProt
 	public List<IdentifiedPeptide> getIdentifiedPeptides() {
 		if (peptides == null) {
 			peptides = new ArrayList<IdentifiedPeptide>();
-			final List<DTASelectPSM> psMs = dtaSelectProtein.getPSMs();
+			final List<PSM> psMs = idProtein.getPSMs();
 			if (psMs != null) {
-				for (final DTASelectPSM dtaSelectPSM : psMs) {
-					if (psmMapByPSMId.containsKey(dtaSelectPSM.getPsmIdentifier())) {
-						final IdentifiedPeptide pep = psmMapByPSMId.get(dtaSelectPSM.getPsmIdentifier());
+				for (final PSM dtaSelectPSM : psMs) {
+					if (psmMapByPSMId.containsKey(dtaSelectPSM.getIdentifier())) {
+						final IdentifiedPeptide pep = psmMapByPSMId.get(dtaSelectPSM.getIdentifier());
 						pep.getIdentifiedProteins().add(this);
 						peptides.add(pep);
 					} else {
-						final IdentifiedPeptideImplFromDTASelect pep = new IdentifiedPeptideImplFromDTASelect(
+						final IdentifiedPeptideImplFromIdParser pep = new IdentifiedPeptideImplFromIdParser(
 								dtaSelectPSM, cvManager);
-						psmMapByPSMId.put(dtaSelectPSM.getPsmIdentifier(), pep);
+						psmMapByPSMId.put(dtaSelectPSM.getIdentifier(), pep);
 						pep.getIdentifiedProteins().add(this);
 						peptides.add(pep);
 					}
