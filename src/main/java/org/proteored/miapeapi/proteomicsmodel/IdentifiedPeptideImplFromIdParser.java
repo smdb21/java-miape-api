@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.dtaselect;
+package org.proteored.miapeapi.proteomicsmodel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +137,7 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 		// conf.toString()).build();
 		// ret.add(score);
 		// }
-		final Double deltacn = psm.getDeltaCn();
+		final Float deltacn = psm.getDeltaCn();
 		if (deltacn != null) {
 			ControlVocabularyTerm scoreTerm = null;
 			if ("sequest".equalsIgnoreCase(psm.getSearchEngine())) {
@@ -154,7 +154,7 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 			final PeptideScore score = new PeptideScoreBuilder(scoreName, deltacn.toString()).build();
 			ret.add(score);
 		}
-		final Double xcorr = psm.getXCorr();
+		final Float xcorr = psm.getXCorr();
 		if (xcorr != null) {
 			ControlVocabularyTerm scoreTerm = null;
 			if ("sequest".equalsIgnoreCase(psm.getSearchEngine())) {
@@ -216,7 +216,7 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 	@Override
 	public String getMassDesviation() {
 		final StringBuilder sb = new StringBuilder();
-		final Double calculatedMassH = psm.getCalcMH();
+		final Float calculatedMassH = psm.getCalcMH();
 		Integer charge = null;
 		charge = Integer.valueOf(getCharge());
 		if (calculatedMassH != null && charge != null) {
@@ -225,7 +225,7 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 			sb.append(mz);
 			sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 		}
-		final Double experimentalMassH = psm.getExperimentalMH();
+		final Float experimentalMassH = psm.getExperimentalMH();
 		if (experimentalMassH != null && charge != null) {
 			sb.append(MiapeXmlUtil.EXPERIMENTAL_MZ + "=");
 			final double mz = (experimentalMassH - MassesUtil.H) / charge * 1.0;

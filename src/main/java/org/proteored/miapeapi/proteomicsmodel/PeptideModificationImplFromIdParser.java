@@ -1,4 +1,4 @@
-package org.proteored.miapeapi.xml.dtaselect;
+package org.proteored.miapeapi.proteomicsmodel;
 
 import java.util.List;
 import java.util.Set;

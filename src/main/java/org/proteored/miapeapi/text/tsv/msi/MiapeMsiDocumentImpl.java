@@ -620,7 +620,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 				else
 					return "Glu->pyro-Glu";
 			}
-			final DecimalFormat df = new DecimalFormat("+#.####");
+			final DecimalFormat df = new DecimalFormat("+#.####,-#.####");
 			return df.format(deltaMass);
 
 			// final ControlVocabularyTerm pepModifDetailsTerm =

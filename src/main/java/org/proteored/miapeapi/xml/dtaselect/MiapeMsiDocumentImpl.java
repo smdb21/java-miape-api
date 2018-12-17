@@ -32,6 +32,7 @@ import org.proteored.miapeapi.interfaces.msi.MiapeMSIDocument;
 import org.proteored.miapeapi.interfaces.msi.Validation;
 import org.proteored.miapeapi.interfaces.persistence.PersistenceManager;
 import org.proteored.miapeapi.interfaces.xml.MiapeXmlFile;
+import org.proteored.miapeapi.proteomicsmodel.IdentifiedProteinImplFromIdParser;
 import org.proteored.miapeapi.validation.ValidationReport;
 import org.proteored.miapeapi.xml.msi.MiapeMSIXmlFactory;
 
