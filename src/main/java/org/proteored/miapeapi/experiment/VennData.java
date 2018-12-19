@@ -572,14 +572,7 @@ public abstract class VennData {
 		processCollections();
 		Integer ret = null;
 		if (col1 != null) {
-			if (ret == null) {
-				ret = col1.size();
-			} else {
-				if (ret < col1.size()) {
-					ret = col1.size();
-				}
-			}
-
+			ret = col1.size();
 		}
 		if (col2 != null) {
 			if (ret == null) {

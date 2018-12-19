@@ -531,6 +531,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	 *
 	 */
 	private void processMzIdentML() {
+
 		// clear static identifier counters
 		MiapeXmlUtil.clearIdentifierCounters();
 		String spectrumIdentificationSoftwareID = "";
@@ -656,7 +657,6 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 			log.info("processing SpectrumIdentificationResults in SIL " + spectrumIdentificationList.getId());
 			while (spectrumIdentificationResultIterator.hasNext()) {
 				final SpectrumIdentificationResult spectIdentResultXML = spectrumIdentificationResultIterator.next();
-
 				final String RT = getRetentionTimeInSeconds(spectIdentResultXML);
 
 				// TODO this is very important! Be careful.

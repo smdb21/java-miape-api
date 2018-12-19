@@ -609,7 +609,6 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 					.get(0);
 			generatedFileURI = file.getLocation();
 		}
-
 	}
 
 	private String getRetentionTimeInSeconds(PSIPIAnalysisSearchSpectrumIdentificationResultType spectIdentResultXML) {

@@ -596,7 +596,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	private String getModificationNameFromResidueAndMass(String aa, double deltaMass) {
 		try {
 			// try first with the PRIDE mapping
-			final PTM ptm = new PTMEx(deltaMass, aa.charAt(0), -1);
+			final PTM ptm = new PTMEx(deltaMass, aa, -1);
 			if (ptm.getName() != null) {
 				return ptm.getName();
 			}

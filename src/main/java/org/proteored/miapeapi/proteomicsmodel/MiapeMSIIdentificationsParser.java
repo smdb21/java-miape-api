@@ -123,49 +123,58 @@ public class MiapeMSIIdentificationsParser extends IdentificationsParser
 			}
 			final Set<IdentifiedProteinSet> identifiedProteinSets = miapeMSI.getIdentifiedProteinSets();
 			for (final IdentifiedProteinSet identifiedProteinSet : identifiedProteinSets) {
-				final String proteinSetName = identifiedProteinSet.getName();
 				final Set<MSRun> msRuns = new THashSet<MSRun>();
 				for (final InputDataSet inputDataSet : identifiedProteinSet.getInputDataSets()) {
 					for (final InputData inputData : inputDataSet.getInputDatas()) {
 						msRuns.add(getMSRunByInputData(inputData));
 					}
 				}
-				for (final IdentifiedProtein protein : identifiedProteinSet.getIdentifiedProteins().values()) {
-					Protein p = null;
-					final String acc = FastaParser.getACC(protein.getAccession()).getAccession();
-					if (StaticProteomicsModelStorage.containsProtein(msRuns, null, acc)) {
-						p = StaticProteomicsModelStorage.getSingleProtein(null, acc, msRuns);
-					} else {
-						// if (dbIndex == null) {
-						p = new ProteinFromMIAPEMSI(protein, this);
+				for (final IdentifiedProtein proteinFromMIAPE : identifiedProteinSet.getIdentifiedProteins().values()) {
+					String acc = proteinFromMIAPE.getAccession();
+					if (!ignoreACCFormat) {
+						acc = FastaParser.getACC(proteinFromMIAPE.getAccession()).getAccession();
 					}
-					if (proteinsByAccession.containsKey(p.getAccession())) {
-						final Protein p2 = proteinsByAccession.get(p.getAccession());
-						p.mergeWithProtein(p2);
-					}
-					if (!searchEngines.isEmpty()) {
-						p.setSearchEngine(searchEngines.iterator().next());
+					if ("Q02248".equals(acc)) {
+						log.info(acc + " " + msRuns.iterator().next().getRunId());
 					}
 					boolean skip = false;
 					if (decoyPattern != null) {
-						final Matcher matcher = decoyPattern.matcher(p.getAccession());
+						final Matcher matcher = decoyPattern.matcher(acc);
 						if (matcher.find()) {
 							numDecoy++;
 							skip = true;
 						}
 					}
 					if (!skip) {
-						proteinsByAccession.put(p.getAccession(), p);
-						final List<IdentifiedPeptide> identifiedPeptides = protein.getIdentifiedPeptides();
+						Protein protein = null;
+
+						if (containsProteinByAccession(acc)) {
+							protein = getProteinByAccession(acc);
+						} else {
+							protein = new ProteinFromMIAPEMSI(proteinFromMIAPE, this);
+						}
+						for (final MSRun msRun : msRuns) {
+							protein.addMSRun(msRun);
+						}
+
+						if (!searchEngines.isEmpty()) {
+							protein.setSearchEngine(searchEngines.iterator().next());
+						}
+
+						addProteinToMapAndList(protein);
+						final List<IdentifiedPeptide> identifiedPeptides = proteinFromMIAPE.getIdentifiedPeptides();
 						for (final IdentifiedPeptide identifiedPeptide : identifiedPeptides) {
 							final MSRun msRun = getMSRunByInputData(identifiedPeptide.getInputData());
 							PSM psm = new PSMFromMIAPEMSI(identifiedPeptide, msRun, this);
-							if (StaticProteomicsModelStorage.containsPSM(msRun, null, psm.getIdentifier())) {
-								psm = StaticProteomicsModelStorage.getSinglePSM(msRun, null, psm.getIdentifier());
+							if (containsPSMByPSMID(psm.getIdentifier())) {
+								psm = getPSMByPSMID(psm.getIdentifier());
+							} else {
+								addPSMToMaps(psm);
 							}
-							psmTableByPSMID.put(psm.getIdentifier(), psm);
+							psm.addProtein(protein, true);
 						}
 					}
+
 				}
 			}
 		}

@@ -10,6 +10,7 @@ import org.proteored.miapeapi.interfaces.msi.PeptideModification;
 import edu.scripps.yates.utilities.proteomicsmodel.AbstractPSM;
 import edu.scripps.yates.utilities.proteomicsmodel.MSRun;
 import edu.scripps.yates.utilities.proteomicsmodel.PTM;
+import edu.scripps.yates.utilities.proteomicsmodel.PTMPosition;
 import edu.scripps.yates.utilities.proteomicsmodel.Protein;
 import edu.scripps.yates.utilities.proteomicsmodel.factories.PTMEx;
 import edu.scripps.yates.utilities.proteomicsmodel.staticstorage.StaticProteomicsModelStorage;
@@ -29,7 +30,9 @@ public class PSMFromMIAPEMSI extends AbstractPSM {
 	@Override
 	public String getIdentifier() {
 		if (super.getIdentifier() == null) {
-			setIdentifier(identifiedPeptide.getId() + "-" + identifiedPeptide.getSpectrumRef());
+			setIdentifier(identifiedPeptide.getInputData().getName() + "-" + identifiedPeptide.getId() + "-"
+					+ identifiedPeptide.getSpectrumRef() + "-" + identifiedPeptide.getSequence() + "-"
+					+ identifiedPeptide.getCharge());
 		}
 		return super.getIdentifier();
 	}
@@ -57,8 +60,9 @@ public class PSMFromMIAPEMSI extends AbstractPSM {
 		if (super.getPTMs() == null || super.getPTMs().isEmpty()) {
 			if (identifiedPeptide.getModifications() != null) {
 				for (final PeptideModification peptideModification : identifiedPeptide.getModifications()) {
-					final PTM ptm = new PTMEx(peptideModification.getMonoDelta(),
-							peptideModification.getResidues().charAt(0), peptideModification.getPosition());
+					final PTM ptm = new PTMEx(peptideModification.getMonoDelta(), peptideModification.getResidues(),
+							peptideModification.getPosition(),
+							PTMPosition.getPTMPositionFromSequence(getSequence(), peptideModification.getPosition()));
 					addPTM(ptm);
 				}
 			}
