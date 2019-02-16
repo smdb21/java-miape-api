@@ -340,6 +340,11 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>com.compomics</groupId>
+			<artifactId>utilities</artifactId>
+			<version>4.12.12</version>
+		</dependency>
 	</dependencies>
 	<organization>
 		<name>ProteoRed - National Center for Biotechnology - CSIC &amp; The Scripps Research Institute (TSRI)</name>
