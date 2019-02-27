@@ -25,6 +25,7 @@ public class PSMFromMIAPEMSI extends AbstractPSM {
 		this.msRunProviderByInputData = msRunProviderByInputData;
 		setMSRun(msRun);
 		setSequence(identifiedPeptide.getSequence());
+		setKey(getIdentifier());
 	}
 
 	@Override

@@ -20,6 +20,7 @@ public class ProteinFromMIAPEMSI extends AbstractProtein {
 	public ProteinFromMIAPEMSI(IdentifiedProtein protein, MSRunProviderByInputData msRunProviderByInputData) {
 		this.protein = protein;
 		this.msRunProviderByInputData = msRunProviderByInputData;
+		setKey(getAccession());
 	}
 
 	@Override
