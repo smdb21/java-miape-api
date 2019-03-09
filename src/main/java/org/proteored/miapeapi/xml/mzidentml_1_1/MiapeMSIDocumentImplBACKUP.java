@@ -55,6 +55,7 @@ import edu.scripps.yates.utilities.cores.SystemCoreManager;
 import edu.scripps.yates.utilities.pi.ParIterator;
 import edu.scripps.yates.utilities.pi.ParIterator.Schedule;
 import edu.scripps.yates.utilities.pi.ParIteratorFactory;
+import edu.scripps.yates.utilities.pi.exceptions.ParIteratorException;
 import edu.scripps.yates.utilities.pi.reductions.Reducible;
 import edu.scripps.yates.utilities.pi.reductions.Reduction;
 import gnu.trove.map.hash.THashMap;
@@ -70,6 +71,7 @@ import uk.ac.ebi.jmzidml.model.mzidml.AuditCollection;
 import uk.ac.ebi.jmzidml.model.mzidml.BibliographicReference;
 import uk.ac.ebi.jmzidml.model.mzidml.CvParam;
 import uk.ac.ebi.jmzidml.model.mzidml.DBSequence;
+import uk.ac.ebi.jmzidml.model.mzidml.InputSpectra;
 import uk.ac.ebi.jmzidml.model.mzidml.InputSpectrumIdentifications;
 import uk.ac.ebi.jmzidml.model.mzidml.MzIdentML;
 import uk.ac.ebi.jmzidml.model.mzidml.Peptide;
@@ -85,7 +87,9 @@ import uk.ac.ebi.jmzidml.model.mzidml.SearchDatabase;
 import uk.ac.ebi.jmzidml.model.mzidml.SearchDatabaseRef;
 import uk.ac.ebi.jmzidml.model.mzidml.SourceFile;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectraData;
+import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentification;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationItem;
+import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationItemRef;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationList;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationProtocol;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult;
@@ -132,6 +136,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	private Iterator<SpectrumIdentificationList> silIterator;
 
+	private final Map<String, Set<String>> spectrumIdentificationItemsByPeptideEvidence = new THashMap<String, Set<String>>();
+
 	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, ControlVocabularyManager cvManager,
 			String mzIdentMLFileName, String projectName, boolean processInParallel) throws JAXBException {
 		mzIdentMLUnmarshaller = unmarshaller;
@@ -141,8 +147,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		this.mzIdentMLFileName = mzIdentMLFileName;
 		if (false && processInParallel) {
 			log.info("Starting processing of mzIdentML in parallel");
-			throw new IllegalArgumentException("It is not supported");
-//			processMzIdentMLInParallel();
+			processMzIdentMLInParallel();
 		} else {
 			log.info("Starting processing of mzIdentML using just one core");
 			processMzIdentML();
@@ -161,7 +166,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		dbManager = databaseManager;
 		this.mzIdentMLFileName = mzIdentMLFileName;
 		if (false && processInParallel) {
-			throw new IllegalArgumentException("It is not supported");
+			log.info("Starting processing of mzIdentML in parallel");
+			processMzIdentMLInParallel();
 		} else {
 			log.info("Starting processing of mzIdentML using just one core");
 			processMzIdentML();
@@ -169,25 +175,329 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	}
 
-	private String getInputParameterKey(ProteinDetectionProtocol pdp, Iterator<SearchDatabase> databaseListXML,
-			Software msiSoftware) {
-		final StringBuilder sb = new StringBuilder();
+	/**
+	 * Main method that reads the mzIdentML file and create the MIAPE MSI sections
+	 * in paralell
+	 *
+	 * @param mzIdentMLUnmarshaller
+	 */
+	/**
+	 * @throws JAXBException
+	 *
+	 */
+	private void processMzIdentMLInParallel() throws JAXBException {
+		// clear static identifier counters
+		MiapeXmlUtil.clearIdentifierCounters();
+		final Map<String, InputDataSet> inputDataSetMap = new THashMap<String, InputDataSet>();
 
+		String spectrumIdentificationSoftwareID = "";
+		log.info("unmarshalling sourceFiles");
+		sourceFiles = mzIdentMLUnmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SourceFile);
+		if (sourceFiles.hasNext())
+			sourceFilesCount = mzIdentMLUnmarshaller.getObjectCountForXpath(MzIdentMLElement.SourceFile.getXpath());
+		log.info("unmarshalling searchDatbases");
+		searchDataBases = mzIdentMLUnmarshaller.unmarshalCollectionFromXpath(MzIdentMLElement.SearchDatabase);
+		log.info("unmarshalling analysisSoftwareList");
+		analysisSoftwareList = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSoftwareList);
+		log.info("unmarshalling auditCollection");
+		auditCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AuditCollection);
+		if (auditCollection != null) {
+			mzIdentContactList = auditCollection.getPersonOrOrganization();
+
+		}
+
+		log.info("unmarshalling analysisProtocolCollection");
+		analysisProtocolCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisProtocolCollection);
+		log.info("unmarshalling analysisSampleCollection");
+		analysisSampleCollection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSampleCollection);
+		log.info("unmarshalling spectrumIdentification");
+
+		final Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
+				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentification);
+
+		initProteinHypothesisByPeptideEvidenceHashMapInParallel();
+		log.info("Processing spectrumIdentifications");
+		int i = 1;
+		// for (SpectrumIdentification spectrumIdent : spectrumIdentifications)
+		// {
+		while (spectrumIdentifications.hasNext()) {
+			final SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
+			final SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
+					spectrumIdent.getSpectrumIdentificationListRef());
+			Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
+
+			log.info("spectrum identification " + i++ + " " + spectrumIdent.getId());
+
+			SpectrumIdentificationProtocol spectrumIdentProtocol = null;
+			// spectrumIdentProtocol = spectrumIdent
+			// .getSpectrumIdentificationProtocol();
+			// if (spectrumIdentProtocol == null)
+			try {
+				spectrumIdentProtocol = mzIdentMLUnmarshaller.unmarshal(SpectrumIdentificationProtocol.class,
+						spectrumIdent.getSpectrumIdentificationProtocolRef());
+			} catch (final JAXBException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			// getSpectrumIdentificationProtocol(spectrumIdent.getSpectrumIdentificationProtocolRef(),
+			// analysisProtocolCollection.getSpectrumIdentificationProtocol());
+			final List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
+					searchDataBases);
+
+			final AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
+			if (softwareXML != null)
+				spectrumIdentificationSoftwareID = softwareXML.getId();
+
+			final ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
+					spectrumIdent.getSpectrumIdentificationListRef());
+			// getSoftware(
+			// spectrumIdentProtocol.getAnalysisSoftwareRef(),
+			// analysisSoftware);
+			Software msiSoftware = null;
+			if (softwareXML != null) {
+				if (msiSoftwares.containsKey(softwareXML.getId())) {
+					msiSoftware = msiSoftwares.get(softwareXML.getId());
+				} else {
+					final Integer softwareID = MiapeIdentifierCounter.increaseCounter();
+					msiSoftware = new SoftwareImpl(softwareXML, softwareID, cvManager);
+					msiSoftwares.put(softwareXML.getId(), msiSoftware);
+				}
+			}
+			// SpectrumIdentificationList spectIdentListXML =
+			// getSpectrumIdentificationList(spectrumIdent
+			// .getSpectrumIdentificationListRef());
+			final Map<String, String> elementAttributes = mzIdentMLUnmarshaller.getElementAttributes(
+					spectrumIdent.getSpectrumIdentificationListRef(), SpectrumIdentificationList.class);
+			Long numSeqSearched = (long) -1;
+			if (elementAttributes.containsKey("numSequencesSearched"))
+				numSeqSearched = Long.valueOf(elementAttributes.get("numSequencesSearched"));
+
+			// Input parameter and databases
+			InputParameter inputParameter = null;
+			final String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML,
+					msiSoftware, numSeqSearched);
+			if (inputParameters.containsKey(inputParameterKey)) {
+				inputParameter = inputParameters.get(inputParameterKey);
+			} else {
+				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
+				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
+						inputParamID, numSeqSearched, cvManager);
+				inputParameters.put(inputParameterKey, inputParameter);
+			}
+
+			// inputDataSet
+			// Integer inputDataSetID = MiapeXmlUtil.InputDataSetCounter
+			// .increaseCounter();
+			// InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID);
+			// inputDataSets.add(inputDataSet);
+			// inputDataSet
+			final List<InputSpectra> inputSpectraXML = spectrumIdent.getInputSpectra();
+			if (inputSpectraXML != null) {
+				for (final InputSpectra inputSpectra : inputSpectraXML) {
+					final String spectraDataRef = inputSpectra.getSpectraDataRef();
+					if (!inputDataSetMap.containsKey(spectraDataRef)) {
+						final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
+						final InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID, spectraDataRef);
+						inputDataSetMap.put(spectraDataRef, inputDataSet);
+					}
+				}
+			}
+
+			// proteinSet
+			final IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSetMap.values());
+			proteinSets.add(proteinSet);
+
+			// time
+			final long t1 = System.currentTimeMillis();
+
+			final List<SpectrumIdentificationResult> spectrumIdentificationResultList = spectrumIdentificationList
+					.getSpectrumIdentificationResult();
+			final Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationResultList
+					.iterator();
+
+			final int threadCount = SystemCoreManager.getAvailableNumSystemCores(MAX_NUMBER_PARALLEL_PROCESSES);
+
+			log.info("Using " + threadCount + " processors from processing " + spectrumIdentificationResultList.size()
+					+ " SIR");
+			final ParIterator<SpectrumIdentificationResult> iterator = ParIteratorFactory.createParIterator(
+					spectrumIdentificationResultIterator, spectrumIdentificationResultList.size(), threadCount,
+					Schedule.GUIDED);
+
+			final Reducible<List<IdentifiedPeptide>> reduciblePeptides = new Reducible<List<IdentifiedPeptide>>();
+			final Map<String, InputData> inputDataHash = new THashMap<String, InputData>();
+			final MapSync<String, InputData> syncInputDataHash = new MapSync<String, InputData>(inputDataHash);
+			final Reducible<Map<String, IdentifiedProtein>> reducibleProteinHash = new Reducible<Map<String, IdentifiedProtein>>();
+
+			final List<SpectrumIdentificationResultParallelProcesser> runners = new ArrayList<SpectrumIdentificationResultParallelProcesser>();
+			for (int numCore = 0; numCore < threadCount; numCore++) {
+				// take current DB session
+				final SpectrumIdentificationResultParallelProcesser runner = new SpectrumIdentificationResultParallelProcesser(
+						iterator, numCore, cvManager, mzIdentMLUnmarshaller, syncInputDataHash, reduciblePeptides,
+						new MapSync<String, ProteinDetectionHypothesis>(proteinDetectionHypotesisWithPeptideEvidence),
+						reducibleProteinHash);
+				runners.add(runner);
+				runner.start();
+			}
+
+			// Main thread waits for worker threads to complete
+			for (int k = 0; k < threadCount; k++) {
+				try {
+					runners.get(k).join();
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// Handle exceptions
+			final ParIteratorException<SpectrumIdentificationResult>[] piExceptions = iterator.getAllExceptions();
+			for (int k = 0; k < piExceptions.length; k++) {
+				final ParIteratorException<SpectrumIdentificationResult> pie = piExceptions[k];
+				// object for iteration in which exception was encountered
+				final Object iteration = pie.getIteration();
+				// thread executing that iteration
+				final Thread thread = pie.getRegisteringThread();
+				// actual exception thrown
+				final Exception e = pie.getException();
+				// print exact location of exception
+				e.printStackTrace();
+				throw new IllegalMiapeArgumentException("Error in SIR parallel iterator: " + e.getMessage());
+			}
+			// Reductors
+			final Reduction<List<IdentifiedPeptide>> peptideListReduction = new Reduction<List<IdentifiedPeptide>>() {
+				@Override
+				public List<IdentifiedPeptide> reduce(List<IdentifiedPeptide> first, List<IdentifiedPeptide> second) {
+					final List<IdentifiedPeptide> peptides = new ArrayList<IdentifiedPeptide>();
+					peptides.addAll(first);
+					peptides.addAll(second);
+					return peptides;
+				}
+			};
+
+			final Reduction<Map<String, IdentifiedProtein>> proteinHashReduction = new Reduction<Map<String, IdentifiedProtein>>() {
+				@Override
+				public Map<String, IdentifiedProtein> reduce(Map<String, IdentifiedProtein> first,
+						Map<String, IdentifiedProtein> second) {
+					final Map<String, IdentifiedProtein> map = new THashMap<String, IdentifiedProtein>();
+
+					final List<Map<String, IdentifiedProtein>> listofmaps = new ArrayList<Map<String, IdentifiedProtein>>();
+					listofmaps.add(first);
+					listofmaps.add(second);
+					for (final Map<String, IdentifiedProtein> mapToReduce : listofmaps) {
+
+						for (final String proteinAcc : mapToReduce.keySet()) {
+							if (!map.containsKey(proteinAcc)) {
+								map.put(proteinAcc, mapToReduce.get(proteinAcc));
+							} else {
+								// Add peptides from protein2 to the protein1
+								final IdentifiedProteinImpl protein = (IdentifiedProteinImpl) map.get(proteinAcc);
+								final IdentifiedProtein protein2 = mapToReduce.get(proteinAcc);
+								for (final IdentifiedPeptide peptide2 : protein2.getIdentifiedPeptides()) {
+									protein.addIdentifiedPeptide(peptide2);
+
+									// delete protein2 from peptide
+									final IdentifiedPeptideImpl peptideImpl2 = (IdentifiedPeptideImpl) peptide2;
+									final Iterator<IdentifiedProtein> iterator2 = peptideImpl2.getIdentifiedProteins()
+											.iterator();
+									while (iterator2.hasNext()) {
+										if (iterator2.next().getId() == protein2.getId())
+											iterator2.remove();
+									}
+									// add protein1 to peptide
+									peptideImpl2.addProtein(protein);
+								}
+							}
+						}
+					}
+					return map;
+				}
+			};
+			log.info("Collapsing thread results");
+			peptides.addAll(reduciblePeptides.reduce(peptideListReduction));
+			proteinHash = reducibleProteinHash.reduce(proteinHashReduction);
+
+			for (final String spectraDataRef : syncInputDataHash.keySet()) {
+				if (inputDataSetMap.containsKey(spectraDataRef)) {
+					final InputDataSet inputDataSet = inputDataSetMap.get(spectraDataRef);
+
+					final Set<InputData> inputDatas = inputDataSet.getInputDatas();
+					boolean include = true;
+					for (final InputData inputData : inputDatas) {
+						if (inputData.getName().equals(spectraDataRef))
+							include = false;
+					}
+					if (include)
+						inputDatas.add(syncInputDataHash.get(spectraDataRef));
+				}
+			}
+
+			log.info(spectrumIdentificationResultList.size() + " SIR processed successfully in parallel in "
+					+ (System.currentTimeMillis() - t1) / 1000 + " sg.");
+
+			// Add all the proteins to the proteinSet
+			for (final String protein_Acc : proteinHash.keySet()) {
+				final IdentifiedProtein protein = proteinHash.get(protein_Acc);
+				((ProteinSetImpl) proteinSet).addIdentifiedProtein(protein);
+			}
+			log.info("Parsed " + proteinHash.size() + " proteins and " + peptides.size() + " peptides.");
+		}
+		// add input data sets:
+		for (final InputDataSet inputDataSet : inputDataSetMap.values()) {
+			inputDataSets.add(inputDataSet);
+		}
+
+		// for the protein detection protocol and the peptide identification
+		// detection protocol
+		final Map<String, List<Object>> protocolsBySoftware = getProtocolsBySoftware(analysisProtocolCollection);
+		if (protocolsBySoftware != null) {
+			for (final List<Object> list : protocolsBySoftware.values()) {
+				// Validations
+				validations.add(new ValidationImpl(list, analysisSoftwareList.getAnalysisSoftware(),
+						spectrumIdentificationSoftwareID, cvManager));
+			}
+		}
+
+		// Add new validation softwares for the softwares not referenced by
+		// protocols
+		if (analysisSoftwareList != null) {
+			final Set<String> referencesSoftwareRefs = getProtocolsBySoftwareIDs(analysisProtocolCollection);
+			for (final AnalysisSoftware analysisSoftware : analysisSoftwareList.getAnalysisSoftware()) {
+				final String analysisSoftwareID = analysisSoftware.getId();
+				if (!referencesSoftwareRefs.contains(analysisSoftwareID)
+						&& !spectrumIdentificationSoftwareID.equals(analysisSoftwareID)) {
+					validations.add(new ValidationImpl(analysisSoftware, cvManager));
+				}
+			}
+		}
+		//
+		if (existsSourceFile()) {
+			// Get the location of the first file in the list. The rest of them,
+			// put it in GeneratedFilesDescription
+			final SourceFile file = sourceFiles.next();
+			generatedFileURI = file.getLocation();
+		}
+
+	}
+
+	private String getInputParameterKey(SpectrumIdentificationProtocol spectrumIdentProtocol,
+			ProteinDetectionProtocol pdp, List<SearchDatabase> databaseListXML, Software msiSoftware,
+			Long numSeqSearched) {
+		final StringBuilder sb = new StringBuilder();
+		if (spectrumIdentProtocol != null) {
+			sb.append(spectrumIdentProtocol.getId());
+		}
 		if (pdp != null) {
 			sb.append(pdp.getId());
 		}
 		if (databaseListXML != null) {
-			int numDatabases = 0;
-			while (databaseListXML.hasNext()) {
-				databaseListXML.next();
-				numDatabases++;
-			}
-			sb.append(numDatabases);
+			sb.append(databaseListXML.size());
 		}
 		if (msiSoftware != null) {
 			sb.append(msiSoftware.getId());
 		}
-
+		if (numSeqSearched != null) {
+			sb.append(numSeqSearched);
+		}
 		final String inputParameterKey = sb.toString();
 		return inputParameterKey;
 	}
@@ -256,191 +566,215 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 		// e1.printStackTrace();
 		// }
 
+		final Iterator<SpectrumIdentification> spectrumIdentifications = mzIdentMLUnmarshaller
+				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentification);
 		// List<SpectrumIdentification> spectrumIdentification =
 		// analysisCollection
 		// .getSpectrumIdentification();
 
 		initProteinHypothesisByPeptideEvidenceHashMap();
 		log.info("Processing spectrumIdentifications");
-		final int i = 1;
+		int i = 1;
 		// for (SpectrumIdentification spectrumIdent : spectrumIdentifications)
 		// {
 		// create a protein set per proteinIdentificationlist
 
-		final Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
+		while (spectrumIdentifications.hasNext()) {
+			final Map<String, IdentifiedProtein> proteinHash = new THashMap<String, IdentifiedProtein>();
 
-		final Iterator<SearchDatabase> databaseListXML = mzIdentMLUnmarshaller
-				.unmarshalCollectionFromXpath(MzIdentMLElement.SearchDatabase);
+			final SpectrumIdentification spectrumIdent = spectrumIdentifications.next();
+			log.info("spectrum identification " + i++ + " " + spectrumIdent.getId());
 
-		// MSI Software
+			final SpectrumIdentificationList spectrumIdentificationList = getSpectrumIdentificationList(
+					spectrumIdent.getSpectrumIdentificationListRef());
 
-		final AnalysisSoftware softwareXML = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.AnalysisSoftware);
-		if (softwareXML != null)
-			spectrumIdentificationSoftwareID = softwareXML.getId();
+			SpectrumIdentificationProtocol spectrumIdentProtocol = null;
 
-		final ProteinDetectionProtocol pdp = getProteinDetectionProtocol(null);
-		Software msiSoftware = null;
-		if (softwareXML != null) {
-			if (msiSoftwares.containsKey(softwareXML.getId())) {
-				msiSoftware = msiSoftwares.get(softwareXML.getId());
-			} else {
-				final Integer softwareID = MiapeIdentifierCounter.increaseCounter();
-
-				msiSoftware = new SoftwareImpl(softwareXML, softwareID, cvManager);
-				msiSoftwares.put(softwareXML.getId(), msiSoftware);
-			}
-		}
-
-		final String inputParameterKey = getInputParameterKey(pdp, databaseListXML, msiSoftware);
-		// Input parameter and databases
-		InputParameter inputParameter = null;
-		if (inputParameters.containsKey(inputParameterKey)) {
-			inputParameter = inputParameters.get(inputParameterKey);
-		} else {
-			final SpectrumIdentificationProtocol spectrumIdentProtocol = mzIdentMLUnmarshaller
-					.unmarshal(MzIdentMLElement.SpectrumIdentificationProtocol);
-			final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
-			final Long numSeqSearched = -1l;
-			inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
-					inputParamID, numSeqSearched, cvManager);
-			inputParameters.put(inputParameterKey, inputParameter);
-		}
-
-		// inputDataSet
-		final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
-		final InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID);
-		inputDataSets.add(inputDataSet);
-
-		// proteinSet
-		final IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSet);
-		proteinSets.add(proteinSet);
-		final Map<String, InputData> inputDataBySpectraDataRef = new THashMap<String, InputData>();
-		// Map<spectraDataXML.ID, InputData
-
-		// List<SpectrumIdentificationResult> spectrumIdentificationResult =
-		// spectIdentListXML
-		// .getSpectrumIdentificationResult();
-
-		long peptideCount = 0;
-
-		final Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = mzIdentMLUnmarshaller
-				.unmarshalCollectionFromXpath(MzIdentMLElement.SpectrumIdentificationResult);
-//			spectrumIdentificationList.getSpectrumIdentificationResult().iterator();
-//			log.info("processing SpectrumIdentificationResults in SIL " + spectrumIdentificationList.getId());
-		while (spectrumIdentificationResultIterator.hasNext()) {
-			final SpectrumIdentificationResult spectIdentResultXML = spectrumIdentificationResultIterator.next();
-			final String RT = getRetentionTimeInSeconds(spectIdentResultXML);
-
-			// TODO this is very important! Be careful.
-
-			// final String spectrumID =
-			// spectIdentResultXML.getSpectrumID();
-			final String spectrumRef = parseSpectrumRef(spectIdentResultXML.getSpectrumID());
-
-			// Input data
-			// check if the spectraData is already captured. If not, add a
-			// new input Data
-			final String spectraDataRef = spectIdentResultXML.getSpectraDataRef();
-			InputData inputData = null;
 			try {
-				if (!inputDataBySpectraDataRef.containsKey(spectraDataRef)) {
-					final SpectraData spectraDataXML = mzIdentMLUnmarshaller.unmarshal(SpectraData.class,
-							spectraDataRef);
-					final Integer inputDataID = MiapeIdentifierCounter.increaseCounter();
-					inputData = new InputDataImpl(spectraDataXML, inputDataID);
-					inputDataBySpectraDataRef.put(spectraDataRef, inputData);
-				} else {
-					inputData = inputDataBySpectraDataRef.get(spectraDataRef);
-				}
-				((InputDataSetImpl) inputDataSet).addInputData(inputData);
-
+				spectrumIdentProtocol = mzIdentMLUnmarshaller.unmarshal(SpectrumIdentificationProtocol.class,
+						spectrumIdent.getSpectrumIdentificationProtocolRef());
 			} catch (final JAXBException e1) {
+				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			// log.info(spectIdentResultXML.getSpectrumIdentificationItem().size()
-			// + " SpectrumIdentificationItems");
-			final Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
-			final List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
-					.getSpectrumIdentificationItem();
-			for (final SpectrumIdentificationItem spectIdentItemXML : spectrumIdentificationItems) {
 
-				// some peptides contribute to proteins even if they
-				// have
-				// not passed the threshold
-				// if (spectIdentItemXML.isPassThreshold()) {
+			final List<SearchDatabase> databaseListXML = getSearchDatabases(spectrumIdent.getSearchDatabaseRef(),
+					searchDataBases);
 
-				// CREATE Peptide
-				final Integer peptideID = MiapeIdentifierCounter.increaseCounter();
-				Peptide peptideXML = null;
+			// MSI Software
 
-				if (spectIdentItemXML.getPeptideRef() != null) {
-					if (peptideXML == null) {
-						try {
-							peptideXML = mzIdentMLUnmarshaller.unmarshal(Peptide.class,
-									spectIdentItemXML.getPeptideRef());
-						} catch (final JAXBException e) {
-							log.debug(e.getMessage());
-						} catch (final IllegalArgumentException e) {
-							log.debug(e.getMessage());
-						}
-					}
-				}
-				if (peptideXML == null) {
-					peptideXML = getPeptideFromPeptideEvidences(spectIdentItemXML.getPeptideEvidenceRef());
-				}
-				if (peptideXML == null) {
-					throw new IllegalMiapeArgumentException(
-							"Peptide " + spectIdentItemXML.getPeptideRef() + " cannot be found in mzIdentML file");
+			final AnalysisSoftware softwareXML = spectrumIdentProtocol.getAnalysisSoftware();
+			if (softwareXML != null)
+				spectrumIdentificationSoftwareID = softwareXML.getId();
+
+			final ProteinDetectionProtocol pdp = getProteinDetectionProtocol(
+					spectrumIdent.getSpectrumIdentificationListRef());
+			Software msiSoftware = null;
+			if (softwareXML != null) {
+				if (msiSoftwares.containsKey(softwareXML.getId())) {
+					msiSoftware = msiSoftwares.get(softwareXML.getId());
 				} else {
+					final Integer softwareID = MiapeIdentifierCounter.increaseCounter();
 
-					boolean includePeptide = false;
-					final Set<PeptideScore> scores = IdentifiedPeptideImpl.getScoresFromThisPeptide(spectIdentItemXML,
-							peptideXML, cvManager);
-					// if (scores == null || scores.isEmpty()) {
-					// log.info("Skipping SII:" + spectIdentItemXML.getId()
-					// + " because no scores have found");
-					// continue;
-					// }
-					if (spectIdentItemXML.getRank() == 1) {
-						includePeptide = true;
-						scoresFromFirstPeptide.clear();
-						scoresFromFirstPeptide.addAll(scores);
-					} else {
-						// if the rank 2 has the same scores, also
-						// include it
-						if (comparePeptideScores(scoresFromFirstPeptide, scores) == 0) {
-							includePeptide = true;
-							log.debug("Peptide with rank " + spectIdentItemXML.getRank() + " is going to be included");
-						}
-					}
-					if (!includePeptide) {
-						break;
-					} else {
-						final IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
-								inputData, spectrumRef, peptideID, cvManager,
-								new MapSync<String, ProteinDetectionHypothesis>(
-										proteinDetectionHypotesisWithPeptideEvidence),
-								proteinHash, RT);
-						// if (peptide.getScores() == null ||
-						// peptide.getScores().isEmpty())
-						// throw new IllegalMiapeArgumentException(
-						// "The peptide from SII:" +
-						// spectIdentItemXML.getId() + " has no scores!");
-						// Add the peptide to the peptide list
-						peptides.add(peptide);
-						peptideCount++;
-
-					}
-
+					msiSoftware = new SoftwareImpl(softwareXML, softwareID, cvManager);
+					msiSoftwares.put(softwareXML.getId(), msiSoftware);
 				}
 			}
+			final Map<String, String> elementAttributes = mzIdentMLUnmarshaller.getElementAttributes(
+					spectrumIdent.getSpectrumIdentificationListRef(), SpectrumIdentificationList.class);
+			Long numSeqSearched = (long) -1;
+			if (elementAttributes.containsKey("numSequencesSearched"))
+				numSeqSearched = Long.valueOf(elementAttributes.get("numSequencesSearched"));
+
+			final String inputParameterKey = getInputParameterKey(spectrumIdentProtocol, pdp, databaseListXML,
+					msiSoftware, numSeqSearched);
+			// Input parameter and databases
+			InputParameter inputParameter = null;
+			if (inputParameters.containsKey(inputParameterKey)) {
+				inputParameter = inputParameters.get(inputParameterKey);
+			} else {
+				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
+				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
+						inputParamID, numSeqSearched, cvManager);
+				inputParameters.put(inputParameterKey, inputParameter);
+			}
+
+			// inputDataSet
+			final Integer inputDataSetID = MiapeIdentifierCounter.increaseCounter();
+			final InputDataSet inputDataSet = new InputDataSetImpl(inputDataSetID);
+			inputDataSets.add(inputDataSet);
+
+			// proteinSet
+			final IdentifiedProteinSet proteinSet = new ProteinSetImpl(inputParameter, inputDataSet);
+			proteinSets.add(proteinSet);
+			final Map<String, InputData> inputDataBySpectraDataRef = new THashMap<String, InputData>();
+			// Map<spectraDataXML.ID, InputData
+
+			// List<SpectrumIdentificationResult> spectrumIdentificationResult =
+			// spectIdentListXML
+			// .getSpectrumIdentificationResult();
+
+			long peptideCount = 0;
+
+			final Iterator<SpectrumIdentificationResult> spectrumIdentificationResultIterator = spectrumIdentificationList
+					.getSpectrumIdentificationResult().iterator();
+			log.info("processing SpectrumIdentificationResults in SIL " + spectrumIdentificationList.getId());
+			while (spectrumIdentificationResultIterator.hasNext()) {
+				final SpectrumIdentificationResult spectIdentResultXML = spectrumIdentificationResultIterator.next();
+				final String RT = getRetentionTimeInSeconds(spectIdentResultXML);
+
+				// TODO this is very important! Be careful.
+
+				// final String spectrumID =
+				// spectIdentResultXML.getSpectrumID();
+				final String spectrumRef = parseSpectrumRef(spectIdentResultXML.getSpectrumID());
+
+				// Input data
+				// check if the spectraData is already captured. If not, add a
+				// new input Data
+				final String spectraDataRef = spectIdentResultXML.getSpectraDataRef();
+				InputData inputData = null;
+				try {
+					if (!inputDataBySpectraDataRef.containsKey(spectraDataRef)) {
+						final SpectraData spectraDataXML = mzIdentMLUnmarshaller.unmarshal(SpectraData.class,
+								spectraDataRef);
+						final Integer inputDataID = MiapeIdentifierCounter.increaseCounter();
+						inputData = new InputDataImpl(spectraDataXML, inputDataID);
+						inputDataBySpectraDataRef.put(spectraDataRef, inputData);
+					} else {
+						inputData = inputDataBySpectraDataRef.get(spectraDataRef);
+					}
+					((InputDataSetImpl) inputDataSet).addInputData(inputData);
+
+				} catch (final JAXBException e1) {
+					e1.printStackTrace();
+				}
+				// log.info(spectIdentResultXML.getSpectrumIdentificationItem().size()
+				// + " SpectrumIdentificationItems");
+				final Set<PeptideScore> scoresFromFirstPeptide = new THashSet<PeptideScore>();
+				final List<SpectrumIdentificationItem> spectrumIdentificationItems = spectIdentResultXML
+						.getSpectrumIdentificationItem();
+				for (final SpectrumIdentificationItem spectIdentItemXML : spectrumIdentificationItems) {
+
+					// some peptides contribute to proteins even if they
+					// have
+					// not passed the threshold
+					// if (spectIdentItemXML.isPassThreshold()) {
+
+					// CREATE Peptide
+					final Integer peptideID = MiapeIdentifierCounter.increaseCounter();
+					Peptide peptideXML = null;
+
+					if (spectIdentItemXML.getPeptideRef() != null) {
+						if (peptideXML == null) {
+							try {
+								peptideXML = mzIdentMLUnmarshaller.unmarshal(Peptide.class,
+										spectIdentItemXML.getPeptideRef());
+							} catch (final JAXBException e) {
+								log.debug(e.getMessage());
+							} catch (final IllegalArgumentException e) {
+								log.debug(e.getMessage());
+							}
+						}
+					}
+					if (peptideXML == null) {
+						peptideXML = getPeptideFromPeptideEvidences(spectIdentItemXML.getPeptideEvidenceRef());
+					}
+					if (peptideXML == null) {
+						throw new IllegalMiapeArgumentException(
+								"Peptide " + spectIdentItemXML.getPeptideRef() + " cannot be found in mzIdentML file");
+					} else {
+
+						boolean includePeptide = false;
+						final Set<PeptideScore> scores = IdentifiedPeptideImpl
+								.getScoresFromThisPeptide(spectIdentItemXML, peptideXML, cvManager);
+						// if (scores == null || scores.isEmpty()) {
+						// log.info("Skipping SII:" + spectIdentItemXML.getId()
+						// + " because no scores have found");
+						// continue;
+						// }
+						if (spectIdentItemXML.getRank() == 1) {
+							includePeptide = true;
+							scoresFromFirstPeptide.clear();
+							scoresFromFirstPeptide.addAll(scores);
+						} else {
+							// if the rank 2 has the same scores, also
+							// include it
+							if (comparePeptideScores(scoresFromFirstPeptide, scores) == 0) {
+								includePeptide = true;
+								log.debug("Peptide with rank " + spectIdentItemXML.getRank()
+										+ " is going to be included");
+							}
+						}
+						if (!includePeptide) {
+							break;
+						} else {
+							final IdentifiedPeptide peptide = new IdentifiedPeptideImpl(spectIdentItemXML, peptideXML,
+									inputData, spectrumRef, peptideID, cvManager,
+									new MapSync<String, ProteinDetectionHypothesis>(
+											proteinDetectionHypotesisWithPeptideEvidence),
+									proteinHash, RT);
+							// if (peptide.getScores() == null ||
+							// peptide.getScores().isEmpty())
+							// throw new IllegalMiapeArgumentException(
+							// "The peptide from SII:" +
+							// spectIdentItemXML.getId() + " has no scores!");
+							// Add the peptide to the peptide list
+							peptides.add(peptide);
+							peptideCount++;
+
+						}
+
+					}
+				}
+			}
+			// Add all the proteins to the proteinSet
+			for (final String protein_Acc : proteinHash.keySet()) {
+				final IdentifiedProtein protein = proteinHash.get(protein_Acc);
+				((ProteinSetImpl) proteinSet).addIdentifiedProtein(protein);
+			}
+			log.info("Parsed " + proteinHash.size() + " proteins and " + peptideCount + " peptides.");
 		}
-		// Add all the proteins to the proteinSet
-		for (final String protein_Acc : proteinHash.keySet()) {
-			final IdentifiedProtein protein = proteinHash.get(protein_Acc);
-			((ProteinSetImpl) proteinSet).addIdentifiedProtein(protein);
-		}
-		log.info("Parsed " + proteinHash.size() + " proteins and " + peptideCount + " peptides.");
 
 		// for the protein detection protocol and the peptide identification
 		// detection protocol
@@ -571,9 +905,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 	}
 
 	private ProteinDetectionProtocol getProteinDetectionProtocol(String spectrumIdentificationListRef) {
-		if (spectrumIdentificationListRef == null) {
-			return mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.ProteinDetectionProtocol);
-		}
+
 		final ProteinDetection proteinDetection = mzIdentMLUnmarshaller.unmarshal(MzIdentMLElement.ProteinDetection);
 		if (proteinDetection != null) {
 			final List<InputSpectrumIdentifications> inputSpectrumIdentifications = proteinDetection
@@ -793,7 +1125,18 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 						proteinDetectionHypotesisWithPeptideEvidence.put(peptideHypothesisXML.getPeptideEvidenceRef(),
 								proteinHypothesisXML);
 					}
-
+					final List<SpectrumIdentificationItemRef> spectrumIdentificationItemRefs = peptideHypothesisXML
+							.getSpectrumIdentificationItemRef();
+					for (final SpectrumIdentificationItemRef spectrumIdentificationItemRef : spectrumIdentificationItemRefs) {
+						final String siiID = spectrumIdentificationItemRef.getSpectrumIdentificationItemRef();
+						if (!spectrumIdentificationItemsByPeptideEvidence
+								.containsKey(peptideHypothesisXML.getPeptideEvidenceRef())) {
+							spectrumIdentificationItemsByPeptideEvidence
+									.put(peptideHypothesisXML.getPeptideEvidenceRef(), new THashSet<String>());
+						}
+						spectrumIdentificationItemsByPeptideEvidence.get(peptideHypothesisXML.getPeptideEvidenceRef())
+								.add(siiID);
+					}
 				}
 			}
 

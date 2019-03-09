@@ -1,5 +1,6 @@
 package org.proteored.miapeapi.xml.mzidentml_1_1;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ import uk.ac.ebi.jmzidml.model.mzidml.UserParam;
 
 public class InputParameterImpl implements InputParameter {
 	private final SpectrumIdentificationProtocol sip;
-	private final List<SearchDatabase> searchDatabaseList;
+	private final Iterator<SearchDatabase> searchDatabaseList;
 	private final Software msiSoftware;
 	private final Integer identifier;
 	private final Long numSeqSearched;
@@ -36,7 +37,7 @@ public class InputParameterImpl implements InputParameter {
 	private final ProteinDetectionProtocol pdp;
 
 	public InputParameterImpl(SpectrumIdentificationProtocol spectrumIdentProtocol, ProteinDetectionProtocol pdp,
-			List<SearchDatabase> databaseListXML, Software msiSoftware, Integer identifier, Long numSeqSearched,
+			Iterator<SearchDatabase> databaseListXML, Software msiSoftware, Integer identifier, Long numSeqSearched,
 			ControlVocabularyManager cvManager) {
 		this.sip = spectrumIdentProtocol;
 		this.searchDatabaseList = databaseListXML;
@@ -51,12 +52,12 @@ public class InputParameterImpl implements InputParameter {
 	public String getAaModif() {
 		if (sip != null && sip.getModificationParams() != null
 				&& sip.getModificationParams().getSearchModification() != null) {
-			List<SearchModification> modifications = sip.getModificationParams().getSearchModification();
-			StringBuilder sb = new StringBuilder();
+			final List<SearchModification> modifications = sip.getModificationParams().getSearchModification();
+			final StringBuilder sb = new StringBuilder();
 			// fix mode if false --> Variable true --> Fixed
 			// Add CV
 
-			for (SearchModification modification : modifications) {
+			for (final SearchModification modification : modifications) {
 				if (!sb.equals(""))
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 				final String modificationName = MzidentmlControlVocabularyXmlFactory
@@ -80,7 +81,7 @@ public class InputParameterImpl implements InputParameter {
 				if (modification.getResidues().size() > 0) {
 					sb.append(Utils.RESIDUES + "=");
 					int count = 0;
-					for (String residue : modification.getResidues()) {
+					for (final String residue : modification.getResidues()) {
 						sb.append(residue);
 						count++;
 						if (count < modification.getResidues().size()) {
@@ -90,7 +91,7 @@ public class InputParameterImpl implements InputParameter {
 					sb.append(MiapeXmlUtil.TERM_SEPARATOR);
 				}
 				if (modification.getSpecificityRules() != null) {
-					for (SpecificityRules specifivityRule : modification.getSpecificityRules()) {
+					for (final SpecificityRules specifivityRule : modification.getSpecificityRules()) {
 						sb.append(MzidentmlControlVocabularyXmlFactory
 								.readEntireCVParamList(specifivityRule.getCvParam(), true));
 					}
@@ -104,11 +105,11 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getAdditionalCleavages() {
-		StringBuilder ret = new StringBuilder();
+		final StringBuilder ret = new StringBuilder();
 		if (sip != null && sip.getEnzymes() != null && sip.getEnzymes().getEnzyme() != null) {
-			Set<String> enzymeInfoSets = new THashSet<String>();
-			for (Enzyme enzyme : sip.getEnzymes().getEnzyme()) {
-				StringBuilder sb = new StringBuilder();
+			final Set<String> enzymeInfoSets = new THashSet<String>();
+			for (final Enzyme enzyme : sip.getEnzymes().getEnzyme()) {
+				final StringBuilder sb = new StringBuilder();
 				// disabled on 28-May-2013: is already captured in
 				// getMissedCleavages
 				// if (enzyme.getMissedCleavages() != null) {
@@ -141,14 +142,14 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public Set<AdditionalParameter> getAdditionalParameters() {
 		// from Additional Search Params
-		Set<AdditionalParameter> addParameter = new THashSet<AdditionalParameter>();
+		final Set<AdditionalParameter> addParameter = new THashSet<AdditionalParameter>();
 		if (sip != null && sip.getAdditionalSearchParams() != null
 				&& sip.getAdditionalSearchParams().getParamGroup() != null) {
-			List<AbstractParam> parameters = sip.getAdditionalSearchParams().getParamGroup();
-			for (AbstractParam param : parameters) {
+			final List<AbstractParam> parameters = sip.getAdditionalSearchParams().getParamGroup();
+			for (final AbstractParam param : parameters) {
 				if (param != null) {
-					StringBuilder wkName = new StringBuilder();
-					StringBuilder wkValue = new StringBuilder();
+					final StringBuilder wkName = new StringBuilder();
+					final StringBuilder wkValue = new StringBuilder();
 					if (param.getValue() == null) {
 						wkName.append(param.getName());
 					} else {
@@ -163,11 +164,11 @@ public class InputParameterImpl implements InputParameter {
 			}
 		}
 		if (pdp != null && pdp.getAnalysisParams() != null) {
-			List<AbstractParam> parameters = pdp.getAnalysisParams().getParamGroup();
-			for (AbstractParam param : parameters) {
+			final List<AbstractParam> parameters = pdp.getAnalysisParams().getParamGroup();
+			for (final AbstractParam param : parameters) {
 				if (param != null) {
-					StringBuilder wkName = new StringBuilder();
-					StringBuilder wkValue = new StringBuilder();
+					final StringBuilder wkName = new StringBuilder();
+					final StringBuilder wkValue = new StringBuilder();
 					if (param.getValue() == null) {
 						wkName.append(param.getName());
 					} else {
@@ -188,15 +189,15 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getCleavageName() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
 		if (sip != null && sip.getEnzymes() != null && sip.getEnzymes().getEnzyme() != null) {
-			List<Enzyme> enzymes = sip.getEnzymes().getEnzyme();
-			Set<String> cleavageNames = new THashSet<String>();
+			final List<Enzyme> enzymes = sip.getEnzymes().getEnzyme();
+			final Set<String> cleavageNames = new THashSet<String>();
 			int counter = 1;
-			for (Enzyme enzyme : enzymes) {
+			for (final Enzyme enzyme : enzymes) {
 				if (enzyme.getEnzymeName() != null) {
-					String enzymeNameCV = MzidentmlControlVocabularyXmlFactory
+					final String enzymeNameCV = MzidentmlControlVocabularyXmlFactory
 							.readEntireParamList(enzyme.getEnzymeName());
 					if (!cleavageNames.contains(enzymeNameCV)) {
 						cleavageNames.add(enzymeNameCV);
@@ -215,11 +216,11 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getCleavageRules() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		int counter = 1;
-		Set<String> siteRegexp = new THashSet<String>();
+		final Set<String> siteRegexp = new THashSet<String>();
 		if (sip != null && sip.getEnzymes() != null && sip.getEnzymes().getEnzyme() != null) {
-			for (Enzyme enzyme : sip.getEnzymes().getEnzyme()) {
+			for (final Enzyme enzyme : sip.getEnzymes().getEnzyme()) {
 				if (enzyme.getSiteRegexp() != null) {
 					if (!siteRegexp.contains(enzyme.getSiteRegexp())) {
 						siteRegexp.add(enzyme.getSiteRegexp());
@@ -240,8 +241,9 @@ public class InputParameterImpl implements InputParameter {
 	@Override
 	public Set<Database> getDatabases() {
 		if (this.searchDatabaseList != null) {
-			Set<Database> databaseSet = new THashSet<Database>();
-			for (SearchDatabase databaseXML : searchDatabaseList) {
+			final Set<Database> databaseSet = new THashSet<Database>();
+			while (searchDatabaseList.hasNext()) {
+				final SearchDatabase databaseXML = searchDatabaseList.next();
 				databaseSet.add(new DatabaseImpl(databaseXML));
 			}
 			return databaseSet;
@@ -359,7 +361,7 @@ public class InputParameterImpl implements InputParameter {
 	public String getScoringAlgorithm() {
 
 		if (sip != null && this.sip.getAdditionalSearchParams() != null) {
-			for (AbstractParam paramType : this.sip.getAdditionalSearchParams().getParamGroup()) {
+			for (final AbstractParam paramType : this.sip.getAdditionalSearchParams().getParamGroup()) {
 				// take <userParam name="Mascot Instrument Name"
 				// value="MALDI-TOF-TOF"/>
 				if (paramType instanceof UserParam) {
@@ -393,11 +395,11 @@ public class InputParameterImpl implements InputParameter {
 
 	@Override
 	public String getTaxonomy() {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		if (sip == null || sip.getDatabaseFilters() == null || sip.getDatabaseFilters().getFilter() == null)
 			return null;
-		List<Filter> filters = sip.getDatabaseFilters().getFilter();
-		for (Filter filter : filters) {
+		final List<Filter> filters = sip.getDatabaseFilters().getFilter();
+		for (final Filter filter : filters) {
 			if (filter.getFilterType() != null) {
 				sb.append(Utils.FILTER_TYPE + "=");
 				sb.append(MzidentmlControlVocabularyXmlFactory.readEntireParam(filter.getFilterType()));

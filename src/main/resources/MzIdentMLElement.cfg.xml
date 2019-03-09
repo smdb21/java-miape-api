@@ -522,7 +522,7 @@ Configurations for various properties of model classes.
 		<xpath>/MzIdentML/AnalysisCollection/ProteinDetection</xpath>
 	</configurations>
 	<configurations>
-		<autoRefResolving>false</autoRefResolving>
+		<autoRefResolving>true</autoRefResolving>
 		<cached>false</cached>
 		<clazz>uk.ac.ebi.jmzidml.model.mzidml.ProteinDetectionHypothesis</clazz>
 		<cvParamClass>uk.ac.ebi.jmzidml.model.mzidml.params.ProteinDetectionHypothesisCvParam</cvParamClass>
@@ -698,7 +698,7 @@ Configurations for various properties of model classes.
 	</configurations>
 	<configurations>
 		<autoRefResolving>false</autoRefResolving>
-		<cached>false</cached>
+		<cached>true</cached>
 		<clazz>uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationList</clazz>
 		<cvParamClass>uk.ac.ebi.jmzidml.model.mzidml.params.SpectrumIdentificationListCvParam</cvParamClass>
 		<idMapped>true</idMapped>
@@ -728,7 +728,7 @@ Configurations for various properties of model classes.
 		<clazz>uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult</clazz>
 		<cvParamClass>uk.ac.ebi.jmzidml.model.mzidml.params.SpectrumIdentificationResultCvParam</cvParamClass>
 		<!-- change on 4 ago 2017 -->
-		<idMapped>false</idMapped>
+		<idMapped>true</idMapped>
 		<indexed>true</indexed>
 		<refResolverClass>uk.ac.ebi.jmzidml.xml.jaxb.resolver.SpectrumIdentificationResultRefResolver</refResolverClass>
 		<tagName>SpectrumIdentificationResult</tagName>
