@@ -95,7 +95,7 @@ import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationProtocol;
 import uk.ac.ebi.jmzidml.model.mzidml.SpectrumIdentificationResult;
 import uk.ac.ebi.jmzidml.xml.io.MzIdentMLUnmarshaller;
 
-public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
+public class MiapeMSIDocumentImplBACKUP implements MiapeMSIDocument {
 	private static final int MAX_NUMBER_PARALLEL_PROCESSES = Integer.MAX_VALUE;
 
 	private int msDocumentID;
@@ -138,7 +138,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	private final Map<String, Set<String>> spectrumIdentificationItemsByPeptideEvidence = new THashMap<String, Set<String>>();
 
-	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, ControlVocabularyManager cvManager,
+	public MiapeMSIDocumentImplBACKUP(MzIdentMLUnmarshaller unmarshaller, ControlVocabularyManager cvManager,
 			String mzIdentMLFileName, String projectName, boolean processInParallel) throws JAXBException {
 		mzIdentMLUnmarshaller = unmarshaller;
 		user = null;
@@ -155,7 +155,7 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 
 	}
 
-	public MiapeMSIDocumentImpl(MzIdentMLUnmarshaller unmarshaller, PersistenceManager databaseManager,
+	public MiapeMSIDocumentImplBACKUP(MzIdentMLUnmarshaller unmarshaller, PersistenceManager databaseManager,
 			ControlVocabularyManager cvManager, String user, String password, String mzIdentMLFileName,
 			String projectName, boolean processInParallel)
 			throws MiapeDatabaseException, MiapeSecurityException, JAXBException {
@@ -281,8 +281,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				inputParameter = inputParameters.get(inputParameterKey);
 			} else {
 				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
-				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
-						inputParamID, numSeqSearched, cvManager);
+				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML.iterator(),
+						msiSoftware, inputParamID, numSeqSearched, cvManager);
 				inputParameters.put(inputParameterKey, inputParameter);
 			}
 
@@ -634,8 +634,8 @@ public class MiapeMSIDocumentImpl implements MiapeMSIDocument {
 				inputParameter = inputParameters.get(inputParameterKey);
 			} else {
 				final Integer inputParamID = MiapeIdentifierCounter.increaseCounter();
-				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML, msiSoftware,
-						inputParamID, numSeqSearched, cvManager);
+				inputParameter = new InputParameterImpl(spectrumIdentProtocol, pdp, databaseListXML.iterator(),
+						msiSoftware, inputParamID, numSeqSearched, cvManager);
 				inputParameters.put(inputParameterKey, inputParameter);
 			}
 
