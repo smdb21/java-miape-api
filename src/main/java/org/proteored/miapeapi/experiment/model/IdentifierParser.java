@@ -18,8 +18,8 @@ public class IdentifierParser {
 
 	/**
 	 * Accessions like sp|P12345|PASD_HUMAN are parsed to P12345.<br>
-	 * If remove acc version is set to true, accessions like P12345-2 are parsed
-	 * to P12345.
+	 * If remove acc version is set to true, accessions like P12345-2 are parsed to
+	 * P12345.
 	 * 
 	 * @param accession
 	 * @return
@@ -27,6 +27,9 @@ public class IdentifierParser {
 	public static String parseACC(String accession) {
 		if (accession != null) {
 			if (accession.toLowerCase().contains("reverse")) {
+				return accession;
+			}
+			if (accession.toLowerCase().contains("decoy")) {
 				return accession;
 			}
 			if (accession.contains("|")) {
@@ -37,11 +40,11 @@ public class IdentifierParser {
 			}
 			// P123123-2 to P123123
 			if (remove_acc_version) {
-				String regexp = "(.*)-\\d(.*)";
+				final String regexp = "(.*)-\\d(.*)";
 
 				if (Pattern.matches(regexp, accession)) {
-					Pattern p = Pattern.compile(regexp);
-					Matcher m = p.matcher(accession);
+					final Pattern p = Pattern.compile(regexp);
+					final Matcher m = p.matcher(accession);
 					if (m.find()) {
 						accession = m.group(1);
 						if (m.groupCount() > 1)
