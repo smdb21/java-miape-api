@@ -263,12 +263,12 @@
 			<artifactId>pride-mod</artifactId>
 			<version>2.1.11-SNAPSHOT</version>
 		</dependency>
-		<!--  Create PDFs -->
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>1.8.2</version>
-		</dependency>
+  		<!--  Create PDFs -->  
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.pdfbox</groupId> -->
+<!-- 			<artifactId>pdfbox</artifactId> -->
+<!-- 			<version>1.8.2</version> -->
+<!-- 		</dependency> -->
 
 		<!-- FTP CLIENT -->
 		<dependency>
