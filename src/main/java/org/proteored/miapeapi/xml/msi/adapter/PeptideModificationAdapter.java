@@ -52,8 +52,11 @@ public class PeptideModificationAdapter implements Adapter<MSIPeptideModificatio
 
 				// search by delta mass
 				if (modification.getMonoDelta() != null) {
-					final List<PTM> ptmListByMonoDelta = modReader
-							.getPTMListByMonoDeltaMass(modification.getMonoDelta(), 0.01);
+					List<PTM> ptmListByMonoDelta = modReader.getPTMListByMonoDeltaMass(modification.getMonoDelta(),
+							0.0001);
+					if (ptmListByMonoDelta == null || ptmListByMonoDelta.isEmpty()) {
+						ptmListByMonoDelta = modReader.getPTMListByMonoDeltaMass(modification.getMonoDelta(), 0.001);
+					}
 					if (!ptmListByMonoDelta.isEmpty()) {
 						final PTM ptm = ptmListByMonoDelta.get(0);
 						final ParamType paramType = factory.createParamType();

@@ -31,8 +31,9 @@ public class ModificationFilter implements Filter {
 
 	public ModificationFilter(String modificationName, LogicOperator operator, boolean contain, int number,
 			boolean doNotGroupNonConclusiveProteins, boolean separateNonConclusiveProteins, Software software) {
-		ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain, number);
-		this.modificationItemList.add(modifItem);
+		final ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain,
+				number);
+		modificationItemList.add(modifItem);
 		this.software = software;
 		this.separateNonConclusiveProteins = separateNonConclusiveProteins;
 		this.doNotGroupNonConclusiveProteins = doNotGroupNonConclusiveProteins;
@@ -48,31 +49,32 @@ public class ModificationFilter implements Filter {
 	}
 
 	public void addModificationItem(String modificationName, LogicOperator operator, boolean contain, int number) {
-		ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain, number);
-		this.modificationItemList.add(modifItem);
+		final ModificationFilterItem modifItem = new ModificationFilterItem(operator, modificationName, contain,
+				number);
+		modificationItemList.add(modifItem);
 
 	}
 
 	public void addModificationItem(ModificationFilterItem modifItem) {
-		this.modificationItemList.add(modifItem);
+		modificationItemList.add(modifItem);
 	}
 
 	public void removeModificationItem(int index) {
-		this.modificationItemList.remove(index);
+		modificationItemList.remove(index);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof ModificationFilter) {
-			ModificationFilter filter = (ModificationFilter) obj;
-			List<ModificationFilterItem> modificationFilterItems = filter.getModificationFilterItems();
-			List<ModificationFilterItem> localModificationFilterItems = this.getModificationFilterItems();
+			final ModificationFilter filter = (ModificationFilter) obj;
+			final List<ModificationFilterItem> modificationFilterItems = filter.getModificationFilterItems();
+			final List<ModificationFilterItem> localModificationFilterItems = getModificationFilterItems();
 			if (modificationFilterItems.size() != localModificationFilterItems.size())
 				return false;
 
 			for (int i = 0; i < localModificationFilterItems.size(); i++) {
-				ModificationFilterItem localModificationFilterItem = localModificationFilterItems.get(i);
-				ModificationFilterItem modificationFilterItem = modificationFilterItems.get(i);
+				final ModificationFilterItem localModificationFilterItem = localModificationFilterItems.get(i);
+				final ModificationFilterItem modificationFilterItem = modificationFilterItems.get(i);
 				if (!localModificationFilterItem.equals(modificationFilterItem))
 					return false;
 			}
@@ -84,8 +86,8 @@ public class ModificationFilter implements Filter {
 	private TIntHashSet filterPeptides(List<ExtendedIdentifiedPeptide> identifiedPeptides,
 			IdentificationSet currentIdSet) {
 		log.info("Filtering by Modification: " + this);
-		TIntHashSet ret = new TIntHashSet();
-		for (ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
+		final TIntHashSet ret = new TIntHashSet();
+		for (final ExtendedIdentifiedPeptide peptide : identifiedPeptides) {
 			if (passFilter(peptide)) {
 				if (!ret.contains(peptide.getId()))
 					ret.add(peptide.getId());
@@ -101,12 +103,12 @@ public class ModificationFilter implements Filter {
 	private boolean passFilter(ExtendedIdentifiedPeptide peptide) {
 		LogicOperator operator = null;
 		Boolean passFilter = false;
-		for (int i = 0; i < this.modificationItemList.size(); i++) {
+		for (int i = 0; i < modificationItemList.size(); i++) {
 
-			operator = this.modificationItemList.get(i).getOperator();
+			operator = modificationItemList.get(i).getOperator();
 
-			ModificationFilterItem modificationFilterItem = this.modificationItemList.get(i);
-			boolean passFilterItemTMP = passFilterItem(peptide, modificationFilterItem);
+			final ModificationFilterItem modificationFilterItem = modificationItemList.get(i);
+			final boolean passFilterItemTMP = passFilterItem(peptide, modificationFilterItem);
 			// if operator==null -> if this is the first modificationItem
 			if (operator == null) {
 				passFilter = passFilterItemTMP;
@@ -135,7 +137,7 @@ public class ModificationFilter implements Filter {
 		if (modifications != null && !modifications.isEmpty()) {
 			boolean containsThisModification = false;
 			int num = 0;
-			for (PeptideModification modification : modifications) {
+			for (final PeptideModification modification : modifications) {
 				if (modification.getName().equalsIgnoreCase(filterItem.getModifName())) {
 					containsThisModification = true;
 					num++;
@@ -163,10 +165,10 @@ public class ModificationFilter implements Filter {
 	@Override
 	public String toString() {
 		String ret = "";
-		for (int i = 0; i < this.modificationItemList.size(); i++) {
-			ModificationFilterItem modifItem = this.modificationItemList.get(i);
+		for (int i = 0; i < modificationItemList.size(); i++) {
+			final ModificationFilterItem modifItem = modificationItemList.get(i);
 
-			LogicOperator operator = this.modificationItemList.get(i).getOperator();
+			final LogicOperator operator = modificationItemList.get(i).getOperator();
 			if (operator != null)
 				ret = " ( " + ret + " " + operator + " ";
 
@@ -177,14 +179,31 @@ public class ModificationFilter implements Filter {
 		return "Peptides " + ret;
 	}
 
+	public String toHTMLString() {
+		String ret = "";
+		for (int i = 0; i < modificationItemList.size(); i++) {
+			final ModificationFilterItem modifItem = modificationItemList.get(i);
+
+			final LogicOperator operator = modificationItemList.get(i).getOperator();
+			if (operator != null)
+				ret = " ( " + ret + " " + operator + " ";
+
+			ret += modifItem.toString();
+			if (operator != null)
+				ret += " )<br>";
+		}
+		return "<html>Peptides " + ret + "</html>";
+	}
+
 	public List<ModificationFilterItem> getModificationFilterItems() {
-		return this.modificationItemList;
+		return modificationItemList;
 	}
 
 	@Override
 	public List<ProteinGroup> filter(List<ProteinGroup> proteinGroups, IdentificationSet currentIdSet) {
-		List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager.getPeptidesFromProteinGroups(proteinGroups);
-		TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
+		final List<ExtendedIdentifiedPeptide> identifiedPeptides = DataManager
+				.getPeptidesFromProteinGroups(proteinGroups);
+		final TIntHashSet filteredPeptides = filterPeptides(identifiedPeptides, currentIdSet);
 		return DataManager.filterProteinGroupsByPeptides(proteinGroups, doNotGroupNonConclusiveProteins,
 				separateNonConclusiveProteins, filteredPeptides, currentIdSet.getCvManager());
 	}
