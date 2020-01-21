@@ -233,7 +233,10 @@
 					<groupId>lennart</groupId>
 					<artifactId>xxindex</artifactId>
 				</exclusion> 
-
+				<exclusion>
+					<groupId>net.jimmc</groupId>
+					<artifactId>jshortcut</artifactId>
+				</exclusion>
 			</exclusions> 
 		</dependency> 
 		<!-- OMSSA PARSER -->
@@ -350,6 +353,12 @@
 			<groupId>com.compomics</groupId>
 			<artifactId>utilities</artifactId>
 			<version>4.12.12</version>
+			<exclusions>
+				<exclusion>
+					<groupId>net.jimmc</groupId>
+					<artifactId>jshortcut</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<organization>
