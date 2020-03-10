@@ -505,8 +505,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	}
 
 	/**
-	 * Throws exception if some protein has no peptides or if some peptide has
-	 * no proteins
+	 * Throws exception if some protein has no peptides or if some peptide has no
+	 * proteins
 	 * 
 	 * @param peptides
 	 * @param proteins
@@ -539,8 +539,7 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 	/**
 	 * Splits the protein accession in a list if they are separated by other
 	 * separator than the separator of the class.<br>
-	 * It also converts a OKAK_HUMAN uniprot ID to a uniprot ACCESSION like
-	 * P123122
+	 * It also converts a OKAK_HUMAN uniprot ID to a uniprot ACCESSION like P123122
 	 *
 	 * @param proteinAcc
 	 * @return
