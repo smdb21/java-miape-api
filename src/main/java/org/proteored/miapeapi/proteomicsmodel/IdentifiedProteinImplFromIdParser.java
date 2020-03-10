@@ -29,6 +29,7 @@ public class IdentifiedProteinImplFromIdParser implements IdentifiedProtein {
 	private static final String NSAF_NORM = "NSAF_norm";
 	private static final String SPC_BY_LEN_RATIO = "SPC/Length ratio";
 	private static final String PEPTIDE_PSM_COUNT = "peptide PSM count";
+	private static final Random generator = new Random();
 
 	public IdentifiedProteinImplFromIdParser(Protein dtaSelectProtein, ControlVocabularyManager cvManager) {
 		this.idProtein = dtaSelectProtein;
@@ -37,7 +38,7 @@ public class IdentifiedProteinImplFromIdParser implements IdentifiedProtein {
 	}
 
 	private int getRandomInt() {
-		final Random generator = new Random();
+
 		final int i = generator.nextInt(Integer.MAX_VALUE);
 		return i;
 	}
