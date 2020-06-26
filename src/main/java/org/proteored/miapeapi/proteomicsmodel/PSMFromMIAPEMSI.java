@@ -21,6 +21,7 @@ public class PSMFromMIAPEMSI extends AbstractPSM {
 
 	public PSMFromMIAPEMSI(IdentifiedPeptide identifiedPeptide, MSRun msRun,
 			MSRunProviderByInputData msRunProviderByInputData) {
+		super(true, true);
 		this.identifiedPeptide = identifiedPeptide;
 		this.msRunProviderByInputData = msRunProviderByInputData;
 		setMSRun(msRun);

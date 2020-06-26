@@ -179,13 +179,13 @@ public class MiapeMSIIdentificationsParser extends IdentificationsParser
 							// create the peptide too
 							// create the peptide
 							Peptide peptide = null;
-							final String peptideKey = KeyUtils.getInstance().getSequenceKey(psm, true);
+							final String peptideKey = KeyUtils.getInstance().getSequenceChargeKey(psm, true, true);
 							if (StaticProteomicsModelStorage.containsPeptide(psm.getMSRun(), null, peptideKey)) {
 								peptide = StaticProteomicsModelStorage.getSinglePeptide(psm.getMSRun(), null,
 										peptideKey);
 							} else {
-								peptide = new PeptideEx(psm.getFullSequence());
-								StaticProteomicsModelStorage.addPeptide(peptide, psm.getMSRun(), null);
+								peptide = new PeptideEx(psm.getFullSequence(), peptideKey);
+								StaticProteomicsModelStorage.addPeptide(peptide, psm.getMSRun(), null, peptideKey);
 								peptide.setSearchEngine(psm.getSearchEngine());
 								peptide.addMSRun(psm.getMSRun());
 							}
