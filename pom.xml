@@ -131,11 +131,6 @@
 			<version>1.8.5</version>
 		</dependency>
 		<!--  log4j -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
 
 		<!-- java mail -->
 		<dependency>
@@ -359,6 +354,11 @@
 					<artifactId>jshortcut</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.13.3</version>
 		</dependency>
 	</dependencies>
 	<organization>
