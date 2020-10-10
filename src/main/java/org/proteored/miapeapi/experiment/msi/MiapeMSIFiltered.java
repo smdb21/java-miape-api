@@ -397,7 +397,7 @@ public class MiapeMSIFiltered implements MiapeMSIDocument {
 		try {
 			validations.add(new ValidationImpl(idSet));
 			return validations;
-		} catch (final IllegalMiapeArgumentException e) {
+		} catch (final Exception e) {
 
 		}
 		return null;
