@@ -17,6 +17,7 @@ import org.proteored.miapeapi.interfaces.msi.PeptideScore;
 import org.proteored.miapeapi.xml.mzidentml.util.Utils;
 import org.proteored.miapeapi.xml.util.MiapeXmlUtil;
 
+import edu.scripps.yates.dtaselectparser.util.DTASelectPSM;
 import edu.scripps.yates.utilities.masses.MassesUtil;
 import edu.scripps.yates.utilities.proteomicsmodel.PSM;
 import edu.scripps.yates.utilities.proteomicsmodel.PTM;
@@ -85,8 +86,8 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 	 * <li>(-)TVAAPSVFIFPPSDEQLK(S) -> TVAAPSVFIFPPSDEQLK</li>
 	 * <li>K.EKS[167.00]KESAIASTEVK.L -> EKSKESAIASTEVK</li>
 	 * </ul>
-	 * getting just the sequence without modifications and between the pre and
-	 * post AA if available
+	 * getting just the sequence without modifications and between the pre and post
+	 * AA if available
 	 *
 	 * @param seq
 	 * @return
@@ -191,7 +192,24 @@ public class IdentifiedPeptideImplFromIdParser implements IdentifiedPeptide {
 					.build();
 			ret.add(score);
 		}
+		// look for XICs or CCSs
+		final Set<edu.scripps.yates.utilities.proteomicsmodel.Score> scores = psm.getScores();
+		for (final edu.scripps.yates.utilities.proteomicsmodel.Score score : scores) {
+			boolean addScore = false;
+			final String scoreName = score.getScoreName();
+			if (scoreName.equals(DTASelectPSM.CCS)) {
+				addScore = true;
+			} else if (scoreName.equals(DTASelectPSM.ESTIMATED_XIC)) {
+				addScore = true;
+			} else if (scoreName.equals(DTASelectPSM.XIC)) {
+				addScore = true;
+			}
+			if (addScore) {
+				ret.add(new PeptideScoreBuilder(score.getScoreName(), score.getValue()).build());
+			}
+		}
 		return ret;
+
 	}
 
 	@Override
