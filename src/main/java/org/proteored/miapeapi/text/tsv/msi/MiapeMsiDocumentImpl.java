@@ -431,8 +431,8 @@ public class MiapeMsiDocumentImpl implements MiapeMSIDocument {
 									peptide.addScore(peptideScore);
 								} catch (final NumberFormatException e) {
 									log.warn("Error parsing score value for column " + (index + 1) + " row " + row
-											+ " in file '" + tsvFile.getAbsolutePath() + "'");
-									log.warn(e.getMessage());
+											+ " in file '" + tsvFile.getAbsolutePath() + "': " + e.getMessage()
+											+ "\nIf that column is not intended to be a score, disregard this warning message...it will be ignored anyway.");
 								}
 							}
 						}
